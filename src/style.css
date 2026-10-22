@@ -75,14 +75,14 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 .gameTitle .arena{font-size:clamp(16px,2.7vw,31px);letter-spacing:11px;font-weight:1000;text-shadow:0 0 24px rgba(0,162,255,.95),0 4px 16px #000}
 .vBadge{display:inline-block;background:linear-gradient(90deg,#00c853,#00e5ff);color:#00251a;font-weight:1000;font-size:12px;letter-spacing:2px;padding:5px 12px;border-radius:999px;box-shadow:0 8px 22px rgba(0,229,255,.35)}
 .signed{display:inline-flex;gap:8px;align-items:center;background:rgba(0,0,0,.45);border:1px solid rgba(255,196,0,.65);color:#ffe082;padding:8px 14px;border-radius:999px;font-weight:1000;font-size:13px}
-.modeCards{display:grid;grid-template-columns:repeat(4,minmax(150px,205px));gap:11px;justify-content:center}
+.modeCards{display:grid;grid-template-columns:repeat(5,minmax(142px,1fr));gap:10px;justify-content:center;width:min(98%,980px)}
 @media(max-width:920px){.modeCards{grid-template-columns:repeat(2,minmax(145px,1fr));width:min(96%,520px)}}
 .modeCard{border:1.5px solid rgba(255,255,255,.22);cursor:pointer;color:#fff;text-align:left;border-radius:20px;padding:16px 15px 13px;min-height:118px;position:relative;overflow:hidden;box-shadow:0 16px 36px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.3);transition:transform .14s,filter .14s,border-color .14s}
 .modeCard:hover,.modeCard:focus-visible{transform:translateY(-4px) scale(1.02);filter:brightness(1.12);border-color:#fff;outline:none}
 .modeCard .ic{font-size:30px;display:block;margin-bottom:6px}
 .modeCard b{font-size:17px;letter-spacing:.3px;display:block}
 .modeCard small{opacity:.9;font-size:12px;line-height:1.4;display:block;margin-top:3px}
-.mc-bot{background:linear-gradient(150deg,#ff7a00,#ff2e88)}.mc-2p{background:linear-gradient(150deg,#0091ea,#651fff)}.mc-arc{background:linear-gradient(150deg,#f9a825,#c17900 55%,#6d4c00)}.mc-tr{background:linear-gradient(150deg,#00897b,#00c853)}
+.mc-bot{background:linear-gradient(150deg,#ff7a00,#ff2e88)}.mc-2p{background:linear-gradient(150deg,#0091ea,#651fff)}.mc-arc{background:linear-gradient(150deg,#f9a825,#c17900 55%,#6d4c00)}.mc-tr{background:linear-gradient(150deg,#00897b,#00c853)}.mc-surv{background:linear-gradient(150deg,#6a1b9a,#d50000 65%,#311b92)}
 .btnRow{display:flex;gap:11px;flex-wrap:wrap;justify-content:center}
 .btn{border:0;cursor:pointer;color:#fff;font-weight:1000;border-radius:17px;padding:14px 21px;font-size:clamp(14px,1.8vw,18px);box-shadow:0 12px 30px rgba(0,0,0,.45),inset 0 2px 0 rgba(255,255,255,.4);transition:transform .12s,filter .12s;min-width:205px}
 .btn:hover{transform:translateY(-2px) scale(1.02);filter:brightness(1.09)}

@@ -25,16 +25,16 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V3.0 (futur) expérience connectée.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.0 (référence) |
+| Indicateur | Cible | V2.2 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 24/24 ✅ |
-| Taille version 1-fichier | < 200 Ko | 124 Ko ✅ |
+| Tests automatisés | 100 % verts | 63/63 ✅ |
+| Taille version 1-fichier | < 200 Ko | 155 Ko ✅ |
 | Dépendances externes | 0 | 0 ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
-| Modes / Personnages / Arènes | en croissance | 4 / 4 / 3 |
+| Modes / Personnages / Arènes | en croissance | 6 / 5 / 3 |
 
 ## 🗂️ Sprint en cours
 Voir `docs/ROADMAP.md` → section « Sprint 01 ».

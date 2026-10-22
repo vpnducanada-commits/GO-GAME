@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.1 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.2 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.1.0";
+const GAME_VERSION="2.2.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -24,7 +24,7 @@ function defaultProfile(){ return {
   names:{p1:"Gideon",p2:"Joueur 2"}, initials:{p1:"G",p2:"R"},
   customColors:{p1:null,p2:null},
   selection:{charP1:0,charP2:1,arena:"stadium"},
-  stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0},
+  stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0},
   unlocks:{prime:false},
   story:{progressStep:1,completed:false,clears:0},
   leaderboard:[],
@@ -77,6 +77,7 @@ const SFX={
   hit(hard){noiseHit(hard?.15:.09,hard?.28:.18,hard?620:950);tone(hard?115:165,.11,"square",.09,52)},
   counter(){tone(1180,.16,"square",.12,500);noiseHit(.12,.2,1200)},
   block(){tone(920,.06,"square",.06,620);noiseHit(.035,.045,3600)},
+  parry(){tone(1320,.09,"square",.1,1760);setTimeout(()=>tone(1760,.14,"triangle",.1,990),45);noiseHit(.06,.08,4200)},
   jump(){tone(250,.13,"sine",.05,640)},
   dash(){noiseHit(.16,.09,1800);tone(300,.16,"sine",.045,900)},
   fire(){tone(175,.28,"sawtooth",.09,920);noiseHit(.2,.09,1450)},
@@ -106,15 +107,15 @@ function stopMusic(){ if(musicTimer)clearInterval(musicTimer); musicTimer=null; 
 
 /* ---------------- DONNÉES : PERSONNAGES ---------------- */
 const CHARACTERS=[
- {id:"gideon",name:"GÉDÉON",title:"Le Champion Équilibré",letter:"G",style:"hero",hp:100,speed:1,power:1,atkSpeed:1,energyGain:1,scale:1,bulk:1,reach:1,gravity:.8,jump:15.8,knockRes:1,dashCD:28,
+ {id:"gideon",name:"GÉDÉON",title:"Le Champion Équilibré",letter:"G",style:"hero",specName:"⚡ Foudre Gédéon",superName:"🌟 Jugement Godson",hp:100,speed:1,power:1,atkSpeed:1,energyGain:1,scale:1,bulk:1,reach:1,gravity:.8,jump:15.8,knockRes:1,dashCD:28,
   skin:{primary:"#0091ea",dark:"#01579b",accent:"#ffc400",pants:"#263238",skin:"#8d5524",hair:"#14100c",glove:"#ff1744",trail:"#ffc400"}},
- {id:"kira",name:"Kira",title:"La Foudre Rapide",letter:"K",style:"kunoichi",hp:92,speed:1.22,power:.88,atkSpeed:1.18,energyGain:1.05,scale:.96,bulk:.85,reach:.98,gravity:.76,jump:16.9,knockRes:1.12,dashCD:20,
+ {id:"kira",name:"Kira",title:"La Foudre Rapide",letter:"K",style:"kunoichi",specName:"🌪️ Rafale Kira",superName:"⚡ Tempête de Lames",hp:92,speed:1.22,power:.88,atkSpeed:1.18,energyGain:1.05,scale:.96,bulk:.85,reach:.98,gravity:.76,jump:16.9,knockRes:1.12,dashCD:20,
   skin:{primary:"#00c853",dark:"#00695c",accent:"#b9f6ca",pants:"#1b2a1e",skin:"#a06a35",hair:"#180a2a",glove:"#ffd600",trail:"#69f0ae"}},
- {id:"titan",name:"TITAN",title:"La Montagne de Fer",letter:"T",style:"titan",hp:120,speed:.82,power:1.28,atkSpeed:.88,energyGain:.9,scale:1.13,bulk:1.35,reach:1.08,gravity:.9,jump:14.6,knockRes:.72,dashCD:36,
+ {id:"titan",name:"TITAN",title:"La Montagne de Fer",letter:"T",style:"titan",specName:"🌋 Onde Sismique",superName:"☄️ Séisme Titan",hp:120,speed:.82,power:1.28,atkSpeed:.88,energyGain:.9,scale:1.13,bulk:1.35,reach:1.08,gravity:.9,jump:14.6,knockRes:.72,dashCD:36,
   skin:{primary:"#e53935",dark:"#7f0000",accent:"#ffccbc",pants:"#1c1c22",skin:"#7a4a21",hair:"#050505",glove:"#263238",trail:"#ff7043"}},
- {id:"nova",name:"NOVA",title:"La Maîtresse de l’Énergie",letter:"N",style:"nova",hp:96,speed:1.06,power:.96,atkSpeed:1.04,energyGain:1.55,scale:1,bulk:.92,reach:1.02,gravity:.78,jump:16.2,knockRes:1.02,dashCD:25,
+ {id:"nova",name:"NOVA",title:"La Maîtresse de l’Énergie",letter:"N",style:"nova",specName:"🔮 Orbe Chercheuse",superName:"🌠 Pluie d’Énergie",hp:96,speed:1.06,power:.96,atkSpeed:1.04,energyGain:1.55,scale:1,bulk:.92,reach:1.02,gravity:.78,jump:16.2,knockRes:1.02,dashCD:25,
   skin:{primary:"#7c3aed",dark:"#311b92",accent:"#e040fb",pants:"#241040",skin:"#c68642",hair:"#2a0a3a",glove:"#69f0ae",trail:"#e040fb"}},
- {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",unlockKey:"prime",lockedHint:"Termine le Mode Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
+ {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",unlockKey:"prime",lockedHint:"Termine le Mode Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
   skin:{primary:"#f5a623",dark:"#7a3b00",accent:"#00e5ff",pants:"#17202b",skin:"#8d5524",hair:"#120b02",glove:"#0b1c2c",trail:"#ffc400"}}
 ];
 function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:clamp(Math.round(c.power*62),5,100),VIE:clamp(Math.round(c.hp*.78),5,100),ÉNER:clamp(Math.round(c.energyGain*55),5,100)}; }
@@ -140,9 +141,9 @@ const ATTACKS={
 };
 const CANCELS={ punch:["punch","kick","uppercut","sweep","special"], kick:["special"], uppercut:["special"], sweep:[], airPunch:["airKick"], airKick:[], special:[], super:[] };
 const DIFFS={
-  facile:{label:"Facile",react:24,agg:.42,block:.15,spec:.25,jump:.06,mistake:.38,speed:.9,combo:.18,dash:.08},
-  moyen:{label:"Moyen",react:13,agg:.66,block:.42,spec:.6,jump:.13,mistake:.16,speed:1,combo:.55,dash:.3},
-  difficile:{label:"Difficile",react:7,agg:.88,block:.69,spec:.92,jump:.2,mistake:.05,speed:1.07,combo:.92,dash:.55}
+  facile:{label:"Facile",react:24,agg:.42,block:.15,spec:.25,jump:.06,mistake:.38,speed:.9,combo:.18,dash:.08,parry:.04},
+  moyen:{label:"Moyen",react:13,agg:.66,block:.42,spec:.6,jump:.13,mistake:.16,speed:1,combo:.55,dash:.3,parry:.17},
+  difficile:{label:"Difficile",react:7,agg:.88,block:.69,spec:.92,jump:.2,mistake:.05,speed:1.07,combo:.92,dash:.55,parry:.36}
 };
 
 /* ---------------- MODE HISTOIRE : CHAPITRE 1 ---------------- */
@@ -192,7 +193,7 @@ class Fighter{
     this.skin={...this.char.skin}; this.letter=this.char.letter;
     this.name=side===1?"Gédéon":"Adversaire"; this.displayName=this.name;
     this.maxHealth=this.char.hp; this.roundWins=0;
-    this.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0};
+    this.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0};
     this.reset();
   }
   reset(){
@@ -202,6 +203,7 @@ class Fighter{
     this.blocking=false; this.crouching=false; this.dead=false; this.victory=false; this.koT=0;
     this.attackT=0; this.attackDur=0; this.attackType=null; this.attack=null; this.attackId=0; this.hasHit=false; this.hitConfirmed=false; this.spawned=true;
     this.hitStun=0; this.blockStun=0; this.hitFlash=0; this.downT=0; this.knockdownPending=false; this.invulnT=0; this.juggleT=0; this.comboVuln=false;
+    this.parryT=0; this.parryFlashT=0; this.counterWindowT=0; this.powerMul=1;
     this.combo=0; this.comboT=0; this.comboDamage=0; this.comboSeq=[]; this.lastHitBy=null;
     this.dashT=0; this.dashDir=1; this.dashCD=0; this.airDashed=false;
     this.bufType=null; this.bufT=0; this.jumpBufT=0; this.dashBufT=0; this.dashBufDir=1; this.coyote=0; this.jumpCut=false;
@@ -226,6 +228,7 @@ function buildDisplayNames(){
   if(mode==="2p")p2.name=(PROFILE.names.p2||"Joueur 2").trim()||"Joueur 2";
   else if(mode==="training")p2.name="Mannequin";
   else if(mode==="story")p2.name=currentStoryFight().foeName;
+  else if(mode==="survival")p2.name=(survival.next&&survival.next.boss?"👑 BOSS — Vague ":"🌊 Vague ")+survival.wave;
   else if(mode==="arcade")p2.name="BOT — Étage "+arcade.stage+"/5";
   else p2.name="BOT "+DIFFS[botDiff].label.toUpperCase();
   p1.displayName=p1.name+" • "+p1.char.name;
@@ -237,6 +240,9 @@ let state="menu",prevState="menu",mode="bot",pendingMode="bot",botDiff="moyen";
 let selCharP1=PROFILE.selection.charP1||0, selCharP2=(PROFILE.selection.charP2==null?1:PROFILE.selection.charP2), selArenaId=PROFILE.selection.arena||"stadium";
 let arcade={stage:1,seq:[],lastWin:false};
 let story={step:1,total:STORY_CAMPAIGN.fights.length,lastWin:false};
+let survival={wave:1,score:0,lastWaveScore:0,lastWin:false,next:null,carryHealth:null,carryEnergy:0,recorded:false,runCounted:false};
+function roundsToWin(){ return mode==="survival"?1:SETTINGS.roundsWin; }
+function fighterMatchScore(f,op){ return Math.max(0,Math.round(f.stats.damage+f.stats.maxComboDamage*4+(f.health/f.maxHealth)*120+f.roundWins*90-op.stats.damage*.35)); }
 let dummyMode="immobile";
 let round=1,timerSec=99,timerFrames=0,matchElapsed=0,simFrame=0,timeGlobal=0;
 let introT=0,roundEndT=0,announcedFight=false,announceT=0,lastWinner=null,lastFinishType="";
@@ -306,7 +312,7 @@ function getInputP2(){
 const pressed=(f,inp,k)=>!!inp[k]&&!f.prev[k];
 
 /* ---------------- IA / BOT PRO ---------------- */
-const bot={input:{left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false},move:0,timer:0,blockT:0,downT:0,press:{},queue:[],lastFollowId:-1};
+const bot={input:{left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false},move:0,timer:0,blockT:0,downT:0,press:{},queue:[],lastFollowId:-1,lastParryFollow:-999};
 function botPress(key){ bot.press[key]=2; }
 function botAction(a){
   if(a==="uppercut"){ bot.downT=Math.max(bot.downT,4); botPress("punch"); }
@@ -325,6 +331,8 @@ function updateBot(){
   if(bot.blockT>0){ bot.blockT--; inp.block=true; inp.left=inp.right=false; return; }
   inp.left=bot.move<0; inp.right=bot.move>0;
   if(!isCombat()||me.dead)return;
+  // Riposte immédiate après un parry réussi
+  if(me.counterWindowT>8&&simFrame-bot.lastParryFollow>20){ bot.lastParryFollow=simFrame; bot.blockT=0; bot.move=0; botPress(Math.random()<.55?"punch":"kick"); return; }
   // Enchaînement automatique après un coup confirmé (vrais combos du bot)
   if(me.hitConfirmed&&me.attack&&bot.lastFollowId!==me.attackId&&Math.random()<D.combo){
     bot.lastFollowId=me.attackId;
@@ -340,6 +348,7 @@ function updateBot(){
   const projThreat=projectiles.some(pr=>pr.owner!==me&&Math.sign(pr.vx)===Math.sign(me.x-pr.x)&&Math.abs(pr.x-me.x)<250);
   if(((op.attackT>0&&ad<180)||projThreat)&&Math.random()<D.block+.07){
     if(projThreat&&Math.random()<D.dash*.6){ bot.move=dir; botPress("dash"); }
+    else if(Math.random()<(D.parry||0)){ bot.blockT=3; bot.move=0; } // garde tapée au dernier moment = tentative de parry
     else { bot.blockT=9+((Math.random()*10)|0); bot.move=0; }
     return;
   }
@@ -388,19 +397,46 @@ function startAttack(f,type){
   if(atkType==="punch"||atkType==="airPunch")SFX.punch(); else if(atkType!=="special"&&atkType!=="super")SFX.kick();
   return true;
 }
+function abilitySpecs(f,isSuper){
+  // Supers UNIQUES par personnage (V2.2) — chaque spec décrit un projectile.
+  const dir=f.facing,op=f===p1?p2:p1,baseY=f.y-112*f.char.scale;
+  const S=(o)=>Object.assign({x:f.x+dir*52,y:baseY,vx:dir*8.7,vy:0,r:18,dmg:isSuper?23:14,kind:"bolt",grav:0,life:175,pierce:false,homing:0},o||{});
+  switch(f.char.id){
+    case "kira":
+      return isSuper
+        ?[-2,-1,0,1,2].map(i=>S({y:baseY+i*17,vx:dir*11.2,vy:i*.72,r:13,dmg:7,kind:"blade"}))
+        :[-1,0,1].map(i=>S({y:baseY+i*16,vx:dir*10.6,vy:i*.42,r:12.5,dmg:6,kind:"blade"}));
+    case "titan":
+      return isSuper
+        ?[S({y:GROUND-20,vx:dir*7.9,r:38,dmg:24,kind:"ground",life:190})]
+        :[S({y:GROUND-18,vx:dir*7.1,r:26,dmg:15,kind:"ground",life:185})];
+    case "nova":
+      return isSuper
+        ?[-125,-42,42,125].map((off,i)=>S({x:clamp(op.x+off,45,W-45),y:74+i*22,vx:-off/52,vy:5.2,r:17,dmg:9,kind:"meteor",grav:.16,life:150}))
+        :[S({vx:dir*8.1,r:21,dmg:14,kind:"orb",homing:.16,life:190})];
+    case "godson-prime":
+      return isSuper
+        ?[-32,0,32].map(off=>S({y:baseY+off,vx:dir*10.4,r:off===0?24:19,dmg:off===0?13:10,kind:"royal"}))
+        :[-18,18].map(off=>S({y:baseY+off,vx:dir*9.6,r:16,dmg:9,kind:"royal"}));
+    default: // Gideon
+      return isSuper
+        ?[S({vx:dir*9.2,r:34,dmg:25,kind:"judgment",pierce:true,life:190})]
+        :[S({vx:dir*10.3,r:19,dmg:14,kind:"bolt"})];
+  }
+}
 function spawnProjectile(f){
   const isSuper=f.attackType==="super";
   const baseAtk={...(isSuper?ATTACKS.super:ATTACKS.special)};
-  const triple=isSuper&&f.char.id==="godson-prime";
-  const offsets=triple?[-32,0,32]:[0];
-  offsets.forEach(off=>{
-    const atk=off===0?baseAtk:{...baseAtk,dmg:11,hitstun:13,hitstop:65,knockdown:false};
-    const sx=f.x+f.facing*52, sy=f.y-112*f.char.scale+off;
-    projectiles.push({x:sx,y:sy,px:sx,py:sy,rx:sx,ry:sy,vx:f.facing*(isSuper?10.6:8.7)*(f.char.id==="nova"?1.12:1),r:(isSuper?(off===0?27:20):18)*(f.char.id==="nova"?1.18:1),owner:f,super:isSuper,life:175,atk});
+  const specs=abilitySpecs(f,isSuper);
+  specs.forEach(sp=>{
+    const atk={...baseAtk,dmg:sp.dmg};
+    if(specs.length>1){ atk.hitstun=Math.min(atk.hitstun,13); atk.hitstop=Math.min(atk.hitstop,55); if(sp.y!==specs[0].y)atk.knockdown=false; }
+    projectiles.push({x:sp.x,y:sp.y,px:sp.x,py:sp.y,rx:sp.x,ry:sp.y,vx:sp.vx,vy:sp.vy||0,r:sp.r,owner:f,super:isSuper,life:sp.life||175,atk,kind:sp.kind||"bolt",grav:sp.grav||0,pierce:!!sp.pierce,homing:sp.homing||0});
   });
-  ring(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail); spark(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail,triple?22:13,3);
-  SFX.fire(); floater(f.x,f.y-198*f.char.scale,triple?"👑 TRIPLE VAGUE Godson !":(isSuper?"💥 SUPER ATTAQUE !":"✨ SPÉCIAL !"),f.skin.trail,isSuper);
-  if(isSuper){ shake=Math.max(shake,triple?10:7); cinematic=Math.max(cinematic,16); }
+  ring(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail); spark(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail,specs.length>2?22:13,3);
+  SFX.fire();
+  floater(f.x,f.y-198*f.char.scale,(isSuper?(f.char.superName||"💥 SUPER ATTAQUE"):(f.char.specName||"✨ SPÉCIAL"))+" !",f.skin.trail,isSuper);
+  if(isSuper){ shake=Math.max(shake,f.char.id==="titan"||f.char.id==="godson-prime"?10:7); cinematic=Math.max(cinematic,16); }
 }
 function comboSequenceName(f){
   const s=f.comboSeq.join(">");
@@ -415,6 +451,17 @@ function applyDamage(att,def,atk,typeLabel){
   const atkElapsed=def.attack?def.attackDur-def.attackT:99;
   const isCounter=!def.blocking&&def.attackT>0&&def.attack&&atkElapsed<def.attack.start;
   const blocked=def.blocking&&def.grounded&&Math.sign(att.x-def.x)===(def.facing||1);
+  if(blocked&&def.parryT>0&&typeLabel!=="super"){
+    // ✨ PARRY PARFAITE : garde déclenchée à la dernière fraction de seconde
+    def.parryT=0; def.parryFlashT=16; def.counterWindowT=30; def.blockStun=0; def.kvx=0;
+    def.energy=Math.min(100,def.energy+12*def.char.energyGain); def.stats.parries=(def.stats.parries||0)+1; def.stats.blocked++;
+    att.hitConfirmed=false; att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
+    spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
+    floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
+    hitStopT=Math.max(hitStopT,92); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
+    if(def===p1){ unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","3 parry dans un match"); }
+    return;
+  }
   if(blocked){
     const chip=def.health>1?1:0;
     def.health-=chip; def.blockStun=Math.max(def.blockStun,atk.blockstun||6); def.kvx=att.facing*(atk.knock||4)*.32*def.char.knockRes;
@@ -427,7 +474,9 @@ function applyDamage(att,def,atk,typeLabel){
   att.combo=continuing?att.combo+1:1; if(!continuing){att.comboDamage=0;att.comboSeq=[];}
   att.comboSeq.push(typeLabel); att.comboT=62;
   const scaling=Math.max(.45,1-(att.combo-1)*.08);
-  let dmg=Math.max(1,Math.round((atk.dmg||6)*att.char.power*scaling*(isCounter?1.25:1)));
+  const isRiposte=att.counterWindowT>0; if(isRiposte)att.counterWindowT=0;
+  const bonusMul=isRiposte?1.35:(isCounter?1.25:1);
+  let dmg=Math.max(1,Math.round((atk.dmg||6)*att.char.power*(att.powerMul||1)*scaling*bonusMul));
   def.health=Math.max(0,def.health-dmg);
   def.hitStun=Math.max(def.hitStun,atk.hitstun||11); def.hitFlash=SETTINGS.reduceFlash?2:6;
   def.comboVuln=true; def.lastHitBy=att; def.energy=Math.min(100,def.energy+4*def.char.energyGain);
@@ -442,11 +491,11 @@ function applyDamage(att,def,atk,typeLabel){
   else if(atk.knockdown){ def.vy=-5; def.grounded=false; def.knockdownPending=true; }
   else if(atk.hard&&def.grounded)def.vy=-2.6;
   spark(midX,hitY,atk.hard?att.skin.trail:"#fff59d",atk.hard?22:14,atk.hard?6:4.4); spark(midX,hitY,"#ff5252",7,3.2);
-  floater(def.x,def.y-184*def.char.scale,(isCounter?"CONTRE ! -":"-")+dmg,isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter);
+  floater(def.x,def.y-184*def.char.scale,(isRiposte?"Riposte ! -":isCounter?"CONTRE ! -":"-")+dmg,isRiposte?"#ffc400":isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter||isRiposte);
   const seqName=comboSequenceName(att); if(att.combo>=3&&seqName)floater(att.x,att.y-212*att.char.scale,seqName,"#ffc400");
-  shake=Math.max(shake,(atk.hard?8.5:4.6)*(isCounter?1.3:1)); crowdExcite=95;
-  hitStopT=Math.max(hitStopT,(atk.hitstop||45)*(isCounter?1.45:1));
-  if(isCounter)SFX.counter(); else SFX.hit(!!atk.hard);
+  shake=Math.max(shake,(atk.hard?8.5:4.6)*((isCounter||isRiposte)?1.3:1)); crowdExcite=95;
+  hitStopT=Math.max(hitStopT,(atk.hitstop||45)*((isCounter||isRiposte)?1.45:1));
+  if(isCounter||isRiposte)SFX.counter(); else SFX.hit(!!atk.hard);
   if(def.health<=0){
     if(state==="training"){ spark(def.x,hitY,"#ffffff",30,6); floater(def.x,def.y-220,"MANNEQUIN RÉINITIALISÉ","#69f0ae",true); def.health=def.maxHealth; def.comboVuln=false; att.combo=0; att.comboT=0; }
     else { if(att===p1&&(typeLabel==="super"))unlock("superko","K.O. par SUPER attaque"); endRound(att,true,typeLabel); }
@@ -474,6 +523,7 @@ function updateFighter(f,inp,op){
   f.px=f.x; f.py=f.y; f.anim++;
   if(f.hitFlash>0)f.hitFlash--; if(f.squashT>0)f.squashT--; if(f.dashCD>0)f.dashCD--; if(f.invulnT>0)f.invulnT--; if(f.juggleT>0)f.juggleT--;
   if(f.bufT>0)f.bufT--; if(f.jumpBufT>0)f.jumpBufT--; if(f.dashBufT>0)f.dashBufT--;
+  if(f.parryT>0)f.parryT--; if(f.parryFlashT>0)f.parryFlashT--; if(f.counterWindowT>0)f.counterWindowT--;
   if(f.comboT>0){ f.comboT--; if(f.comboT===0){f.combo=0;f.comboDamage=0;f.comboSeq=[];} }
   if(--f.blinkT<-7)f.blinkT=90+Math.random()*140;
   if(f.dead){ f.koT++; f.vy+=.85; f.y+=f.vy; f.x+=f.kvx; f.kvx*=.9; if(f.y>=GROUND){ if(!f.grounded)dust(f.x,GROUND,8); f.y=GROUND;f.vy=0;f.grounded=true; } clampX(f); Object.assign(f.prev,inp); return; }
@@ -492,6 +542,7 @@ function updateFighter(f,inp,op){
   // --- Tampons d’entrée (fluidité pro) ---
   if(f===p1){ if(pressed(f,inp,"jump"))playerHabits.jumps++; if(inp.block&&simFrame%24===0)playerHabits.blocks++; }
   if(pressed(f,inp,"jump"))f.jumpBufT=9;
+  if(pressed(f,inp,"block")&&f.grounded&&f.attackT<=0&&f.downT<=0)f.parryT=9; // fenêtre de parry : 9 frames (~150 ms)
   let tapDir=0; if(pressed(f,inp,"left"))tapDir=-1; if(pressed(f,inp,"right"))tapDir=1;
   if(tapDir!==0){ if(f.lastTapDir===tapDir&&simFrame-f.lastTapFrame<=18){ f.dashBufT=9; f.dashBufDir=tapDir; } f.lastTapDir=tapDir; f.lastTapFrame=simFrame; }
   if(pressed(f,inp,"dash")){ f.dashBufT=9; f.dashBufDir=inp.left?-1:(inp.right?1:f.facing); }
@@ -515,7 +566,7 @@ function updateFighter(f,inp,op){
   let move=0; if(canAct&&!f.crouching&&!(f.attackT>0&&f.grounded)){ if(inp.left)move-=1; if(inp.right)move+=1; }
   if(move!==0&&move===f.holdDir)f.holdT++; else {f.holdDir=move;f.holdT=0;}
   const runMul=f.grounded?1+Math.min(.3,f.holdT/160):1;
-  const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="story"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
+  const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
   let target=move*4.7*f.char.speed*botMul*runMul*(f.grounded?1:.8);
   if(f.dashT>0)target=f.dashDir*12.4*f.char.speed;
   f.vx+=(target-f.vx)*(f.dashT>0?.65:(f.grounded?.42:.13));
@@ -543,19 +594,33 @@ function separate(){
   }
 }
 function updateProjectiles(){
-  // Chocs de projectiles entre eux
-  for(let i=projectiles.length-1;i>=0;i--)for(let j=i-1;j>=0;j--){
+  // Chocs de projectiles entre eux (un projectile « perforant » traverse les autres)
+  const clashRemove=new Set();
+  for(let i=0;i<projectiles.length;i++)for(let j=i+1;j<projectiles.length;j++){
     const a=projectiles[i],b=projectiles[j];
-    if(a&&b&&a.owner!==b.owner&&Math.abs(a.x-b.x)<a.r+b.r&&Math.abs(a.y-b.y)<44){
-      spark((a.x+b.x)/2,(a.y+b.y)/2,"#ffffff",26,5.5); ring((a.x+b.x)/2,(a.y+b.y)/2,"#fff"); SFX.boom();
-      projectiles.splice(i,1); projectiles.splice(j,1); i=Math.min(i,projectiles.length); break;
+    if(a.owner!==b.owner&&Math.abs(a.x-b.x)<a.r+b.r&&Math.abs(a.y-b.y)<46){
+      spark((a.x+b.x)/2,(a.y+b.y)/2,"#ffffff",24,5.2); ring((a.x+b.x)/2,(a.y+b.y)/2,"#fff"); SFX.boom();
+      if(a.pierce&&!b.pierce)clashRemove.add(j);
+      else if(b.pierce&&!a.pierce)clashRemove.add(i);
+      else { clashRemove.add(i); clashRemove.add(j); }
     }
   }
+  if(clashRemove.size)projectiles=projectiles.filter((_,idx)=>!clashRemove.has(idx));
   for(let i=projectiles.length-1;i>=0;i--){
-    const pr=projectiles[i]; pr.px=pr.x; pr.py=pr.y; pr.x+=pr.vx; pr.life--;
-    if(qualityLevel>0||simFrame%2===0)pushParticle({x:pr.x,y:pr.y+(Math.random()-.5)*12,vx:-pr.vx*.05,vy:(Math.random()-.5)*.7,life:15,max:15,r:pr.r*.32,c:pr.owner.skin.trail,grav:0});
-    const def=pr.owner===p1?p2:p1;
-    let remove=pr.life<=0||pr.x<-45||pr.x>W+45;
+    const pr=projectiles[i],def=pr.owner===p1?p2:p1;
+    pr.px=pr.x; pr.py=pr.y;
+    if(pr.homing&&!def.dead){ const ty=def.y-92*def.char.scale; pr.vy=clamp((pr.vy||0)+(ty-pr.y)*.012,-3.4,3.4); }
+    pr.vy=(pr.vy||0)+(pr.grav||0);
+    pr.x+=pr.vx; pr.y+=pr.vy; pr.life--;
+    if(pr.kind==="ground"){ pr.y=GROUND-19; if(simFrame%3===0)dust(pr.x,GROUND,2); }
+    if(qualityLevel>0||simFrame%2===0)pushParticle({x:pr.x,y:pr.y+(Math.random()-.5)*11,vx:-pr.vx*.04,vy:(Math.random()-.5)*.65,life:14,max:14,r:pr.r*.3,c:pr.owner.skin.trail,grav:0});
+    let remove=pr.life<=0||pr.x<-55||pr.x>W+55||pr.y>H+70;
+    // Explosion des météores au sol
+    if(!remove&&pr.kind==="meteor"&&pr.y>=GROUND-13){
+      spark(pr.x,GROUND-8,pr.owner.skin.trail,20,5.2); ring(pr.x,GROUND-8,"#fff"); dust(pr.x,GROUND,7); SFX.boom();
+      if(!def.dead&&def.downT<=0&&def.invulnT<=0&&def.dashT<=7&&Math.abs(pr.x-def.x)<76&&def.y>GROUND-95)applyDamage(pr.owner,def,pr.atk,pr.super?"super":"special");
+      remove=true;
+    }
     if(!remove&&!def.dead&&def.downT<=0&&def.invulnT<=0&&def.dashT<=7&&Math.abs(pr.x-def.x)<pr.r+34&&Math.abs(pr.y-(def.y-86*def.char.scale))<94*def.char.scale){
       applyDamage(pr.owner,def,pr.atk,pr.super?"super":"special"); spark(pr.x,pr.y,pr.owner.skin.trail,25,6); ring(pr.x,pr.y,"#fff"); SFX.boom(); remove=true;
     }
@@ -578,15 +643,23 @@ function announce(text,sub,ko){
   a.style.display="grid"; t.style.animation="none"; void t.offsetWidth; t.style.animation="";
 }
 function hideAnnounce(){ const a=$("announce"); if(a)a.style.display="none"; }
-function resetFighterStats(){ fighters.forEach(f=>f.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0}); }
+function resetFighterStats(){ fighters.forEach(f=>f.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0}); }
+function applySurvivalScaling(){
+  p1.powerMul=1; p2.powerMul=1;
+  if(mode!=="survival")return;
+  const hpMul=1+Math.min(.38,Math.max(0,survival.wave-2)*.045);
+  p2.maxHealth=Math.round(p2.char.hp*hpMul); p2.health=p2.maxHealth;
+  p2.powerMul=1+Math.min(.28,Math.max(0,survival.wave-3)*.035);
+  if(survival.carryHealth!=null){ p1.health=clamp(survival.carryHealth,1,p1.maxHealth); p1.energy=clamp(survival.carryEnergy||0,0,100); survival.carryHealth=null; }
+}
 function resetRound(){
   const w1=p1.roundWins,w2=p2.roundWins;
-  p1.reset(); p2.reset(); p1.roundWins=w1; p2.roundWins=w2;
+  p1.reset(); p2.reset(); p1.roundWins=w1; p2.roundWins=w2; applySurvivalScaling();
   projectiles=[]; floaters=[]; rings=[]; ghosts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
   timerSec=SETTINGS.roundTime; timerFrames=0; state="intro"; introT=132; announcedFight=false; lastWinner=null; cinematic=70;
   if(typeof buildPips==="function")buildPips();
-  $("roundLabel").textContent=mode==="arcade"?("ARCADE "+arcade.stage+"/5 • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):("ROUND "+round);
-  announce("ROUND "+round,mode==="arcade"?("Étage "+arcade.stage+" / 5"):mode==="story"?currentStoryFight().chapter:"Prêt… ?"); SFX.beep();
+  $("roundLabel").textContent=mode==="arcade"?("ARCADE "+arcade.stage+"/5 • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
+  announce(mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),mode==="arcade"?("Étage "+arcade.stage+" / 5"):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
   if(typeof resetCamera==="function")resetCamera(true);
   if(typeof snapHUD==="function")snapHUD();
 }
@@ -598,6 +671,7 @@ function resetTrainingPositions(full){
 }
 function beginMatch(){
   buildDisplayNames();
+  if(mode==="survival"&&survival.wave===1&&!survival.runCounted){ survival.runCounted=true; PROFILE.stats.survivalRuns=(PROFILE.stats.survivalRuns||0)+1; saveProfile(); }
   p1.roundWins=0; p2.roundWins=0; round=1; matchElapsed=0; resetFighterStats();
   playerHabits.jumps=0; playerHabits.blocks=0; playerHabits.dashes=0;
   $("nameP1").innerHTML="🟦 "+escapeHTML(p1.displayName);
@@ -627,7 +701,7 @@ function endRound(winner,byKO,finishType){
 }
 function finishMatch(winner){
   state="matchEnd"; hideAnnounce(); stopMusic(); SFX.win(); confetti(); cinematic=0;
-  if(mode==="bot"||mode==="arcade"||mode==="story"){
+  if(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"){
     PROFILE.stats.matches++;
     if(winner===p1){ PROFILE.stats.wins++; unlock("firstwin","Première victoire"); if(botDiff==="difficile"&&mode==="bot")unlock("hardwin","Vaincre le bot Difficile"); }
     else PROFILE.stats.losses++;
@@ -645,6 +719,23 @@ function finishMatch(winner){
         unlock("primeunlock","GODSON PRIME débloqué");
       }
     }
+  }
+  if(mode==="survival"){
+    survival.lastWin=(winner===p1);
+    const perf=fighterMatchScore(p1,p2);
+    if(winner===p1){
+      survival.lastWaveScore=100*survival.wave+perf;
+      survival.carryHealth=Math.min(p1.maxHealth,p1.health+Math.round(p1.maxHealth*.35));
+      survival.carryEnergy=Math.min(80,p1.energy+15);
+      PROFILE.stats.bestSurvivalWave=Math.max(PROFILE.stats.bestSurvivalWave||0,survival.wave);
+      if(survival.wave>=3)unlock("survival3","Survivre à la vague 3");
+      if(survival.wave>=5)unlock("survival5","Survivre à la vague 5 — Boss vaincu");
+      if(survival.wave>=10)unlock("survival10","Légende de la Survie : vague 10");
+    } else {
+      survival.lastWaveScore=Math.round(perf/3);
+      survival.carryHealth=null;
+    }
+    survival.score+=survival.lastWaveScore;
   }
   saveProfile();
   if(typeof showEndScreen==="function")showEndScreen(winner);
@@ -673,7 +764,7 @@ function updateGameLogic(){
     if(roundEndT===108&&lastWinner)announce(lastWinner.name.toUpperCase()+" GAGNE !","Round "+round+" terminé");
     if(roundEndT===70)firework(200+Math.random()*880,140+Math.random()*100);
     if(--roundEndT<=0){
-      if(lastWinner&&lastWinner.roundWins>=SETTINGS.roundsWin)finishMatch(lastWinner);
+      if(lastWinner&&lastWinner.roundWins>=roundsToWin())finishMatch(lastWinner);
       else { if(lastWinner)round++; resetRound(); }
     }
   }

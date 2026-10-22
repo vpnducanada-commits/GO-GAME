@@ -25,16 +25,17 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 | 5 | Grades de carrière (Débutant → Légende Godson) | Affichés dans l'en-tête et le menu |
 | 6 | Qualité : tests étendus (Histoire, déblocage, classement), build 1-fichier V2.1 | Tous les tests verts, Definition of Done respectée |
 
-## 🔜 SPRINT 02 — V2.2 « Profondeur de combat » *(planifié par le manager)*
-- Supers **uniques par personnage** (signature moves : rafale de Kira, séisme de Titan, pluie d'énergie de Nova…)
-- Garde parfaite (*parry*) avec fenêtre de timing et contre garanti
-- Mode **Survie** (vagues infinies, vie partiellement restaurée)
-- Replays locaux des meilleurs combos (enregistrement des entrées)
+## ✅ SPRINT 02 — V2.2 « Profondeur de combat » *(LIVRÉ le 22/10/2026 — 63/63 tests verts)*
+- ✅ Supers **uniques par personnage** : rafale/tempête de lames (Kira), onde sismique/séisme (Titan), orbe chercheuse/pluie de météores (Nova), jugement perforant (Gideon), doubles/triples vagues royales (GODSON PRIME)
+- ✅ Garde parfaite (*parry*) : fenêtre ~150 ms, 0 dégât, riposte +35%, bot capable de parry selon difficulté
+- ✅ Mode **Survie** : vagues infinies, +35% de vie entre vagues, boss toutes les 5 vagues, score cumulé au Hall of Fame
+- ↪️ Replays des combos **reportés au Sprint 03** (exigent une graine aléatoire déterministe — décision technique du manager)
 
-## 🔭 SPRINT 03 — V2.3 « Contenu » *(vision)*
+## 🔜 SPRINT 03 — V2.3 « Contenu & Replays » *(prochain sprint du manager)*
 - Mode Histoire **Chapitre 2** + nouvelle arène (Plage de Libreville 🌴)
+- Moteur à graine déterministe + **replays** des matchs (lecture des entrées enregistrées)
 - 6e personnage, costumes alternatifs déblocables
-- Défis quotidiens locaux (« Réalise un combo x6 »)
+- Défis quotidiens locaux (« Réalise un combo x6 », « 3 parry en un match »)
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

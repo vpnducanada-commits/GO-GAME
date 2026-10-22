@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.1 PRO — INTERFACE & MENUS PRO
+   GÉDÉON - Godson ARENA V2.2 PRO — INTERFACE & MENUS PRO
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -25,7 +25,7 @@ function profileRank(){
 function syncProfileUI(){
   const s=PROFILE.stats,storyInfo=PROFILE.story||{},top=(PROFILE.leaderboard&&PROFILE.leaderboard[0])?PROFILE.leaderboard[0].score:0;
   $("profileStats").textContent=profileRank()+" • 🏆 "+s.wins+"V • "+s.losses+"D • Combo "+s.bestCombo+(top?" • Record "+top:"");
-  $("menuStats").textContent="Carrière : "+s.matches+" match(s), "+s.wins+" victoire(s), combo max "+s.bestCombo+" hits ("+s.bestComboDamage+" dégâts), Histoire "+(storyInfo.completed?"terminée x"+(storyInfo.clears||0):"combat "+(storyInfo.progressStep||1)+"/3")+", GODSON PRIME "+(PROFILE.unlocks&&PROFILE.unlocks.prime?"👑 débloqué":"🔒 secret")+".";
+  $("menuStats").textContent="Carrière : "+s.matches+" match(s), "+s.wins+" victoire(s), combo max "+s.bestCombo+" hits ("+s.bestComboDamage+" dégâts), Histoire "+(storyInfo.completed?"terminée x"+(storyInfo.clears||0):"combat "+(storyInfo.progressStep||1)+"/3")+", Survie : vague "+(s.bestSurvivalWave||0)+", GODSON PRIME "+(PROFILE.unlocks&&PROFILE.unlocks.prime?"👑 débloqué":"🔒 secret")+".";
   const lbl=$("storyProgressLabel");
   if(lbl)lbl.textContent=storyInfo.completed?"✅ Chapitre 1 terminé x"+(storyInfo.clears||0)+" — Rejouer l’aventure • GODSON PRIME débloqué 👑":(storyInfo.progressStep&&storyInfo.progressStep>1?"▶ Reprendre au combat "+storyInfo.progressStep+"/3 • Boss final • Récompense secrète 👑":"3 combats scénarisés • Boss final • Récompense secrète 👑");
 }
@@ -47,25 +47,25 @@ function buildRosters(){
       btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button";
       btn.innerHTML=locked
         ?"<span class='avatar'>🔒</span><b>??? SECRET</b><small>Personnage légendaire</small><span class='stat'><span>???</span><i><b style='width:100%'></b></i></span><small>"+escapeHTML(c.lockedHint||"À débloquer")+"</small>"
-        :"<span class='avatar' style='background:linear-gradient(135deg,"+sk.primary+","+sk.accent+")'>"+c.letter+"</span><b>"+c.name+"</b><small>"+c.title+"</small>"+statRows(c);
+        :"<span class='avatar' style='background:linear-gradient(135deg,"+sk.primary+","+sk.accent+")'>"+c.letter+"</span><b>"+c.name+"</b><small>"+c.title+"<br>"+escapeHTML(c.superName||"")+"</small>"+statRows(c);
       btn.onclick=()=>{
         if(locked){ showToast("🔒 Personnage secret — "+(c.lockedHint||"à débloquer")); return; }
-        if(side===2&&(pendingMode==="arcade"||pendingMode==="story"))return;
+        if(side===2&&(pendingMode==="arcade"||pendingMode==="story"||pendingMode==="survival"))return;
         if(side===1)selCharP1=i; else selCharP2=i; saveSelection(); refreshSelect();
       };
       container.appendChild(btn);
     });
     if(allowRandom){ const btn=document.createElement("button"); btn.className="charCard"+(selected===-1?" sel":""); btn.type="button";
       btn.innerHTML="<span class='avatar' style='background:linear-gradient(135deg,#37474f,#90a4ae)'>?</span><b>ALÉATOIRE</b><small>Adversaire surprise</small><span class='stat'><span>FUN</span><i><b style='width:100%'></b></i></span>";
-      btn.onclick=()=>{ if(pendingMode==="arcade"||pendingMode==="story")return; selCharP2=-1; saveSelection(); refreshSelect(); }; container.appendChild(btn); }
+      btn.onclick=()=>{ if(pendingMode==="arcade"||pendingMode==="story"||pendingMode==="survival")return; selCharP2=-1; saveSelection(); refreshSelect(); }; container.appendChild(btn); }
   };
   build($("rosterP1"),1,selCharP1,false);
   build($("rosterP2"),2,selCharP2,true);
-  const autoP2=pendingMode==="arcade"||pendingMode==="story";
+  const autoP2=pendingMode==="arcade"||pendingMode==="story"||pendingMode==="survival";
   $("rosterP2").style.opacity=autoP2?.5:1;
   $("rosterP2").style.pointerEvents=autoP2?"none":"auto";
-  $("arenaRow").style.opacity=pendingMode==="story"?.5:1;
-  $("arenaRow").style.pointerEvents=pendingMode==="story"?"none":"auto";
+  $("arenaRow").style.opacity=(pendingMode==="story"||pendingMode==="survival")?.5:1;
+  $("arenaRow").style.pointerEvents=(pendingMode==="story"||pendingMode==="survival")?"none":"auto";
 }
 function buildArenaCards(){
   const row=$("arenaRow"); row.innerHTML="";
@@ -75,14 +75,28 @@ function buildArenaCards(){
   r.onclick=()=>{ selArenaId="random"; saveSelection(); buildArenaCards(); updateLaunchSummary(); }; row.appendChild(r);
 }
 function stageOpponent(){ if(!arcade.seq.length)setupArcadeRun(); return arcade.seq[clamp(arcade.stage-1,0,4)]; }
+function generateSurvivalWave(){
+  const wave=survival.wave,bossWave=wave%5===0;
+  const pattern=wave>6?"difficile":(["facile","moyen","moyen","difficile","difficile"][(wave-1)%5]);
+  const char=bossWave?(Math.random()<.55?4:2):((Math.random()*4)|0);
+  survival.next={char,diff:pattern,arena:ARENAS[(Math.random()*ARENAS.length)|0].id,boss:bossWave};
+  return survival.next;
+}
+function survivalOpponent(){ return survival.next||generateSurvivalWave(); }
+function setupSurvivalRun(){
+  survival.wave=1; survival.score=0; survival.lastWaveScore=0; survival.lastWin=false;
+  survival.carryHealth=null; survival.carryEnergy=0; survival.recorded=false; survival.runCounted=false;
+  generateSurvivalWave();
+}
 function updateLaunchSummary(){
   const c1=CHARACTERS[selCharP1];
   let opp="Adversaire";
   if(pendingMode==="story"){ const f=currentStoryFight(); opp=f.foeName+" ("+DIFFS[f.diff].label+") — Combat "+story.step+"/"+story.total; }
+  else if(pendingMode==="survival"){ const o=survivalOpponent(); opp=CHARACTERS[o.char].name+" ("+DIFFS[o.diff].label+") — Vague "+survival.wave; }
   else if(pendingMode==="arcade"){ const o=stageOpponent(); opp=CHARACTERS[o.char].name+" ("+DIFFS[o.diff].label+") — Étage "+arcade.stage+"/5"; }
   else if(pendingMode==="training")opp=(selCharP2<0?"Mannequin surprise":CHARACTERS[selCharP2].name+" (mannequin)");
   else opp=selCharP2<0?"Aléatoire":CHARACTERS[selCharP2].name;
-  const ar=pendingMode==="story"?(ARENAS.find(a=>a.id===currentStoryFight().arena)||ARENAS[0]).name+" (scénario)":(selArenaId==="random"?"Arène aléatoire":(ARENAS.find(a=>a.id===selArenaId)||ARENAS[0]).name);
+  const ar=pendingMode==="story"?(ARENAS.find(a=>a.id===currentStoryFight().arena)||ARENAS[0]).name+" (scénario)":pendingMode==="survival"?(ARENAS.find(a=>a.id===survivalOpponent().arena)||ARENAS[0]).name+" (vague)":(selArenaId==="random"?"Arène aléatoire":(ARENAS.find(a=>a.id===selArenaId)||ARENAS[0]).name);
   $("launchSummary").textContent=c1.name+" vs "+opp+" • "+ar;
 }
 function refreshSelect(){
@@ -91,13 +105,15 @@ function refreshSelect(){
   let previewP2=selCharP2<0?1:selCharP2;
   if(pendingMode==="arcade")previewP2=stageOpponent().char;
   if(pendingMode==="story")previewP2=currentStoryFight().char;
+  if(pendingMode==="survival")previewP2=survivalOpponent().char;
   applyCharacterTo(p1,selCharP1); applyCharacterTo(p2,previewP2);
   p1.reset(); p2.reset(); buildDisplayNames(); placeMenuFighters();
   if(pendingMode==="story")setArenaById(currentStoryFight().arena);
-  const titles={bot:"Affronte le BOT "+DIFFS[botDiff].label,"2p":"Duel entre joueurs",arcade:"Mode Arcade — 5 étages",training:"Salle d’entraînement",story:STORY_CAMPAIGN.title};
+  if(pendingMode==="survival")setArenaById(survivalOpponent().arena);
+  const titles={bot:"Affronte le BOT "+DIFFS[botDiff].label,"2p":"Duel entre joueurs",arcade:"Mode Arcade — 5 étages",training:"Salle d’entraînement",story:STORY_CAMPAIGN.title,survival:"🌊 Survie — Combien de vagues tiendras-tu ?"};
   $("selectTitle").textContent=titles[pendingMode]||"Choisis ton combattant";
   $("rosterTitleP1").textContent="🟦 "+((PROFILE.names.p1||"Joueur 1").toUpperCase());
-  $("rosterTitleP2").textContent=pendingMode==="2p"?"🟥 JOUEUR 2":pendingMode==="training"?"🥋 MANNEQUIN":pendingMode==="arcade"?"🏆 ADVERSAIRE ARCADE (AUTO)":pendingMode==="story"?"📖 ADVERSAIRE DE L’HISTOIRE (AUTO)":"🤖 BOT "+DIFFS[botDiff].label.toUpperCase();
+  $("rosterTitleP2").textContent=pendingMode==="2p"?"🟥 JOUEUR 2":pendingMode==="training"?"🥋 MANNEQUIN":pendingMode==="arcade"?"🏆 ADVERSAIRE ARCADE (AUTO)":pendingMode==="story"?"📖 ADVERSAIRE DE L’HISTOIRE (AUTO)":pendingMode==="survival"?"🌊 VAGUE "+survival.wave+" (AUTO)":"🤖 BOT "+DIFFS[botDiff].label.toUpperCase();
 }
 function enterSelect(newMode){ pendingMode=newMode; mode=newMode; refreshSelect(); showOnly("menuSelect"); }
 function setupArcadeRun(){
@@ -116,6 +132,7 @@ function setupStoryRun(){
 function prepareMatch(keepPrepared){
   mode=pendingMode;
   if(mode==="story"){ const f=currentStoryFight(); preparedCharP2=f.char; botDiff=f.diff; preparedArenaId=f.arena; }
+  else if(mode==="survival"){ const o=survivalOpponent(); preparedCharP2=o.char; botDiff=o.diff; preparedArenaId=o.arena; }
   else if(mode==="arcade"){ const o=stageOpponent(); preparedCharP2=o.char; botDiff=o.diff; if(!keepPrepared)preparedArenaId=selArenaId==="random"?ARENAS[(Math.random()*ARENAS.length)|0].id:selArenaId; }
   else if(!keepPrepared){ preparedCharP2=selCharP2<0?((Math.random()*CHARACTERS.length)|0):selCharP2; preparedArenaId=selArenaId==="random"?ARENAS[(Math.random()*ARENAS.length)|0].id:selArenaId; }
   applyCharacterTo(p1,selCharP1); applyCharacterTo(p2,preparedCharP2);
@@ -124,9 +141,9 @@ function prepareMatch(keepPrepared){
 function showVS(keepPrepared){
   audio(); prepareMatch(!!keepPrepared); SFX.confirm();
   $("hud").style.display="none"; $("trainingBar").style.display="none";
-  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.textContent=f.letter; a.style.background="linear-gradient(135deg,"+f.skin.primary+","+f.skin.accent+")"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title; };
+  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.textContent=f.letter; a.style.background="linear-gradient(135deg,"+f.skin.primary+","+f.skin.accent+")"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title+" • "+(f.char.superName||""); };
   setSide("vsAvatar1","vsName1","vsChar1",p1); setSide("vsAvatar2","vsName2","vsChar2",p2);
-  $("vsArena").textContent="🏟️ "+currentArena.name+(mode==="arcade"?" • Étage "+arcade.stage+"/5":mode==="story"?" • Histoire "+story.step+"/"+story.total:"");
+  $("vsArena").textContent="🏟️ "+currentArena.name+(mode==="arcade"?" • Étage "+arcade.stage+"/5":mode==="story"?" • Histoire "+story.step+"/"+story.total:mode==="survival"?" • 🌊 Vague "+survival.wave:"");
   showOnly("menuVS");
   clearTimeout(vsTimeout); vsTimeout=setTimeout(()=>{ if(state==="vs")launchPreparedMatch(); },2450);
 }
@@ -174,15 +191,25 @@ function togglePause(){
 }
 
 /* ---------------- FIN DE MATCH PRO ---------------- */
-function matchScore(f,op){ return Math.max(0,Math.round(f.stats.damage+f.stats.maxComboDamage*4+(f.health/f.maxHealth)*120+f.roundWins*90-op.stats.damage*.35)); }
+function matchScore(f,op){ return fighterMatchScore(f,op); }
 function gradeFromScore(score){ return score>=520?"S":score>=420?"A":score>=315?"B":score>=210?"C":"D"; }
 function matchGrade(f,op){ return gradeFromScore(matchScore(f,op)); }
 function modeDisplayName(){
-  return mode==="story"?"Histoire "+story.step+"/"+story.total:mode==="arcade"?"Arcade "+arcade.stage+"/5":mode==="2p"?"2 Joueurs":mode==="training"?"Entraînement":"Bot "+DIFFS[botDiff].label;
+  return mode==="story"?"Histoire "+story.step+"/"+story.total:mode==="survival"?"Survie vague "+survival.wave:mode==="arcade"?"Arcade "+arcade.stage+"/5":mode==="2p"?"2 Joueurs":mode==="training"?"Entraînement":"Bot "+DIFFS[botDiff].label;
+}
+function recordSurvivalRun(){
+  if(survival.recorded)return;
+  survival.recorded=true;
+  if(!Array.isArray(PROFILE.leaderboard))PROFILE.leaderboard=[];
+  const entry={id:"surv-"+Date.now(),name:p1.name,char:p1.char.name,score:survival.score,grade:gradeFromScore(survival.score),mode:"🌊 Survie — "+(PROFILE.stats.bestSurvivalWave||0)+" vague(s)",combo:p1.stats.maxCombo,date:new Date().toLocaleDateString("fr-FR")};
+  PROFILE.leaderboard.push(entry); PROFILE.leaderboard.sort((a,b)=>b.score-a.score); PROFILE.leaderboard=PROFILE.leaderboard.slice(0,10);
+  const idx=PROFILE.leaderboard.indexOf(entry); if(idx>=0)lastHallRank=idx+1;
+  saveProfile();
 }
 function recordLeaderboard(winner){
   lastHallRank=0;
   if(mode==="training")return;
+  if(mode==="survival"){ if(winner!==p1)recordSurvivalRun(); return; } // en Survie, une seule entrée par run (à la défaite ou via « Terminer »)
   const key=mode+"-"+simFrame+"-"+winner.id+"-"+p1.stats.damage+"-"+p2.stats.damage;
   if(recordedMatchKey===key)return; recordedMatchKey=key;
   if(!Array.isArray(PROFILE.leaderboard))PROFILE.leaderboard=[];
@@ -215,14 +242,16 @@ function statTable(winner){
    row("Coups réussis / tentés",p1.stats.hits+" / "+p1.stats.attacks+" ("+prec(p1)+"%)",p2.stats.hits+" / "+p2.stats.attacks+" ("+prec(p2)+"%)")+
    row("Meilleur combo",p1.stats.maxCombo+" hits • "+p1.stats.maxComboDamage+" dégâts",p2.stats.maxCombo+" hits • "+p2.stats.maxComboDamage+" dégâts")+
    row("Coups bloqués",p1.stats.blocked,p2.stats.blocked)+
+   row("✨ Parry parfaites",p1.stats.parries||0,p2.stats.parries||0)+
    row("Temps de match","<span colspan='2'>"+fmtClock(matchElapsed)+"</span>","")+
-   "</table><p style='margin-top:8px;text-align:center'>Score du vainqueur : <b>"+matchScore(winner,winner===p1?p2:p1)+"</b> • Note : <span class='grade'>"+matchGrade(winner,winner===p1?p2:p1)+"</span>"+(lastHallRank?"<br>🏅 Nouveau Hall of Fame : <b>"+lastHallRank+"e place</b> !":"")+"</p>";
+   "</table><p style='margin-top:8px;text-align:center'>Score du vainqueur : <b>"+matchScore(winner,winner===p1?p2:p1)+"</b> • Note : <span class='grade'>"+matchGrade(winner,winner===p1?p2:p1)+"</span>"+(mode==="survival"?"<br>🌊 Run de Survie : vague "+survival.wave+" • Points de vague +"+survival.lastWaveScore+" • <b>Score total "+survival.score+"</b> • Record : vague "+(PROFILE.stats.bestSurvivalWave||0):"")+(lastHallRank?"<br>🏅 Nouveau Hall of Fame : <b>"+lastHallRank+"e place</b> !":"")+"</p>";
 }
 function showEndScreen(winner){
   lastEndWinner=winner; recordLeaderboard(winner);
   $("winnerTitle").textContent=winner.name.toUpperCase();
   let kicker="🏆 VAINQUEUR DU MATCH 🏆",next=$("btnNextStage"),rematch=$("btnRematch"),change=$("btnEndSelect");
   next.classList.add("hidden"); rematch.classList.remove("hidden"); change.classList.remove("hidden");
+  rematch.textContent="🔥 REVANCHE"; change.textContent="🥋 Changer de combattant";
   if(mode==="arcade"){
     rematch.classList.add("hidden");
     if(winner===p1&&arcade.stage>=5)kicker="👑 CHAMPION DU MODE ARCADE 👑";
@@ -236,12 +265,24 @@ function showEndScreen(winner){
     else { kicker="💀 DÉFAITE — "+currentStoryFight().chapter.toUpperCase(); next.textContent="↻ Réessayer ce combat"; }
     next.classList.remove("hidden");
   }
+  if(mode==="survival"){
+    if(winner===p1){
+      rematch.classList.add("hidden");
+      kicker="🌊 VAGUE "+survival.wave+" TERMINÉE — +35% DE VIE";
+      next.textContent="➡ Vague suivante ("+(survival.wave+1)+")"; next.classList.remove("hidden");
+      change.textContent="🏅 Terminer & enregistrer le score";
+    }else{
+      kicker="💀 RUN TERMINÉE — VAGUE "+survival.wave;
+      rematch.textContent="🌊 Nouvelle run de Survie";
+    }
+  }
   $("endKicker").textContent=kicker;
   $("endStats").innerHTML=statTable(winner);
   showOnly("menuEnd"); syncProfileUI();
 }
 function handleCampaignNext(){
   if(mode==="arcade"){ if(arcade.lastWin)arcade.stage=Math.min(5,arcade.stage+1); pendingMode="arcade"; showVS(false); return; }
+  if(mode==="survival"){ if(!survival.lastWin)return; survival.wave++; generateSurvivalWave(); pendingMode="survival"; showVS(false); return; }
   if(mode!=="story")return;
   pendingMode="story";
   if(!story.lastWin)showStoryScene("retry");
@@ -313,6 +354,7 @@ function bindUI(){
   $("btnBotBack").onclick=()=>showOnly("menuMain");
   $("btnMode2P").onclick=()=>enterSelect("2p");
   $("btnModeArcade").onclick=()=>{ setupArcadeRun(); enterSelect("arcade"); };
+  $("btnModeSurvival").onclick=()=>{ audio(); setupSurvivalRun(); enterSelect("survival"); };
   $("btnModeTraining").onclick=()=>enterSelect("training");
   $("btnCustomize").onclick=()=>{ populateCustomize(); showOnly("menuCustomize"); };
   $("btnHall").onclick=()=>{ renderHall(); showOnly("menuHall"); };
@@ -327,9 +369,11 @@ function bindUI(){
   $("btnStoryQuit").onclick=()=>{ saveProfile(); goMenu(); showToast("📖 Progression de l’Histoire sauvegardée — combat "+story.step+"/"+story.total); };
   $("btnResume").onclick=togglePause;
   $("btnRestart").onclick=()=>{ showOnly(null); beginMatch(); };
-  $("btnRematch").onclick=()=>showVS(true);
+  $("btnRematch").onclick=()=>{ if(mode==="survival"){ setupSurvivalRun(); pendingMode="survival"; showVS(false); } else showVS(true); };
   $("btnNextStage").onclick=handleCampaignNext;
-  $("btnEndSelect").onclick=()=>{ const m=mode; if(m==="arcade")setupArcadeRun(); if(m==="story")setupStoryRun(); enterSelect(m); };
+  $("btnEndSelect").onclick=()=>{ const m=mode;
+    if(m==="survival"&&survival.lastWin&&state==="matchEnd"){ recordSurvivalRun(); goMenu(); showToast("🏅 Run de Survie enregistrée au Hall of Fame : "+survival.score+" points"); return; }
+    if(m==="arcade")setupArcadeRun(); if(m==="story")setupStoryRun(); if(m==="survival")setupSurvivalRun(); enterSelect(m); };
   $("btnQuit1").onclick=goMenu; $("btnQuit2").onclick=goMenu; $("btnPauseTop").onclick=togglePause;
   $("btnFull").onclick=()=>{ const el=$("gameWrap"); if(document.fullscreenElement)document.exitFullscreen(); else if(el.requestFullscreen)el.requestFullscreen(); };
   $("btnTouch").onclick=function(){ touchEnabled=!touchEnabled; this.textContent=touchEnabled?"📱 Tactile : ON":"📱 Tactile"; $("touchUI").style.display=(touchEnabled&&(isCombat()||state==="intro"))?"flex":"none"; };

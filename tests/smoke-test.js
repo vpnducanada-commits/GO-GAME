@@ -71,6 +71,16 @@ function winCurrentMatch(maxSteps) {
     } else { step(25); guard += 25; }
   }
 }
+function holdCodes(codes, frames) { codes.forEach(c => ev(`keys.add(${JSON.stringify(c)})`)); step(frames); codes.forEach(c => ev(`keys.delete(${JSON.stringify(c)})`)); }
+function loseCurrentMatch(maxSteps) {
+  let guard = 0;
+  while (ev('state') !== 'matchEnd' && guard < (maxSteps || 2600)) {
+    if (ev('state') === 'fight') {
+      ev('p1.health=Math.min(p1.health,2); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p2.facing=-1; p1.blocking=false; p1.crouching=false; p1.invulnT=0; p1.dashT=0; p1.parryT=0; p1.downT=0; applyDamage(p2,p1,ATTACKS.punch,"punch");');
+      step(20); guard += 20;
+    } else { step(25); guard += 25; }
+  }
+}
 
 try {
   console.log('\n— Démarrage / menu —');
@@ -166,6 +176,48 @@ try {
   ev('goMenu()'); click('btnHall');
   assert(window.document.getElementById('hallList').innerHTML.includes('hallTable'), 'Hall of Fame affiche le classement');
   assert(ev('PROFILE.leaderboard.length') >= 3, 'au moins 3 scores au classement (' + ev('PROFILE.leaderboard.length') + ')');
+  ev('goMenu()');
+
+  console.log('\n— V2.2 : supers uniques par personnage —');
+  ev('goMenu()');
+  const sig = (char, type) => ev(`applyCharacterTo(p1,${char}); p1.reset(); p1.x=420; p2.x=880; projectiles=[]; p1.attackType=${JSON.stringify(type)}; spawnProjectile(p1); projectiles.length + ":" + projectiles.map(p=>p.kind).join(",") + ":" + projectiles.some(p=>p.pierce)`);
+  assert(sig(0, 'special') === '1:bolt:false', 'Gideon spécial : éclair rapide');
+  assert(sig(0, 'super') === '1:judgment:true', 'Gideon SUPER : vague perforante');
+  assert(sig(1, 'special').startsWith('3:blade,blade,blade'), 'Kira spécial : rafale de 3 lames');
+  assert(sig(1, 'super').startsWith('5:blade,blade,blade,blade,blade'), 'Kira SUPER : tempête de 5 lames');
+  assert(sig(2, 'special') === '1:ground:false' && ev('projectiles[0].y') > 560, 'TITAN spécial : onde sismique au sol');
+  assert(sig(3, 'special') === '1:orb:false' && ev('projectiles[0].homing') > 0, 'Nova spécial : orbe chercheuse');
+  assert(sig(3, 'super').startsWith('4:meteor,meteor,meteor,meteor'), 'Nova SUPER : pluie de 4 météores');
+  assert(sig(4, 'special').startsWith('2:royal,royal'), 'GODSON PRIME spécial : double vague royale');
+
+  console.log('\n— V2.2 : parry parfaite + riposte —');
+  click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
+  ev('p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.vy=p2.vy=0; p1.attackT=0; p1.attack=null; p2.attackT=0; p2.attack=null; p1.hitStun=p2.hitStun=0; p1.blockStun=p2.blockStun=0; p1.downT=p2.downT=0; p2.parryT=0;');
+  const hpP2BeforeParry = ev('p2.health'), hpP1BeforeRiposte = ev('p1.health');
+  holdCodes(['ArrowDown', 'KeyF'], 9);
+  assert(ev('p2.stats.parries') === 1, 'parry réussie comptabilisée');
+  assert(ev('p2.health') === hpP2BeforeParry, 'parry = zéro dégât encaissé');
+  assert(ev('p2.counterWindowT') > 0, 'fenêtre de riposte ouverte');
+  press('KeyK', 2); step(14);
+  assert(ev('p1.health') <= hpP1BeforeRiposte - 7, 'riposte renforcée (+35%) appliquée (' + hpP1BeforeRiposte + ' -> ' + ev('p1.health') + ')');
+
+  console.log('\n— V2.2 : mode Survie (vagues, soin, score) —');
+  ev('goMenu()'); click('btnModeSurvival');
+  assert(ev('state') === 'select' && ev('survival.wave') === 1 && !!ev('survival.next'), 'Survie : sélection vague 1 générée');
+  const firstWaveChar = ev('survival.next.char');
+  click('btnLaunchFight'); ev('skipVS()'); step(170);
+  assert(ev('state') === 'fight' && ev('mode') === 'survival' && ev('p2.charIndex') === firstWaveChar && ev('roundsToWin()') === 1, 'vague 1 en combat (1 round)');
+  ev('p1.health=45');
+  winCurrentMatch();
+  assert(ev('state') === 'matchEnd' && ev('survival.score') > 0 && ev('PROFILE.stats.bestSurvivalWave') >= 1, 'vague 1 terminée : score et record enregistrés');
+  const carry = ev('survival.carryHealth');
+  assert(carry > 45, 'soin +35% préparé entre vagues (' + carry + ' PV)');
+  click('btnNextStage'); ev('skipVS()'); step(170);
+  assert(ev('survival.wave') === 2 && ev('state') === 'fight' && ev('p1.health') === carry, 'vague 2 lancée avec la vie soignée conservée');
+  loseCurrentMatch();
+  assert(ev('state') === 'matchEnd' && ev('survival.recorded') === true && ev('PROFILE.leaderboard.some(e=>String(e.mode).includes("Survie"))'), 'défaite : run enregistrée au Hall of Fame');
+  click('btnRematch');
+  assert(ev('state') === 'vs' && ev('survival.wave') === 1 && ev('survival.score') === 0, 'nouvelle run relancée à la vague 1');
   ev('goMenu()');
 
   console.log('\n— Pause, réglages, personnalisation, arènes —');
