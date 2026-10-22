@@ -1,0 +1,5 @@
+# GÉDÉON - Godson ARENA — fichiers ignorés par Git
+node_modules/
+.DS_Store
+Thumbs.db
+*.log

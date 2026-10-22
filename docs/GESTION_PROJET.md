@@ -1,0 +1,43 @@
+# 👔 GESTION DE PROJET — GÉDÉON - Godson ARENA
+
+**Produit** : jeu de combat 1v1 navigateur, haute résolution, signé Gideon - Godson.
+**Propriétaire du produit (Product Owner)** : **Gideon - Godson** — vision, validation finale, marque.
+**Manager officiel & Développeur principal** : l'assistant Arena (nommé le 22/10/2026) — priorisation, architecture, développement, tests, livraisons.
+
+---
+
+## 🎯 Vision & principes directeurs
+1. **Fun instantané** : le jeu se lance en 1 clic, en 1 seul fichier, sans installation ni compte.
+2. **60 FPS partout** : la fluidité passe avant les effets ; la qualité s'adapte automatiquement.
+3. **Toujours livrable** : chaque session se termine par une version jouable, testée et documentée.
+4. **Signature Gideon - Godson** visible et fière dans chaque écran.
+
+## 🔁 Méthode de travail (sprints par session)
+Chaque session = 1 sprint complet :
+`Audit → Plan du sprint → Développement → Tests automatisés → Build 1-fichier → Documentation → Livraison au Product Owner`
+
+## ✅ Definition of Done (obligatoire avant toute livraison)
+- [ ] Aucune erreur de syntaxe (`node --check` sur tous les fichiers JS)
+- [ ] Test d'exécution automatisé 100% vert (`tests/smoke-test.js`)
+- [ ] Version autonome régénérée (`tools/build-single.py`) et vérifiée
+- [ ] Serveur de prévisualisation actif et ressources en HTTP 200
+- [ ] `CHANGELOG.md` et `README.md` à jour
+- [ ] Commit Git + tag de version
+
+## 🏷️ Versionnage
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V3.0 (futur) expérience connectée.
+
+## 📊 Indicateurs suivis par le manager
+| Indicateur | Cible | V2.0 (référence) |
+|---|---|---|
+| Tests automatisés | 100 % verts | 24/24 ✅ |
+| Taille version 1-fichier | < 200 Ko | 124 Ko ✅ |
+| Dépendances externes | 0 | 0 ✅ |
+| Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
+| Modes / Personnages / Arènes | en croissance | 4 / 4 / 3 |
+
+## 🗂️ Sprint en cours
+Voir `docs/ROADMAP.md` → section « Sprint 01 ».
+
+---
+✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.
