@@ -225,6 +225,9 @@ try {
   assert(ev('state') === 'fight', 'combat relancé pour tester la pause');
   ev('togglePause()'); assert(ev('state') === 'pause', 'pause');
   ev('togglePause()'); assert(ev('state') === 'fight', 'reprise');
+  // Régression Sarah : un impact de projectile qui termine le round ne doit pas casser l’itération des projectiles restants.
+  ev('applyCharacterTo(p1,1); p1.reset(); p1.x=740; p1.facing=1; p2.x=800; p1.y=p2.y=GROUND; p2.health=1; p2.hitStun=0; p2.blockStun=0; p2.downT=0; p2.invulnT=0; p2.dashT=0; p1.attackType="special"; projectiles=[]; spawnProjectile(p1); updateProjectiles();');
+  assert(ev('state') === 'roundEnd' && ev('projectiles.length') === 0, 'régression : fin de round pendant updateProjectiles sans crash');
   ev('goMenu()'); click('btnSettings');
   window.document.getElementById('setQuality').value = 'low';
   window.document.getElementById('setQuality').dispatchEvent(new window.Event('change'));
@@ -239,6 +242,23 @@ try {
   assert(ev('currentArena.id') === 'temple', 'les 3 arènes se rendent sans erreur');
   for (let i = 0; i < 5; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); render();`); }
   assert(true, 'les 5 personnages se rendent sans erreur');
+
+  // ===== V2.3 — Pipeline de rendu Kenzo + QA Sarah =====
+  ev('qualityLevel=2; resizeCanvas(); render()');
+  assert(ev('JSON.stringify(renderStats.passesRun)') === JSON.stringify(['background','floor','shadows','entities','projectiles','effects','post']), 'pipeline : les 7 passes s’exécutent dans l’ordre');
+  assert(ev('RENDER_PIPELINE.length') === 7, 'pipeline : 7 passes déclarées');
+  assert(ev('typeof cachedLinearGradient') === 'function' && ev('typeof drawPostProcess') === 'function' && ev('typeof runRenderPass') === 'function', 'API pipeline V2.3 disponible');
+  const before = ev('renderStats.frame');
+  ev('render(); render(); render()');
+  assert(ev('renderStats.frame') === before + 3, 'pipeline : compteur de frames (+3)');
+  assert(ev('cachedLinearGradient("t:1",0,0,10,10,[[0,"#fff"],[1,"#000"]])===cachedLinearGradient("t:1",0,0,10,10,[[0,"#fff"],[1,"#000"]])'), 'cache dégradés : même instance réutilisée');
+  const alloc = ev('renderStats.gradientMisses');
+  ev('cachedLinearGradient("t:1",0,0,10,10,[[0,"#fff"],[1,"#000"]]); cachedLinearGradient("t:1",0,0,10,10,[[0,"#fff"],[1,"#000"]])');
+  assert(ev('renderStats.gradientMisses') === alloc, 'cache dégradés : aucune allocation sur hit');
+  ev('qualityLevel=2; render()'); assert(String(ev('renderStats.lastPost')).endsWith(':q2'), 'post-traitement : trace qualité haute');
+  ev('qualityLevel=0; render()'); assert(String(ev('renderStats.lastPost')).endsWith(':q0'), 'post-traitement : contourné en qualité basse mais tracé');
+  assert(ev('Object.keys(FLOOR_THEMES).length') === 3, 'thèmes de sol : 3 arènes couvertes');
+  ev('qualityLevel=2; resizeCanvas();');
 
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);

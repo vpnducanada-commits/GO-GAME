@@ -1,13 +1,14 @@
-# 🎮 GÉDÉON - Godson ARENA — V2.2 PRO
+# 🎮 GÉDÉON - Godson ARENA — V2.3 PRO « Studio Quality »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
 👔 *Manager officiel & Développeur principal : Assistant Arena*
+🏭 *Studio V2.3 : Nadia (Game Design) • Kenzo (Directeur Artistique & Rendu) • Sarah (Lead QA / Performance)*
 
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V2.2-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
+| ⭐ **`Gedeon-GODSON-Arena-V2.3-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
 
@@ -49,13 +50,23 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 ## ⚙️ Personnalisation & progression
 Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto selon FPS, durée/rounds/vitesse des matchs — tout est **sauvegardé automatiquement**, avec statistiques de carrière, succès déblocables et classement Hall of Fame.
 
+## 🏭 Studio Gideon - Godson ARENA (nouveau V2.3)
+| Membre | Rôle | Responsabilités |
+|---|---|---|
+| Assistant Arena | **Manager & Développeur principal** | Vision, priorités, intégration, releases |
+| **Nadia** | Lead Game Designer | Combat, équilibrage, modes, narration (`docs/GAME_DESIGN.md`) |
+| **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
+| **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
+
+**V2.3 « Studio Quality »** : pipeline graphique restructuré en 7 passes mesurables (`background → floor → shadows → entities → projectiles → effects → post`), **cache de dégradés** (moins d'allocations par frame = fluidité), **teinte colorée par arène** et flash d'impact en qualité haute, gate QA automatique `tools/qa-check.py` (13 contrôles de release) et suite d'exécution étendue.
+
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V2.2-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V2.3-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
-├── docs/GESTION_PROJET.md • docs/ROADMAP.md • CHANGELOG.md
-├── tests/smoke-test.js   → 63 vérifications automatisées ✅
-└── tools/build-single.py → génère la version 1 fichier
+├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
+├── tests/smoke-test.js   → 73 vérifications d’exécution automatisées ✅
+└── tools/ build-single.py • qa-check.py (gate de release Sarah)
 ```
 Chaque livraison suit la **Definition of Done** du manager : syntaxe vérifiée, tests 100% verts, build régénéré, documentation à jour, commit Git + tag de version.
 

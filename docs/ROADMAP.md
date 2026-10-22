@@ -31,11 +31,17 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - ✅ Mode **Survie** : vagues infinies, +35% de vie entre vagues, boss toutes les 5 vagues, score cumulé au Hall of Fame
 - ↪️ Replays des combos **reportés au Sprint 03** (exigent une graine aléatoire déterministe — décision technique du manager)
 
-## 🔜 SPRINT 03 — V2.3 « Contenu & Replays » *(prochain sprint du manager)*
-- Mode Histoire **Chapitre 2** + nouvelle arène (Plage de Libreville 🌴)
-- Moteur à graine déterministe + **replays** des matchs (lecture des entrées enregistrées)
-- 6e personnage, costumes alternatifs déblocables
-- Défis quotidiens locaux (« Réalise un combo x6 », « 3 parry en un match »)
+## ✅ SPRINT 03 — V2.3 « Studio Quality » *(LIVRÉ le 22/10/2026 — décision PO)*
+*Décision du Product Owner : agrandir l’équipe et structurer le studio avant d’ajouter du contenu.*
+- 🏭 Équipe de 4 : Manager (Assistant Arena) + **Nadia** (Design), **Kenzo** (Rendu/Tech Art), **Sarah** (QA/Performance) — voir `docs/EQUIPE.md`
+- 🎼 Pipeline de rendu en 7 passes + cache de dégradés + post-traitement par arène (Kenzo)
+- 🛡️ Gate QA automatique `tools/qa-check.py` + 73 tests d’exécution (Sarah)
+- 📐 Docs `ARCHITECTURE`, `GAME_DESIGN`, `QA_QUALITE` + board Sprint 03
+
+## 🔜 SPRINT 04 — V2.4 « Contenu & Replays » *(planifié, par spécialiste)*
+- **Nadia** : Mode Histoire **Chapitre 2** (dialogues, objectifs), défis locaux (« combo x6 », « 3 parry en un match »), équilibrage frame data
+- **Kenzo** : nouvelle arène **Plage de Libreville 🌴** + costumes alternatifs déblocables, finition des passes VFX
+- **Technique** : graine déterministe seedable puis **replays** des matchs ; 6e personnage (design Nadia, rendu Kenzo, tests Sarah)
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.2 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.3 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.2.0";
+const GAME_VERSION="2.3.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -607,7 +607,9 @@ function updateProjectiles(){
   }
   if(clashRemove.size)projectiles=projectiles.filter((_,idx)=>!clashRemove.has(idx));
   for(let i=projectiles.length-1;i>=0;i--){
-    const pr=projectiles[i],def=pr.owner===p1?p2:p1;
+    // applyDamage() peut terminer le round et vider projectiles pendant l'itération.
+    const pr=projectiles[i]; if(!pr)break;
+    const def=pr.owner===p1?p2:p1;
     pr.px=pr.x; pr.py=pr.y;
     if(pr.homing&&!def.dead){ const ty=def.y-92*def.char.scale; pr.vy=clamp((pr.vy||0)+(ty-pr.y)*.012,-3.4,3.4); }
     pr.vy=(pr.vy||0)+(pr.grav||0);
@@ -624,7 +626,7 @@ function updateProjectiles(){
     if(!remove&&!def.dead&&def.downT<=0&&def.invulnT<=0&&def.dashT<=7&&Math.abs(pr.x-def.x)<pr.r+34&&Math.abs(pr.y-(def.y-86*def.char.scale))<94*def.char.scale){
       applyDamage(pr.owner,def,pr.atk,pr.super?"super":"special"); spark(pr.x,pr.y,pr.owner.skin.trail,25,6); ring(pr.x,pr.y,"#fff"); SFX.boom(); remove=true;
     }
-    if(remove)projectiles.splice(i,1);
+    if(remove&&projectiles[i]===pr)projectiles.splice(i,1);
   }
 }
 function updateEffects(){

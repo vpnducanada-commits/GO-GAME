@@ -18,26 +18,26 @@ Chaque session = 1 sprint complet :
 
 ## ✅ Definition of Done (obligatoire avant toute livraison)
 - [ ] Aucune erreur de syntaxe (`node --check` sur tous les fichiers JS)
-- [ ] Test d'exécution automatisé 100% vert (`tests/smoke-test.js`)
+- [ ] Test d'exécution automatisé 100% vert (`tests/smoke-test.js`) + gate statique `python3 tools/qa-check.py` (veto Sarah)
 - [ ] Version autonome régénérée (`tools/build-single.py`) et vérifiée
 - [ ] Serveur de prévisualisation actif et ressources en HTTP 200
 - [ ] `CHANGELOG.md` et `README.md` à jour
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V3.0 (futur) expérience connectée.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.2 (actuel) |
+| Indicateur | Cible | V2.3 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 63/63 ✅ |
-| Taille version 1-fichier | < 200 Ko | 155 Ko ✅ |
+| Tests automatisés | 100 % verts | 73/73 ✅ + 13 contrôles QA statiques |
+| Taille version 1-fichier | < 200 Ko | ≤ 250 Ko (gate) ✅ |
 | Dépendances externes | 0 | 0 ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
 | Modes / Personnages / Arènes | en croissance | 6 / 5 / 3 |
 
 ## 🗂️ Sprint en cours
-Voir `docs/ROADMAP.md` → section « Sprint 01 ».
+Sprint 03 « Studio Quality » livré (V2.3). Voir `docs/SPRINT_03_STUDIO_QUALITY.md`, `docs/EQUIPE.md` et `docs/ROADMAP.md` (prochain : Sprint 04 « Contenu & Replays »).
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

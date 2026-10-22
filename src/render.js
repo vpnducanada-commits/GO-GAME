@@ -1,11 +1,29 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.2 PRO — RENDU HAUT GRAPHISME
+   GÉDÉON - Godson ARENA V2.3 PRO — RENDU HAUT GRAPHISME
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
 let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
+const gradientCache=new Map();
+const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:""};
+const FLOOR_THEMES={
+  stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
+  tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
+  temple:{top:"#8d6e63",mid:"#6d4c41",bot:"#332016",line:"#ffd54f",grade:"rgba(255,205,90,.13)"}
+};
+function cachedLinearGradient(key,x0,y0,x1,y1,stops){
+  const hit=gradientCache.get(key);
+  if(hit){ renderStats.gradientHits++; return hit; }
+  if(gradientCache.size>110)gradientCache.clear();
+  const g=ctx.createLinearGradient(x0,y0,x1,y1);
+  stops.forEach(s=>g.addColorStop(s[0],s[1]));
+  gradientCache.set(key,g); renderStats.gradientMisses++; renderStats.gradientCacheSize=gradientCache.size;
+  return g;
+}
+function runRenderPass(name,fn){ renderStats.passesRun.push(name); fn(); }
 function glowSprite(color){
   if(glowCache.has(color))return glowCache.get(color);
   const c=document.createElement("canvas"); c.width=c.height=128; const g=c.getContext("2d");
@@ -18,6 +36,10 @@ function rebuildArenaCache(){
   if(currentArena.id==="stadium")arenaCache.sky=mk([[0,"#1a237e"],[.38,"#6a1b9a"],[.63,"#ff7043"],[1,"#21122e"]]);
   else if(currentArena.id==="tokyo")arenaCache.sky=mk([[0,"#02061f"],[.45,"#111743"],[.72,"#3b1454"],[1,"#0a0d24"]]);
   else arenaCache.sky=mk([[0,"#2196f3"],[.42,"#81d4fa"],[.7,"#ffe9a8"],[1,"#5d4037"]]);
+  const theme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium;
+  arenaCache.floor=cachedLinearGradient("floor:"+currentArena.id,0,GROUND-22,0,H+180,[[0,theme.top],[.25,theme.mid],[1,theme.bot]]);
+  arenaCache.billboard=cachedLinearGradient("billboard",405,32,875,148,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
+  arenaCache.grade=theme.grade;
   vignetteGrad=ctx.createRadialGradient(W/2,H/2,H*.38,W/2,H/2,H*.86);
   vignetteGrad.addColorStop(0,"rgba(0,0,0,0)"); vignetteGrad.addColorStop(1,"rgba(0,0,0,.42)");
 }
@@ -53,7 +75,7 @@ function updateCamera(dtMs){
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function drawBillboard(title,sub){
   ctx.save(); ctx.fillStyle="rgba(5,8,30,.88)"; rr(405,32,470,116,20); ctx.fill();
-  const eg=ctx.createLinearGradient(405,32,875,148); eg.addColorStop(0,"#00a2ff"); eg.addColorStop(.5,"#7c3aed"); eg.addColorStop(1,"#ff2e88");
+  const eg=arenaCache.billboard||cachedLinearGradient("billboard",405,32,875,148,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
   ctx.strokeStyle=eg; ctx.lineWidth=4; rr(405,32,470,116,20); ctx.stroke();
   ctx.textAlign="center"; ctx.fillStyle="#fff"; ctx.font="1000 34px 'Segoe UI',Arial"; ctx.fillText(title,640,80);
   ctx.font="1000 17px 'Segoe UI',Arial"; ctx.fillStyle="#ffe082"; ctx.fillText("★ A R E N A   C H A M P I O N S H I P ★",640,110);
@@ -73,7 +95,7 @@ function drawStadium(){
   ctx.restore();
   // Faisceaux lumineux
   ctx.save(); ctx.globalCompositeOperation="screen";
-  [[105,50,.45],[1175,50,-.45],[640,16,.85]].forEach((s,i)=>{ const a=Math.sin(renderTicker*.008+i*2.1)*.5+s[2]; const grd=ctx.createLinearGradient(s[0],s[1],s[0]+Math.sin(a)*560,s[1]+Math.cos(a)*560); grd.addColorStop(0,"rgba(255,255,190,.30)"); grd.addColorStop(1,"rgba(255,255,190,0)"); ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(s[0],s[1]); ctx.lineTo(s[0]+Math.sin(a-.085)*575,s[1]+Math.cos(a-.085)*575); ctx.lineTo(s[0]+Math.sin(a+.085)*575,s[1]+Math.cos(a+.085)*575); ctx.closePath(); ctx.fill(); });
+  [[105,50,.45],[1175,50,-.45],[640,16,.85]].forEach((s,i)=>{ const a=Math.sin(renderTicker*.008+i*2.1)*.5+s[2]; const ex=Math.round((s[0]+Math.sin(a)*560)/12)*12,ey=Math.round((s[1]+Math.cos(a)*560)/12)*12; const grd=cachedLinearGradient("beam:"+i+":"+ex+":"+ey,s[0],s[1],ex,ey,[[0,"rgba(255,255,190,.30)"],[1,"rgba(255,255,190,0)"]]); ctx.fillStyle=grd; ctx.beginPath(); ctx.moveTo(s[0],s[1]); ctx.lineTo(s[0]+Math.sin(a-.085)*575,s[1]+Math.cos(a-.085)*575); ctx.lineTo(s[0]+Math.sin(a+.085)*575,s[1]+Math.cos(a+.085)*575); ctx.closePath(); ctx.fill(); });
   ctx.restore();
   drawBillboard("GÉDÉON - Godson",modeLabel());
   // Tribunes et foule réactive
@@ -149,12 +171,8 @@ function drawBackground(){
   if(currentArena.id==="stadium")drawStadium(); else if(currentArena.id==="tokyo")drawTokyo(); else drawTemple();
 }
 function drawFloor(){
-  const id=currentArena.id;
-  let top,mid,bot,line;
-  if(id==="stadium"){top="#37474f";mid="#263238";bot="#0b0f26";line="#00e5ff";}
-  else if(id==="tokyo"){top="#1a2238";mid="#101728";bot="#050816";line="#ff2e88";}
-  else {top="#8d6e63";mid="#6d4c41";bot="#332016";line="#ffd54f";}
-  const fg=ctx.createLinearGradient(0,GROUND-22,0,H+180); fg.addColorStop(0,top); fg.addColorStop(.25,mid); fg.addColorStop(1,bot);
+  const id=currentArena.id,theme=FLOOR_THEMES[id]||FLOOR_THEMES.stadium,line=theme.line;
+  const fg=arenaCache.floor||cachedLinearGradient("floor:"+id,0,GROUND-22,0,H+180,[[0,theme.top],[.25,theme.mid],[1,theme.bot]]);
   ctx.fillStyle=fg; ctx.fillRect(-420,GROUND-22,2120,360);
   ctx.fillStyle=line; ctx.globalAlpha=.9; ctx.fillRect(-420,GROUND-22,2120,5); ctx.globalAlpha=1;
   if(id==="tokyo"){ ctx.save(); ctx.globalAlpha=.16; ["#00e5ff","#ff2e88","#ffc400"].forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(90+i*420,GROUND-16,120,150);}); ctx.globalAlpha=.22; ctx.fillStyle="#b3e5fc"; [180,520,860,1120].forEach(x=>{ctx.beginPath();ctx.ellipse(x,GROUND+58,95,14,0,0,7);ctx.fill();}); ctx.restore(); }
@@ -207,7 +225,7 @@ function drawFighter(f){
   if(f.hitFlash>0){ try{ctx.filter="brightness(2.05) saturate(.45)";}catch(e){} }
   const hipY=lerp(-76,-57,cb)+bob,shY=lerp(-126,-102,cb)+bob,headY=lerp(-148,-123,cb)+bob;
   // Cape de Nova et de GODSON PRIME
-  if((ch.style==="nova"||ch.style==="prime")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*8-f.vx*f.facing*1.4; const cg=ctx.createLinearGradient(0,shY,0,-8); cg.addColorStop(0,sk.dark); cg.addColorStop(1,sk.accent); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(-13,shY+4); ctx.quadraticCurveTo(-44+wv,-62,-35+wv*1.3,-8); ctx.quadraticCurveTo(-14,-28,-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  if((ch.style==="nova"||ch.style==="prime")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*8-f.vx*f.facing*1.4; const cg=cachedLinearGradient("cape:"+sk.dark+":"+sk.accent+":"+Math.round(shY/4),0,shY,0,-8,[[0,sk.dark],[1,sk.accent]]); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(-13,shY+4); ctx.quadraticCurveTo(-44+wv,-62,-35+wv*1.3,-8); ctx.quadraticCurveTo(-14,-28,-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
   // Jambes
   let bFoot={x:-23,y:0},fFoot={x:25,y:0},bKnee={x:-16,y:lerp(-40,-28,cb)},fKnee={x:18,y:lerp(-39,-27,cb)};
   if(cb>.4){ bFoot={x:-29,y:0}; fFoot={x:27,y:0}; }
@@ -225,8 +243,8 @@ function drawFighter(f){
   // Bras arrière
   limb(-6,shY+5,-21,-98+bob-cb*-8,-8,-82+bob-cb*-6,11.5*ch.bulk,sk.dark,sk.glove,10.5*ch.bulk);
   // Torse structuré
-  const tw=20*ch.bulk;
-  const tg=ctx.createLinearGradient(-tw,hipY,tw,shY); tg.addColorStop(0,sk.dark); tg.addColorStop(.55,sk.primary); tg.addColorStop(1,shade(sk.primary,28));
+  const tw=20*ch.bulk,light=shade(sk.primary,28);
+  const tg=cachedLinearGradient("torso:"+sk.dark+":"+sk.primary+":"+light+":"+Math.round(tw)+":"+Math.round(hipY/4)+":"+Math.round(shY/4),-tw,hipY,tw,shY,[[0,sk.dark],[.55,sk.primary],[1,light]]);
   ctx.fillStyle=tg; ctx.beginPath(); ctx.moveTo(-tw,hipY+5); ctx.lineTo(-tw+3,shY+2); ctx.quadraticCurveTo(0,shY-10,tw-2,shY+2); ctx.lineTo(tw+2,hipY+5); ctx.quadraticCurveTo(0,hipY+14,-tw,hipY+5); ctx.fill();
   ctx.strokeStyle="rgba(0,0,0,.4)"; ctx.lineWidth=2.2; ctx.stroke();
   ctx.fillStyle="rgba(255,255,255,.2)"; ctx.fillRect(-tw+6,shY+7,6,42*(1-cb*.25));
@@ -315,27 +333,41 @@ function drawEffects(){
   ctx.textAlign="center";
   for(const fl of floaters){ ctx.save(); ctx.globalAlpha=Math.min(1,fl.life/28); ctx.font="1000 "+(fl.big?27:18)+"px 'Segoe UI',Arial"; ctx.lineWidth=5; ctx.strokeStyle="rgba(0,0,0,.68)"; ctx.strokeText(fl.text,fl.x,fl.y); ctx.fillStyle=fl.c; ctx.fillText(fl.text,fl.x,fl.y); ctx.restore(); }
 }
+function drawPostProcess(){
+  // Passe POST (V2.3 Kenzo) : teinte colorée par arène, vignette, alertes, barres cinéma.
+  renderStats.lastPost=currentArena.id+":q"+qualityLevel;
+  if(qualityLevel>0&&arenaCache.grade){ ctx.save(); try{ctx.globalCompositeOperation="soft-light";}catch(e){} ctx.fillStyle=arenaCache.grade; ctx.fillRect(0,0,W,H); ctx.restore(); }
+  if(vignetteGrad){ ctx.fillStyle=vignetteGrad; ctx.fillRect(0,0,W,H); }
+  const Low=(p1.health/p1.maxHealth<.25||p2.health/p2.maxHealth<.25)&&isCombat();
+  if(Low&&!SETTINGS.reduceFlash){ ctx.save(); ctx.globalAlpha=.1+.07*Math.sin(renderTicker*.18); ctx.fillStyle="#ff1744"; ctx.fillRect(0,0,W,8); ctx.fillRect(0,H-8,W,8); ctx.fillRect(0,0,8,H); ctx.fillRect(W-8,0,8,H); ctx.restore(); }
+  if(qualityLevel===2&&shake>6.5&&!SETTINGS.reduceFlash){
+    ctx.save(); ctx.strokeStyle="rgba(255,255,255,"+clamp((shake-6.5)/26,.05,.3)+")"; ctx.lineWidth=2;
+    for(let i=0;i<8;i++){ const y=60+pseudo(i*17+renderStats.frame)*600,len=45+pseudo(i*31)*90,left=i%2===0; ctx.beginPath(); ctx.moveTo(left?0:W,y); ctx.lineTo(left?len:W-len,y+(left?8:-8)); ctx.stroke(); }
+    ctx.restore();
+  }
+  const bars=(state==="intro"||state==="roundEnd"||cinematic>0)?34:0;
+  if(bars){ ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bars); ctx.fillRect(0,H-bars,W,bars); }
+  ctx.save(); ctx.font="italic 1000 16px 'Segoe UI',Arial"; ctx.textAlign="right"; ctx.fillStyle="rgba(255,255,255,.74)"; ctx.fillText("✍️ Gideon - Godson",W-17,H-13-Math.max(0,bars-4)); ctx.restore();
+}
 function render(){
+  renderStats.frame++; renderStats.passesRun.length=0;
   ctx.setTransform(DPR,0,0,DPR,0,0);
   ctx.clearRect(0,0,W,H);
   const shakeAmt=shake*(SETTINGS.shake/100);
   const shX=(Math.random()-.5)*shakeAmt*2,shY=(Math.random()-.5)*shakeAmt*1.35;
-  // Arrière-plan avec parallaxe douce
-  ctx.save(); const bgZoom=1+(cam.zoom-1)*.32,panX=(640-cam.x)*.045;
-  ctx.translate(W/2+shX*.35,H*.46+shY*.35); ctx.scale(bgZoom,bgZoom); ctx.translate(-W/2+panX,-H*.46);
-  drawBackground(); ctx.restore();
-  // Monde du combat sous caméra dynamique
+  runRenderPass("background",()=>{
+    ctx.save(); const bgZoom=1+(cam.zoom-1)*.32,panX=(640-cam.x)*.045;
+    ctx.translate(W/2+shX*.35,H*.46+shY*.35); ctx.scale(bgZoom,bgZoom); ctx.translate(-W/2+panX,-H*.46);
+    drawBackground(); ctx.restore();
+  });
   ctx.save(); ctx.translate(W/2+shX,GROUND+shY); ctx.scale(cam.zoom,cam.zoom); ctx.translate(-cam.x,-GROUND);
-  drawFloor(); drawReflection(p1); drawReflection(p2); drawGhosts();
-  const order=[p1,p2].sort((a,b)=>b.ry-a.ry); drawFighter(order[0]); drawFighter(order[1]);
-  drawProjectiles(); drawEffects(); ctx.restore();
-  // Vignette, alerte vie basse, barres cinéma, signature
-  if(vignetteGrad){ ctx.fillStyle=vignetteGrad; ctx.fillRect(0,0,W,H); }
-  const Low=(p1.health/p1.maxHealth<.25||p2.health/p2.maxHealth<.25)&&isCombat();
-  if(Low&&!SETTINGS.reduceFlash){ ctx.save(); ctx.globalAlpha=.1+.07*Math.sin(renderTicker*.18); ctx.fillStyle="#ff1744"; ctx.fillRect(0,0,W,8); ctx.fillRect(0,H-8,W,8); ctx.fillRect(0,0,8,H); ctx.fillRect(W-8,0,8,H); ctx.restore(); }
-  const bars=(state==="intro"||state==="roundEnd"||cinematic>0)?34:0;
-  if(bars){ ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bars); ctx.fillRect(0,H-bars,W,bars); }
-  ctx.save(); ctx.font="italic 1000 16px 'Segoe UI',Arial"; ctx.textAlign="right"; ctx.fillStyle="rgba(255,255,255,.74)"; ctx.fillText("✍️ Gideon - Godson",W-17,H-13-Math.max(0,bars-4)); ctx.restore();
+  runRenderPass("floor",drawFloor);
+  runRenderPass("shadows",()=>{ drawReflection(p1); drawReflection(p2); drawGhosts(); });
+  runRenderPass("entities",()=>{ const order=[p1,p2].sort((a,b)=>b.ry-a.ry); drawFighter(order[0]); drawFighter(order[1]); });
+  runRenderPass("projectiles",drawProjectiles);
+  runRenderPass("effects",drawEffects);
+  ctx.restore();
+  runRenderPass("post",drawPostProcess);
 }
 
 /* ---------------- HUD PRO ---------------- */
