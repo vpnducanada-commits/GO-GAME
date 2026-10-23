@@ -62,6 +62,19 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #trainingBar{position:absolute;top:104px;left:50%;transform:translateX(-50%);z-index:6;display:none;gap:7px;flex-wrap:wrap;justify-content:center;background:rgba(0,0,0,.55);padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.25)}
 #trainingBar button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.1);color:#fff;border-radius:999px;padding:6px 11px;font-weight:800;font-size:12px;cursor:pointer}
 #trainingBar button.on{background:var(--or);color:#221200;border-color:#fff}
+#replayBar{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);z-index:14;display:none;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;width:min(96%,1040px);background:rgba(3,7,24,.78);backdrop-filter:blur(10px);padding:9px 12px;border-radius:18px;border:1.5px solid rgba(255,196,0,.55);box-shadow:0 16px 42px rgba(0,0,0,.55);font-size:12px}
+#replayBar.show{display:flex}
+#replayBar button,#replayBar select{border:1px solid rgba(255,255,255,.32);background:rgba(255,255,255,.12);color:#fff;border-radius:999px;padding:7px 11px;font-weight:900;font-size:12px;cursor:pointer}
+#replayBar button:disabled{opacity:.45;cursor:not-allowed}
+#replayBar select option{color:#111}
+.replayBadge{font-weight:1000;letter-spacing:1.5px;color:#221200;background:linear-gradient(135deg,#ffc400,#ff7a00);border-radius:999px;padding:7px 11px;box-shadow:0 0 18px rgba(255,150,0,.45)}
+.replaySpeedLabel{font-weight:900;display:flex;align-items:center;gap:6px}
+.replayTrack{display:block;flex:1 1 150px;min-width:110px;height:8px;border-radius:99px;background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.28);overflow:hidden}
+.replayTrack i{display:block;height:100%;width:0;background:linear-gradient(90deg,#00a2ff,#ffc400,#ff2e88);border-radius:99px;transition:width .16s linear}
+#replayProgress{font-weight:1000;font-variant-numeric:tabular-nums;min-width:38px;text-align:right}
+#replayStatus{font-weight:900;color:#bfe7ff}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:saturate(.45)}
+@media(max-width:720px){#replayBar{bottom:8px;border-radius:14px}.replayTrack{order:8;flex-basis:100%}#replayStatus{order:9;width:100%;text-align:center}}
 #toast{position:absolute;bottom:18px;left:50%;transform:translate(-50%,90px);z-index:30;background:linear-gradient(135deg,#20140a,#3a2403);border:1.5px solid var(--or);color:#ffe082;font-weight:1000;padding:13px 20px;border-radius:16px;box-shadow:0 18px 44px rgba(0,0,0,.6);transition:transform .45s cubic-bezier(.2,1.4,.4,1);pointer-events:none;text-align:center}
 #toast.show{transform:translate(-50%,0)}
 /* MENUS PRO */

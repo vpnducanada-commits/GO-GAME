@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.5 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.6 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.5.0";
+const GAME_VERSION="2.6.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -40,6 +40,105 @@ if(PROFILE.story.completed&&!PROFILE.story.chapter2Completed){
 }
 let SETTINGS=PROFILE.settings;
 function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
+
+/* ---------------- REPLAYS DÉTERMINISTES V2.6 ----------------
+   Enregistrement lockstep : on conserve les entrées FINALEMENT appliquées
+   aux deux combattants (clavier, tactile, manettes ou bot), compactées en
+   événements de changement. Physique et dégâts étant déterministes, les
+   rejouer depuis l'état initial reproduit le même match ; des hashs
+   d'état périodiques le prouvent pendant la lecture. */
+const REPLAY_VERSION=1,REPLAY_STORE_KEY="gideonGodsonArenaLastReplayV1";
+const REPLAY_INPUT_KEYS=["left","right","jump","block","punch","kick","special","dash"];
+let replayVisualSeedState=0x676f6473;
+let replayRecorder={active:false,framesElapsed:0,currentFrame:0,lastA:-1,lastB:-1,events:[],meta:null,checkpoints:[],seed:0};
+let replayPlayback={active:false,ended:false,paused:false,framesElapsed:0,currentFrame:0,eventIndex:0,a:0,b:0,data:null,speed:1,verified:null,restoreSettings:null,restoreSelection:null};
+const replayInputP1={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
+const replayInputP2={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
+function seedReplayVisuals(seed){ replayVisualSeedState=(seed>>>0)||0x676f6473; }
+function replayRand(){
+  let t=replayVisualSeedState+=0x6D2B79F5;
+  t=Math.imul(t^(t>>>15),t|1); t^=t+Math.imul(t^(t>>>7),t|61);
+  return ((t^(t>>>14))>>>0)/4294967296;
+}
+function encodeReplayInput(inp){ let bits=0; REPLAY_INPUT_KEYS.forEach((k,i)=>{ if(inp&&inp[k])bits|=1<<i; }); return bits; }
+function decodeReplayInput(bits,target){ REPLAY_INPUT_KEYS.forEach((k,i)=>target[k]=!!(bits&(1<<i))); return target; }
+function replayStateHash(){
+  const q=v=>Math.round((v||0)*1000)/1000;
+  const parts=[state,round,timerSec,p1.charIndex,p2.charIndex,
+    q(p1.x),q(p1.y),q(p1.vx),q(p1.vy),q(p1.health),q(p1.energy),p1.roundWins,p1.attackType||"",p1.attackT,p1.hitStun,p1.downT,p1.stats.damage,p1.stats.hits,p1.stats.maxCombo,
+    q(p2.x),q(p2.y),q(p2.vx),q(p2.vy),q(p2.health),q(p2.energy),p2.roundWins,p2.attackType||"",p2.attackT,p2.hitStun,p2.downT,p2.stats.damage,p2.stats.hits,p2.stats.maxCombo,
+    projectiles.length,projectiles.map(pr=>q(pr.x)+","+q(pr.y)+","+pr.kind).join(";")];
+  let h=0x811c9dc5; const s=parts.join("|");
+  for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193); }
+  return ("0000000"+(h>>>0).toString(16)).slice(-8);
+}
+function makeReplaySeed(){ return ((Date.now()&0xffffffff)^((Math.random()*0xffffffff)>>>0))>>>0; }
+function saveLastReplay(data){ try{ window.localStorage.setItem(REPLAY_STORE_KEY,JSON.stringify(data)); }catch(e){} }
+function loadLastReplay(){
+  try{ const raw=window.localStorage.getItem(REPLAY_STORE_KEY); if(!raw)return null; const d=JSON.parse(raw);
+    return d&&d.v===REPLAY_VERSION&&Array.isArray(d.events)&&d.mode&&d.start&&d.duration>0?d:null;
+  }catch(e){ return null; }
+}
+let lastReplayData=loadLastReplay();
+function captureReplayMeta(seed){
+  const snap=f=>({char:f.charIndex,health:f.health,maxHealth:f.maxHealth,energy:f.energy,powerMul:f.powerMul||1});
+  return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,
+    char1:p1.charIndex,char2:p2.charIndex,names:{p1:p1.name,p2:p2.name},
+    settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},
+    context:{storyStep:story.step,arcadeStage:arcade.stage,survivalWave:survival.wave,survivalScore:survival.score},
+    start:{p1:snap(p1),p2:snap(p2)}};
+}
+function startReplayRecording(seed){
+  replayRecorder={active:mode!=="training"&&!replayPlayback.active,framesElapsed:0,currentFrame:0,lastA:-1,lastB:-1,events:[],meta:null,checkpoints:[],seed:seed>>>0};
+  if(replayRecorder.active){ replayRecorder.meta=captureReplayMeta(seed); replayRecorder.checkpoints.push({f:0,h:replayStateHash()}); }
+}
+function cancelReplayRecording(){ replayRecorder.active=false; replayRecorder.events=[]; replayRecorder.meta=null; }
+function tickReplayFrameStart(){
+  if(replayPlayback.active){ replayPlayback.currentFrame=replayPlayback.framesElapsed++; return true; }
+  if(replayRecorder.active){ replayRecorder.currentFrame=replayRecorder.framesElapsed++; return true; }
+  return false;
+}
+function recordReplayInputs(i1,i2){
+  if(!replayRecorder.active)return;
+  const a=encodeReplayInput(i1),b=encodeReplayInput(i2),f=replayRecorder.currentFrame;
+  if(a!==replayRecorder.lastA||b!==replayRecorder.lastB){ replayRecorder.events.push({f,a,b}); replayRecorder.lastA=a; replayRecorder.lastB=b; }
+}
+function replayInputsForCurrentFrame(){
+  const d=replayPlayback.data,f=replayPlayback.currentFrame;
+  while(d&&replayPlayback.eventIndex<d.events.length&&d.events[replayPlayback.eventIndex].f<=f){ const e=d.events[replayPlayback.eventIndex++]; replayPlayback.a=e.a; replayPlayback.b=e.b; }
+  return {p1:decodeReplayInput(replayPlayback.a,replayInputP1),p2:decodeReplayInput(replayPlayback.b,replayInputP2)};
+}
+function verifyReplayCheckpoint(){
+  if(replayPlayback.active&&replayPlayback.data&&Array.isArray(replayPlayback.data.checkpoints)){
+    const cp=replayPlayback.data.checkpoints.find(c=>c.f===replayPlayback.currentFrame);
+    if(cp&&cp.h!==replayStateHash())replayPlayback.verified=false;
+  } else if(replayRecorder.active&&replayRecorder.currentFrame>0&&replayRecorder.currentFrame%300===0){
+    replayRecorder.checkpoints.push({f:replayRecorder.currentFrame,h:replayStateHash()});
+  }
+}
+function finalizeReplayRecording(winner){
+  if(!replayRecorder.active||!replayRecorder.meta)return null;
+  const finalHash=replayStateHash(),duration=Math.max(1,replayRecorder.framesElapsed);
+  if(!replayRecorder.checkpoints.some(c=>c.f===replayRecorder.currentFrame))replayRecorder.checkpoints.push({f:replayRecorder.currentFrame,h:finalHash});
+  const data={...replayRecorder.meta,duration,events:replayRecorder.events.slice(),checkpoints:replayRecorder.checkpoints.slice(),finalHash,
+    result:{winnerSide:winner===p1?1:2,winnerName:winner.name,p1Health:Math.round(p1.health),p2Health:Math.round(p2.health),rounds:[p1.roundWins,p2.roundWins],damage:[p1.stats.damage,p2.stats.damage],maxCombo:[p1.stats.maxCombo,p2.stats.maxCombo]}};
+  lastReplayData=data; saveLastReplay(data); replayRecorder.active=false;
+  if(typeof syncReplayUI==="function")syncReplayUI();
+  return data;
+}
+function finishReplayPlayback(winner){
+  const d=replayPlayback.data,okHash=!d||!d.finalHash||d.finalHash===replayStateHash(),okWinner=!d||!d.result||d.result.winnerSide===(winner===p1?1:2);
+  if(replayPlayback.verified==null)replayPlayback.verified=true;
+  replayPlayback.verified=replayPlayback.verified&&okHash&&okWinner;
+  replayPlayback.active=false; replayPlayback.ended=true; replayPlayback.paused=false;
+  state="matchEnd"; lastWinner=winner; hideAnnounce(); stopMusic(); cinematic=0;
+  if(typeof onReplayFinished==="function")onReplayFinished(winner);
+}
+function stopReplayPlayback(restore){
+  if(replayPlayback.restoreSettings){ SETTINGS.roundTime=replayPlayback.restoreSettings.roundTime; SETTINGS.roundsWin=replayPlayback.restoreSettings.roundsWin; }
+  if(restore!==false&&replayPlayback.restoreSelection){ selCharP1=replayPlayback.restoreSelection.charP1; selCharP2=replayPlayback.restoreSelection.charP2; selArenaId=replayPlayback.restoreSelection.arena; }
+  replayPlayback.active=false; replayPlayback.ended=false; replayPlayback.paused=false; replayPlayback.data=null; replayPlayback.restoreSettings=null; replayPlayback.restoreSelection=null;
+}
 
 /* ---------------- QUALITÉ / HAUTE RÉSOLUTION ---------------- */
 let DPR=1,qualityLevel=2; // 2 haute, 1 moyenne, 0 basse
@@ -245,7 +344,7 @@ class Fighter{
     this.dashT=0; this.dashDir=1; this.dashCD=0; this.airDashed=false;
     this.bufType=null; this.bufT=0; this.jumpBufT=0; this.dashBufT=0; this.dashBufDir=1; this.coyote=0; this.jumpCut=false;
     this.lastTapDir=0; this.lastTapFrame=-99; this.holdDir=0; this.holdT=0;
-    this.anim=Math.random()*100; this.walkPhase=0; this.squashT=0; this.blinkT=80+Math.random()*120;
+    this.anim=replayRand()*100; this.walkPhase=0; this.squashT=0; this.blinkT=80+replayRand()*120;
     this.prev={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
   }
 }
@@ -302,7 +401,7 @@ function addGhost(f){ if(ghosts.length>36)ghosts.shift(); ghosts.push({x:f.x,y:f
 /* ---------------- SUCCÈS / TOAST ---------------- */
 let toastTimer=null;
 function showToast(text){ const t=$("toast"); if(!t)return; t.textContent=text; t.classList.add("show"); clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove("show"),3400); }
-function unlock(id,label){ if(PROFILE.ach[id])return; PROFILE.ach[id]=true; saveProfile(); showToast("🏆 Succès débloqué : "+label); SFX.achieve(); }
+function unlock(id,label){ if(replayPlayback.active||PROFILE.ach[id])return; PROFILE.ach[id]=true; saveProfile(); showToast("🏆 Succès débloqué : "+label); SFX.achieve(); }
 
 /* ---------------- ENTRÉES : clavier, tactile, manettes ---------------- */
 const keys=new Set();
@@ -500,7 +599,7 @@ function applyDamage(att,def,atk,typeLabel){
     spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
     hitStopT=Math.max(hitStopT,92); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
-    if(def===p1){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
+    if(def===p1&&!replayPlayback.active){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
     return;
   }
   if(blocked){
@@ -524,7 +623,7 @@ function applyDamage(att,def,atk,typeLabel){
   att.energy=Math.min(100,att.energy+(atk.energy||6)*att.char.energyGain);
   att.hitConfirmed=true; att.comboDamage+=dmg; att.stats.damage+=dmg; att.stats.hits++;
   att.stats.maxCombo=Math.max(att.stats.maxCombo,att.combo); att.stats.maxComboDamage=Math.max(att.stats.maxComboDamage,att.comboDamage);
-  if(att===p1){ PROFILE.stats.bestCombo=Math.max(PROFILE.stats.bestCombo,att.combo); PROFILE.stats.bestComboDamage=Math.max(PROFILE.stats.bestComboDamage,att.comboDamage);
+  if(att===p1&&!replayPlayback.active){ PROFILE.stats.bestCombo=Math.max(PROFILE.stats.bestCombo,att.combo); PROFILE.stats.bestComboDamage=Math.max(PROFILE.stats.bestComboDamage,att.comboDamage);
     if(att.combo>=5)unlock("combo5","Combo x5"); if(att.combo>=6)unlock("combo6","Défi Tempête Gideon — Combo x6"); if(att.comboDamage>=30)unlock("combo30","30 dégâts en un combo"); }
   def.kvx=att.facing*(atk.knock||4)*def.char.knockRes;
   if(atk.launcher){ def.vy=-atk.launcher; def.grounded=false; def.juggleT=36; }
@@ -566,7 +665,7 @@ function updateFighter(f,inp,op){
   if(f.bufT>0)f.bufT--; if(f.jumpBufT>0)f.jumpBufT--; if(f.dashBufT>0)f.dashBufT--;
   if(f.parryT>0)f.parryT--; if(f.parryFlashT>0)f.parryFlashT--; if(f.counterWindowT>0)f.counterWindowT--;
   if(f.comboT>0){ f.comboT--; if(f.comboT===0){f.combo=0;f.comboDamage=0;f.comboSeq=[];} }
-  if(--f.blinkT<-7)f.blinkT=90+Math.random()*140;
+  if(--f.blinkT<-7)f.blinkT=90+replayRand()*140;
   if(f.dead){ f.koT++; f.vy+=.85; f.y+=f.vy; f.x+=f.kvx; f.kvx*=.9; if(f.y>=GROUND){ if(!f.grounded)dust(f.x,GROUND,8); f.y=GROUND;f.vy=0;f.grounded=true; } clampX(f); Object.assign(f.prev,inp); return; }
   const wasHitStun=f.hitStun>0;
   if(f.hitStun>0)f.hitStun--; if(f.blockStun>0)f.blockStun--;
@@ -716,8 +815,10 @@ function resetTrainingPositions(full){
   if(typeof snapHUD==="function")snapHUD();
 }
 function beginMatch(){
+  const replaySeed=replayPlayback.active&&replayPlayback.data?replayPlayback.data.seed:makeReplaySeed();
+  seedReplayVisuals(replaySeed);
   buildDisplayNames();
-  if(mode==="survival"&&survival.wave===1&&!survival.runCounted){ survival.runCounted=true; PROFILE.stats.survivalRuns=(PROFILE.stats.survivalRuns||0)+1; saveProfile(); }
+  if(!replayPlayback.active&&mode==="survival"&&survival.wave===1&&!survival.runCounted){ survival.runCounted=true; PROFILE.stats.survivalRuns=(PROFILE.stats.survivalRuns||0)+1; saveProfile(); }
   p1.roundWins=0; p2.roundWins=0; round=1; matchElapsed=0; resetFighterStats();
   playerHabits.jumps=0; playerHabits.blocks=0; playerHabits.dashes=0;
   $("nameP1").innerHTML="🟦 "+escapeHTML(p1.displayName);
@@ -732,6 +833,11 @@ function beginMatch(){
     if(typeof snapHUD==="function")snapHUD();
     if(typeof resetCamera==="function")resetCamera(true);
   } else resetRound();
+  if(replayPlayback.active&&replayPlayback.data&&replayPlayback.data.start){
+    const restoreFighter=(f,s)=>{ if(!s)return; f.maxHealth=s.maxHealth; f.health=s.health; f.energy=s.energy; f.powerMul=s.powerMul||1; };
+    restoreFighter(p1,replayPlayback.data.start.p1); restoreFighter(p2,replayPlayback.data.start.p2);
+    if(typeof snapHUD==="function")snapHUD();
+  } else startReplayRecording(replaySeed);
   startMusic();
 }
 function endRound(winner,byKO,finishType){
@@ -746,6 +852,8 @@ function endRound(winner,byKO,finishType){
   if(typeof buildPips==="function")buildPips();
 }
 function finishMatch(winner){
+  if(replayPlayback.active){ finishReplayPlayback(winner); return; }
+  finalizeReplayRecording(winner);
   state="matchEnd"; hideAnnounce(); stopMusic(); SFX.win(); confetti(); cinematic=0;
   if(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"){
     PROFILE.stats.matches++;
@@ -795,6 +903,9 @@ function finishMatch(winner){
   if(typeof showEndScreen==="function")showEndScreen(winner);
 }
 function updateGameLogic(){
+  tickReplayFrameStart(); verifyReplayCheckpoint();
+  const replayedInputs=replayPlayback.active?replayInputsForCurrentFrame():null;
+  if(!replayPlayback.active&&state!=="fight"&&state!=="training")recordReplayInputs(INPUT_BLANK,INPUT_BLANK);
   simFrame++; timeGlobal++;
   if(state==="intro"){
     introT--; updateFighter(p1,INPUT_BLANK,p2); updateFighter(p2,INPUT_BLANK,p1); separate();
@@ -803,9 +914,14 @@ function updateGameLogic(){
   }
   else if(state==="fight"||state==="training"){
     matchElapsed+=1/60;
-    const i1=getInputP1();
-    let i2;
-    if(mode==="2p")i2=getInputP2(); else if(mode==="training")i2=getDummyInput(); else { updateBot(); i2=bot.input; }
+    let i1,i2;
+    if(replayPlayback.active){ i1=replayedInputs.p1; i2=replayedInputs.p2; }
+    else {
+      i1=getInputP1();
+      if(mode==="2p")i2=getInputP2(); else if(mode==="training")i2=getDummyInput(); else { updateBot(); i2=bot.input; }
+      /* Entrées finales (bot inclus) : la relecture ne redemande jamais son avis au hasard. */
+      recordReplayInputs(i1,i2);
+    }
     updateFighter(p1,i1,p2); updateFighter(p2,i2,p1); separate(); updateProjectiles();
     if(state==="fight"&&SETTINGS.roundTime>0){
       timerFrames++; if(timerFrames>=60){ timerFrames=0; timerSec--; if(timerSec<=10&&timerSec>0)SFX.beep();
@@ -827,6 +943,7 @@ function updateGameLogic(){
     p1.facing=1; p2.facing=-1;
     if(state==="matchEnd"&&Math.random()<.012)confetti();
   }
+  if(replayPlayback.active&&replayPlayback.data&&replayPlayback.currentFrame>=replayPlayback.data.duration+180&&state!=="matchEnd")finishReplayPlayback(lastWinner||(p1.health>=p2.health?p1:p2));
   updateEffects();
 }
 function escapeHTML(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }

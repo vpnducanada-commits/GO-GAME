@@ -50,11 +50,16 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🚶 Passants mobiles dans les 4 arènes, ola de foule, drapeaux et pirogues animées
 - ⚡ Optimisations ciblées (cache texte, effets) et métriques d’animation testables
 
-## 🔜 SPRINT 06 — V2.6 « Replays déterministes » *(planifié)*
-- **Technique/Manager** : graine déterministe seedable + **replays** des matchs (enregistrement des entrées)
-- **Kenzo** : polish VFX par personnage, variations d’arènes (jour/nuit), finition tactile
-- **Nadia** : équilibrage post-Zara, nouvelles lignes de victoire, défi tournant local
-- **Sarah** : matrice de tests replays/déterminisme + budgets FPS sur écrans 120 Hz
+## ✅ SPRINT 06 — V2.6 « Replays déterministes » *(LIVRÉ le 23/10/2026 — 122 assertions source, suite verte)*
+- 🎬 **Enregistrement lockstep** des entrées finales des deux combattants (bot inclus), compacté en RLE et persisté localement
+- ▶️ **Lecteur intégré** : pause/reprise, 0,5×→4×, redémarrage, progression, sortie propre et restauration des réglages
+- 🔐 **Isolation totale** : aucun gain de profil, succès, progression ou Hall of Fame pendant un replay
+- ✅ **Preuve Sarah** : vrai match joué uniquement par entrées, relu de bout en bout avec hash final et vainqueur identiques
+
+## 🔜 Sprint suivant — à arbitrer par le Manager après retour du PO
+- Bibliothèque de plusieurs replays et renommage des meilleurs matchs
+- Polish VFX par personnage et variations d’arènes jour/nuit (Kenzo)
+- Nouvel équilibrage post-Zara et lignes de victoire (Nadia)
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

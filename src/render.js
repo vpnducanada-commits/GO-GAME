@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.5 PRO — RENDU HAUT GRAPHISME
+   GÉDÉON - Godson ARENA V2.6 PRO — RENDU HAUT GRAPHISME
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -600,17 +600,18 @@ function loop(ts){
     else autoGoodChecks=0;
   }
   if(SETTINGS.showFps&&rafCount%12===0){ const txt=Math.round(fpsEMA)+" FPS • Q"+qualityLevel; if(txt!==lastFpsShown){lastFpsShown=txt;$("fpsChip").textContent=txt;} }
-  if(state==="pause"){ prepareInterpolation(1); updateCamera(0); render(); return; }
-  if(hitStopT>0){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); return; }
-  let scale=SETTINGS.speed;
+  if(state==="pause"||(replayPlayback.active&&replayPlayback.paused)){ prepareInterpolation(1); updateCamera(0); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
+  if(hitStopT>0){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
+  let scale=replayPlayback.active?replayPlayback.speed:SETTINGS.speed;
   if(slowmoT>0){ slowmoT-=dt/16.667; scale*=.34; }
   acc+=dt*scale;
   const step=1000/60; let n=0;
-  while(acc>=step&&n<3){ updateGameLogic(); acc-=step; n++; }
-  if(n===3&&acc>=step)acc=0;
+  const maxSteps=replayPlayback.active?Math.max(3,Math.ceil(replayPlayback.speed)+1):3;
+  while(acc>=step&&n<maxSteps){ updateGameLogic(); acc-=step; n++; }
+  if(n===maxSteps&&acc>=step)acc=0;
   prepareInterpolation(clamp(acc/step,0,1));
   updateCamera(dt);
-  render(); updateHUD();
+  render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar();
 }
 function startLoop(){ resizeCanvas(); requestAnimationFrame(loop); }
 rebuildArenaCache();

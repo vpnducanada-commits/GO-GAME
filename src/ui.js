@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.5 PRO — INTERFACE & MENUS PRO
+   GÉDÉON - Godson ARENA V2.6 PRO — INTERFACE & MENUS PRO
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -171,6 +171,84 @@ function showVS(keepPrepared){
 function launchPreparedMatch(){ clearTimeout(vsTimeout); showOnly(null); beginMatch(); }
 function skipVS(){ if(state==="vs")launchPreparedMatch(); }
 
+/* ---------------- REPLAYS DÉTERMINISTES V2.6 ---------------- */
+let lastReplayUiKey="";
+function replayModeLabel(d){
+  if(!d)return "";
+  const c=d.context||{};
+  return d.mode==="story"?"Histoire "+(c.storyStep||"?")+"/6":d.mode==="survival"?"Survie — vague "+(c.survivalWave||1):d.mode==="arcade"?"Arcade "+(c.arcadeStage||1)+"/5":d.mode==="2p"?"2 Joueurs":"Bot "+((DIFFS[d.botDiff]||{}).label||d.botDiff||"");
+}
+function replaySummary(d){
+  if(!d)return "Aucun replay enregistré";
+  const c1=(CHARACTERS[d.char1]||{}).name||"J1",c2=(CHARACTERS[d.char2]||{}).name||"J2",winner=d.result?d.result.winnerName:"?";
+  return c1+" vs "+c2+" • "+replayModeLabel(d)+" • "+fmtClock((d.duration||0)/60)+" • Vainqueur : "+winner;
+}
+function syncReplayUI(){
+  const has=!!(lastReplayData&&lastReplayData.duration>0),main=$("btnLastReplay"),end=$("btnWatchReplay"),info=$("replayInfo");
+  if(main)main.disabled=!has;
+  if(end)end.disabled=!has;
+  if(info)info.textContent=has?("🎬 Dernier replay prêt : "+replaySummary(lastReplayData)+"."):"🎬 Termine un match pour pouvoir le revoir ici, exactement comme il s’est joué.";
+  updateReplayBar(true);
+}
+function updateReplayBar(force){
+  const bar=$("replayBar"); if(!bar)return;
+  const visible=!!(replayPlayback.active||replayPlayback.ended),d=replayPlayback.data;
+  bar.classList.toggle("show",visible);
+  if(!visible){ lastReplayUiKey=""; return; }
+  const pct=d?clamp(Math.round((replayPlayback.framesElapsed||0)/Math.max(1,d.duration)*100),0,100):0;
+  const status=replayPlayback.ended?(replayPlayback.verified?"✅ Replay vérifié — même état final":"⚠️ Replay divergent — ancienne version ?"):replayPlayback.paused?"⏸ En pause":replayPlayback.verified===false?"⚠️ Divergence détectée":"▶ Lecture déterministe";
+  const key=pct+"|"+status+"|"+(replayPlayback.paused?1:0)+"|"+(replayPlayback.ended?1:0);
+  if(!force&&key===lastReplayUiKey)return; lastReplayUiKey=key;
+  $("replayProgressFill").style.width=pct+"%";
+  $("replayProgress").textContent=pct+"%";
+  $("replayStatus").textContent=status;
+  const play=$("btnReplayPlay"); play.disabled=!!replayPlayback.ended; play.textContent=replayPlayback.paused?"▶ Reprendre":"⏸ Pause";
+  const spd=$("replaySpeed"); if(spd&&document.activeElement!==spd)spd.value=String(replayPlayback.speed||1);
+}
+function startReplayPlayback(data){
+  data=data||lastReplayData||loadLastReplay();
+  if(!data||!Array.isArray(data.events)){ showToast("🎬 Aucun replay disponible — termine d’abord un match !"); return false; }
+  audio(); clearTimeout(vsTimeout);
+  const keepSpeed=replayPlayback.speed||1;
+  const restoreSettings=replayPlayback.restoreSettings||{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin};
+  const restoreSelection=replayPlayback.restoreSelection||{charP1:selCharP1,charP2:selCharP2,arena:selArenaId};
+  const ctx=data.context||{};
+  cancelReplayRecording();
+  replayPlayback={active:true,ended:false,paused:false,framesElapsed:0,currentFrame:0,eventIndex:0,a:0,b:0,data,speed:keepSpeed,verified:null,restoreSettings,restoreSelection};
+  mode=data.mode; pendingMode=data.mode; if(data.botDiff)botDiff=data.botDiff;
+  if(ctx.storyStep)story.step=ctx.storyStep;
+  if(ctx.arcadeStage)arcade.stage=ctx.arcadeStage;
+  if(ctx.survivalWave)survival.wave=ctx.survivalWave;
+  survival.score=ctx.survivalScore||0; survival.carryHealth=null; survival.lastWin=false;
+  if(data.settings){ SETTINGS.roundTime=data.settings.roundTime; SETTINGS.roundsWin=data.settings.roundsWin; }
+  applyCharacterTo(p1,data.char1); applyCharacterTo(p2,data.char2);
+  setArenaById(data.arena||"stadium");
+  showOnly(null);
+  beginMatch();
+  $("touchUI").style.display="none"; $("trainingBar").style.display="none";
+  $("roundLabel").textContent="🎬 REPLAY • "+replayModeLabel(data).toUpperCase();
+  syncReplayUI();
+  showToast("🎬 Replay : "+replaySummary(data));
+  return true;
+}
+function toggleReplayPause(){ if(!replayPlayback.active)return; replayPlayback.paused=!replayPlayback.paused; updateReplayBar(true); }
+function restartReplayPlayback(){ const d=replayPlayback.data||lastReplayData; if(d)startReplayPlayback(d); }
+function exitReplayPlayback(){ stopReplayPlayback(true); goMenu(); }
+function onReplayFinished(winner){
+  SFX.win();
+  $("roundLabel").textContent="🎬 REPLAY TERMINÉ";
+  syncReplayUI();
+  showToast(replayPlayback.verified?("✅ Replay vérifié — "+winner.name+" gagne, exactement comme la première fois !"):"⚠️ Replay terminé, mais l’état final diverge (replay d’une autre version ?)");
+}
+function bindReplayUI(){
+  $("btnLastReplay").onclick=()=>startReplayPlayback();
+  $("btnWatchReplay").onclick=()=>startReplayPlayback();
+  $("btnReplayPlay").onclick=toggleReplayPause;
+  $("btnReplayRestart").onclick=restartReplayPlayback;
+  $("btnReplayQuit").onclick=exitReplayPlayback;
+  $("replaySpeed").addEventListener("change",e=>{ replayPlayback.speed=+e.target.value||1; updateReplayBar(true); });
+}
+
 /* ---------------- MODE HISTOIRE : SCÈNES ---------------- */
 function storyDialogueHTML(lines){
   return lines.map(line=>"<p class='"+(line[0]==="NARRATION"?"narr":"")+"'><b>"+escapeHTML(line[0]==="TOI"?(PROFILE.names.p1||"TOI").toUpperCase():line[0])+"</b>"+escapeHTML(line[1])+"</p>").join("");
@@ -198,16 +276,21 @@ function storyContinue(){
 
 /* ---------------- NAVIGATION MENUS ---------------- */
 function goMenu(){
-  clearTimeout(vsTimeout); state="menu"; mode="bot"; stopMusic(); hideAnnounce();
+  clearTimeout(vsTimeout);
+  cancelReplayRecording();
+  if(replayPlayback.active||replayPlayback.ended)stopReplayPlayback(true);
+  state="menu"; mode="bot"; stopMusic(); hideAnnounce();
   $("hud").style.display="none"; $("trainingBar").style.display="none"; $("touchUI").style.display="none";
   p1.roundWins=0; p2.roundWins=0; projectiles=[]; particles=[]; floaters=[]; rings=[]; ghosts=[];
   applyCharacterTo(p1,selCharP1); applyCharacterTo(p2,selCharP2<0?1:selCharP2);
   p1.reset(); p2.reset(); buildDisplayNames(); placeMenuFighters(); resetCamera(true);
   if(selArenaId!=="random")setArenaById(selArenaId);
-  syncProfileUI(); showOnly("menuMain");
+  syncProfileUI(); showOnly("menuMain"); syncReplayUI();
   if(AC)startMusic();
 }
 function togglePause(){
+  if(replayPlayback.active){ toggleReplayPause(); return; }
+  if(replayPlayback.ended)return;
   if(state==="fight"||state==="intro"||state==="roundEnd"||state==="training"){ prevState=state; state="pause"; showOnly("menuPause"); }
   else if(state==="pause"){ state=prevState; showOnly(null); }
 }
@@ -325,6 +408,7 @@ function populateSettings(){
   $("fpsChip").classList.toggle("hidden",!SETTINGS.showFps);
 }
 function openSettings(){
+  if(replayPlayback.active||replayPlayback.ended){ showToast("🎬 Réglages indisponibles pendant un replay — quitte la lecture d’abord."); return; }
   audio();
   if(state==="fight"||state==="intro"||state==="roundEnd"||state==="training"){ prevState=state; state="pause"; settingsReturn="menuPause"; }
   else settingsReturn=state==="pause"?"menuPause":"menuMain";
@@ -427,7 +511,7 @@ pendingMode="bot"; mode="bot";
 if(isCharLocked(CHARACTERS[selCharP1]))selCharP1=0;
 if(selCharP2>=0&&isCharLocked(CHARACTERS[selCharP2]))selCharP2=1;
 if(selArenaId!=="random")setArenaById(selArenaId);
-bindSettings(); bindCustomize(); bindUI(); populateSettings(); populateCustomize();
+bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); populateSettings(); populateCustomize();
 buildRosters(); buildArenaCards(); updateLaunchSummary();
 buildPips(); goMenu(); startLoop();
 console.log("%cGÉDÉON - Godson ARENA V"+GAME_VERSION+" PRO%c signé Gideon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");

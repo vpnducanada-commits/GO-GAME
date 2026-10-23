@@ -3,6 +3,18 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [2.6.0] — 23 octobre 2026 — « Replays déterministes » (Sprint 06)
+### Replay du dernier match — Manager + Kenzo
+- 🎬 **Enregistrement lockstep** de tous les matchs terminés hors entraînement : les entrées finales des deux combattants (clavier, tactile, manettes et décisions déjà produites par le bot) sont encodées en masques 8 bits puis compactées en événements de changement.
+- ▶️ **Lecteur intégré** accessible depuis l’écran de fin et le menu principal : redémarrage, pause/reprise avec la touche `P`, vitesses **0,5×, 1×, 2× et 4×**, barre de progression et sortie propre.
+- 💾 **Persistance locale** du dernier replay avec ses personnages, son arène, son mode, ses règles, ses conditions de départ et son résultat ; il reste disponible après rechargement de la page.
+### Déterminisme & sécurité du profil — Sarah
+- 🎲 **Graine visuelle reproductible** pour l’état d’animation initial et les clignements ; la physique et les dégâts ne dépendent d’aucun tirage aléatoire.
+- 🔐 **Hashs d’état** au départ, tous les 300 frames et à la fin : le lecteur affiche « ✅ Replay vérifié » uniquement si la relecture produit le même état final et le même vainqueur.
+- 🛡️ **Isolation complète** pendant la lecture : statistiques, combos records, parry, succès, Histoire, Survie, Arcade et Hall of Fame ne peuvent pas être modifiés une deuxième fois. Les réglages temporaires du match original sont restaurés à la sortie.
+- ✅ Suite étendue à **122 assertions source**, dont un vrai match 2 joueurs joué uniquement par les entrées puis relu intégralement ; gate QA enrichie d’un contrôle permanent des hooks replay.
+- Board du sprint : `docs/SPRINT_06_REPLAYS.md`.
+
 ## [2.5.0] — 23 octobre 2026 — « Human Motion & Living Arenas » (Sprint 05 — demande directe du Product Owner)
 ### Fluidité & corps humain — Kenzo, game feel Nadia
 - 🕺 **Moteur d’animation corporelle continue** : posture, inclinaison, course, saut, garde, douleur, dash, squash et regard sont lissés avec le vrai delta d’écran (60/120/144 Hz), au lieu de suivre les paliers bruts de la simulation 60 Hz.

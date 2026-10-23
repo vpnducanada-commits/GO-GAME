@@ -320,6 +320,46 @@ try {
   assert(ev('renderStats.ambientPeople') > 0 && ev('renderStats.ambientPeople') <= 5, 'qualité basse : foule réduite mais arène toujours vivante');
   ev('qualityLevel=2; resizeCanvas();');
 
+  console.log('\n— V2.6 : replays déterministes —');
+  assert(ev('typeof startReplayRecording') === 'function' && ev('typeof replayStateHash') === 'function' && ev('typeof startReplayPlayback') === 'function', 'moteur de replay disponible');
+  assert(ev('encodeReplayInput({left:false,right:true,jump:false,block:false,punch:true,kick:false,special:false,dash:true})') === 146 && ev('decodeReplayInput(146,replayInputP1).right') === true && ev('replayInputP1.punch') === true && ev('replayInputP1.dash') === true, 'encodage/décodage des entrées en masque 8 bits');
+
+  /* Vrai match joué UNIQUEMENT par les entrées : aucune santé ni position
+     n’est forcée ici, sinon la preuve de déterminisme ne vaudrait rien. */
+  ev('goMenu(); SETTINGS.roundsWin=1; SETTINGS.roundTime=99; selCharP1=0; selCharP2=1; selArenaId="stadium"; saveSelection();');
+  click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()');
+  assert(ev('replayRecorder.active') === true, 'enregistrement du match démarré');
+  ev(`(() => { let guard=0; while(state!=="matchEnd"&&guard++<7000){ keys.clear(); if(state==="fight"){ const dx=p2.x-p1.x; if(dx>92)keys.add("KeyD"); else if(dx<-92)keys.add("KeyA"); else if(simFrame%22<2)keys.add("KeyF"); } updateGameLogic(); } keys.clear(); return guard; })()`);
+  step(2);
+  assert(ev('state') === 'matchEnd' && ev('p1.roundWins') === 1, 'match de référence terminé par les seules entrées');
+  assert(ev('!!lastReplayData') && ev('lastReplayData.duration') > 500 && ev('lastReplayData.events.length') > 10 && ev('lastReplayData.events.length') < ev('lastReplayData.duration'), 'replay enregistré et compacté en événements de changement');
+  assert(ev('loadLastReplay().finalHash') === ev('lastReplayData.finalHash'), 'replay persisté dans le stockage local');
+  assert(window.document.getElementById('btnWatchReplay').disabled === false && window.document.getElementById('replayInfo').textContent.includes(' vs Kira '), 'replay proposé sur l’écran de fin et au menu');
+
+  const profileBeforeReplay = ev('JSON.stringify({stats:PROFILE.stats,story:PROFILE.story,unlocks:PROFILE.unlocks,ach:PROFILE.ach,leaderboard:PROFILE.leaderboard})');
+  ev('SETTINGS.roundTime=60; SETTINGS.roundsWin=3;');
+  click('btnWatchReplay');
+  assert(ev('replayPlayback.active') === true && window.document.getElementById('replayBar').classList.contains('show'), 'lecteur de replay affiché');
+  assert(ev('SETTINGS.roundTime') === 99 && ev('SETTINGS.roundsWin') === 1, 'le replay réutilise les règles du match original');
+  step(90);
+  click('btnReplayPlay');
+  assert(ev('replayPlayback.paused') === true, 'pause du replay');
+  click('btnReplayPlay');
+  const speedSelect = window.document.getElementById('replaySpeed');
+  speedSelect.value = '4'; speedSelect.dispatchEvent(new window.Event('change'));
+  assert(ev('replayPlayback.speed') === 4 && ev('replayPlayback.paused') === false, 'reprise et vitesse 4× du replay');
+  click('btnReplayRestart');
+  assert(ev('replayPlayback.active') === true && ev('replayPlayback.framesElapsed') === 0, 'redémarrage du replay depuis le début');
+  ev(`(() => { let guard=0; while(replayPlayback.active&&guard++<9000)updateGameLogic(); return guard; })()`);
+  assert(ev('replayPlayback.ended') === true && ev('replayPlayback.verified') === true, 'relecture complète vérifiée par hash d’état');
+  assert(ev('lastWinner===p1') && ev('p1.stats.damage') === ev('lastReplayData.result.damage[0]') && ev('p2.stats.damage') === ev('lastReplayData.result.damage[1]'), 'même vainqueur et mêmes dégâts qu’à l’original');
+  click('btnReplayQuit');
+  assert(ev('state') === 'menu' && !window.document.getElementById('replayBar').classList.contains('show'), 'sortie propre du replay vers le menu');
+  assert(ev('SETTINGS.roundTime') === 60 && ev('SETTINGS.roundsWin') === 3, 'réglages du joueur restaurés après le replay');
+  assert(ev('JSON.stringify({stats:PROFILE.stats,story:PROFILE.story,unlocks:PROFILE.unlocks,ach:PROFILE.ach,leaderboard:PROFILE.leaderboard})') === profileBeforeReplay, 'profil strictement inchangé pendant le replay');
+  assert(window.document.getElementById('btnLastReplay').disabled === false, 'dernier replay toujours disponible après retour au menu');
+  ev('SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveProfile();');
+
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);
 }
