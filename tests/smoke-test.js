@@ -360,6 +360,47 @@ try {
   assert(window.document.getElementById('btnLastReplay').disabled === false, 'dernier replay toujours disponible après retour au menu');
   ev('SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveProfile();');
 
+  console.log('\n— V2.7 : Replay Studio & lignes de victoire —');
+  assert(ev('typeof loadReplayLibrary') === 'function' && ev('typeof renderReplayLibrary') === 'function' && ev('typeof renameReplayById') === 'function', 'bibliothèque de replays disponible');
+  assert(ev('CHARACTERS.every(c=>c.victoryLine&&c.victoryLine.length>12)') === true, 'les 6 combattants ont une ligne de victoire signature');
+  const firstStudioReplayId = ev('lastReplayData.id'), firstStudioHash = ev('lastReplayData.finalHash');
+  assert(!!firstStudioReplayId && ev('replayLibrary[0].id') === firstStudioReplayId && ev('loadReplayLibrary()[0].finalHash') === firstStudioHash, 'le replay V2.6 devient le premier élément persisté de la bibliothèque');
+  ev(`renameReplayById(${JSON.stringify(firstStudioReplayId)},"Finale Godson Studio"); setReplayFavorite(${JSON.stringify(firstStudioReplayId)},true);`);
+  assert(ev(`findReplayById(${JSON.stringify(firstStudioReplayId)}).title`) === 'Finale Godson Studio' && ev(`findReplayById(${JSON.stringify(firstStudioReplayId)}).favorite`) === true, 'renommage et favori persistés sur un replay');
+
+  /* Deuxième vrai match, toujours joué uniquement par entrées simulées. */
+  ev('goMenu(); SETTINGS.roundsWin=1; SETTINGS.roundTime=99; selCharP1=5; selCharP2=2; selArenaId="Libreville"; saveSelection();');
+  click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()');
+  ev(`(() => { let guard=0; while(state!=="matchEnd"&&guard++<8000){ keys.clear(); if(state==="fight"){ const dx=p2.x-p1.x; if(dx>92)keys.add("KeyD"); else if(dx<-92)keys.add("KeyA"); else if(simFrame%22<2)keys.add("KeyF"); } updateGameLogic(); } keys.clear(); return guard; })()`);
+  step(2);
+  const secondStudioReplayId = ev('lastReplayData.id');
+  assert(ev('state') === 'matchEnd' && ev('p1.roundWins') === 1 && secondStudioReplayId !== firstStudioReplayId && ev('replayLibrary[0].id') === secondStudioReplayId, 'deuxième match ajouté en tête de bibliothèque sans écraser le favori');
+  assert(window.document.getElementById('winnerQuote').textContent.includes('Libreville'), 'ligne de victoire de Zara affichée sur l’écran de fin');
+
+  ev('goMenu()'); click('btnLastReplay');
+  assert(!window.document.getElementById('menuReplays').classList.contains('hidden') && window.document.querySelectorAll('.replayCard').length >= 2 && window.document.getElementById('replayLibraryList').textContent.includes('Finale Godson Studio'), 'écran Bibliothèque : cartes et titre personnalisé visibles');
+  const playOldButton = window.document.querySelector(`[data-action="play"][data-id="${firstStudioReplayId}"]`);
+  assert(!!playOldButton, 'bouton Lire présent sur l’ancien replay favori');
+  if (playOldButton) playOldButton.click();
+  assert(ev('replayPlayback.active') === true && ev('replayPlayback.data.id') === firstStudioReplayId, 'lecture lancée sur le replay ancien sélectionné, pas seulement le dernier');
+  ev(`(() => { let guard=0; while(replayPlayback.active&&guard++<9000)updateGameLogic(); return guard; })()`);
+  assert(ev('replayPlayback.ended') === true && ev('replayPlayback.verified') === true && window.document.getElementById('replayStatus').textContent.includes('nom Godson'), 'ancien replay favori relu, vérifié et conclu par la ligne du vainqueur');
+  click('btnReplayQuit'); click('btnLastReplay');
+  window.confirm = () => true;
+  const deleteSecondButton = window.document.querySelector(`[data-action="delete"][data-id="${secondStudioReplayId}"]`);
+  assert(!!deleteSecondButton, 'bouton Supprimer présent dans la bibliothèque');
+  if (deleteSecondButton) deleteSecondButton.click();
+  assert(ev(`findReplayById(${JSON.stringify(secondStudioReplayId)})`) === null && !!ev(`findReplayById(${JSON.stringify(firstStudioReplayId)})`), 'suppression ciblée sans toucher au replay favori');
+
+  ev(`(() => { const base=findReplayById(${JSON.stringify(firstStudioReplayId)}); for(let i=0;i<10;i++){ const c=JSON.parse(JSON.stringify(base)); c.id="test-rotation-"+i; c.title="Clone rotation "+i; c.favorite=false; c.createdAt=Date.now()+10000+i; addReplayToLibrary(c); } return replayLibrary.length; })()`);
+  assert(ev('replayLibrary.length') <= ev('REPLAY_LIBRARY_MAX') && !!ev(`findReplayById(${JSON.stringify(firstStudioReplayId)})`), 'rotation automatique plafonnée et favori protégé');
+
+  const savedLibraryRaw = window.localStorage.getItem('gideonGodsonArenaReplayLibraryV1');
+  const legacyHash = ev(`(() => { const d=JSON.parse(JSON.stringify(findReplayById(${JSON.stringify(firstStudioReplayId)}))); delete d.id; delete d.title; delete d.favorite; localStorage.setItem(REPLAY_STORE_KEY,JSON.stringify(d)); localStorage.removeItem(REPLAY_LIBRARY_KEY); return d.finalHash; })()`);
+  assert(ev('loadReplayLibrary().length') === 1 && ev('loadReplayLibrary()[0].finalHash') === legacyHash && !!ev('loadReplayLibrary()[0].id') && !!ev('loadReplayLibrary()[0].title'), 'migration automatique d’un replay V2.6 sans bibliothèque');
+  if (savedLibraryRaw) window.localStorage.setItem('gideonGodsonArenaReplayLibraryV1', savedLibraryRaw);
+  ev('reloadReplayLibrary(); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveProfile(); goMenu();');
+
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);
 }

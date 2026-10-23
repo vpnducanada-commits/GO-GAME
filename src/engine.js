@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.6 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.7 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.6.0";
+const GAME_VERSION="2.7.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -41,13 +41,14 @@ if(PROFILE.story.completed&&!PROFILE.story.chapter2Completed){
 let SETTINGS=PROFILE.settings;
 function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
 
-/* ---------------- REPLAYS DÉTERMINISTES V2.6 ----------------
+/* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7 ----------------
    Enregistrement lockstep : on conserve les entrées FINALEMENT appliquées
    aux deux combattants (clavier, tactile, manettes ou bot), compactées en
    événements de changement. Physique et dégâts étant déterministes, les
    rejouer depuis l'état initial reproduit le même match ; des hashs
    d'état périodiques le prouvent pendant la lecture. */
-const REPLAY_VERSION=1,REPLAY_STORE_KEY="gideonGodsonArenaLastReplayV1";
+const REPLAY_VERSION=1,REPLAY_STORE_KEY="gideonGodsonArenaLastReplayV1",REPLAY_LIBRARY_KEY="gideonGodsonArenaReplayLibraryV1";
+const REPLAY_LIBRARY_MAX=8,REPLAY_LIBRARY_HARD_MAX=12,REPLAY_LIBRARY_BUDGET=1800000;
 const REPLAY_INPUT_KEYS=["left","right","jump","block","punch","kick","special","dash"];
 let replayVisualSeedState=0x676f6473;
 let replayRecorder={active:false,framesElapsed:0,currentFrame:0,lastA:-1,lastB:-1,events:[],meta:null,checkpoints:[],seed:0};
@@ -73,13 +74,97 @@ function replayStateHash(){
   return ("0000000"+(h>>>0).toString(16)).slice(-8);
 }
 function makeReplaySeed(){ return ((Date.now()&0xffffffff)^((Math.random()*0xffffffff)>>>0))>>>0; }
+function isReplayData(d){ return !!(d&&d.v===REPLAY_VERSION&&Array.isArray(d.events)&&d.mode&&d.start&&d.duration>0); }
+function defaultReplayTitle(d){
+  const n=d&&d.names?d.names:{};
+  return ((n.p1||"Joueur 1")+" vs "+(n.p2||"Joueur 2")).slice(0,42);
+}
+function makeReplayId(d){
+  const stamp=(d&&d.createdAt?d.createdAt:Date.now()).toString(36),seed=((d&&d.seed)||0).toString(16),hash=(d&&d.finalHash)||"replay";
+  return "r"+stamp+"-"+seed+"-"+hash;
+}
+function normalizeReplayData(d){
+  if(!isReplayData(d))return null;
+  if(!d.id)d.id=makeReplayId(d);
+  d.title=String(d.title||defaultReplayTitle(d)).trim().slice(0,42)||defaultReplayTitle(d);
+  d.favorite=!!d.favorite;
+  return d;
+}
 function saveLastReplay(data){ try{ window.localStorage.setItem(REPLAY_STORE_KEY,JSON.stringify(data)); }catch(e){} }
 function loadLastReplay(){
-  try{ const raw=window.localStorage.getItem(REPLAY_STORE_KEY); if(!raw)return null; const d=JSON.parse(raw);
-    return d&&d.v===REPLAY_VERSION&&Array.isArray(d.events)&&d.mode&&d.start&&d.duration>0?d:null;
-  }catch(e){ return null; }
+  try{ const raw=window.localStorage.getItem(REPLAY_STORE_KEY); if(!raw)return null; return normalizeReplayData(JSON.parse(raw)); }
+  catch(e){ return null; }
 }
-let lastReplayData=loadLastReplay();
+function pruneReplayLibrary(protectId){
+  const removeOldestNonFavorite=()=>{
+    for(let i=replayLibrary.length-1;i>=0;i--)if(!replayLibrary[i].favorite&&replayLibrary[i].id!==protectId){ replayLibrary.splice(i,1); return true; }
+    return false;
+  };
+  while(replayLibrary.length>REPLAY_LIBRARY_MAX&&removeOldestNonFavorite()){}
+  while(replayLibrary.length>REPLAY_LIBRARY_HARD_MAX){ const idx=replayLibrary.findIndex((d,i)=>i===replayLibrary.length-1&&d.id!==protectId); if(idx<0)break; replayLibrary.pop(); }
+  while(replayLibrary.length>1&&JSON.stringify(replayLibrary).length>REPLAY_LIBRARY_BUDGET&&removeOldestNonFavorite()){}
+}
+function persistReplayLibrary(){
+  pruneReplayLibrary(lastReplayData&&lastReplayData.id);
+  for(let attempt=0;attempt<8;attempt++){
+    try{ window.localStorage.setItem(REPLAY_LIBRARY_KEY,JSON.stringify(replayLibrary)); return true; }
+    catch(e){
+      let removed=false;
+      for(let i=replayLibrary.length-1;i>=0;i--)if(!replayLibrary[i].favorite&&(!lastReplayData||replayLibrary[i].id!==lastReplayData.id)){ replayLibrary.splice(i,1); removed=true; break; }
+      if(!removed)return false;
+    }
+  }
+  return false;
+}
+function loadReplayLibrary(){
+  let list=[];
+  try{
+    const raw=window.localStorage.getItem(REPLAY_LIBRARY_KEY);
+    if(raw){ const parsed=JSON.parse(raw); if(Array.isArray(parsed))list=parsed.map(normalizeReplayData).filter(Boolean); }
+  }catch(e){ list=[]; }
+  if(!list.length){ const legacy=loadLastReplay(); if(legacy)list=[legacy]; }
+  const seen=new Set();
+  list=list.filter(d=>{ if(seen.has(d.id))d.id=d.id+"-"+seen.size; seen.add(d.id); return true; });
+  list.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  return list.slice(0,REPLAY_LIBRARY_HARD_MAX);
+}
+let replayLibrary=loadReplayLibrary();
+let lastReplayData=replayLibrary[0]||loadLastReplay();
+if(lastReplayData&&!replayLibrary.some(d=>d.id===lastReplayData.id)){ replayLibrary=[lastReplayData]; persistReplayLibrary(); }
+function refreshLastReplay(){
+  lastReplayData=replayLibrary[0]||null;
+  try{
+    if(lastReplayData)saveLastReplay(lastReplayData); else window.localStorage.removeItem(REPLAY_STORE_KEY);
+  }catch(e){}
+}
+function reloadReplayLibrary(){ replayLibrary=loadReplayLibrary(); refreshLastReplay(); if(typeof syncReplayUI==="function")syncReplayUI(); return replayLibrary; }
+function addReplayToLibrary(data){
+  data=normalizeReplayData(data); if(!data)return null;
+  replayLibrary=replayLibrary.filter(d=>d.id!==data.id);
+  replayLibrary.unshift(data); lastReplayData=data;
+  pruneReplayLibrary(data.id); saveLastReplay(data); persistReplayLibrary();
+  return data;
+}
+function findReplayById(id){ return replayLibrary.find(d=>d.id===id)||null; }
+function renameReplayById(id,title){
+  const d=findReplayById(id); if(!d)return false;
+  d.title=String(title||"").trim().slice(0,42)||defaultReplayTitle(d);
+  persistReplayLibrary(); refreshLastReplay(); if(typeof syncReplayUI==="function")syncReplayUI();
+  return true;
+}
+function setReplayFavorite(id,favorite){
+  const d=findReplayById(id); if(!d)return false;
+  d.favorite=favorite==null?!d.favorite:!!favorite;
+  persistReplayLibrary(); refreshLastReplay(); if(typeof syncReplayUI==="function")syncReplayUI();
+  return d.favorite;
+}
+function deleteReplayById(id){
+  const before=replayLibrary.length;
+  replayLibrary=replayLibrary.filter(d=>d.id!==id);
+  if(replayLibrary.length===before)return false;
+  refreshLastReplay(); persistReplayLibrary(); if(typeof syncReplayUI==="function")syncReplayUI();
+  return true;
+}
 function captureReplayMeta(seed){
   const snap=f=>({char:f.charIndex,health:f.health,maxHealth:f.maxHealth,energy:f.energy,powerMul:f.powerMul||1});
   return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,
@@ -121,8 +206,9 @@ function finalizeReplayRecording(winner){
   const finalHash=replayStateHash(),duration=Math.max(1,replayRecorder.framesElapsed);
   if(!replayRecorder.checkpoints.some(c=>c.f===replayRecorder.currentFrame))replayRecorder.checkpoints.push({f:replayRecorder.currentFrame,h:finalHash});
   const data={...replayRecorder.meta,duration,events:replayRecorder.events.slice(),checkpoints:replayRecorder.checkpoints.slice(),finalHash,
-    result:{winnerSide:winner===p1?1:2,winnerName:winner.name,p1Health:Math.round(p1.health),p2Health:Math.round(p2.health),rounds:[p1.roundWins,p2.roundWins],damage:[p1.stats.damage,p2.stats.damage],maxCombo:[p1.stats.maxCombo,p2.stats.maxCombo]}};
-  lastReplayData=data; saveLastReplay(data); replayRecorder.active=false;
+    result:{winnerSide:winner===p1?1:2,winnerName:winner.name,winnerChar:winner.charIndex,victoryLine:winner.char.victoryLine||"",p1Health:Math.round(p1.health),p2Health:Math.round(p2.health),rounds:[p1.roundWins,p2.roundWins],damage:[p1.stats.damage,p2.stats.damage],maxCombo:[p1.stats.maxCombo,p2.stats.maxCombo]}};
+  data.id=makeReplayId(data); data.title=defaultReplayTitle(data); data.favorite=false;
+  addReplayToLibrary(data); replayRecorder.active=false;
   if(typeof syncReplayUI==="function")syncReplayUI();
   return data;
 }
@@ -210,17 +296,17 @@ function stopMusic(){ if(musicTimer)clearInterval(musicTimer); musicTimer=null; 
 
 /* ---------------- DONNÉES : PERSONNAGES ---------------- */
 const CHARACTERS=[
- {id:"gideon",name:"GÉDÉON",title:"Le Champion Équilibré",letter:"G",style:"hero",specName:"⚡ Foudre Gédéon",superName:"🌟 Jugement Godson",hp:100,speed:1,power:1,atkSpeed:1,energyGain:1,scale:1,bulk:1,reach:1,gravity:.8,jump:15.8,knockRes:1,dashCD:28,
+ {id:"gideon",name:"GÉDÉON",title:"Le Champion Équilibré",letter:"G",style:"hero",specName:"⚡ Foudre Gédéon",superName:"🌟 Jugement Godson",victoryLine:"Pour Libreville, pour l’Arène — le nom Godson ne recule jamais.",hp:100,speed:1,power:1,atkSpeed:1,energyGain:1,scale:1,bulk:1,reach:1,gravity:.8,jump:15.8,knockRes:1,dashCD:28,
   skin:{primary:"#0091ea",dark:"#01579b",accent:"#ffc400",pants:"#263238",skin:"#8d5524",hair:"#14100c",glove:"#ff1744",trail:"#ffc400"}},
- {id:"kira",name:"Kira",title:"La Foudre Rapide",letter:"K",style:"kunoichi",specName:"🌪️ Rafale Kira",superName:"⚡ Tempête de Lames",hp:92,speed:1.22,power:.88,atkSpeed:1.18,energyGain:1.05,scale:.96,bulk:.85,reach:.98,gravity:.76,jump:16.9,knockRes:1.12,dashCD:20,
+ {id:"kira",name:"Kira",title:"La Foudre Rapide",letter:"K",style:"kunoichi",specName:"🌪️ Rafale Kira",superName:"⚡ Tempête de Lames",victoryLine:"Trop lent. La foudre avait déjà gagné avant ton premier pas.",hp:92,speed:1.22,power:.88,atkSpeed:1.18,energyGain:1.05,scale:.96,bulk:.85,reach:.98,gravity:.76,jump:16.9,knockRes:1.12,dashCD:20,
   skin:{primary:"#00c853",dark:"#00695c",accent:"#b9f6ca",pants:"#1b2a1e",skin:"#a06a35",hair:"#180a2a",glove:"#ffd600",trail:"#69f0ae"}},
- {id:"titan",name:"TITAN",title:"La Montagne de Fer",letter:"T",style:"titan",specName:"🌋 Onde Sismique",superName:"☄️ Séisme Titan",hp:120,speed:.82,power:1.28,atkSpeed:.88,energyGain:.9,scale:1.13,bulk:1.35,reach:1.08,gravity:.9,jump:14.6,knockRes:.72,dashCD:36,
+ {id:"titan",name:"TITAN",title:"La Montagne de Fer",letter:"T",style:"titan",specName:"🌋 Onde Sismique",superName:"☄️ Séisme Titan",victoryLine:"Une montagne ne négocie pas avec le vent.",hp:120,speed:.82,power:1.28,atkSpeed:.88,energyGain:.9,scale:1.13,bulk:1.35,reach:1.08,gravity:.9,jump:14.6,knockRes:.72,dashCD:36,
   skin:{primary:"#e53935",dark:"#7f0000",accent:"#ffccbc",pants:"#1c1c22",skin:"#7a4a21",hair:"#050505",glove:"#263238",trail:"#ff7043"}},
- {id:"nova",name:"NOVA",title:"La Maîtresse de l’Énergie",letter:"N",style:"nova",specName:"🔮 Orbe Chercheuse",superName:"🌠 Pluie d’Énergie",hp:96,speed:1.06,power:.96,atkSpeed:1.04,energyGain:1.55,scale:1,bulk:.92,reach:1.02,gravity:.78,jump:16.2,knockRes:1.02,dashCD:25,
+ {id:"nova",name:"NOVA",title:"La Maîtresse de l’Énergie",letter:"N",style:"nova",specName:"🔮 Orbe Chercheuse",superName:"🌠 Pluie d’Énergie",victoryLine:"J’ai lu ton énergie… puis je l’ai réécrite en lumière.",hp:96,speed:1.06,power:.96,atkSpeed:1.04,energyGain:1.55,scale:1,bulk:.92,reach:1.02,gravity:.78,jump:16.2,knockRes:1.02,dashCD:25,
   skin:{primary:"#7c3aed",dark:"#311b92",accent:"#e040fb",pants:"#241040",skin:"#c68642",hair:"#2a0a3a",glove:"#69f0ae",trail:"#e040fb"}},
- {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",unlockKey:"prime",lockedHint:"Termine le Chapitre 1 de l’Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
+ {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",victoryLine:"Agenouille-toi devant la légende — puis relève-toi et deviens-en une.",unlockKey:"prime",lockedHint:"Termine le Chapitre 1 de l’Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
   skin:{primary:"#f5a623",dark:"#7a3b00",accent:"#00e5ff",pants:"#17202b",skin:"#8d5524",hair:"#120b02",glove:"#0b1c2c",trail:"#ffc400"}},
- {id:"Zara",name:"Zara",title:"La Vague de Libreville",letter:"Z",style:"Zara",specName:"🌊 Lames de Marée",superName:"🌀 Raz-de-Marée Libreville",hp:102,speed:1.14,power:1,atkSpeed:1.09,energyGain:1.18,scale:1,bulk:.94,reach:1.05,gravity:.77,jump:16.7,knockRes:.98,dashCD:22,
+ {id:"Zara",name:"Zara",title:"La Vague de Libreville",letter:"Z",style:"Zara",specName:"🌊 Lames de Marée",superName:"🌀 Raz-de-Marée Libreville",victoryLine:"La marée de Libreville finit toujours par emporter les certitudes.",hp:102,speed:1.14,power:1,atkSpeed:1.09,energyGain:1.18,scale:1,bulk:.94,reach:1.05,gravity:.77,jump:16.7,knockRes:.98,dashCD:22,
   skin:{primary:"#00acc1",dark:"#006064",accent:"#ff7043",pants:"#073642",skin:"#7a4a21",hair:"#06202b",glove:"#ffd54f",trail:"#4dd0e1"}}
 ];
 function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:clamp(Math.round(c.power*62),5,100),VIE:clamp(Math.round(c.hp*.78),5,100),ÉNER:clamp(Math.round(c.energyGain*55),5,100)}; }

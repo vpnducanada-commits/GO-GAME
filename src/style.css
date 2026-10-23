@@ -156,6 +156,7 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .endStats td,.endStats th{padding:3px 6px;border-bottom:1px solid rgba(255,255,255,.12)}
 .endStats th{color:#ffe082;text-align:left}
 .grade{display:inline-block;font-size:30px;font-weight:1000;font-style:italic;color:var(--or);text-shadow:0 0 22px rgba(255,196,0,.8)}
+#winnerQuote{max-width:780px;margin:7px auto 0;font-size:clamp(14px,2vw,21px);line-height:1.45;font-style:italic;font-weight:1000;color:#ffe082;text-shadow:0 3px 16px #000,0 0 26px rgba(255,150,0,.35)}
 /* V2.1 — Histoire, Hall of Fame, personnages verrouillés */
 .storyBanner{display:flex;align-items:center;gap:14px;width:min(98%,860px);text-align:left;border:2px solid rgba(255,196,0,.75);cursor:pointer;color:#fff;border-radius:20px;padding:13px 17px;background:linear-gradient(100deg,rgba(90,45,0,.92),rgba(140,20,70,.88) 55%,rgba(20,40,120,.92));box-shadow:0 16px 38px rgba(0,0,0,.5),inset 0 2px 0 rgba(255,255,255,.3);transition:transform .14s,filter .14s}
 .storyBanner:hover{transform:translateY(-2px) scale(1.01);filter:brightness(1.12)}
@@ -191,6 +192,17 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .challengeBody{flex:1;min-width:0}.challengeBody p{font-size:12.5px;line-height:1.45;opacity:.9;margin:3px 0 7px}.challengeBody small{font-size:11px;color:#ffe082;font-weight:900}
 .challengeTop{display:flex;justify-content:space-between;gap:8px;align-items:center}.challengeTop b{font-size:14px}.challengeTop span{font-size:11px;font-weight:1000;color:#bfe7ff;white-space:nowrap}.challengeCard.done .challengeTop span{color:#69f0ae}
 .challengeBar{height:9px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden;margin-bottom:5px}.challengeBar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#00b0ff,#00e676,#ffc400)}
+/* V2.7 — Replay Studio */
+.replayLibraryPanel{max-width:920px;width:min(97%,920px)}
+.replayLibrarySummary{text-align:center;font-weight:1000;color:#c8f2ff;background:rgba(0,162,255,.13);border:1px solid rgba(0,194,255,.45);border-radius:12px;padding:9px 11px;margin-bottom:12px;line-height:1.5}
+.replayLibraryList{display:grid;grid-template-columns:1fr 1fr;gap:10px;max-height:52vh;overflow-y:auto;padding-right:3px}
+@media(max-width:760px){.replayLibraryList{grid-template-columns:1fr;max-height:58vh}}
+.replayCard{background:linear-gradient(145deg,rgba(255,255,255,.09),rgba(255,255,255,.035));border:1.5px solid rgba(255,255,255,.17);border-radius:17px;padding:12px;box-shadow:0 10px 28px rgba(0,0,0,.25)}
+.replayCard.favorite{border-color:rgba(255,196,0,.85);background:linear-gradient(145deg,rgba(255,150,0,.17),rgba(255,255,255,.05));box-shadow:0 0 0 1px rgba(255,196,0,.2),0 12px 30px rgba(0,0,0,.3)}
+.replayCardTop{display:flex;justify-content:space-between;gap:9px;align-items:flex-start}.replayCardTop b{font-size:15px;line-height:1.35}.replayCardTop span{font-size:10px;font-weight:1000;letter-spacing:.6px;color:#221200;background:#ffc400;border-radius:999px;padding:4px 7px;white-space:nowrap}
+.replayCard p{font-size:12.5px;line-height:1.5;opacity:.93;margin:7px 0 5px}.replayCard small{display:block;font-size:11px;line-height:1.5;color:#bfe7ff;font-weight:800}
+.replayActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.replayActions button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.11);color:#fff;border-radius:999px;padding:7px 10px;font-size:11.5px;font-weight:1000;cursor:pointer}.replayActions button:hover,.replayActions button:focus-visible{filter:brightness(1.22);border-color:#fff;outline:none}.replayActions button[data-action="play"]{background:linear-gradient(135deg,#ff7a00,#ff2e88);border-color:rgba(255,255,255,.55)}.replayActions button[data-action="delete"]{background:rgba(255,23,68,.18)}
+.replayLibraryEmpty{grid-column:1/-1;text-align:center;padding:24px 12px;border:1.5px dashed rgba(255,255,255,.28);border-radius:16px;line-height:1.65;opacity:.92}
 
 /* Tactile PRO */
 #touchUI{position:absolute;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:space-between;padding:9px 10px 12px;pointer-events:none}

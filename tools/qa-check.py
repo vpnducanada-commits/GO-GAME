@@ -95,9 +95,9 @@ else:
 # 10. Signature officielle
 check("Signature « Gideon - Godson » présente (HTML+rendu)", ("Gideon - Godson" in html) and ("Gideon - Godson" in js["render"]))
 
-# 11. Replays déterministes V2.6 : enregistrement, hash, lecteur et persistance
-replay_hooks = ["startReplayRecording", "replayStateHash", "finalizeReplayRecording", "startReplayPlayback", "REPLAY_STORE_KEY"]
-check("Système de replay déterministe présent", all(h in all_js for h in replay_hooks) and "btnReplayPlay" in html, "lockstep + hash + lecteur + stockage local")
+# 11. Replays déterministes V2.6 + Replay Studio V2.7
+replay_hooks = ["startReplayRecording", "replayStateHash", "finalizeReplayRecording", "startReplayPlayback", "REPLAY_STORE_KEY", "loadReplayLibrary", "renderReplayLibrary", "renameReplayById"]
+check("Système de replay déterministe présent", all(h in all_js for h in replay_hooks) and "btnReplayPlay" in html and "menuReplays" in html, "lockstep + hash + lecteur + bibliothèque locale")
 
 print("\n— Rapport QA (Sarah) : " + ("RELEASE REFUSÉE ❌" if fails else "RELEASE AUTORISÉE ✅") + f" ({len(fails)} refus, {len(warns)} avertissement(s))")
 sys.exit(1 if fails else 0)

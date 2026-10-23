@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V2.6 PRO « Replays déterministes »
+# 🎮 GÉDÉON - Godson ARENA — V2.7 PRO « Replay Studio & Victoires »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V2.6-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
+| ⭐ **`Gedeon-GODSON-Arena-V2.7-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
 
@@ -22,7 +22,7 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 - 🏆 **Arcade** : 5 étages, boss secret possible
 - 🥋 **Entraînement** : mannequin réglable, vie/temps illimités
 - 🎯 **Défis & carrière** *(nouveau V2.4)* : combo x6, 3 parry, 10 victoires, Survie vague 5, Arcade et saga complète, avec barres de progression
-- 🎬 **Replay du dernier match** *(nouveau V2.6)* : revois ton match exactement comme il s’est joué — entrées enregistrées en *lockstep*, pause, vitesses 0,5×/1×/2×/4×, redémarrage, progression et **hash de vérification** du même vainqueur. Le replay ne modifie jamais ton profil.
+- 🎬 **Replay Studio** *(V2.6 + bibliothèque V2.7)* : conserve plusieurs matchs exactement comme ils se sont joués — *lockstep*, pause, vitesses 0,5×/1×/2×/4×, favoris protégés, renommage, suppression et **hash de vérification**. Le replay ne modifie jamais ton profil.
 - 🏅 **Hall of Fame** : Top 10 local de tes meilleurs scores + grades de carrière (Débutant → 👑 Légende Godson)
 
 ## 🥋 Les 6 combattants
@@ -60,11 +60,13 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 - **Retournements souples** : le personnage pivote progressivement au lieu d’être retourné instantanément comme une image.
 - **Arènes peuplées** : passants qui marchent réellement au Stade, sous parapluies à Néon Tokyo, au Temple et sur la Plage de Libreville ; ola des supporters, drapeaux au vent et pirogues qui tanguent.
 
-## 🎬 Replay déterministe (V2.6)
+## 🎬 Replay Studio déterministe (V2.6 → V2.7)
 - **Enregistrement lockstep** : les entrées finales des deux combattants — clavier, tactile, manettes ou décisions déjà produites par le bot — sont encodées en masques 8 bits et compactées en événements de changement.
 - **Relecture fidèle** : mêmes personnages, arène, règles, vie/énergie de départ et graine visuelle ; checkpoints d’état tous les 300 frames et hash final.
 - **Lecteur intégré** : ⏮ redémarrer, ⏸/▶ pause (touche `P`), vitesses 0,5× à 4×, barre de progression et statut « ✅ Replay vérifié ».
+- **Bibliothèque locale** : 8 replays en rotation normale, favoris protégés, titres personnalisés, cartes détaillées et migration automatique du replay V2.6.
 - **Zéro effet de bord** : statistiques, succès, progression, scores et Hall of Fame sont verrouillés pendant la lecture ; les réglages du joueur sont restaurés à la sortie.
+- **Victoires signées** : chaque combattant conclut le match par sa phrase de victoire, aussi affichée après un replay vérifié.
 
 ## 🏭 Studio Gideon - Godson ARENA
 | Membre | Rôle | Responsabilités |
@@ -74,14 +76,14 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V2.6 « Replays déterministes »** : chaque match terminé (hors entraînement) est enregistré en entrées compactées, persisté localement et relu depuis les mêmes conditions initiales ; des hashs d’état prouvent que le vainqueur et l’état final sont identiques. L’animation humaine V2.5, Libreville V2.4 et le pipeline QA V2.3 restent intégralement conservés.
+**V2.7 « Replay Studio & Victoires »** : la bibliothèque locale conserve plusieurs matchs déterministes avec favoris, titres personnalisés et migration V2.6 ; les 6 combattants gagnent une phrase de victoire signature. Les replays V2.6, l’animation humaine V2.5, Libreville V2.4 et le pipeline QA V2.3 restent intégralement conservés.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V2.6-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V2.7-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
-├── tests/smoke-test.js   → 122 assertions d’exécution automatisées ✅
+├── tests/smoke-test.js   → 136 assertions d’exécution automatisées ✅
 └── tools/ build-single.py • qa-check.py (gate de release Sarah)
 ```
 Chaque livraison suit la **Definition of Done** du manager : syntaxe vérifiée, tests 100% verts, build régénéré, documentation à jour, commit Git + tag de version.

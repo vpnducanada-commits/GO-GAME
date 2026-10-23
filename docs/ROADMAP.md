@@ -56,10 +56,19 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🔐 **Isolation totale** : aucun gain de profil, succès, progression ou Hall of Fame pendant un replay
 - ✅ **Preuve Sarah** : vrai match joué uniquement par entrées, relu de bout en bout avec hash final et vainqueur identiques
 
-## 🔜 Sprint suivant — à arbitrer par le Manager après retour du PO
-- Bibliothèque de plusieurs replays et renommage des meilleurs matchs
-- Polish VFX par personnage et variations d’arènes jour/nuit (Kenzo)
-- Nouvel équilibrage post-Zara et lignes de victoire (Nadia)
+## ✅ SPRINT 07 — V2.7 « Replay Studio & Victoires » *(LIVRÉ le 23/10/2026 — 136 assertions source, suite verte)*
+- 🎬 **Bibliothèque Replay Studio** : 8 replays en rotation, favoris protégés, renommage, suppression et migration du replay V2.6
+- 🃏 **Cartes détaillées** : titre, mode, durée, vainqueur, arène, date, dégâts, combo max et hash
+- 🏆 **Lignes de victoire** : phrase signature pour les 6 combattants, affichée en fin de match et après replay vérifié
+- ✅ **Preuve Sarah** : deuxième vrai match ajouté, ancien replay favori sélectionné dans la bibliothèque puis relu et vérifié
+
+## 🔜 SPRINT 08 — « Arena Moods & Polish » *(envisagé)*
+- **Kenzo** : variantes Jour/Crépuscule/Nuit des 4 arènes, VFX signatures renforcés, finition tactile
+- **Sarah** : budgets FPS et lisibilité des variantes sur écrans 60/120 Hz
+
+## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
+- **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
+- **Manager** : historique de tournoi et récompenses cosmétiques locales
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

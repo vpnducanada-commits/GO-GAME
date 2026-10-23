@@ -3,6 +3,19 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [2.7.0] — 23 octobre 2026 — « Replay Studio & Victoires » (Sprint 07)
+### Bibliothèque Replay Studio — Manager + Kenzo
+- 🎬 **Plusieurs replays conservés localement** au lieu du seul dernier match : rotation normale de 8 matchs, plafond de sécurité à 12 et budget de stockage d’environ 1,8 Mo.
+- ⭐ **Favoris protégés** du nettoyage automatique, **renommage** des grands combats, suppression ciblée et lecture de n’importe quel replay de la bibliothèque.
+- 🃏 **Cartes détaillées** : titre, personnages, mode, vainqueur, durée, arène, date, dégâts totaux, combo maximal et hash de vérification.
+- 💾 **Migration automatique** : un replay V2.6 déjà présent sur l’appareil devient la première entrée du Replay Studio, sans perte.
+### Personnalité des victoires — Nadia
+- 🏆 **Phrase de victoire signature** pour GÉDÉON, Kira, TITAN, Nova, GODSON PRIME et Zara, affichée sur l’écran de fin et dans la barre du lecteur après un replay vérifié.
+### Qualité — Sarah
+- ✅ Suite étendue à **136 assertions source** : deuxième vrai match joué par entrées, ancien replay renommé/favori sélectionné dans la bibliothèque puis relu et vérifié, suppression ciblée, rotation et migration V2.6.
+- Gate QA enrichie pour verrouiller durablement les hooks Bibliothèque/Replay Studio.
+- Board du sprint : `docs/SPRINT_07_REPLAY_STUDIO.md`.
+
 ## [2.6.0] — 23 octobre 2026 — « Replays déterministes » (Sprint 06)
 ### Replay du dernier match — Manager + Kenzo
 - 🎬 **Enregistrement lockstep** de tous les matchs terminés hors entraînement : les entrées finales des deux combattants (clavier, tactile, manettes et décisions déjà produites par le bot) sont encodées en masques 8 bits puis compactées en événements de changement.

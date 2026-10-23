@@ -25,19 +25,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V3.0 (futur) expérience connectée.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.6 (actuel) |
+| Indicateur | Cible | V2.7 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 122 assertions source ✅ + gate QA statique |
+| Tests automatisés | 100 % verts | 136 assertions source ✅ + gate QA statique |
 | Taille version 1-fichier | < 200 Ko | ≤ 250 Ko (gate) ✅ |
 | Dépendances externes | 0 | 0 ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
 | Modes / Personnages / Arènes | en croissance | 6 (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Sprint 06 « Replays déterministes » livré (V2.6). Voir `docs/SPRINT_06_REPLAYS.md` et `docs/ROADMAP.md`. Le mode en ligne reste réservé à une éventuelle V3 après validation explicite du Product Owner.
+Sprint 07 « Replay Studio & Victoires » livré (V2.7). Voir `docs/SPRINT_07_REPLAY_STUDIO.md` et `docs/ROADMAP.md`. Prochain cap envisagé : Sprint 08 « Arena Moods » ; le mode en ligne reste réservé à une éventuelle V3 après validation explicite du Product Owner.
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

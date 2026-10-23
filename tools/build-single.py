@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Génère la version autonome 1 fichier de GÉDÉON - Godson ARENA V2.6 PRO.
+"""Génère la version autonome 1 fichier de GÉDÉON - Godson ARENA V2.7 PRO.
 Fusionne index.html + src/style.css + src/*.js en un seul HTML partageable.
 Usage : python3 tools/build-single.py
 Signé : Gideon - Godson
@@ -22,7 +22,7 @@ for name in ("engine.js", "render.js", "ui.js"):
         "<script>\n" + js + "\n</script>",
     )
 
-out = ROOT / "Gedeon-GODSON-Arena-V2.6-PRO.html"
-header = "<!-- GÉDÉON - Godson ARENA V2.6 PRO — version autonome 1 fichier — signé Gideon - Godson © 2026 -->\n"
+out = ROOT / "Gedeon-GODSON-Arena-V2.7-PRO.html"
+header = "<!-- GÉDÉON - Godson ARENA V2.7 PRO — version autonome 1 fichier — signé Gideon - Godson © 2026 -->\n"
 out.write_text(header + html, encoding="utf-8")
 print(f"OK -> {out.name} ({out.stat().st_size/1024:.0f} Ko)")
