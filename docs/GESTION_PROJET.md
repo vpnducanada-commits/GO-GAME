@@ -25,19 +25,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V3.0 (futur) expérience connectée.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.4 (actuel) |
+| Indicateur | Cible | V2.5 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 94/94 ✅ + gate QA statique |
+| Tests automatisés | 100 % verts | 104/104 ✅ + gate QA statique |
 | Taille version 1-fichier | < 200 Ko | ≤ 250 Ko (gate) ✅ |
 | Dépendances externes | 0 | 0 ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
 | Modes / Personnages / Arènes | en croissance | 6 (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Sprint 04 « Libreville Rising » livré (V2.4). Voir `docs/SPRINT_04_LIBREVILLE_RISING.md`, `docs/EQUIPE.md` et `docs/ROADMAP.md` (prochain : Sprint 05 « Replays & Polish »).
+Sprint 05 « Human Motion & Living Arenas » livré (V2.5), à la demande du Product Owner. Voir `docs/SPRINT_05_HUMAN_MOTION.md` et `docs/ROADMAP.md` (prochain : Sprint 06 « Replays déterministes », si validé).
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

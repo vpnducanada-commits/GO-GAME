@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.4 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.5 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.4.0";
+const GAME_VERSION="2.5.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -610,8 +610,9 @@ function updateFighter(f,inp,op){
   const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
   let target=move*4.7*f.char.speed*botMul*runMul*(f.grounded?1:.8);
   if(f.dashT>0)target=f.dashDir*12.4*f.char.speed;
-  f.vx+=(target-f.vx)*(f.dashT>0?.65:(f.grounded?.42:.13));
-  if(move!==0&&f.grounded)f.walkPhase+=.25*runMul;
+  // Inertie humaine : accélération un peu plus progressive que le freinage, sans perdre la réactivité arcade.
+  const groundBlend=move!==0?.30:.36;
+  f.vx+=(target-f.vx)*(f.dashT>0?.65:(f.grounded?groundBlend:.15));
   // --- Physique ---
   let grav=f.char.gravity; if(f.juggleT>0)grav*=.55; if(f.dashT>0&&!f.grounded)grav*=.25; if(inp.block&&!f.grounded)grav+=.5;
   f.vy+=grav; if(f.vy>19)f.vy=19;
@@ -624,6 +625,7 @@ function updateFighter(f,inp,op){
     f.y=GROUND; f.vy=0; f.grounded=true;
   } else f.grounded=false;
   clampX(f);
+  if(f.grounded&&Math.abs(f.vx+f.kvx)>.25)f.walkPhase+=clamp(Math.abs(f.vx+f.kvx)*.052,.07,.42)*runMul;
   if(f.grounded&&f.attackT<=0&&f.dashT<=0&&isCombat())f.facing=op.x>=f.x?1:-1;
   if(isCombat())f.energy=Math.min(100,f.energy+.016*f.char.energyGain);
   Object.assign(f.prev,inp);

@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V2.4 PRO « Libreville Rising »
+# 🎮 GÉDÉON - Godson ARENA — V2.5 PRO « Human Motion & Living Arenas »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V2.4-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
+| ⭐ **`Gedeon-GODSON-Arena-V2.5-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
 
@@ -52,6 +52,13 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 ## ⚙️ Personnalisation & progression
 Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto selon FPS, durée/rounds/vitesse des matchs — tout est **sauvegardé automatiquement**, avec statistiques de carrière, 6 défis, succès, tenue « Coucher de soleil de Libreville » déblocable et classement Hall of Fame.
 
+## 🕺 Animation humaine & décors vivants (V2.5)
+- **Corps vivant** : respiration visible, tête qui suit l’adversaire, épaules et hanches qui se tordent séparément, poids transféré d’un appui à l’autre.
+- **Locomotion** : foulée alternée proportionnelle à la vitesse réelle, pieds qui se lèvent, genoux articulés, bras en balancier opposé, accélération/freinage plus humains.
+- **Attaques** : chaque coup recule d’abord (*anticipation*), frappe avec une courbe rapide, puis récupère en douceur (*follow-through*) au lieu de changer de pose d’un coup.
+- **Retournements souples** : le personnage pivote progressivement au lieu d’être retourné instantanément comme une image.
+- **Arènes peuplées** : passants qui marchent réellement au Stade, sous parapluies à Néon Tokyo, au Temple et sur la Plage de Libreville ; ola des supporters, drapeaux au vent et pirogues qui tanguent.
+
 ## 🏭 Studio Gideon - Godson ARENA
 | Membre | Rôle | Responsabilités |
 |---|---|---|
@@ -60,14 +67,14 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V2.4 « Libreville Rising »** : Nadia livre le Chapitre 2 et les défis, Kenzo la Plage de Libreville + Zara et sa vague, Sarah la migration des sauvegardes et 94 tests. La base V2.3 (pipeline 7 passes, cache de dégradés, gate QA) reste le socle de production.
+**V2.5 « Human Motion & Living Arenas »** : animation corporelle lissée au rythme réel de l’écran (respiration, transfert de poids, torsion du torse, retournement progressif), locomotion articulée liée à la vitesse, attaques en anticipation → impact → récupération, passants mobiles dans les 4 arènes, ola de foule et drapeaux. La V2.4 (Zara, Libreville, Chapitre 2) et le pipeline QA V2.3 restent intégralement conservés.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V2.4-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V2.5-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
-├── tests/smoke-test.js   → 94 vérifications d’exécution automatisées ✅
+├── tests/smoke-test.js   → 104 vérifications d’exécution automatisées ✅
 └── tools/ build-single.py • qa-check.py (gate de release Sarah)
 ```
 Chaque livraison suit la **Definition of Done** du manager : syntaxe vérifiée, tests 100% verts, build régénéré, documentation à jour, commit Git + tag de version.

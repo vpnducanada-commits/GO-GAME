@@ -44,11 +44,17 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 📖 **Chapitre 2** : combats 4 à 6 (Zara, Nova Déchaînée, GODSON PRIME boss ultime), migration douce des anciennes sauvegardes
 - 🎯 **Défis & carrière** : 6 objectifs persistants ; 🌅 tenue de Libreville en récompense de saga
 
-## 🔜 SPRINT 05 — V2.5 « Replays & Polish » *(planifié)*
+## ✅ SPRINT 05 — V2.5 « Human Motion & Living Arenas » *(LIVRÉ le 23/10/2026 — demande directe du PO, 104/104 tests verts)*
+- 🕺 Animation corporelle lissée à la fréquence d’écran : respiration, poids, torsion, regard, retournement progressif
+- 🏃 Locomotion articulée liée à la vitesse + attaques anticipation → impact → récupération
+- 🚶 Passants mobiles dans les 4 arènes, ola de foule, drapeaux et pirogues animées
+- ⚡ Optimisations ciblées (cache texte, effets) et métriques d’animation testables
+
+## 🔜 SPRINT 06 — V2.6 « Replays déterministes » *(planifié)*
 - **Technique/Manager** : graine déterministe seedable + **replays** des matchs (enregistrement des entrées)
 - **Kenzo** : polish VFX par personnage, variations d’arènes (jour/nuit), finition tactile
-- **Nadia** : équilibrage post-Zara, nouvelles lignes de victoire, défi hebdomadaire local
-- **Sarah** : matrice de tests replays/déterminisme + budgets FPS sur la nouvelle arène
+- **Nadia** : équilibrage post-Zara, nouvelles lignes de victoire, défi tournant local
+- **Sarah** : matrice de tests replays/déterminisme + budgets FPS sur écrans 120 Hz
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

@@ -300,6 +300,26 @@ try {
   assert(ev('PROFILE.customColors.p1.primary') === '#00acc1' && ev('PROFILE.customColors.p1.accent') === '#ff7043', 'tenue Coucher de soleil appliquée au Joueur 1');
   click('btnCustReset');
 
+  console.log('\n— V2.5 : animation humaine & arènes vivantes —');
+  assert(ev('typeof fighterMotion') === 'function' && ev('typeof smoothMotionValue') === 'function' && ev('typeof attackMotionCurve') === 'function', 'moteur d’animation V2.5 disponible');
+  assert(ev('smoothMotionValue(0,10,12)') > 0 && ev('smoothMotionValue(0,10,12)') < 10, 'lissage : approche progressive sans saut instantané');
+  assert(ev('attackMotionCurve(1,5,20)') < 0 && ev('attackMotionCurve(8,5,20)') > .75 && ev('attackMotionCurve(20,5,20)') < .05, 'attaque : anticipation → impact → récupération');
+  ev('qualityLevel=2; renderDtFactor=1; p1.motion=null; p1.facing=1; p1.grounded=true; p1.vx=6; p1.kvx=0; render();');
+  assert(ev('!!p1.motion') && ev('p1.motion.face') > 0 && ev('renderStats.motionSamples') > 0, 'état corporel initialisé et échantillonné');
+  ev('p1.facing=-1; render()');
+  assert(ev('p1.motion.face') > -1, 'retournement corporel progressif, pas de flip instantané');
+  ev('for(let i=0;i<14;i++)render();');
+  assert(ev('p1.motion.face') < 0 && ev('p1.motion.run') > .45, 'retournement terminé en douceur + course détectée');
+  ev('p1.facing=1; p1.vx=0;');
+  assert(ev('cachedTextWidth("Gideon","1000 11px Arial")') === ev('cachedTextWidth("Gideon","1000 11px Arial")') && ev('renderStats.textCacheSize') > 0, 'cache des mesures de texte actif');
+  const walkerX = ev('setArenaById("Libreville"); render(); ambientWalkers[0].x');
+  ev('for(let i=0;i<8;i++)render();');
+  assert(ev('ambientWalkers.length') === 18 && ev('ambientWalkers[0].x') !== walkerX, 'passants : positions réellement mobiles entre frames');
+  for (const id of ['stadium', 'tokyo', 'temple', 'Libreville']) { ev(`setArenaById(${JSON.stringify(id)}); render();`); assert(ev('renderStats.ambientPeople') > 0, 'vie d’ambiance active dans l’arène ' + id); }
+  ev('qualityLevel=0; render()');
+  assert(ev('renderStats.ambientPeople') > 0 && ev('renderStats.ambientPeople') <= 5, 'qualité basse : foule réduite mais arène toujours vivante');
+  ev('qualityLevel=2; resizeCanvas();');
+
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);
 }

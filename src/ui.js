@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.4 PRO — INTERFACE & MENUS PRO
+   GÉDÉON - Godson ARENA V2.5 PRO — INTERFACE & MENUS PRO
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

@@ -3,6 +3,21 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [2.5.0] — 23 octobre 2026 — « Human Motion & Living Arenas » (Sprint 05 — demande directe du Product Owner)
+### Fluidité & corps humain — Kenzo, game feel Nadia
+- 🕺 **Moteur d’animation corporelle continue** : posture, inclinaison, course, saut, garde, douleur, dash, squash et regard sont lissés avec le vrai delta d’écran (60/120/144 Hz), au lieu de suivre les paliers bruts de la simulation 60 Hz.
+- 🌬️ **Respiration et transfert de poids** : torse qui respire, hanches et épaules décalées séparément, tête qui suit l’adversaire, cape/cheveux davantage réactifs à la vitesse.
+- 🏃 **Locomotion reconstruite** : foulée alternée proportionnelle à la vitesse réelle, levée des pieds, genoux articulés, balancier opposé des bras, mélange progressif sol/air/dash, accélération et freinage plus humains.
+- 🥊 **Attaques en trois temps** : anticipation (le membre recule), impact rapide, puis récupération/follow-through par courbes d’easing ; **retournement progressif** du personnage au lieu d’un flip instantané.
+### Décors vivants — Kenzo
+- 🚶 **Passants animés dans les 4 arènes** : supporters en coursive au Stade, piétons sous parapluies à Néon Tokyo, visiteurs/moines au Temple et promeneurs à chapeaux à Libreville — jambes et bras articulés, directions et rythmes variés, quantité adaptée au preset de qualité.
+- 🙌 **Foule plus humaine** : ola qui traverse les tribunes du Stade, bras levés et lumières de téléphones pendant les moments chauds.
+- 🌴 Drapeaux qui claquent au vent, pirogues qui dérivent et tanguent sur la Plage de Libreville.
+### Performance & qualité — Sarah
+- Cache des mesures de texte (noms et bandeau LED), dessin des particules/anneaux allégé et métriques d’animation dans `renderStats` (échantillons, passants actifs, cache).
+- Suite étendue à **104 assertions** : lissage, courbes d’attaque, retournement progressif, passants mobiles et vie active dans chaque arène.
+- Board du sprint : `docs/SPRINT_05_HUMAN_MOTION.md`.
+
 ## [2.4.0] — 23 octobre 2026 — « Libreville Rising » (Sprint 04 — contenu de l’équipe studio)
 ### Ajouté — contenu Nadia + Kenzo
 - 🥋 **6e combattante jouable : Zara — la Vague de Libreville** (rapide, portée longue, tresse et fleur corail). Techniques uniques : **Lames de Marée ×2** en croix et **Raz-de-Marée Libreville**, énorme vague au sol à éviter en sautant. Intégrée à la sélection, l’écran VS, Arcade et Survie.
