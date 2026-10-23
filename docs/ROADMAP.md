@@ -38,10 +38,17 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🛡️ Gate QA automatique `tools/qa-check.py` + 73 tests d’exécution (Sarah)
 - 📐 Docs `ARCHITECTURE`, `GAME_DESIGN`, `QA_QUALITE` + board Sprint 03
 
-## 🔜 SPRINT 04 — V2.4 « Contenu & Replays » *(planifié, par spécialiste)*
-- **Nadia** : Mode Histoire **Chapitre 2** (dialogues, objectifs), défis locaux (« combo x6 », « 3 parry en un match »), équilibrage frame data
-- **Kenzo** : nouvelle arène **Plage de Libreville 🌴** + costumes alternatifs déblocables, finition des passes VFX
-- **Technique** : graine déterministe seedable puis **replays** des matchs ; 6e personnage (design Nadia, rendu Kenzo, tests Sarah)
+## ✅ SPRINT 04 — V2.4 « Libreville Rising » *(LIVRÉ le 23/10/2026 — 94/94 tests verts)*
+- 🥋 **Zara** (6e combattante, jouable immédiatement) : Lames de Marée ×2 et Raz-de-Marée géant
+- 🌴 **Plage de Libreville** : océan animé, palmiers, pirogues, soleil couchant, musique dédiée
+- 📖 **Chapitre 2** : combats 4 à 6 (Zara, Nova Déchaînée, GODSON PRIME boss ultime), migration douce des anciennes sauvegardes
+- 🎯 **Défis & carrière** : 6 objectifs persistants ; 🌅 tenue de Libreville en récompense de saga
+
+## 🔜 SPRINT 05 — V2.5 « Replays & Polish » *(planifié)*
+- **Technique/Manager** : graine déterministe seedable + **replays** des matchs (enregistrement des entrées)
+- **Kenzo** : polish VFX par personnage, variations d’arènes (jour/nuit), finition tactile
+- **Nadia** : équilibrage post-Zara, nouvelles lignes de victoire, défi hebdomadaire local
+- **Sarah** : matrice de tests replays/déterminisme + budgets FPS sur la nouvelle arène
 
 ## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
 Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».

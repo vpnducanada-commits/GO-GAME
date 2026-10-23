@@ -142,9 +142,9 @@ try {
   if (lockedCard) lockedCard.click();
   assert(ev('selCharP1') === 0, 'clic sur carte verrouillée refusé');
 
-  console.log('\n— V2.1 : Mode Histoire complet (3 combats) —');
+  console.log('\n— V2.4 : Saga Histoire complète (Chapitres 1 & 2, 6 combats) —');
   ev('goMenu()'); click('btnModeStory');
-  assert(ev('state') === 'select' && ev('story.step') === 1, 'Histoire : sélection au combat 1/3');
+  assert(ev('state') === 'select' && ev('story.step') === 1 && ev('story.total') === 6, 'Histoire : sélection au combat 1/6');
   click('btnLaunchFight');
   assert(ev('state') === 'scene', 'scène scénarisée affichée avant le combat 1');
   click('btnStoryContinue'); ev('skipVS()'); step(170);
@@ -158,21 +158,42 @@ try {
   assert(ev('p2.char.id') === 'nova' && ev('currentArena.id') === 'temple', 'combat 2 : Nova au Temple');
   winCurrentMatch();
   click('btnNextStage');
-  assert(ev('state') === 'scene' && ev('story.step') === 3, 'scène du boss final');
+  assert(ev('state') === 'scene' && ev('story.step') === 3, 'scène du boss du Chapitre 1');
   click('btnStoryContinue'); ev('skipVS()'); step(170);
-  assert(ev('p2.char.id') === 'titan' && ev('currentArena.id') === 'tokyo' && ev('botDiff') === 'difficile', 'boss final : TITAN difficile à Tokyo');
+  assert(ev('p2.char.id') === 'titan' && ev('currentArena.id') === 'tokyo' && ev('botDiff') === 'difficile', 'boss du Chapitre 1 : TITAN difficile à Tokyo');
   winCurrentMatch();
-  assert(ev('PROFILE.story.completed') === true && ev('PROFILE.unlocks.prime') === true, 'Chapitre 1 terminé -> GODSON PRIME débloqué');
+  assert(ev('PROFILE.story.chapter1Completed') === true && ev('PROFILE.story.progressStep') === 4 && ev('PROFILE.unlocks.prime') === true, 'Chapitre 1 terminé -> GODSON PRIME débloqué, Chapitre 2 prêt');
   click('btnNextStage');
-  assert(ev('state') === 'scene' && ev('storyPhase') === 'ending', 'scène de fin affichée');
+  assert(ev('state') === 'scene' && ev('storyPhase') === 'chapter1Ending', 'scène de fin du Chapitre 1 affichée');
   click('btnStoryContinue');
-  assert(ev('state') === 'menu', 'retour au menu après la fin');
+  assert(ev('state') === 'scene' && ev('story.step') === 4, 'Chapitre 2 : scène du combat 4');
+  click('btnStoryContinue'); ev('skipVS()'); step(170);
+  assert(ev('p2.char.id') === 'Zara' && ev('currentArena.id') === 'Libreville', 'combat 4 : Zara sur la Plage de Libreville');
+  winCurrentMatch();
+  assert(ev('PROFILE.story.progressStep') === 5, 'progression du Chapitre 2 sauvegardée (combat 5)');
+  click('btnNextStage');
+  assert(ev('state') === 'scene' && ev('story.step') === 5, 'scène du combat 5');
+  click('btnStoryContinue'); ev('skipVS()'); step(170);
+  assert(ev('p2.char.id') === 'nova' && ev('botDiff') === 'difficile' && ev('currentArena.id') === 'tokyo', 'combat 5 : Nova Déchaînée difficile à Tokyo');
+  winCurrentMatch();
+  click('btnNextStage');
+  assert(ev('state') === 'scene' && ev('story.step') === 6, 'scène du boss ultime');
+  click('btnStoryContinue'); ev('skipVS()'); step(170);
+  assert(ev('p2.char.id') === 'godson-prime' && ev('currentArena.id') === 'Libreville', 'combat final : GODSON PRIME à Libreville');
+  winCurrentMatch();
+  assert(ev('PROFILE.story.chapter2Completed') === true && ev('PROFILE.unlocks.librevilleSkin') === true, 'Chapitre 2 terminé -> tenue de Libreville débloquée');
+  click('btnNextStage');
+  assert(ev('state') === 'scene' && ev('storyPhase') === 'ending', 'scène de fin de la saga affichée');
+  click('btnStoryContinue');
+  assert(ev('state') === 'menu', 'retour au menu après la fin de la saga');
   click('btnMode2P');
   assert(!window.document.querySelector('#rosterP1 .charCard.locked'), 'plus aucune carte verrouillée');
   window.document.querySelectorAll('#rosterP1 .charCard')[4].click();
   assert(ev('selCharP1') === 4, 'GODSON PRIME sélectionnable');
   ev('applyCharacterTo(p1,4); p1.reset(); projectiles=[]; p1.attackType="super"; spawnProjectile(p1);');
   assert(ev('projectiles.length') === 3, 'SUPER de GODSON PRIME = 3 projectiles');
+  window.document.querySelectorAll('#rosterP1 .charCard')[5].click();
+  assert(ev('selCharP1') === 5 && ev('CHARACTERS[5].id') === 'Zara', 'Zara sélectionnable immédiatement');
   ev('goMenu()'); click('btnHall');
   assert(window.document.getElementById('hallList').innerHTML.includes('hallTable'), 'Hall of Fame affiche le classement');
   assert(ev('PROFILE.leaderboard.length') >= 3, 'au moins 3 scores au classement (' + ev('PROFILE.leaderboard.length') + ')');
@@ -189,6 +210,8 @@ try {
   assert(sig(3, 'special') === '1:orb:false' && ev('projectiles[0].homing') > 0, 'Nova spécial : orbe chercheuse');
   assert(sig(3, 'super').startsWith('4:meteor,meteor,meteor,meteor'), 'Nova SUPER : pluie de 4 météores');
   assert(sig(4, 'special').startsWith('2:royal,royal'), 'GODSON PRIME spécial : double vague royale');
+  assert(sig(5, 'special').startsWith('2:blade,blade'), 'Zara spécial : deux Lames de Marée');
+  assert(sig(5, 'super') === '1:wave:false' && ev('projectiles[0].r') === 40, 'Zara SUPER : raz-de-marée géant au sol');
 
   console.log('\n— V2.2 : parry parfaite + riposte —');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -200,6 +223,8 @@ try {
   assert(ev('p2.counterWindowT') > 0, 'fenêtre de riposte ouverte');
   press('KeyK', 2); step(14);
   assert(ev('p1.health') <= hpP1BeforeRiposte - 7, 'riposte renforcée (+35%) appliquée (' + hpP1BeforeRiposte + ' -> ' + ev('p1.health') + ')');
+  ev('p1.x=700; p2.x=790; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; p1.grounded=true; p1.blocking=true; p1.parryT=8; p1.hitStun=0; p1.blockStun=0; p2.attackT=0; p2.attack=null; applyDamage(p2,p1,ATTACKS.punch,"punch");');
+  assert(ev('PROFILE.stats.bestParriesMatch') >= 1 && ev('p1.stats.parries') >= 1, 'parry du Joueur 1 comptée dans les défis de carrière');
 
   console.log('\n— V2.2 : mode Survie (vagues, soin, score) —');
   ev('goMenu()'); click('btnModeSurvival');
@@ -238,10 +263,12 @@ try {
   nameInput.value = 'Champion GG'; nameInput.dispatchEvent(new window.Event('input'));
   click('btnCustDone');
   assert(ev('PROFILE.names.p1') === 'Champion GG', 'nom personnalisé sauvegardé');
-  for (const id of ['stadium', 'tokyo', 'temple']) { ev(`setArenaById(${JSON.stringify(id)})`); ev('render()'); }
-  assert(ev('currentArena.id') === 'temple', 'les 3 arènes se rendent sans erreur');
-  for (let i = 0; i < 5; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); render();`); }
-  assert(true, 'les 5 personnages se rendent sans erreur');
+  for (const id of ['stadium', 'tokyo', 'temple', 'Libreville']) { ev(`setArenaById(${JSON.stringify(id)})`); ev('render()'); }
+  assert(ev('currentArena.id') === 'Libreville' && ev('ARENAS.length') === 4, 'les 4 arènes se rendent sans erreur, dont Libreville');
+  for (let i = 0; i < 6; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); render();`); }
+  assert(ev('CHARACTERS.length') === 6, 'les 6 personnages se rendent sans erreur');
+  ev('applyCharacterTo(p1,5); p1.reset(); p1.x=300; p1.facing=1; p2.x=1000; p1.y=p2.y=GROUND; projectiles=[]; p1.attackType="super"; spawnProjectile(p1); updateProjectiles();');
+  assert(ev('projectiles[0].kind') === 'wave' && ev('projectiles[0].y') === 572, 'physique Zara : la vague reste au ras du sol');
 
   // ===== V2.3 — Pipeline de rendu Kenzo + QA Sarah =====
   ev('qualityLevel=2; resizeCanvas(); render()');
@@ -257,8 +284,21 @@ try {
   assert(ev('renderStats.gradientMisses') === alloc, 'cache dégradés : aucune allocation sur hit');
   ev('qualityLevel=2; render()'); assert(String(ev('renderStats.lastPost')).endsWith(':q2'), 'post-traitement : trace qualité haute');
   ev('qualityLevel=0; render()'); assert(String(ev('renderStats.lastPost')).endsWith(':q0'), 'post-traitement : contourné en qualité basse mais tracé');
-  assert(ev('Object.keys(FLOOR_THEMES).length') === 3, 'thèmes de sol : 3 arènes couvertes');
+  assert(ev('Object.keys(FLOOR_THEMES).length') === 4 && !!ev('FLOOR_THEMES.Libreville'), 'thèmes de sol : 4 arènes couvertes');
+  assert(ev('typeof drawLibreville') === 'function' && ev('ARENAS.some(a=>a.id==="Libreville")'), 'arène Plage de Libreville disponible');
   ev('qualityLevel=2; resizeCanvas();');
+
+  console.log('\n— V2.4 : Défis & récompense de Libreville —');
+  ev('goMenu()'); click('btnChallenges');
+  assert(ev('CHALLENGE_DEFS.length') === 6 && window.document.querySelectorAll('.challengeCard').length === 6, 'écran Défis : 6 cartes affichées');
+  assert(window.document.getElementById('challengeList').innerHTML.includes('Saga Godson'), 'défi du Chapitre 2 présent');
+  assert(ev('challengeState(CHALLENGE_DEFS.find(d=>d.id==="storych2")).done') === true, 'défi Saga Godson terminé après la saga');
+  assert(ev('PROFILE.stats.bestParriesMatch') >= 1, 'record de parry par match sauvegardé');
+  click('btnChallengesBack'); click('btnCustomize');
+  assert(window.document.getElementById('btnSunsetPreset').disabled === false, 'tenue de Libreville débloquée dans la Personnalisation');
+  click('btnSunsetPreset');
+  assert(ev('PROFILE.customColors.p1.primary') === '#00acc1' && ev('PROFILE.customColors.p1.accent') === '#ff7043', 'tenue Coucher de soleil appliquée au Joueur 1');
+  click('btnCustReset');
 
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);

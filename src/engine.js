@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.3 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.4 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.3.0";
+const GAME_VERSION="2.4.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -24,9 +24,9 @@ function defaultProfile(){ return {
   names:{p1:"Gideon",p2:"Joueur 2"}, initials:{p1:"G",p2:"R"},
   customColors:{p1:null,p2:null},
   selection:{charP1:0,charP2:1,arena:"stadium"},
-  stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0},
-  unlocks:{prime:false},
-  story:{progressStep:1,completed:false,clears:0},
+  stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0,bestParriesMatch:0,totalParries:0},
+  unlocks:{prime:false,librevilleSkin:false},
+  story:{progressStep:1,completed:false,clears:0,chapter1Completed:false,chapter2Completed:false,chapter2Clears:0},
   leaderboard:[],
   ach:{}
 };}
@@ -34,6 +34,10 @@ let PROFILE=defaultProfile();
 try{ const raw=store.get(); if(raw){ const p=JSON.parse(raw), d=defaultProfile();
   PROFILE={...d,...p,settings:{...d.settings,...(p.settings||{})},names:{...d.names,...(p.names||{})},initials:{...d.initials,...(p.initials||{})},customColors:{...d.customColors,...(p.customColors||{})},selection:{...d.selection,...(p.selection||{})},stats:{...d.stats,...(p.stats||{})},unlocks:{...d.unlocks,...(p.unlocks||{})},story:{...d.story,...(p.story||{})},leaderboard:Array.isArray(p.leaderboard)?p.leaderboard:[],ach:p.ach||{}};
 } }catch(e){}
+// Migration V2.4 : avant le Chapitre 2, story.completed signifiait « Chapitre 1 terminé ».
+if(PROFILE.story.completed&&!PROFILE.story.chapter2Completed){
+  PROFILE.story.chapter1Completed=true; PROFILE.story.completed=false; PROFILE.story.progressStep=4;
+}
 let SETTINGS=PROFILE.settings;
 function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
 
@@ -115,8 +119,10 @@ const CHARACTERS=[
   skin:{primary:"#e53935",dark:"#7f0000",accent:"#ffccbc",pants:"#1c1c22",skin:"#7a4a21",hair:"#050505",glove:"#263238",trail:"#ff7043"}},
  {id:"nova",name:"NOVA",title:"La Maîtresse de l’Énergie",letter:"N",style:"nova",specName:"🔮 Orbe Chercheuse",superName:"🌠 Pluie d’Énergie",hp:96,speed:1.06,power:.96,atkSpeed:1.04,energyGain:1.55,scale:1,bulk:.92,reach:1.02,gravity:.78,jump:16.2,knockRes:1.02,dashCD:25,
   skin:{primary:"#7c3aed",dark:"#311b92",accent:"#e040fb",pants:"#241040",skin:"#c68642",hair:"#2a0a3a",glove:"#69f0ae",trail:"#e040fb"}},
- {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",unlockKey:"prime",lockedHint:"Termine le Mode Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
-  skin:{primary:"#f5a623",dark:"#7a3b00",accent:"#00e5ff",pants:"#17202b",skin:"#8d5524",hair:"#120b02",glove:"#0b1c2c",trail:"#ffc400"}}
+ {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",unlockKey:"prime",lockedHint:"Termine le Chapitre 1 de l’Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
+  skin:{primary:"#f5a623",dark:"#7a3b00",accent:"#00e5ff",pants:"#17202b",skin:"#8d5524",hair:"#120b02",glove:"#0b1c2c",trail:"#ffc400"}},
+ {id:"Zara",name:"Zara",title:"La Vague de Libreville",letter:"Z",style:"Zara",specName:"🌊 Lames de Marée",superName:"🌀 Raz-de-Marée Libreville",hp:102,speed:1.14,power:1,atkSpeed:1.09,energyGain:1.18,scale:1,bulk:.94,reach:1.05,gravity:.77,jump:16.7,knockRes:.98,dashCD:22,
+  skin:{primary:"#00acc1",dark:"#006064",accent:"#ff7043",pants:"#073642",skin:"#7a4a21",hair:"#06202b",glove:"#ffd54f",trail:"#4dd0e1"}}
 ];
 function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:clamp(Math.round(c.power*62),5,100),VIE:clamp(Math.round(c.hp*.78),5,100),ÉNER:clamp(Math.round(c.energyGain*55),5,100)}; }
 
@@ -124,7 +130,8 @@ function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:cl
 const ARENAS=[
  {id:"stadium",name:"Stade Godson — Sunset",music:{interval:205,bass:[55,55,82.4,55,65.4,55,98,73.4],lead:[220,261.6,329.6,261.6]}},
  {id:"tokyo",name:"Néon Tokyo — Pluie",music:{interval:178,bass:[49,49,73.4,49,61.7,49,98,82.4],lead:[196,246.9,293.7,246.9]}},
- {id:"temple",name:"Temple Céleste — Jour",music:{interval:235,bass:[65.4,65.4,98,65.4,73.4,65.4,110,98],lead:[261.6,329.6,392,329.6]}}
+ {id:"temple",name:"Temple Céleste — Jour",music:{interval:235,bass:[65.4,65.4,98,65.4,73.4,65.4,110,98],lead:[261.6,329.6,392,329.6]}},
+ {id:"Libreville",name:"Plage de Libreville — Coucher de soleil",music:{interval:218,bass:[55,65.4,82.4,65.4,73.4,82.4,98,73.4],lead:[220,329.6,392,329.6,261.6]}}
 ];
 let currentArena=ARENAS[0];
 
@@ -146,11 +153,11 @@ const DIFFS={
   difficile:{label:"Difficile",react:7,agg:.88,block:.69,spec:.92,jump:.2,mistake:.05,speed:1.07,combo:.92,dash:.55,parry:.36}
 };
 
-/* ---------------- MODE HISTOIRE : CHAPITRE 1 ---------------- */
+/* ---------------- MODE HISTOIRE : SAGA Gideon - Godson (CHAPITRES 1 & 2) ---------------- */
 const STORY_CAMPAIGN={
-  title:"Chapitre 1 — L’Appel de l’Arène",
+  title:"Saga Gideon - Godson — Chapitres 1 & 2",
   fights:[
-    {char:1,diff:"facile",arena:"stadium",foeName:"Kira, la Rivale",chapter:"Combat 1 — La porte du Stade Gideon",
+    {char:1,diff:"facile",arena:"stadium",foeName:"Kira, la Rivale",act:"Chapitre 1 — L’Appel de l’Arène",chapter:"Combat 1 — La porte du Stade Gideon",
      objective:"Prouve ta valeur : remporte le duel d’entrée de l’Arène.",
      dialogue:[
        ["NARRATION","Libreville s’embrase : le tournoi Gideon - Godson va couronner un nouveau champion. Une seule porte, une seule règle — gagner."],
@@ -158,7 +165,7 @@ const STORY_CAMPAIGN={
        ["TOI","Je ne suis pas venu regarder les projecteurs. Je suis venu écrire mon nom au sommet. Que le premier combat commence !"]
      ],
      retry:"Kira te tend la main : « Relève-toi. Un champion se mesure à sa façon de revenir. Encore une fois ! »"},
-    {char:3,diff:"moyen",arena:"temple",foeName:"NOVA, Gardienne de l’Énergie",chapter:"Combat 2 — Le secret du Temple Céleste",
+    {char:3,diff:"moyen",arena:"temple",foeName:"NOVA, Gardienne de l’Énergie",act:"Chapitre 1 — L’Appel de l’Arène",chapter:"Combat 2 — Le secret du Temple Céleste",
      objective:"Maîtrise l’énergie : bats Nova et apprends la voie des attaques spéciales.",
      dialogue:[
        ["NARRATION","Au Temple Céleste, les anciens champions ont caché le secret de l’énergie Godson — celle qui transforme un coup en légende."],
@@ -166,20 +173,50 @@ const STORY_CAMPAIGN={
        ["TOI","Apprends-moi en combattant. Si je dois mériter cette lumière, je la gagnerai à la loyale !"]
      ],
      retry:"Nova sourit : « L’énergie ne se vole pas, elle s’apprend. Respire, observe mes projectiles… et réessaie. »"},
-    {char:2,diff:"difficile",arena:"tokyo",foeName:"TITAN, le Boss de Néon Tokyo",chapter:"Combat final — Le Boss sous la pluie de néons",
+    {char:2,diff:"difficile",arena:"tokyo",foeName:"TITAN, le Boss de Néon Tokyo",act:"Chapitre 1 — L’Appel de l’Arène",chapter:"Combat final du Chapitre 1 — Le Boss sous la pluie de néons",
      objective:"BOSS FINAL : fais tomber TITAN et deviens le Champion de l’Arène.",
      dialogue:[
        ["NARRATION","Néon Tokyo, minuit. Sous la pluie, le champion invaincu TITAN garde la ceinture Gideon - Godson depuis mille combats."],
        ["TITAN","On dit qu’un nouveau nom fait trembler l’Arène. Les noms ne me font pas peur. Seuls les poings parlent ici."],
        ["TOI","Alors écoute bien, Titan : ce soir, l’Arène apprendra à prononcer un nouveau champion. Pour Gideon - Godson !"]
      ],
-     retry:"TITAN croise les bras sous la pluie : « Bien frappé… mais un boss ne tombe pas au premier orage. Reviens plus fort ! »"}
+     retry:"TITAN croise les bras sous la pluie : « Bien frappé… mais un boss ne tombe pas au premier orage. Reviens plus fort ! »"},
+    {char:5,diff:"moyen",arena:"Libreville",foeName:"Zara, la Vague de Libreville",act:"Chapitre 2 — La Marée des Champions",chapter:"Combat 4 — Retour à Libreville",
+     objective:"Nouvelle rivale : résiste aux Lames de Marée de Zara et saute par-dessus son Raz-de-Marée.",
+     dialogue:[
+       ["NARRATION","Après la pluie de Néon Tokyo, le champion rentre à Libreville. Sur la plage, au coucher du soleil, une nouvelle foule l’attend… et une vague ne demande jamais la permission."],
+       ["Zara","Bienvenue chez toi, champion. Ici, le sable glisse, le vent pousse et la mer frappe sans prévenir. Montre-moi que ton titre tient debout face à la marée !"],
+       ["TOI","Libreville m’a vu commencer. Ce soir, elle me verra défendre mon nom. Zara, que la marée monte !"]
+     ],
+     retry:"Zara trace un cercle dans le sable : « La mer recule toujours avant de revenir plus fort. Respire… et reviens avec la prochaine vague. »"},
+    {char:3,diff:"difficile",arena:"tokyo",foeName:"Nova Déchaînée",act:"Chapitre 2 — La Marée des Champions",chapter:"Combat 5 — L’orage d’énergie",
+     objective:"Nova revient en mode difficile : surveille son orbe chercheuse et sa pluie d’énergie.",
+     dialogue:[
+       ["NARRATION","Une tempête d’énergie s’abat sur Néon Tokyo. Nova, battue au Temple, a passé des mois à étudier chaque combo du champion."],
+       ["NOVA","Tu m’as appris la défaite, champion. Je te dois une leçon en retour : mon orbe te suivra, ma pluie te jugera. Cette fois, je ne retiendrai rien."],
+       ["TOI","Alors viens, Nova. Un vrai champion ne craint pas l’orage : il apprend à danser sous la foudre !"]
+     ],
+     retry:"Nova relève ses lunettes d’énergie : « J’ai noté tes habitudes. Change de rythme, champion… surprends-moi. »"},
+    {char:4,diff:"difficile",arena:"Libreville",foeName:"GODSON PRIME — L’Épreuve du Champion",act:"Chapitre 2 — La Marée des Champions",chapter:"Combat final — L’héritier face à la légende",
+     objective:"BOSS ULTIME : vaincs GODSON PRIME sur la Plage de Libreville et deviens une légende vivante.",
+     dialogue:[
+       ["NARRATION","Le soleil touche l’horizon de Libreville. Devant toute l’Arène réunie, une silhouette dorée descend sur le sable : GODSON PRIME, la légende elle-même."],
+       ["GODSON PRIME","Tu as conquis l’Arène, champion. Mais une légende ne se reçoit pas : elle se prouve. Bats-moi, et ton nom dépassera les mers."],
+       ["TOI","Je respecte la légende… mais je suis venu écrire la suite. Pour Libreville, pour l’Arène, pour Gideon - Godson !"]
+     ],
+     retry:"GODSON PRIME tend sa couronne vers l’horizon : « Une légende tombe mille fois avant de se relever une fois pour l’histoire. Encore ! »"}
   ],
-  ending:[
+  chapter1Ending:[
     ["NARRATION","TITAN s’incline sous les néons. La foule explose : l’Arène Gideon - Godson a trouvé son champion !"],
     ["TITAN","Cette ceinture… elle attendait quelqu’un comme toi. Porte-la avec honneur, champion."],
     ["NARRATION","🏆 RÉCOMPENSE DÉBLOQUÉE : le personnage secret GODSON PRIME rejoint ton équipe, avec sa SUPER attaque triple !"],
-    ["TOI","Ce n’est que le Chapitre 1. L’Arène Gideon - Godson ne fait que commencer…"]
+    ["TOI","Ce n’est que le Chapitre 1. Une vague monte déjà du côté de Libreville…"]
+  ],
+  ending:[
+    ["NARRATION","Le dernier coup résonne sur la Plage de Libreville. Le soleil embrase l’océan, la foule se lève : la légende vient de passer le relais."],
+    ["GODSON PRIME","Tu n’as pas seulement gagné un combat. Tu as protégé un nom, une ville et une Arène. À partir d’aujourd’hui, les champions prononceront le tien avec respect."],
+    ["Zara","La marée t’a choisi, champion. Libreville entière combattra à tes côtés !"],
+    ["NARRATION","🌴 RÉCOMPENSE DÉBLOQUÉE : la tenue « Coucher de soleil de Libreville » est disponible dans la Personnalisation. La saga Gideon - Godson continue…"]
   ]
 };
 function currentStoryFight(){ return STORY_CAMPAIGN.fights[clamp((typeof story!=="undefined"?story.step:1)-1,0,STORY_CAMPAIGN.fights.length-1)]; }
@@ -418,6 +455,10 @@ function abilitySpecs(f,isSuper){
       return isSuper
         ?[-32,0,32].map(off=>S({y:baseY+off,vx:dir*10.4,r:off===0?24:19,dmg:off===0?13:10,kind:"royal"}))
         :[-18,18].map(off=>S({y:baseY+off,vx:dir*9.6,r:16,dmg:9,kind:"royal"}));
+    case "Zara":
+      return isSuper
+        ?[S({y:GROUND-28,vx:dir*8.4,r:40,dmg:25,kind:"wave",life:190})]
+        :[-1,1].map(i=>S({y:baseY+i*13,vx:dir*10.8,vy:i*.62,r:14,dmg:8,kind:"blade"}));
     default: // Gideon
       return isSuper
         ?[S({vx:dir*9.2,r:34,dmg:25,kind:"judgment",pierce:true,life:190})]
@@ -436,7 +477,7 @@ function spawnProjectile(f){
   ring(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail); spark(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail,specs.length>2?22:13,3);
   SFX.fire();
   floater(f.x,f.y-198*f.char.scale,(isSuper?(f.char.superName||"💥 SUPER ATTAQUE"):(f.char.specName||"✨ SPÉCIAL"))+" !",f.skin.trail,isSuper);
-  if(isSuper){ shake=Math.max(shake,f.char.id==="titan"||f.char.id==="godson-prime"?10:7); cinematic=Math.max(cinematic,16); }
+  if(isSuper){ shake=Math.max(shake,f.char.id==="titan"||f.char.id==="godson-prime"||f.char.id==="Zara"?10:7); cinematic=Math.max(cinematic,16); }
 }
 function comboSequenceName(f){
   const s=f.comboSeq.join(">");
@@ -459,7 +500,7 @@ function applyDamage(att,def,atk,typeLabel){
     spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
     hitStopT=Math.max(hitStopT,92); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
-    if(def===p1){ unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","3 parry dans un match"); }
+    if(def===p1){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
     return;
   }
   if(blocked){
@@ -484,7 +525,7 @@ function applyDamage(att,def,atk,typeLabel){
   att.hitConfirmed=true; att.comboDamage+=dmg; att.stats.damage+=dmg; att.stats.hits++;
   att.stats.maxCombo=Math.max(att.stats.maxCombo,att.combo); att.stats.maxComboDamage=Math.max(att.stats.maxComboDamage,att.comboDamage);
   if(att===p1){ PROFILE.stats.bestCombo=Math.max(PROFILE.stats.bestCombo,att.combo); PROFILE.stats.bestComboDamage=Math.max(PROFILE.stats.bestComboDamage,att.comboDamage);
-    if(att.combo>=5)unlock("combo5","Combo x5"); if(att.comboDamage>=30)unlock("combo30","30 dégâts en un combo"); }
+    if(att.combo>=5)unlock("combo5","Combo x5"); if(att.combo>=6)unlock("combo6","Défi Tempête Gideon — Combo x6"); if(att.comboDamage>=30)unlock("combo30","30 dégâts en un combo"); }
   def.kvx=att.facing*(atk.knock||4)*def.char.knockRes;
   if(atk.launcher){ def.vy=-atk.launcher; def.grounded=false; def.juggleT=36; }
   else if(!def.grounded){ def.vy=Math.min(def.vy,-3.7+Math.min(2,att.combo*.22)); def.juggleT=Math.max(def.juggleT,22); }
@@ -615,6 +656,7 @@ function updateProjectiles(){
     pr.vy=(pr.vy||0)+(pr.grav||0);
     pr.x+=pr.vx; pr.y+=pr.vy; pr.life--;
     if(pr.kind==="ground"){ pr.y=GROUND-19; if(simFrame%3===0)dust(pr.x,GROUND,2); }
+    if(pr.kind==="wave"){ pr.y=GROUND-28; pr.vy=0; if(simFrame%2===0)pushParticle({x:pr.x+(Math.random()-.5)*42,y:GROUND-8-Math.random()*18,vx:-pr.vx*.08,vy:-.8-Math.random()*.9,life:16,max:16,r:2.4+Math.random()*3.4,c:pr.owner.skin.trail,grav:.03}); }
     if(qualityLevel>0||simFrame%2===0)pushParticle({x:pr.x,y:pr.y+(Math.random()-.5)*11,vx:-pr.vx*.04,vy:(Math.random()-.5)*.65,life:14,max:14,r:pr.r*.3,c:pr.owner.skin.trail,grav:0});
     let remove=pr.life<=0||pr.x<-55||pr.x>W+55||pr.y>H+70;
     // Explosion des météores au sol
@@ -705,20 +747,28 @@ function finishMatch(winner){
   state="matchEnd"; hideAnnounce(); stopMusic(); SFX.win(); confetti(); cinematic=0;
   if(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"){
     PROFILE.stats.matches++;
-    if(winner===p1){ PROFILE.stats.wins++; unlock("firstwin","Première victoire"); if(botDiff==="difficile"&&mode==="bot")unlock("hardwin","Vaincre le bot Difficile"); }
+    if(winner===p1){ PROFILE.stats.wins++; unlock("firstwin","Première victoire"); if(PROFILE.stats.wins>=10)unlock("wins10","Défi Habitué de l’Arène — 10 victoires"); if(botDiff==="difficile"&&mode==="bot")unlock("hardwin","Vaincre le bot Difficile"); }
     else PROFILE.stats.losses++;
+    PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,p1.stats.parries||0);
   } else if(mode==="2p")PROFILE.stats.matches++;
   arcade.lastWin=(winner===p1);
   if(mode==="arcade"&&winner===p1&&arcade.stage>=5){ PROFILE.stats.arcadeClears++; unlock("arcade","Champion du mode Arcade"); }
   if(mode==="story"){
     story.lastWin=(winner===p1);
     if(winner===p1){
-      if(story.step<story.total)PROFILE.story.progressStep=Math.max(PROFILE.story.progressStep||1,story.step+1);
-      else {
-        PROFILE.story.completed=true; PROFILE.story.clears=(PROFILE.story.clears||0)+1; PROFILE.story.progressStep=1;
-        PROFILE.unlocks.prime=true;
+      if(story.step===3){
+        // Fin de l’acte 1 : la récompense secrète reste la même, la saga continue vers Libreville.
+        PROFILE.story.chapter1Completed=true; PROFILE.story.progressStep=4; PROFILE.unlocks.prime=true;
         unlock("storych1","Finir le Chapitre 1 de l’Histoire");
         unlock("primeunlock","GODSON PRIME débloqué");
+      } else if(story.step<story.total) {
+        PROFILE.story.progressStep=Math.max(PROFILE.story.progressStep||1,story.step+1);
+      } else {
+        PROFILE.story.completed=true; PROFILE.story.chapter1Completed=true; PROFILE.story.chapter2Completed=true;
+        PROFILE.story.clears=(PROFILE.story.clears||0)+1; PROFILE.story.chapter2Clears=(PROFILE.story.chapter2Clears||0)+1; PROFILE.story.progressStep=1;
+        PROFILE.unlocks.prime=true; PROFILE.unlocks.librevilleSkin=true;
+        unlock("storych2","Défi Saga Godson — Finir le Chapitre 2");
+        unlock("Librevilleskin","Tenue Coucher de soleil de Libreville débloquée");
       }
     }
   }

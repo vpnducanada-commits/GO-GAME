@@ -116,6 +116,7 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .ar-stadium{background:linear-gradient(180deg,#3949ab,#8e24aa 45%,#ff7043 75%,#263238)}
 .ar-tokyo{background:linear-gradient(180deg,#050b2e,#311b92 45%,#ff2e88 78%,#101828)}
 .ar-temple{background:linear-gradient(180deg,#4fc3f7,#b3e5fc 45%,#ffe082 78%,#5d4037)}
+.ar-Libreville{background:linear-gradient(180deg,#243b6e,#e85d75 42%,#ff9e57 58%,#0097a7 72%,#c99a5b)}
 .ar-random{background:linear-gradient(135deg,#37474f,#111827)}
 /* VS */
 #menuVS{background:linear-gradient(105deg,rgba(0,80,180,.78) 0 49%,rgba(10,10,30,.72) 49.4% 50.6%,rgba(180,0,60,.78) 51% 100%);cursor:pointer}
@@ -166,6 +167,18 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .hallTable th{color:#ffe082;letter-spacing:.4px}
 .hallTable tr.top1 td{font-weight:1000;color:#ffe082}
 .hallEmpty{text-align:center;padding:18px 10px;opacity:.9;line-height:1.6}
+/* V2.4 — Défis & carrière */
+.challengesPanel{max-width:860px}
+.challengeSummary{text-align:center;font-weight:1000;color:#ffe082;background:rgba(255,196,0,.12);border:1px solid rgba(255,196,0,.45);border-radius:12px;padding:9px 11px;margin-bottom:12px;line-height:1.5}
+.challengeList{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:720px){.challengeList{grid-template-columns:1fr}}
+.challengeCard{display:flex;gap:11px;align-items:flex-start;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.15);border-radius:16px;padding:11px}
+.challengeCard.done{border-color:rgba(0,230,118,.75);background:rgba(0,200,83,.1);box-shadow:0 0 0 1px rgba(0,230,118,.22)}
+.challengeIcon{font-size:29px;width:46px;height:46px;display:grid;place-items:center;border-radius:50%;background:rgba(255,255,255,.09);flex:0 0 auto}
+.challengeBody{flex:1;min-width:0}.challengeBody p{font-size:12.5px;line-height:1.45;opacity:.9;margin:3px 0 7px}.challengeBody small{font-size:11px;color:#ffe082;font-weight:900}
+.challengeTop{display:flex;justify-content:space-between;gap:8px;align-items:center}.challengeTop b{font-size:14px}.challengeTop span{font-size:11px;font-weight:1000;color:#bfe7ff;white-space:nowrap}.challengeCard.done .challengeTop span{color:#69f0ae}
+.challengeBar{height:9px;border-radius:99px;background:rgba(255,255,255,.13);overflow:hidden;margin-bottom:5px}.challengeBar i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,#00b0ff,#00e676,#ffc400)}
+
 /* Tactile PRO */
 #touchUI{position:absolute;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:space-between;padding:9px 10px 12px;pointer-events:none}
 .touchGroup{display:flex;gap:7px;pointer-events:auto;flex-wrap:wrap;max-width:48%}

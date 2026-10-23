@@ -1,9 +1,9 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.3 PRO — INTERFACE & MENUS PRO
+   GÉDÉON - Godson ARENA V2.4 PRO — INTERFACE & MENUS PRO
    Signed: Gideon - Godson
    ===================================================================== */
-const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
+const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
 let settingsReturn="menuMain",vsTimeout=null,preparedCharP2=1,preparedArenaId="stadium";
 let storyPhase="intro",lastHallRank=0,lastEndWinner=null,recordedMatchKey="";
 function showOnly(id){
@@ -14,7 +14,7 @@ function showOnly(id){
   else if(id==="menuStory")state="scene";
 }
 function profileRank(){
-  const pts=PROFILE.stats.wins+(PROFILE.stats.arcadeClears||0)*4+((PROFILE.story&&PROFILE.story.clears)||0)*5+Math.floor((PROFILE.stats.bestCombo||0)/3);
+  const pts=PROFILE.stats.wins+(PROFILE.stats.arcadeClears||0)*4+((PROFILE.story&&PROFILE.story.clears)||0)*5+((PROFILE.story&&PROFILE.story.chapter2Clears)||0)*3+Math.floor((PROFILE.stats.bestCombo||0)/3)+completedChallenges()*2;
   if(PROFILE.unlocks&&PROFILE.unlocks.prime&&pts>=28)return "👑 LÉGENDE Godson";
   if(pts>=20)return "🐉 Maître de l’Arène";
   if(pts>=11)return "⚔️ Expert";
@@ -22,12 +22,30 @@ function profileRank(){
   if(pts>=2)return "🌱 Espoir de l’Arène";
   return "🎓 Débutant";
 }
+const CHALLENGE_DEFS=[
+  {id:"combo6",icon:"🌪️",name:"Tempête Gideon",desc:"Réalise un combo de 6 hits.",target:6,unit:"hits",reward:"+2 points de carrière",progress:()=>PROFILE.stats.bestCombo||0},
+  {id:"parry3",icon:"✨",name:"Mur d’or",desc:"Réussis 3 parry parfaites dans un même match.",target:3,unit:"parry",reward:"+2 points de carrière",progress:()=>PROFILE.stats.bestParriesMatch||0},
+  {id:"wins10",icon:"🏟️",name:"Habitué de l’Arène",desc:"Remporte 10 victoires contre le bot, en Arcade, Histoire ou Survie.",target:10,unit:"victoires",reward:"+2 points de carrière",progress:()=>PROFILE.stats.wins||0},
+  {id:"survival5",icon:"🌊",name:"Domiteur de vagues",desc:"Atteins et termine la vague 5 du mode Survie.",target:5,unit:"vagues",reward:"+2 points de carrière",progress:()=>PROFILE.stats.bestSurvivalWave||0},
+  {id:"arcade",icon:"🏆",name:"Roi de l’Arcade",desc:"Termine les 5 étages du mode Arcade.",target:1,unit:"victoire Arcade",reward:"+2 points de carrière",progress:()=>PROFILE.stats.arcadeClears||0},
+  {id:"storych2",icon:"📖",name:"Saga Godson",desc:"Termine les Chapitres 1 et 2 du Mode Histoire.",target:6,unit:"combats d’Histoire",reward:"Tenue Coucher de soleil de Libreville",progress:()=>{ const st=PROFILE.story||{}; return st.chapter2Completed?6:clamp((st.progressStep||1)-1,0,6); }}
+];
+function challengeState(def){ const raw=def.progress()||0; return {value:Math.min(raw,def.target),raw,done:raw>=def.target,pct:clamp(Math.round(raw/def.target*100),0,100)}; }
+function completedChallenges(){ return CHALLENGE_DEFS.filter(d=>challengeState(d).done).length; }
+function renderChallenges(){
+  const done=completedChallenges();
+  $("challengeSummary").textContent=done+"/"+CHALLENGE_DEFS.length+" défis terminés • "+(done*2)+" points de carrière gagnés • Prochaine grande récompense : tenue de Libreville (Chapitre 2).";
+  $("challengeList").innerHTML=CHALLENGE_DEFS.map(d=>{ const s=challengeState(d);
+    return "<article class='challengeCard"+(s.done?" done":"")+"'><div class='challengeIcon'>"+d.icon+"</div><div class='challengeBody'><div class='challengeTop'><b>"+escapeHTML(d.name)+"</b><span>"+(s.done?"✅ TERMINÉ":s.value+" / "+d.target+" "+d.unit)+"</span></div><p>"+escapeHTML(d.desc)+"</p><div class='challengeBar'><i style='width:"+s.pct+"%'></i></div><small>🎁 "+escapeHTML(d.reward)+"</small></div></article>";
+  }).join("");
+}
 function syncProfileUI(){
   const s=PROFILE.stats,storyInfo=PROFILE.story||{},top=(PROFILE.leaderboard&&PROFILE.leaderboard[0])?PROFILE.leaderboard[0].score:0;
-  $("profileStats").textContent=profileRank()+" • 🏆 "+s.wins+"V • "+s.losses+"D • Combo "+s.bestCombo+(top?" • Record "+top:"");
-  $("menuStats").textContent="Carrière : "+s.matches+" match(s), "+s.wins+" victoire(s), combo max "+s.bestCombo+" hits ("+s.bestComboDamage+" dégâts), Histoire "+(storyInfo.completed?"terminée x"+(storyInfo.clears||0):"combat "+(storyInfo.progressStep||1)+"/3")+", Survie : vague "+(s.bestSurvivalWave||0)+", GODSON PRIME "+(PROFILE.unlocks&&PROFILE.unlocks.prime?"👑 débloqué":"🔒 secret")+".";
+  $("profileStats").textContent=profileRank()+" • 🏆 "+s.wins+"V • "+s.losses+"D • Combo "+s.bestCombo+" • Défis "+completedChallenges()+"/6"+(top?" • Record "+top:"");
+  const chapter=(storyInfo.progressStep||1)>3?"Chapitre 2":"Chapitre 1";
+  $("menuStats").textContent="Carrière : "+s.matches+" match(s), "+s.wins+" victoire(s), combo max "+s.bestCombo+" hits ("+s.bestComboDamage+" dégâts), Histoire "+(storyInfo.chapter2Completed?"saga terminée x"+(storyInfo.clears||0):chapter+" — combat "+(storyInfo.progressStep||1)+"/6")+", Survie : vague "+(s.bestSurvivalWave||0)+", GODSON PRIME "+(PROFILE.unlocks&&PROFILE.unlocks.prime?"👑 débloqué":"🔒 secret")+", tenue de Libreville "+(PROFILE.unlocks&&PROFILE.unlocks.librevilleSkin?"🌴 débloquée":"🔒 à gagner")+".";
   const lbl=$("storyProgressLabel");
-  if(lbl)lbl.textContent=storyInfo.completed?"✅ Chapitre 1 terminé x"+(storyInfo.clears||0)+" — Rejouer l’aventure • GODSON PRIME débloqué 👑":(storyInfo.progressStep&&storyInfo.progressStep>1?"▶ Reprendre au combat "+storyInfo.progressStep+"/3 • Boss final • Récompense secrète 👑":"3 combats scénarisés • Boss final • Récompense secrète 👑");
+  if(lbl)lbl.textContent=storyInfo.chapter2Completed?"✅ Saga terminée x"+(storyInfo.clears||0)+" — Rejouer les Chapitres 1 & 2 • Prime + tenue de Libreville débloqués 🌴":storyInfo.chapter1Completed?"🌴 Chapitre 2 en cours — Reprendre au combat "+(storyInfo.progressStep||4)+"/6 • Zara, Nova déchaînée, GODSON PRIME":(storyInfo.progressStep&&storyInfo.progressStep>1?"▶ Reprendre au combat "+storyInfo.progressStep+"/6 • Chapitre 1 puis Chapitre 2 à Libreville":"6 combats scénarisés • 2 chapitres • GODSON PRIME + tenue de Libreville à débloquer");
 }
 function effectiveSkin(char,side){
   const sk={...char.skin},custom=side===1?PROFILE.customColors.p1:PROFILE.customColors.p2;
@@ -78,7 +96,8 @@ function stageOpponent(){ if(!arcade.seq.length)setupArcadeRun(); return arcade.
 function generateSurvivalWave(){
   const wave=survival.wave,bossWave=wave%5===0;
   const pattern=wave>6?"difficile":(["facile","moyen","moyen","difficile","difficile"][(wave-1)%5]);
-  const char=bossWave?(Math.random()<.55?4:2):((Math.random()*4)|0);
+  const normalPool=[0,1,2,3,5],bossPool=[4,4,2,5];
+  const char=bossWave?bossPool[(Math.random()*bossPool.length)|0]:normalPool[(Math.random()*normalPool.length)|0];
   survival.next={char,diff:pattern,arena:ARENAS[(Math.random()*ARENAS.length)|0].id,boss:bossWave};
   return survival.next;
 }
@@ -118,13 +137,15 @@ function refreshSelect(){
 function enterSelect(newMode){ pendingMode=newMode; mode=newMode; refreshSelect(); showOnly("menuSelect"); }
 function setupArcadeRun(){
   arcade.stage=1;
-  const order=[0,1,2,3].sort(()=>Math.random()-.5),diffs=["facile","facile","moyen","difficile"];
+  const order=[0,1,2,3,5].sort(()=>Math.random()-.5).slice(0,4),diffs=["facile","facile","moyen","difficile"];
   arcade.seq=order.map((char,i)=>({char,diff:i===1&&(Math.random()<.5)?"moyen":diffs[i]}));
   arcade.seq.push({char:Math.random()<.35?4:(Math.random()<.5?2:3),diff:"difficile"}); // boss secret possible : GODSON PRIME
 }
 function setupStoryRun(){
   const saved=PROFILE.story||{};
-  story.step=saved.completed?1:clamp(saved.progressStep||1,1,story.total);
+  if(saved.chapter2Completed)story.step=1; // saga terminée : nouvelle partie complète
+  else if(saved.chapter1Completed)story.step=clamp(saved.progressStep||4,4,story.total);
+  else story.step=clamp(saved.progressStep||1,1,story.total);
   story.lastWin=false;
 }
 
@@ -158,19 +179,20 @@ function showStoryScene(phase){
   audio(); pendingMode="story"; mode="story"; storyPhase=phase||"intro";
   const fight=currentStoryFight();
   $("hud").style.display="none"; $("trainingBar").style.display="none"; hideAnnounce();
-  if(storyPhase!=="ending")prepareMatch(false);
-  $("storyKicker").textContent=storyPhase==="ending"?"🏆 FIN DU CHAPITRE 1":storyPhase==="retry"?"📖 MODE HISTOIRE — NOUVEL ESSAI":"📖 MODE HISTOIRE — "+STORY_CAMPAIGN.title.toUpperCase();
-  $("storyTitle").textContent=storyPhase==="ending"?"👑 Un nouveau champion est né":fight.chapter;
-  $("storyText").innerHTML=storyPhase==="ending"?storyDialogueHTML(STORY_CAMPAIGN.ending):storyPhase==="retry"?storyDialogueHTML([["NARRATION",fight.retry]]):storyDialogueHTML(fight.dialogue);
-  $("storyObjective").textContent=storyPhase==="ending"?"🎁 Récompense : GODSON PRIME est maintenant jouable dans tous les modes. Ton score est au Hall of Fame !":"🎯 Objectif : "+fight.objective;
-  $("storyDots").innerHTML=STORY_CAMPAIGN.fights.map((_,i)=>"<i class='"+(storyPhase==="ending"||i+1<story.step?"done":i+1===story.step?"now":"")+"'></i>").join("");
-  $("btnStoryContinue").textContent=storyPhase==="ending"?"🏆 Retourner au menu — Champion !":storyPhase==="retry"?"↻ Relever le défi":"⚔️ Commencer le combat";
+  if(storyPhase!=="ending"&&storyPhase!=="chapter1Ending")prepareMatch(false);
+  $("storyKicker").textContent=storyPhase==="ending"?"👑 FIN DE LA SAGA — CHAPITRE 2 TERMINÉ":storyPhase==="chapter1Ending"?"🏆 FIN DU CHAPITRE 1":storyPhase==="retry"?"📖 MODE HISTOIRE — NOUVEL ESSAI":"📖 "+(fight.act||STORY_CAMPAIGN.title).toUpperCase();
+  $("storyTitle").textContent=storyPhase==="ending"?"🌴 La légende de Libreville":storyPhase==="chapter1Ending"?"👑 Un champion est né":fight.chapter;
+  $("storyText").innerHTML=storyPhase==="ending"?storyDialogueHTML(STORY_CAMPAIGN.ending):storyPhase==="chapter1Ending"?storyDialogueHTML(STORY_CAMPAIGN.chapter1Ending):storyPhase==="retry"?storyDialogueHTML([["NARRATION",fight.retry]]):storyDialogueHTML(fight.dialogue);
+  $("storyObjective").textContent=storyPhase==="ending"?"🎁 Récompenses : GODSON PRIME jouable + tenue « Coucher de soleil de Libreville » disponible dans la Personnalisation. Ton score est au Hall of Fame !":storyPhase==="chapter1Ending"?"🎁 Récompense : GODSON PRIME est jouable. Le Chapitre 2 t’attend maintenant sur la Plage de Libreville !":"🎯 Objectif : "+fight.objective;
+  $("storyDots").innerHTML=STORY_CAMPAIGN.fights.map((_,i)=>"<i class='"+(storyPhase==="ending"||(storyPhase==="chapter1Ending"&&i<3)||i+1<story.step?"done":i+1===story.step?"now":"")+"'></i>").join("");
+  $("btnStoryContinue").textContent=storyPhase==="ending"?"🏆 Retourner au menu — Légende !":storyPhase==="chapter1Ending"?"🌴 Commencer le Chapitre 2 — Libreville":storyPhase==="retry"?"↻ Relever le défi":"⚔️ Commencer le combat";
   $("btnStoryQuit").style.display=storyPhase==="ending"?"none":"";
   showOnly("menuStory");
   if(AC&&!musicTimer)startMusic();
 }
 function storyContinue(){
-  if(storyPhase==="ending"){ goMenu(); showToast("👑 GODSON PRIME débloqué ! Retrouve-le dans la sélection des personnages."); return; }
+  if(storyPhase==="ending"){ goMenu(); showToast("🌴 Saga terminée : GODSON PRIME + tenue de Libreville débloqués !"); return; }
+  if(storyPhase==="chapter1Ending"){ story.step=4; showStoryScene("intro"); return; }
   showVS(true);
 }
 
@@ -260,7 +282,8 @@ function showEndScreen(winner){
   }
   if(mode==="story"){
     rematch.classList.add("hidden"); change.classList.add("hidden");
-    if(winner===p1&&story.step>=story.total){ kicker="👑 BOSS FINAL VAINCU — CHAPITRE 1 TERMINÉ 👑"; next.textContent="🎬 Voir la fin de l’histoire"; }
+    if(winner===p1&&story.step>=story.total){ kicker="👑 GODSON PRIME VAINCU — SAGA TERMINÉE 👑"; next.textContent="🎬 Voir la fin de la saga"; }
+    else if(winner===p1&&story.step===3){ kicker="🏆 CHAPITRE 1 TERMINÉ — RÉCOMPENSE SECRÈTE 🏆"; next.textContent="🎬 Fin du Chapitre 1 & récompense"; }
     else if(winner===p1){ kicker="📖 COMBAT "+story.step+"/"+story.total+" TERMINÉ"; next.textContent="➡ Scène suivante (combat "+(story.step+1)+"/"+story.total+")"; }
     else { kicker="💀 DÉFAITE — "+currentStoryFight().chapter.toUpperCase(); next.textContent="↻ Réessayer ce combat"; }
     next.classList.remove("hidden");
@@ -286,6 +309,7 @@ function handleCampaignNext(){
   if(mode!=="story")return;
   pendingMode="story";
   if(!story.lastWin)showStoryScene("retry");
+  else if(story.step===3)showStoryScene("chapter1Ending");
   else if(story.step<story.total){ story.step++; showStoryScene("intro"); }
   else showStoryScene("ending");
 }
@@ -328,6 +352,8 @@ function populateCustomize(){
   const s1=effectiveSkin(CHARACTERS[selCharP1],1),s2=effectiveSkin(CHARACTERS[selCharP2<0?1:selCharP2],2);
   $("custP1Primary").value=s1.primary; $("custP1Accent").value=s1.accent;
   $("custP2Primary").value=s2.primary; $("custP2Accent").value=s2.accent;
+  const preset=$("btnSunsetPreset");
+  if(preset){ const unlocked=!!(PROFILE.unlocks&&PROFILE.unlocks.librevilleSkin); preset.disabled=!unlocked; preset.textContent=unlocked?"🌴 Tenue Coucher de soleil de Libreville (J1)":"🔒 Tenue de Libreville — termine le Chapitre 2"; preset.style.opacity=unlocked?1:.65; }
 }
 function applyCustomizePreview(){
   applyCharacterTo(p1,selCharP1); applyCharacterTo(p2,selCharP2<0?p2.charIndex:selCharP2);
@@ -341,6 +367,10 @@ function bindCustomize(){
   const color=(pid,aid,key)=>{ const upd=()=>{ PROFILE.customColors[key]={primary:$(pid).value,accent:$(aid).value}; saveProfile(); applyCustomizePreview(); }; $(pid).addEventListener("input",upd); $(aid).addEventListener("input",upd); };
   color("custP1Primary","custP1Accent","p1"); color("custP2Primary","custP2Accent","p2");
   $("btnCustReset").onclick=()=>{ PROFILE.customColors.p1=null; PROFILE.customColors.p2=null; saveProfile(); populateCustomize(); applyCustomizePreview(); showToast("🎨 Couleurs par défaut restaurées"); };
+  $("btnSunsetPreset").onclick=()=>{
+    if(!(PROFILE.unlocks&&PROFILE.unlocks.librevilleSkin)){ showToast("🔒 Termine le Chapitre 2 pour débloquer la tenue de Libreville"); return; }
+    PROFILE.customColors.p1={primary:"#00acc1",accent:"#ff7043"}; saveProfile(); populateCustomize(); applyCustomizePreview(); showToast("🌴 Tenue Coucher de soleil de Libreville équipée pour le Joueur 1");
+  };
   $("btnCustDone").onclick=()=>{ saveProfile(); goMenu(); };
 }
 
@@ -359,6 +389,8 @@ function bindUI(){
   $("btnCustomize").onclick=()=>{ populateCustomize(); showOnly("menuCustomize"); };
   $("btnHall").onclick=()=>{ renderHall(); showOnly("menuHall"); };
   $("btnHallBack").onclick=()=>showOnly("menuMain");
+  $("btnChallenges").onclick=()=>{ renderChallenges(); showOnly("menuChallenges"); };
+  $("btnChallengesBack").onclick=()=>showOnly("menuMain");
   $("btnHow").onclick=()=>showOnly("menuHow");
   $("btnHowBack").onclick=()=>showOnly("menuMain");
   $("btnSettings").onclick=openSettings; $("btnSettingsTop").onclick=openSettings; $("btnPauseSettings").onclick=openSettings;

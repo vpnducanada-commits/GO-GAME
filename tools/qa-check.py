@@ -56,8 +56,13 @@ changelog = ROOT / "CHANGELOG.md"
 ver_in_log = changelog.exists() and (f"[{ver}]" in changelog.read_text(encoding="utf-8", errors="ignore"))
 check("Version unique et documentée", len(allvers) == 1 and ver_in_log, f"version={ver}, définitions={allvers}, changelog={'oui' if ver_in_log else 'NON'}")
 
-# 6. Degrés (°C) accidentels dans les rotations canvas (bug V1 historique)
-suspects = re.findall(r'(?:arc|rotate)\([^;]*(?<![\d.])(?:90|180|270|360)(?![\d.])', all_js)
+# 6. Degrés accidentels dans les rotations canvas (bug V1 historique)
+# On ne vise que les vrais paramètres d'angle : l'unique argument de rotate(),
+# et les 4e/5e arguments (début/fin) de arc(). Les coordonnées -180 restent légales.
+suspects = []
+suspects += re.findall(r'\.rotate\(\s*-?\s*(?:90|180|270|360)(?![\d.])\s*\)', all_js)
+suspects += re.findall(r'\.arc\([^,;]*,[^,;]*,[^,;]*,\s*-?\s*(?:90|180|270|360)(?![\d.])', all_js)
+suspects += re.findall(r'\.arc\([^,;]*,[^,;]*,[^,;]*,[^,;]*,\s*-?\s*(?:90|180|270|360)(?![\d.])', all_js)
 check("Aucune rotation suspecte en degrés (90°/180°/360° bruts)", not suspects, str(len(suspects)) + " suspect(s)" if suspects else "arcs/rotations sains")
 
 # 7. Allocation de dégradés : cache obligatoire (budget Kenzo)

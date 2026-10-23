@@ -25,19 +25,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V3.0 (futur) expérience connectée.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.3 (actuel) |
+| Indicateur | Cible | V2.4 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 73/73 ✅ + 13 contrôles QA statiques |
+| Tests automatisés | 100 % verts | 94/94 ✅ + gate QA statique |
 | Taille version 1-fichier | < 200 Ko | ≤ 250 Ko (gate) ✅ |
 | Dépendances externes | 0 | 0 ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
-| Modes / Personnages / Arènes | en croissance | 6 / 5 / 3 |
+| Modes / Personnages / Arènes | en croissance | 6 (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Sprint 03 « Studio Quality » livré (V2.3). Voir `docs/SPRINT_03_STUDIO_QUALITY.md`, `docs/EQUIPE.md` et `docs/ROADMAP.md` (prochain : Sprint 04 « Contenu & Replays »).
+Sprint 04 « Libreville Rising » livré (V2.4). Voir `docs/SPRINT_04_LIBREVILLE_RISING.md`, `docs/EQUIPE.md` et `docs/ROADMAP.md` (prochain : Sprint 05 « Replays & Polish »).
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.
