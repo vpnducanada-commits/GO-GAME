@@ -1,11 +1,35 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.7 PRO — INTERFACE & MENUS PRO
+   GÉDÉON - Godson ARENA V2.8 PRO — INTERFACE & MENUS PRO
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuReplays","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
 let settingsReturn="menuMain",vsTimeout=null,preparedCharP2=1,preparedArenaId="stadium";
 let storyPhase="intro",lastHallRank=0,lastEndWinner=null,recordedMatchKey="";
+/* Tactile V2.8 : suivi indépendant de chaque pointerId pour éviter
+   qu’un doigt relâché coupe une touche encore tenue par un autre doigt. */
+const touchActivePointers={left:new Set(),right:new Set(),jump:new Set(),block:new Set(),punch:new Set(),kick:new Set(),special:new Set(),dash:new Set()};
+let touchPointerState={activePointers:0,lastKey:"",presses:0};
+function refreshTouchPointerState(key){
+  const set=touchActivePointers[key]; if(!set)return;
+  const on=set.size>0; touchIn[key]=on;
+  const btn=document.querySelector('.tBtn[data-t="'+key+'"]');
+  if(btn){ btn.classList.toggle("on",on); btn.setAttribute("aria-pressed",on?"true":"false"); }
+  touchPointerState.activePointers=Object.values(touchActivePointers).reduce((n,s)=>n+s.size,0);
+}
+function setTouchPointer(key,pointerId,active){
+  const set=touchActivePointers[key]; if(!set)return false;
+  const id=pointerId==null?"pointer":pointerId;
+  if(active){ if(!set.has(id)){ touchPointerState.presses++; touchPointerState.lastKey=key; } set.add(id); }
+  else set.delete(id);
+  refreshTouchPointerState(key);
+  return touchIn[key];
+}
+function clearTouchInputs(){
+  Object.keys(touchActivePointers).forEach(k=>{ touchActivePointers[k].clear(); refreshTouchPointerState(k); });
+  Object.keys(touchIn).forEach(k=>touchIn[k]=false);
+  touchPointerState.activePointers=0; touchPointerState.lastKey="";
+}
 function showOnly(id){
   MENUS.forEach(m=>$(m).classList.toggle("hidden",m!==id));
   if(id==="menuMain"||id==="menuBot"||id==="menuHow"||id==="menuCustomize"||id==="menuHall"||id==="menuReplays"){ if(state!=="pause")state="menu"; }
@@ -52,7 +76,7 @@ function effectiveSkin(char,side){
   if(custom&&custom.primary){sk.primary=custom.primary;sk.accent=custom.accent||sk.accent;sk.trail=custom.accent||sk.trail;}
   return sk;
 }
-function saveSelection(){ PROFILE.selection.charP1=selCharP1; PROFILE.selection.charP2=selCharP2; PROFILE.selection.arena=selArenaId; saveProfile(); }
+function saveSelection(){ PROFILE.selection.charP1=selCharP1; PROFILE.selection.charP2=selCharP2; PROFILE.selection.arena=selArenaId; PROFILE.selection.arenaMood=selArenaMood; saveProfile(); }
 
 /* ---------------- SÉLECTION PERSONNAGES / ARÈNES ---------------- */
 function statRows(c){ const b=charStatBars(c); return Object.keys(b).map(k=>"<span class='stat'><span>"+k+"</span><i><b style='width:"+b[k]+"%'></b></i></span>").join(""); }
@@ -92,6 +116,17 @@ function buildArenaCards(){
   const r=document.createElement("button"); r.type="button"; r.className="arenaCard ar-random"+(selArenaId==="random"?" sel":""); r.textContent="🎲 Aléatoire";
   r.onclick=()=>{ selArenaId="random"; saveSelection(); buildArenaCards(); updateLaunchSummary(); }; row.appendChild(r);
 }
+function buildArenaMoodCards(){
+  const row=$("arenaMoodRow"); if(!row)return; row.innerHTML="";
+  Object.values(ARENA_MOODS).forEach(mood=>{
+    const b=document.createElement("button"); b.type="button"; b.dataset.mood=mood.id;
+    b.className="arenaMoodCard"+(selArenaMood===mood.id?" sel":"");
+    b.setAttribute("aria-pressed",selArenaMood===mood.id?"true":"false");
+    b.innerHTML=mood.icon+" "+mood.label+"<small>"+mood.short+"</small>";
+    b.onclick=()=>{ setArenaMood(mood.id); saveSelection(); buildArenaMoodCards(); updateLaunchSummary(); showToast("🌤️ Ambiance : "+arenaMoodLabel(currentArenaMood)+(selArenaMood==="auto"?" (Auto)":"")); };
+    row.appendChild(b);
+  });
+}
 function stageOpponent(){ if(!arcade.seq.length)setupArcadeRun(); return arcade.seq[clamp(arcade.stage-1,0,4)]; }
 function generateSurvivalWave(){
   const wave=survival.wave,bossWave=wave%5===0;
@@ -116,11 +151,13 @@ function updateLaunchSummary(){
   else if(pendingMode==="training")opp=(selCharP2<0?"Mannequin surprise":CHARACTERS[selCharP2].name+" (mannequin)");
   else opp=selCharP2<0?"Aléatoire":CHARACTERS[selCharP2].name;
   const ar=pendingMode==="story"?(ARENAS.find(a=>a.id===currentStoryFight().arena)||ARENAS[0]).name+" (scénario)":pendingMode==="survival"?(ARENAS.find(a=>a.id===survivalOpponent().arena)||ARENAS[0]).name+" (vague)":(selArenaId==="random"?"Arène aléatoire":(ARENAS.find(a=>a.id===selArenaId)||ARENAS[0]).name);
-  $("launchSummary").textContent=c1.name+" vs "+opp+" • "+ar;
+  const arId=pendingMode==="story"?currentStoryFight().arena:pendingMode==="survival"?survivalOpponent().arena:(selArenaId==="random"?currentArena.id:selArenaId);
+  const moodText=selArenaMood==="auto"?("🎨 Auto → "+arenaMoodLabel(resolveArenaMood(arId,selArenaMood))):arenaMoodLabel(selArenaMood);
+  $("launchSummary").textContent=c1.name+" vs "+opp+" • "+ar+" • "+moodText;
 }
 function refreshSelect(){
   mode=pendingMode;
-  buildRosters(); buildArenaCards(); updateLaunchSummary();
+  buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary();
   let previewP2=selCharP2<0?1:selCharP2;
   if(pendingMode==="arcade")previewP2=stageOpponent().char;
   if(pendingMode==="story")previewP2=currentStoryFight().char;
@@ -164,14 +201,14 @@ function showVS(keepPrepared){
   $("hud").style.display="none"; $("trainingBar").style.display="none";
   const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.textContent=f.letter; a.style.background="linear-gradient(135deg,"+f.skin.primary+","+f.skin.accent+")"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title+" • "+(f.char.superName||""); };
   setSide("vsAvatar1","vsName1","vsChar1",p1); setSide("vsAvatar2","vsName2","vsChar2",p2);
-  $("vsArena").textContent="🏟️ "+currentArena.name+(mode==="arcade"?" • Étage "+arcade.stage+"/5":mode==="story"?" • Histoire "+story.step+"/"+story.total:mode==="survival"?" • 🌊 Vague "+survival.wave:"");
+  $("vsArena").textContent="🏟️ "+currentArena.name+" • "+arenaMoodLabel(currentArenaMood)+(mode==="arcade"?" • Étage "+arcade.stage+"/5":mode==="story"?" • Histoire "+story.step+"/"+story.total:mode==="survival"?" • 🌊 Vague "+survival.wave:"");
   showOnly("menuVS");
   clearTimeout(vsTimeout); vsTimeout=setTimeout(()=>{ if(state==="vs")launchPreparedMatch(); },2450);
 }
 function launchPreparedMatch(){ clearTimeout(vsTimeout); showOnly(null); beginMatch(); }
 function skipVS(){ if(state==="vs")launchPreparedMatch(); }
 
-/* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7 ---------------- */
+/* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7–V2.8 ---------------- */
 let lastReplayUiKey="";
 function replayModeLabel(d){
   if(!d)return "";
@@ -212,7 +249,7 @@ function renderReplayLibrary(){
     return "<article class='replayCard"+(d.favorite?" favorite":"")+"'>"+
       "<div class='replayCardTop'><b>"+(d.favorite?"⭐ ":"")+escapeHTML(d.title||defaultReplayTitle(d))+"</b>"+(i===0?"<span>DERNIER</span>":d.favorite?"<span>FAVORI</span>":"")+"</div>"+
       "<p>"+escapeHTML(replaySummary(d))+"</p>"+
-      "<small>🏟️ "+escapeHTML(replayArenaName(d))+" • "+escapeHTML(replayDateLabel(d))+"</small>"+
+      "<small>🏟️ "+escapeHTML(replayArenaName(d))+" • "+escapeHTML(arenaMoodLabel(resolveArenaMood(d.arena,d.arenaMood||"auto")))+" • "+escapeHTML(replayDateLabel(d))+"</small>"+
       "<small>⚔️ "+damage+" dégâts • 🔥 Combo max "+combo+" • 🔐 #"+escapeHTML(d.finalHash||"sans-hash")+"</small>"+
       "<div class='replayActions'>"+
       "<button data-action='play' data-id='"+escapeHTML(d.id)+"'>▶ Lire</button>"+
@@ -260,7 +297,7 @@ function startReplayPlayback(data){
   audio(); clearTimeout(vsTimeout);
   const keepSpeed=replayPlayback.speed||1;
   const restoreSettings=replayPlayback.restoreSettings||{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin};
-  const restoreSelection=replayPlayback.restoreSelection||{charP1:selCharP1,charP2:selCharP2,arena:selArenaId};
+  const restoreSelection=replayPlayback.restoreSelection||{charP1:selCharP1,charP2:selCharP2,arena:selArenaId,arenaMood:selArenaMood};
   const ctx=data.context||{};
   cancelReplayRecording();
   replayPlayback={active:true,ended:false,paused:false,framesElapsed:0,currentFrame:0,eventIndex:0,a:0,b:0,data,speed:keepSpeed,verified:null,restoreSettings,restoreSelection};
@@ -271,7 +308,7 @@ function startReplayPlayback(data){
   survival.score=ctx.survivalScore||0; survival.carryHealth=null; survival.lastWin=false;
   if(data.settings){ SETTINGS.roundTime=data.settings.roundTime; SETTINGS.roundsWin=data.settings.roundsWin; }
   applyCharacterTo(p1,data.char1); applyCharacterTo(p2,data.char2);
-  setArenaById(data.arena||"stadium");
+  setArenaById(data.arena||"stadium",data.arenaMood||"auto");
   showOnly(null);
   beginMatch();
   $("touchUI").style.display="none"; $("trainingBar").style.display="none";
@@ -326,7 +363,7 @@ function storyContinue(){
 
 /* ---------------- NAVIGATION MENUS ---------------- */
 function goMenu(){
-  clearTimeout(vsTimeout);
+  clearTimeout(vsTimeout); clearTouchInputs();
   cancelReplayRecording();
   if(replayPlayback.active||replayPlayback.ended)stopReplayPlayback(true);
   state="menu"; mode="bot"; stopMusic(); hideAnnounce();
@@ -548,11 +585,20 @@ function bindUI(){
   document.querySelectorAll("#trainingBar [data-dummy]").forEach(b=>b.onclick=()=>{ dummyMode=b.dataset.dummy; document.querySelectorAll("#trainingBar [data-dummy]").forEach(x=>x.classList.toggle("on",x===b)); floater(640,240,"Mannequin : "+b.textContent,"#69f0ae"); });
   $("btnTrainReset").onclick=()=>resetTrainingPositions(false);
   $("btnTrainQuit").onclick=goMenu;
-  // Tactile
+  // Tactile multi-touch : capture du pointeur + état visuel par bouton
   document.querySelectorAll(".tBtn").forEach(b=>{
-    const k=b.dataset.t,on=e=>{e.preventDefault();touchIn[k]=true;audio();},off=e=>{e.preventDefault();touchIn[k]=false;};
-    b.addEventListener("pointerdown",on); b.addEventListener("pointerup",off); b.addEventListener("pointerleave",off); b.addEventListener("pointercancel",off);
+    const k=b.dataset.t;
+    b.setAttribute("aria-pressed","false");
+    const on=e=>{ e.preventDefault(); audio(); try{ b.setPointerCapture(e.pointerId); }catch(err){} setTouchPointer(k,e.pointerId,true); };
+    const off=e=>{ e.preventDefault(); setTouchPointer(k,e.pointerId,false); };
+    b.addEventListener("pointerdown",on);
+    b.addEventListener("pointerup",off);
+    b.addEventListener("pointercancel",off);
+    b.addEventListener("lostpointercapture",off);
+    b.addEventListener("contextmenu",e=>e.preventDefault());
   });
+  window.addEventListener("blur",clearTouchInputs);
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden)clearTouchInputs(); });
   window.addEventListener("gamepadconnected",e=>showToast("🎮 Manette connectée : "+String(e.gamepad.id).slice(0,34)));
 }
 
@@ -563,6 +609,6 @@ if(isCharLocked(CHARACTERS[selCharP1]))selCharP1=0;
 if(selCharP2>=0&&isCharLocked(CHARACTERS[selCharP2]))selCharP2=1;
 if(selArenaId!=="random")setArenaById(selArenaId);
 bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); populateSettings(); populateCustomize();
-buildRosters(); buildArenaCards(); updateLaunchSummary();
+buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary();
 buildPips(); goMenu(); startLoop();
 console.log("%cGÉDÉON - Godson ARENA V"+GAME_VERSION+" PRO%c signé Gideon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");

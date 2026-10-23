@@ -401,6 +401,56 @@ try {
   if (savedLibraryRaw) window.localStorage.setItem('gideonGodsonArenaReplayLibraryV1', savedLibraryRaw);
   ev('reloadReplayLibrary(); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveProfile(); goMenu();');
 
+  console.log('\n— V2.8 : Arena Moods, VFX signatures & tactile —');
+  assert(ev('Object.keys(ARENA_MOOD_THEMES).length') === 4 && ev('Object.values(ARENA_MOOD_THEMES).every(a=>a.jour&&a.crepuscule&&a.nuit)') === true && ev('typeof setArenaMood') === 'function', 'Arena Moods : 4 arènes × 3 ambiances disponibles');
+  assert(ev('resolveArenaMood("stadium","auto")') === 'crepuscule' && ev('resolveArenaMood("tokyo","auto")') === 'nuit' && ev('resolveArenaMood("temple","auto")') === 'jour' && ev('resolveArenaMood("Libreville","auto")') === 'crepuscule', 'mode Auto fidèle à l’identité originale de chaque arène');
+
+  ev('goMenu()'); click('btnMode2P');
+  assert(window.document.querySelectorAll('.arenaMoodCard').length === 4, 'sélection : Auto, Jour, Crépuscule et Nuit affichés');
+  const nightButton = window.document.querySelector('.arenaMoodCard[data-mood="nuit"]');
+  if (nightButton) nightButton.click();
+  assert(ev('selArenaMood') === 'nuit' && ev('currentArenaMood') === 'nuit' && ev('PROFILE.selection.arenaMood') === 'nuit' && window.document.getElementById('launchSummary').textContent.includes('Nuit'), 'ambiance Nuit sélectionnée, appliquée et sauvegardée');
+
+  for (const arenaId of ['stadium', 'tokyo', 'temple', 'Libreville']) {
+    for (const mood of ['jour', 'crepuscule', 'nuit']) {
+      ev(`qualityLevel=2; setArenaById(${JSON.stringify(arenaId)},${JSON.stringify(mood)}); render();`);
+      assert(ev('currentArena.id') === arenaId && ev('currentArenaMood') === mood && ev('renderStats.arenaMood') === mood && ev('renderStats.lastPost').startsWith(arenaId + ':' + mood + ':') && ev('renderStats.passesRun.length') === 7 && (mood === 'nuit' ? ev('renderStats.moodStars') > 0 : mood === 'jour' ? ev('renderStats.moodStars') === 0 : ev('renderStats.moodStars') >= 0), 'rendu ' + arenaId + ' / ' + mood + ' : mood, poste et 7 passes cohérents');
+    }
+  }
+
+  const signatureStyles = new Set();
+  for (let i = 0; i < 6; i++) {
+    ev(`applyCharacterTo(p1,${i}); p1.reset(); projectiles=[{x:640,y:400,px:640,py:400,rx:640,ry:400,vx:8,vy:0,r:18,owner:p1,super:false,life:100,kind:"bolt"}]; renderStats.signatureVfx=0; qualityLevel=0; drawProjectiles();`);
+    signatureStyles.add(ev('renderStats.lastSignatureVfx'));
+    assert(ev('renderStats.signatureVfx') === 1, 'VFX signature actif même en qualité basse : ' + ev('CHARACTERS[' + i + '].name'));
+  }
+  assert(signatureStyles.size === 6, '6 signatures VFX distinctes pour les 6 combattants');
+  ev('projectiles=[]; qualityLevel=2; resizeCanvas();');
+
+  ev('clearTouchInputs(); setTouchPointer("right",101,true); setTouchPointer("right",102,true);');
+  assert(ev('touchIn.right') === true && ev('touchPointerState.activePointers') === 2 && window.document.querySelector('.tBtn[data-t="right"]').classList.contains('on'), 'tactile multi-touch : deux pointeurs suivis sur le même bouton');
+  ev('setTouchPointer("right",101,false);');
+  assert(ev('touchIn.right') === true && ev('touchPointerState.activePointers') === 1, 'tactile : relâcher un doigt ne coupe pas le second');
+  ev('setTouchPointer("right",102,false); setTouchPointer("punch",103,true); clearTouchInputs();');
+  assert(ev('touchIn.right') === false && ev('touchIn.punch') === false && ev('touchPointerState.activePointers') === 0 && !window.document.querySelector('.tBtn[data-t="punch"]').classList.contains('on'), 'tactile : nettoyage complet anti-boutons collés');
+
+  /* Preuve d’intégration : un vrai match en Nuit forcée doit conserver
+     cette ambiance dans son replay, même si la préférence change ensuite. */
+  ev('SETTINGS.roundsWin=1; SETTINGS.roundTime=99; selCharP1=0; selCharP2=1; selArenaId="stadium"; setArenaMood("nuit"); setArenaById("stadium","nuit"); saveSelection(); refreshSelect();');
+  click('btnLaunchFight'); ev('skipVS()');
+  assert(ev('currentArenaMood') === 'nuit' && ev('replayRecorder.active') === true, 'match Arena Moods lancé en Nuit avec enregistrement actif');
+  ev(`(() => { let guard=0; while(state!=="matchEnd"&&guard++<7000){ keys.clear(); if(state==="fight"){ const dx=p2.x-p1.x; if(dx>92)keys.add("KeyD"); else if(dx<-92)keys.add("KeyA"); else if(simFrame%22<2)keys.add("KeyF"); } updateGameLogic(); } keys.clear(); return guard; })()`);
+  step(2);
+  assert(ev('lastReplayData.arenaMood') === 'nuit' && ev('lastReplayData.arenaMoodPreference') === 'nuit', 'ambiance Nuit capturée dans les métadonnées du replay');
+  ev('setArenaMood("jour");');
+  click('btnWatchReplay');
+  assert(ev('replayPlayback.active') === true && ev('currentArenaMood') === 'nuit' && ev('selArenaMood') === 'jour', 'replay relu en Nuit sans écraser la préférence Jour du joueur');
+  ev(`(() => { let guard=0; while(replayPlayback.active&&guard++<9000)updateGameLogic(); return guard; })()`);
+  assert(ev('replayPlayback.ended') === true && ev('replayPlayback.verified') === true, 'replay Arena Moods intégralement vérifié');
+  click('btnReplayQuit');
+  assert(ev('currentArenaMood') === 'jour' && ev('selArenaMood') === 'jour', 'ambiance du joueur restaurée à la sortie du replay');
+  ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
+
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);
 }

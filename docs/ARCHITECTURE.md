@@ -72,7 +72,7 @@ Le rendu est organisé en passes explicites, pilotées par `RENDER_PIPELINE` dan
 
 | Sujet | Plan |
 |---|---|
-| Replays | ✅ V2.6–V2.7 : lockstep + graine seedée + hashs ; bibliothèque locale rotative avec favoris et budget de stockage |
+| Replays | ✅ V2.6–V2.8 : lockstep + graine seedée + hashs ; bibliothèque rotative ; ambiance d’arène capturée et restaurée |
 | Fichiers JS volumineux | conserver 3 modules lisibles tant que les tests restent rapides ; éclater par domaine si un fichier dépasse durablement ~900 lignes |
 | Audio | conserver la synthèse WebAudio ; aucun asset externe sans décision du Product Owner |
 

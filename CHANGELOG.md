@@ -3,6 +3,19 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [2.8.0] — 23 octobre 2026 — « Arena Moods & Polish » (Sprint 08)
+### Ambiances d’arène — Kenzo
+- 🌤️ **Arena Moods** : les 4 arènes peuvent se jouer en **Auto, Jour, Crépuscule ou Nuit**. Auto conserve l’intention originale : Stade et Libreville au crépuscule, Tokyo la nuit, Temple le jour.
+- 🎨 Chaque combinaison possède son ciel, son sol, sa vignette, son grade coloré, son horizon, ses étoiles et son astre. L’atmosphère est appliquée au fond pour ne jamais sacrifier la lisibilité des combattants.
+- 💾 Préférence sauvegardée, affichée dans le résumé de lancement et l’écran VS ; l’ambiance effective est capturée dans les replays puis restaurée pendant la lecture, sans écraser le choix actuel du joueur.
+### Polish combat & mobile — Kenzo + Manager
+- ✨ **VFX signatures** autour des projectiles : éclairs de Gideon, traînées de Kira, éclats sismiques de Titan, orbites de Nova, couronne royale de Godson Prime et écume de Zara — y compris en qualité basse.
+- 📱 **Tactile multi-touch fiable** : suivi indépendant de chaque `pointerId`, capture du pointeur, état visuel/ARIA enfoncé, boutons libellés plus généreux et nettoyage global anti-touches collées.
+### Qualité — Sarah
+- ✅ Suite étendue à **151 assertions source** : matrice **4 arènes × 3 ambiances**, 6 signatures VFX, relâchement multi-doigts et vrai match en Nuit forcée relu et vérifié.
+- Nouvelles métriques `renderStats` pour l’ambiance, les étoiles, les VFX signatures, l’estimation FPS et le budget d’image ; gate QA enrichie d’un contrôle Arena Moods permanent.
+- Board du sprint : `docs/SPRINT_08_ARENA_MOODS.md`.
+
 ## [2.7.0] — 23 octobre 2026 — « Replay Studio & Victoires » (Sprint 07)
 ### Bibliothèque Replay Studio — Manager + Kenzo
 - 🎬 **Plusieurs replays conservés localement** au lieu du seul dernier match : rotation normale de 8 matchs, plafond de sécurité à 12 et budget de stockage d’environ 1,8 Mo.

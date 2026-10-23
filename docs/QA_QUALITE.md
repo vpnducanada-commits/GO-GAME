@@ -9,7 +9,7 @@
 |---|---|---|
 | Syntaxe | `node --check` | les 3 modules JS et les scripts du bundle |
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
-| Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry, rendus, sauvegardes, déterminisme, migration et rotation de la bibliothèque de replays |
+| Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry, rendus, sauvegardes, déterminisme, migration/rotation des replays, matrice Arena Moods, VFX et tactile multi-touch |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
 | Release | Git + tag | arbre propre, commit et version traçables |
 

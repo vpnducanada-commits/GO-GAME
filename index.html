@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GÉDÉON - Godson ARENA V2.7 PRO | Combat 1v1, Histoire, Arcade & Replay Studio — signé Gideon - Godson</title>
+<title>GÉDÉON - Godson ARENA V2.8 PRO | Combat 1v1, Histoire, Arcade, Arena Moods & Replay Studio — signé Gideon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V2.7 PRO</em></h1>
+        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V2.8 PRO</em></h1>
         <p>Combat 1v1 • 60 FPS • Haute résolution</p>
       </div>
     </div>
@@ -79,7 +79,7 @@
         <h2>GÉDÉON<br>GODSON</h2>
         <div class="arena">A R E N A</div>
       </div>
-      <div><span class="vBadge">VERSION 2.7 PRO — REPLAY STUDIO 🎬</span></div>
+      <div><span class="vBadge">VERSION 2.8 PRO — ARENA MOODS 🌤️</span></div>
       <div class="signed">✍️ Créé &amp; signé par <span>Gédéon - Godson</span> © 2026</div>
       <button class="storyBanner" id="btnModeStory"><span class="sbIc">📖</span><span class="sbTx"><b>MODE HISTOIRE — Saga Godson : Chapitres 1 &amp; 2</b><small id="storyProgressLabel">6 combats scénarisés • Zara à Libreville • GODSON PRIME en boss ultime 👑</small></span><span class="sbGo">JOUER ▶</span></button>
       <div class="modeCards">
@@ -98,7 +98,7 @@
         <button class="btn dark" id="btnSettings">⚙️ Réglages</button>
       </div>
       <p class="miniNote" id="replayInfo">🎬 Termine un match pour pouvoir le revoir ici, image par image, exactement comme il s’est joué.</p>
-      <p class="miniNote" id="menuStats">Nouveau V2.7 : conserve plusieurs grands matchs dans le Replay Studio, renomme-les, protège tes favoris et découvre la phrase de victoire signature de chaque combattant !</p>
+      <p class="miniNote" id="menuStats">Nouveau V2.8 : joue chaque arène en Jour, Crépuscule ou Nuit, découvre les VFX signatures des 6 combattants et profite d’un tactile multi-touch plus fiable !</p>
     </div>
 
     <!-- DIFFICULTÉ BOT -->
@@ -121,6 +121,8 @@
       </div>
       <div style="font-weight:1000;letter-spacing:3px;font-size:12px">🏟️ ARÈNE</div>
       <div class="arenaRow" id="arenaRow"></div>
+      <div style="font-weight:1000;letter-spacing:3px;font-size:12px">🌤️ AMBIANCE — ARENA MOODS</div>
+      <div class="arenaMoodRow" id="arenaMoodRow" aria-label="Choix de l’ambiance de l’arène"></div>
       <div class="btnRow">
         <button class="btn dark" id="btnSelectBack">⬅ Retour</button>
         <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
@@ -292,12 +294,18 @@
       <div class="signed">✍️ Un jeu signé Gédéon - Godson © 2026</div>
     </div>
 
-    <div id="touchUI">
+    <div id="touchUI" aria-label="Commandes tactiles du Joueur 1">
       <div class="touchGroup">
-        <div class="tBtn" data-t="left">◀</div><div class="tBtn" data-t="right">▶</div><div class="tBtn" data-t="jump">⬆</div><div class="tBtn" data-t="block">🛡</div><div class="tBtn" data-t="dash">💨</div>
+        <div class="tBtn" role="button" tabindex="0" aria-label="Aller à gauche" data-t="left"><span>◀</span><small>GAUCHE</small></div>
+        <div class="tBtn" role="button" tabindex="0" aria-label="Aller à droite" data-t="right"><span>▶</span><small>DROITE</small></div>
+        <div class="tBtn" role="button" tabindex="0" aria-label="Sauter" data-t="jump"><span>⬆</span><small>SAUT</small></div>
+        <div class="tBtn" role="button" tabindex="0" aria-label="Garde et parry" data-t="block"><span>🛡</span><small>Garde</small></div>
+        <div class="tBtn" role="button" tabindex="0" aria-label="Dash" data-t="dash"><span>💨</span><small>DASH</small></div>
       </div>
       <div class="touchGroup">
-        <div class="tBtn atk" data-t="punch">POING</div><div class="tBtn atk" data-t="kick">PIED</div><div class="tBtn atk" data-t="special">SPÉCIAL</div>
+        <div class="tBtn atk" role="button" tabindex="0" aria-label="Coup de poing" data-t="punch"><span>👊</span><small>POING</small></div>
+        <div class="tBtn atk" role="button" tabindex="0" aria-label="Coup de pied" data-t="kick"><span>🦵</span><small>PIED</small></div>
+        <div class="tBtn atk" role="button" tabindex="0" aria-label="Attaque spéciale ou SUPER" data-t="special"><span>✨</span><small>SPÉCIAL</small></div>
       </div>
     </div>
   </div>
@@ -306,10 +314,10 @@
     <div class="card"><b>🟦 Joueur 1 :</b> <kbd>Q</kbd><kbd>D</kbd> bouger, <kbd>Z</kbd> saut, <kbd>S</kbd> garde, <kbd>F</kbd> poing, <kbd>G</kbd> pied, <kbd>H</kbd> spécial, <kbd>Maj</kbd> dash.</div>
     <div class="card"><b>🟥 Joueur 2 :</b> Flèches + <kbd>K</kbd> poing, <kbd>L</kbd> pied, <kbd>M</kbd> spécial, <kbd>O</kbd> dash. Manettes 🎮 acceptées.</div>
     <div class="card"><b>🔥 Combos :</b> Poing → Pied → Spécial. ⬇+Poing = uppercut qui lance en l’air, puis saute et jongle !</div>
-    <div class="card"><b>✨ Pro :</b> 6 combattants, 4 arènes dont la Plage de Libreville, saga en 2 chapitres, 6 défis, caméra dynamique, ralenti K.O., Replay Studio avec favoris vérifiés et sauvegardes auto.</div>
+    <div class="card"><b>✨ Pro :</b> 6 combattants, 4 arènes dont la Plage de Libreville, saga en 2 chapitres, 6 défis, caméra dynamique, ralenti K.O., Arena Moods Jour/Crépuscule/Nuit, Replay Studio vérifié et sauvegardes auto.</div>
   </div>
 
-  <footer>🎮 <strong>GÉDÉON - Godson ARENA V2.7 PRO</strong> — Combat 1v1 haute résolution : Histoire • Survie • Versus Bot • 2 Joueurs • Arcade • Entraînement • Replay Studio • Hall of Fame<br>✍️ Créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon • Manager &amp; Développeur principal : Assistant Arena (officiel)</footer>
+  <footer>🎮 <strong>GÉDÉON - Godson ARENA V2.8 PRO</strong> — Combat 1v1 haute résolution : Histoire • Survie • Versus Bot • 2 Joueurs • Arcade • Entraînement • Arena Moods • Replay Studio • Hall of Fame<br>✍️ Créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon • Manager &amp; Développeur principal : Assistant Arena (officiel)</footer>
 </div>
 
 <script src="src/engine.js"></script>

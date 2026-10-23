@@ -126,6 +126,14 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .arenaCard{width:158px;height:74px;border-radius:15px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;color:#fff;font-weight:1000;font-size:13px;text-shadow:0 2px 9px #000;display:flex;align-items:flex-end;padding:9px;transition:.13s;text-align:left}
 .arenaCard:hover{transform:translateY(-2px)}
 .arenaCard.sel{border-color:var(--or);box-shadow:0 0 0 2px rgba(255,196,0,.5),0 12px 26px rgba(0,0,0,.45)}
+.arenaMoodRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:min(98%,980px)}
+.arenaMoodCard{min-width:148px;border:1.5px solid rgba(255,255,255,.28);border-radius:999px;background:rgba(3,8,28,.62);color:#fff;padding:8px 12px;font-weight:1000;cursor:pointer;box-shadow:0 8px 22px rgba(0,0,0,.3);transition:transform .13s,filter .13s,border-color .13s}
+.arenaMoodCard small{display:block;font-size:10.5px;font-weight:800;opacity:.82;margin-top:2px}
+.arenaMoodCard:hover,.arenaMoodCard:focus-visible{transform:translateY(-2px);filter:brightness(1.16);border-color:#fff;outline:none}
+.arenaMoodCard.sel{border-color:var(--or);background:linear-gradient(135deg,rgba(255,150,0,.85),rgba(255,46,136,.75));box-shadow:0 0 0 2px rgba(255,196,0,.45),0 12px 26px rgba(0,0,0,.4)}
+.arenaMoodCard[data-mood="jour"]{background:linear-gradient(135deg,rgba(33,150,243,.55),rgba(255,214,64,.35))}
+.arenaMoodCard[data-mood="crepuscule"]{background:linear-gradient(135deg,rgba(255,110,64,.55),rgba(124,58,237,.45))}
+.arenaMoodCard[data-mood="nuit"]{background:linear-gradient(135deg,rgba(10,20,70,.82),rgba(45,90,180,.55))}
 .ar-stadium{background:linear-gradient(180deg,#3949ab,#8e24aa 45%,#ff7043 75%,#263238)}
 .ar-tokyo{background:linear-gradient(180deg,#050b2e,#311b92 45%,#ff2e88 78%,#101828)}
 .ar-temple{background:linear-gradient(180deg,#4fc3f7,#b3e5fc 45%,#ffe082 78%,#5d4037)}
@@ -205,11 +213,15 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .replayLibraryEmpty{grid-column:1/-1;text-align:center;padding:24px 12px;border:1.5px dashed rgba(255,255,255,.28);border-radius:16px;line-height:1.65;opacity:.92}
 
 /* Tactile PRO */
-#touchUI{position:absolute;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:space-between;padding:9px 10px 12px;pointer-events:none}
-.touchGroup{display:flex;gap:7px;pointer-events:auto;flex-wrap:wrap;max-width:48%}
-.tBtn{width:54px;height:54px;border-radius:50%;border:2px solid rgba(255,255,255,.55);background:rgba(0,0,0,.45);color:#fff;font-size:19px;font-weight:1000;display:grid;place-items:center;user-select:none;touch-action:none;box-shadow:0 10px 24px rgba(0,0,0,.45)}
-.tBtn.atk{font-size:10px;background:linear-gradient(135deg,rgba(255,122,0,.92),rgba(255,46,136,.92))}
-.tBtn:active{transform:scale(.93)}
+#touchUI{position:absolute;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:space-between;align-items:flex-end;padding:9px max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));pointer-events:none}
+.touchGroup{display:flex;gap:8px;pointer-events:auto;flex-wrap:wrap;max-width:49%}
+.tBtn{width:clamp(52px,7.2vw,68px);height:clamp(52px,7.2vw,68px);border-radius:50%;border:2px solid rgba(255,255,255,.58);background:rgba(0,0,0,.48);color:#fff;font-size:20px;font-weight:1000;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;touch-action:none;box-shadow:0 10px 24px rgba(0,0,0,.45);transition:transform .08s,filter .08s,background .08s,box-shadow .08s}
+.tBtn small{font-size:8px;letter-spacing:.55px;line-height:1;font-weight:1000}
+.tBtn.atk{background:linear-gradient(135deg,rgba(255,122,0,.94),rgba(255,46,136,.94))}
+.tBtn.on,.tBtn:active{transform:scale(.91);filter:brightness(1.35);background:rgba(255,196,0,.82);color:#221200;border-color:#fff;box-shadow:0 0 0 3px rgba(255,196,0,.35),0 8px 22px rgba(0,0,0,.5)}
+.tBtn.on,.tBtn:active{color:#221200}
+.tBtn:focus-visible{outline:3px solid #fff;outline-offset:2px}
+@media(max-width:520px){.touchGroup{gap:6px}.tBtn{width:50px;height:50px;font-size:17px}.tBtn small{font-size:7px}}
 @media(max-width:720px){.btn{min-width:185px}#gameWrap{min-height:440px;aspect-ratio:auto;height:70vh}.bar{height:16px}#trainingBar{top:96px}}
 .helpBar{margin-top:12px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
 @media(max-width:1000px){.helpBar{grid-template-columns:repeat(2,1fr)}}

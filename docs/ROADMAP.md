@@ -62,9 +62,11 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🏆 **Lignes de victoire** : phrase signature pour les 6 combattants, affichée en fin de match et après replay vérifié
 - ✅ **Preuve Sarah** : deuxième vrai match ajouté, ancien replay favori sélectionné dans la bibliothèque puis relu et vérifié
 
-## 🔜 SPRINT 08 — « Arena Moods & Polish » *(envisagé)*
-- **Kenzo** : variantes Jour/Crépuscule/Nuit des 4 arènes, VFX signatures renforcés, finition tactile
-- **Sarah** : budgets FPS et lisibilité des variantes sur écrans 60/120 Hz
+## ✅ SPRINT 08 — V2.8 « Arena Moods & Polish » *(LIVRÉ le 23/10/2026 — 151 assertions source, suite verte)*
+- 🌤️ **Arena Moods** : Auto/Jour/Crépuscule/Nuit sur les 4 arènes, avec ciel, sol, poste et atmosphère dédiés
+- ✨ **VFX signatures** distincts pour les projectiles des 6 combattants, actifs aussi en qualité basse
+- 📱 **Tactile multi-touch** par `pointerId`, retour visuel enfoncé et nettoyage anti-touches collées
+- ✅ **Matrice Sarah** : 12 combinaisons d’arène/ambiance, replay Nuit forcée vérifié et préférence du joueur restaurée
 
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat

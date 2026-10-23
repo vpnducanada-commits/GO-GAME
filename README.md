@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V2.7 PRO « Replay Studio & Victoires »
+# 🎮 GÉDÉON - Godson ARENA — V2.8 PRO « Arena Moods & Polish »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V2.7-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
+| ⭐ **`Gedeon-GODSON-Arena-V2.8-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
 
@@ -36,7 +36,7 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 | **Zara** *(nouvelle V2.4)* | Vague rapide de Libreville | 🌊 Lames de Marée ×2 / 🌀 Raz-de-Marée au sol |
 
 ## 🏟️ Arènes
-🌇 Stade Gideon Sunset • 🌧️ Néon Tokyo Pluie • ⛩️ Temple Céleste • 🌴 **Plage de Libreville au coucher de soleil** *(nouvelle V2.4 : océan animé, palmiers, pirogues)* — musiques dédiées et caméra dynamique.
+🌇 Stade Gideon Sunset • 🌧️ Néon Tokyo Pluie • ⛩️ Temple Céleste • 🌴 **Plage de Libreville au coucher de soleil** — musiques dédiées, caméra dynamique et **Arena Moods V2.8** : chaque lieu peut se jouer en **Jour, Crépuscule ou Nuit**, ou en Auto signature.
 
 ## ⌨️ Commandes
 | Action | Joueur 1 (AZERTY) | Joueur 2 |
@@ -68,6 +68,12 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 - **Zéro effet de bord** : statistiques, succès, progression, scores et Hall of Fame sont verrouillés pendant la lecture ; les réglages du joueur sont restaurés à la sortie.
 - **Victoires signées** : chaque combattant conclut le match par sa phrase de victoire, aussi affichée après un replay vérifié.
 
+## 🌤️ Arena Moods, VFX signatures & tactile (V2.8)
+- **Ambiances** : Auto signature ou Jour/Crépuscule/Nuit forcé pour les 4 arènes. Le ciel, le sol, la vignette, le grade coloré, les étoiles et l’astre changent sans assombrir les combattants.
+- **Replay fidèle à la lumière** : l’ambiance effective est enregistrée dans le replay puis restaurée à la lecture ; les anciens replays restent en Auto.
+- **VFX signatures** : éclairs de Gideon, traînées de Kira, éclats sismiques de Titan, orbites de Nova, couronne de Godson Prime et écume de Zara autour de leurs projectiles.
+- **Tactile multi-touch** : chaque doigt est suivi par `pointerId`, les boutons affichent leur état enfoncé et un nettoyage global empêche les touches collées.
+
 ## 🏭 Studio Gideon - Godson ARENA
 | Membre | Rôle | Responsabilités |
 |---|---|---|
@@ -76,14 +82,14 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V2.7 « Replay Studio & Victoires »** : la bibliothèque locale conserve plusieurs matchs déterministes avec favoris, titres personnalisés et migration V2.6 ; les 6 combattants gagnent une phrase de victoire signature. Les replays V2.6, l’animation humaine V2.5, Libreville V2.4 et le pipeline QA V2.3 restent intégralement conservés.
+**V2.8 « Arena Moods & Polish »** : 12 combinaisons d’arène/heure avec ciel, sol, poste et atmosphère dédiés ; VFX de projectiles propres aux 6 combattants ; tactile multi-touch par identifiants de pointeur. Le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V2.7-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V2.8-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
-├── tests/smoke-test.js   → 136 assertions d’exécution automatisées ✅
+├── tests/smoke-test.js   → 151 assertions d’exécution automatisées ✅
 └── tools/ build-single.py • qa-check.py (gate de release Sarah)
 ```
 Chaque livraison suit la **Definition of Done** du manager : syntaxe vérifiée, tests 100% verts, build régénéré, documentation à jour, commit Git + tag de version.

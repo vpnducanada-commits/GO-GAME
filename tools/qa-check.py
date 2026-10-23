@@ -99,5 +99,9 @@ check("Signature « Gideon - Godson » présente (HTML+rendu)", ("Gideon - Godso
 replay_hooks = ["startReplayRecording", "replayStateHash", "finalizeReplayRecording", "startReplayPlayback", "REPLAY_STORE_KEY", "loadReplayLibrary", "renderReplayLibrary", "renameReplayById"]
 check("Système de replay déterministe présent", all(h in all_js for h in replay_hooks) and "btnReplayPlay" in html and "menuReplays" in html, "lockstep + hash + lecteur + bibliothèque locale")
 
+# 12. Arena Moods, VFX signatures et tactile multi-touch V2.8
+mood_hooks = ["ARENA_MOOD_THEMES", "resolveArenaMood", "setArenaMood", "drawArenaMoodAtmosphere", "drawSignatureVfx", "setTouchPointer", "clearTouchInputs"]
+check("Arena Moods + VFX signatures + tactile présents", all(h in all_js for h in mood_hooks) and "arenaMoodRow" in html, "4 arènes × 3 ambiances + signatures + pointer IDs")
+
 print("\n— Rapport QA (Sarah) : " + ("RELEASE REFUSÉE ❌" if fails else "RELEASE AUTORISÉE ✅") + f" ({len(fails)} refus, {len(warns)} avertissement(s))")
 sys.exit(1 if fails else 0)

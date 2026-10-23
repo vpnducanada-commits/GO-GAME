@@ -1,10 +1,10 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.7 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V2.8 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="2.7.0";
+const GAME_VERSION="2.8.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -23,7 +23,7 @@ function defaultProfile(){ return {
   settings:{musicVol:70,sfxVol:90,quality:"auto",roundTime:99,roundsWin:2,speed:1,shake:100,showFps:false,reduceFlash:false},
   names:{p1:"Gideon",p2:"Joueur 2"}, initials:{p1:"G",p2:"R"},
   customColors:{p1:null,p2:null},
-  selection:{charP1:0,charP2:1,arena:"stadium"},
+  selection:{charP1:0,charP2:1,arena:"stadium",arenaMood:"auto"},
   stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0,bestParriesMatch:0,totalParries:0},
   unlocks:{prime:false,librevilleSkin:false},
   story:{progressStep:1,completed:false,clears:0,chapter1Completed:false,chapter2Completed:false,chapter2Clears:0},
@@ -41,7 +41,7 @@ if(PROFILE.story.completed&&!PROFILE.story.chapter2Completed){
 let SETTINGS=PROFILE.settings;
 function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
 
-/* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7 ----------------
+/* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7–V2.8 ----------------
    Enregistrement lockstep : on conserve les entrées FINALEMENT appliquées
    aux deux combattants (clavier, tactile, manettes ou bot), compactées en
    événements de changement. Physique et dégâts étant déterministes, les
@@ -167,7 +167,7 @@ function deleteReplayById(id){
 }
 function captureReplayMeta(seed){
   const snap=f=>({char:f.charIndex,health:f.health,maxHealth:f.maxHealth,energy:f.energy,powerMul:f.powerMul||1});
-  return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,
+  return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,arenaMood:currentArenaMood,arenaMoodPreference:selArenaMood,
     char1:p1.charIndex,char2:p2.charIndex,names:{p1:p1.name,p2:p2.name},
     settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},
     context:{storyStep:story.step,arcadeStage:arcade.stage,survivalWave:survival.wave,survivalScore:survival.score},
@@ -222,7 +222,7 @@ function finishReplayPlayback(winner){
 }
 function stopReplayPlayback(restore){
   if(replayPlayback.restoreSettings){ SETTINGS.roundTime=replayPlayback.restoreSettings.roundTime; SETTINGS.roundsWin=replayPlayback.restoreSettings.roundsWin; }
-  if(restore!==false&&replayPlayback.restoreSelection){ selCharP1=replayPlayback.restoreSelection.charP1; selCharP2=replayPlayback.restoreSelection.charP2; selArenaId=replayPlayback.restoreSelection.arena; }
+  if(restore!==false&&replayPlayback.restoreSelection){ selCharP1=replayPlayback.restoreSelection.charP1; selCharP2=replayPlayback.restoreSelection.charP2; selArenaId=replayPlayback.restoreSelection.arena; if(replayPlayback.restoreSelection.arenaMood)selArenaMood=replayPlayback.restoreSelection.arenaMood; }
   replayPlayback.active=false; replayPlayback.ended=false; replayPlayback.paused=false; replayPlayback.data=null; replayPlayback.restoreSettings=null; replayPlayback.restoreSelection=null;
 }
 
@@ -319,6 +319,19 @@ const ARENAS=[
  {id:"Libreville",name:"Plage de Libreville — Coucher de soleil",music:{interval:218,bass:[55,65.4,82.4,65.4,73.4,82.4,98,73.4],lead:[220,329.6,392,329.6,261.6]}}
 ];
 let currentArena=ARENAS[0];
+/* Arena Moods V2.8 : la préférence peut être Auto ou forcée par le joueur ;
+   currentArenaMood contient toujours l’ambiance réellement affichée. */
+const ARENA_MOODS={
+  auto:{id:"auto",label:"Auto",icon:"🎨",short:"Ambiance signature de l’arène"},
+  jour:{id:"jour",label:"Jour",icon:"☀️",short:"Lumière claire et ciel lumineux"},
+  crepuscule:{id:"crepuscule",label:"Crépuscule",icon:"🌇",short:"Horizon doré et reflets chauds"},
+  nuit:{id:"nuit",label:"Nuit",icon:"🌙",short:"Étoiles, lune et néons renforcés"}
+};
+const ARENA_DEFAULT_MOODS={stadium:"crepuscule",tokyo:"nuit",temple:"jour",Libreville:"crepuscule"};
+function resolveArenaMood(arenaId,preference){ return preference&&preference!=="auto"&&ARENA_MOODS[preference]?preference:(ARENA_DEFAULT_MOODS[arenaId]||"jour"); }
+function arenaMoodLabel(mood){ const m=ARENA_MOODS[mood]||ARENA_MOODS.auto; return m.icon+" "+m.label; }
+let selArenaMood=ARENA_MOODS[PROFILE.selection.arenaMood]?PROFILE.selection.arenaMood:"auto";
+let currentArenaMood=resolveArenaMood(currentArena.id,selArenaMood);
 
 /* ---------------- DONNÉES : ATTAQUES (frame data pro) ---------------- */
 const ATTACKS={

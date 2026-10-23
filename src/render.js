@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.7 PRO — RENDU HAUT GRAPHISME
+   GÉDÉON - Godson ARENA V2.8 PRO — RENDU HAUT GRAPHISME
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,13 +8,38 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
   temple:{top:"#8d6e63",mid:"#6d4c41",bot:"#332016",line:"#ffd54f",grade:"rgba(255,205,90,.13)"},
   Libreville:{top:"#d7a86a",mid:"#b9844f",bot:"#65452d",line:"#4dd0e1",grade:"rgba(255,130,70,.15)"}
 };
+/* Arena Moods V2.8 (Kenzo) : chaque lieu garde son identité, mais la lumière,
+   le ciel, le sol et l’atmosphère changent réellement selon l’heure choisie. */
+const ARENA_MOOD_THEMES={
+  stadium:{
+    jour:{sky:[[0,"#1976d2"],[.42,"#64b5f6"],[.72,"#ffe9a8"],[1,"#263238"]],grade:"rgba(120,205,255,.12)",overlay:"rgba(255,246,190,.13)",horizon:"rgba(255,224,130,.18)",floorShift:24,celestial:"sun",stars:0,vignette:.32},
+    crepuscule:{sky:[[0,"#1a237e"],[.38,"#6a1b9a"],[.63,"#ff7043"],[1,"#21122e"]],grade:"rgba(255,138,60,.16)",overlay:"rgba(255,110,64,.08)",horizon:"rgba(255,150,70,.24)",floorShift:0,celestial:"sunLow",stars:12,vignette:.42},
+    nuit:{sky:[[0,"#01030f"],[.42,"#0b1640"],[.74,"#293064"],[1,"#050716"]],grade:"rgba(55,85,255,.17)",overlay:"rgba(2,7,35,.20)",horizon:"rgba(95,145,255,.13)",floorShift:-20,celestial:"moon",stars:76,vignette:.5}
+  },
+  tokyo:{
+    jour:{sky:[[0,"#31547f"],[.42,"#6f9fc4"],[.74,"#c4d9e8"],[1,"#111743"]],grade:"rgba(145,205,255,.12)",overlay:"rgba(230,244,255,.10)",horizon:"rgba(255,255,255,.12)",floorShift:26,celestial:"sun",stars:0,vignette:.34},
+    crepuscule:{sky:[[0,"#170f38"],[.42,"#51245e"],[.74,"#b84a6e"],[1,"#0a0d24"]],grade:"rgba(255,80,150,.15)",overlay:"rgba(90,25,80,.10)",horizon:"rgba(255,110,110,.18)",floorShift:-4,celestial:"sunLow",stars:18,vignette:.44},
+    nuit:{sky:[[0,"#02061f"],[.45,"#111743"],[.72,"#3b1454"],[1,"#0a0d24"]],grade:"rgba(80,90,255,.15)",overlay:"rgba(2,5,28,.10)",horizon:"rgba(255,46,136,.12)",floorShift:0,celestial:"moon",stars:58,vignette:.48}
+  },
+  temple:{
+    jour:{sky:[[0,"#2196f3"],[.42,"#81d4fa"],[.7,"#ffe9a8"],[1,"#5d4037"]],grade:"rgba(255,205,90,.13)",overlay:"rgba(255,248,205,.08)",horizon:"rgba(255,224,130,.15)",floorShift:10,celestial:"sun",stars:0,vignette:.34},
+    crepuscule:{sky:[[0,"#31456e"],[.42,"#9a5570"],[.72,"#ffb37a"],[1,"#4e342e"]],grade:"rgba(255,145,80,.16)",overlay:"rgba(255,130,65,.10)",horizon:"rgba(255,180,90,.24)",floorShift:-10,celestial:"sunLow",stars:16,vignette:.43},
+    nuit:{sky:[[0,"#030e24"],[.42,"#102f57"],[.74,"#405f7d"],[1,"#211711"]],grade:"rgba(70,110,255,.15)",overlay:"rgba(2,8,30,.18)",horizon:"rgba(255,180,80,.12)",floorShift:-26,celestial:"moon",stars:84,vignette:.5}
+  },
+  Libreville:{
+    jour:{sky:[[0,"#0f6fb4"],[.4,"#4db6e8"],[.72,"#c8f2ff"],[1,"#087f9d"]],grade:"rgba(110,220,255,.12)",overlay:"rgba(255,250,205,.09)",horizon:"rgba(255,255,255,.16)",floorShift:18,celestial:"sun",stars:0,vignette:.32},
+    crepuscule:{sky:[[0,"#24406e"],[.34,"#7c3a6e"],[.58,"#e85d75"],[.76,"#ff9e57"],[1,"#0b536d"]],grade:"rgba(255,130,70,.15)",overlay:"rgba(255,120,60,.07)",horizon:"rgba(255,158,87,.25)",floorShift:0,celestial:"sunLow",stars:10,vignette:.42},
+    nuit:{sky:[[0,"#010817"],[.4,"#082744"],[.72,"#145374"],[1,"#032f42"]],grade:"rgba(45,100,255,.16)",overlay:"rgba(1,8,32,.20)",horizon:"rgba(120,210,255,.13)",floorShift:-28,celestial:"moon",stars:88,vignette:.5}
+  }
+};
+function arenaMoodTheme(){ const byArena=ARENA_MOOD_THEMES[currentArena.id]||ARENA_MOOD_THEMES.stadium; return byArena[currentArenaMood]||byArena.crepuscule; }
 function cachedLinearGradient(key,x0,y0,x1,y1,stops){
   const hit=gradientCache.get(key);
   if(hit){ renderStats.gradientHits++; return hit; }
@@ -79,20 +104,53 @@ function glowSprite(color){
 function rebuildArenaCache(){
   arenaCache={};
   const mk=(stops,y1)=>{ const g=ctx.createLinearGradient(0,0,0,y1||H); stops.forEach(s=>g.addColorStop(s[0],s[1])); return g; };
-  if(currentArena.id==="stadium")arenaCache.sky=mk([[0,"#1a237e"],[.38,"#6a1b9a"],[.63,"#ff7043"],[1,"#21122e"]]);
-  else if(currentArena.id==="tokyo")arenaCache.sky=mk([[0,"#02061f"],[.45,"#111743"],[.72,"#3b1454"],[1,"#0a0d24"]]);
-  else if(currentArena.id==="Libreville")arenaCache.sky=mk([[0,"#24406e"],[.34,"#7c3a6e"],[.58,"#e85d75"],[.76,"#ff9e57"],[1,"#0b536d"]]);
-  else arenaCache.sky=mk([[0,"#2196f3"],[.42,"#81d4fa"],[.7,"#ffe9a8"],[1,"#5d4037"]]);
-  const theme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium;
-  arenaCache.floor=cachedLinearGradient("floor:"+currentArena.id,0,GROUND-22,0,H+180,[[0,theme.top],[.25,theme.mid],[1,theme.bot]]);
+  const mood=arenaMoodTheme(),theme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium,shift=mood.floorShift||0;
+  arenaCache.sky=mk(mood.sky);
+  arenaCache.floor=cachedLinearGradient("floor:"+currentArena.id+":"+currentArenaMood,0,GROUND-22,0,H+180,[[0,shade(theme.top,shift)],[.25,shade(theme.mid,shift)],[1,shade(theme.bot,Math.round(shift*.55))]]);
   arenaCache.billboard=cachedLinearGradient("billboard",405,32,875,148,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
-  arenaCache.grade=theme.grade;
+  arenaCache.grade=mood.grade; arenaCache.moodTheme=mood;
+  renderStats.arenaMood=currentArenaMood;
   vignetteGrad=ctx.createRadialGradient(W/2,H/2,H*.38,W/2,H/2,H*.86);
-  vignetteGrad.addColorStop(0,"rgba(0,0,0,0)"); vignetteGrad.addColorStop(1,"rgba(0,0,0,.42)");
+  vignetteGrad.addColorStop(0,"rgba(0,0,0,0)"); vignetteGrad.addColorStop(1,"rgba(0,0,0,"+(mood.vignette||.42)+")");
 }
-function setArenaById(id){
-  const a=ARENAS.find(x=>x.id===id)||ARENAS[0];
-  if(a!==currentArena){ currentArena=a; rebuildArenaCache(); if(musicTimer)startMusic(); }
+function setArenaById(id,moodPreference){
+  const a=ARENAS.find(x=>x.id===id)||ARENAS[0],resolvedMood=resolveArenaMood(a.id,moodPreference||selArenaMood||"auto");
+  if(a!==currentArena||resolvedMood!==currentArenaMood){ currentArena=a; currentArenaMood=resolvedMood; rebuildArenaCache(); if(musicTimer)startMusic(); }
+}
+function setArenaMood(mood){
+  selArenaMood=ARENA_MOODS[mood]?mood:"auto";
+  const resolvedMood=resolveArenaMood(currentArena.id,selArenaMood);
+  if(resolvedMood!==currentArenaMood){ currentArenaMood=resolvedMood; rebuildArenaCache(); }
+  renderStats.arenaMood=currentArenaMood;
+  return currentArenaMood;
+}
+function drawArenaMoodAtmosphere(){
+  const theme=arenaMoodTheme(),id=currentArena.id;
+  renderStats.arenaMood=currentArenaMood; renderStats.moodCelestial=theme.celestial||"";
+  const starTotal=qualityLevel===0?Math.ceil((theme.stars||0)*.45):qualityLevel===1?Math.ceil((theme.stars||0)*.7):(theme.stars||0);
+  renderStats.moodStars=starTotal;
+  ctx.save();
+  ctx.fillStyle=cachedLinearGradient("mood-atmosphere:"+id+":"+currentArenaMood,0,-60,0,GROUND,[[0,theme.overlay],[.62,theme.horizon],[1,"rgba(0,0,0,0)"]]);
+  ctx.fillRect(-220,-60,1720,GROUND+40);
+  if(starTotal>0){
+    ctx.fillStyle="#ffffff";
+    for(let i=0;i<starTotal;i++){ const x=-180+pseudo(i*19+id.length*7)*1640,y=-30+pseudo(i*31+4)*330,tw=.35+.65*Math.abs(Math.sin(renderTicker*.018+i)); ctx.globalAlpha=tw; ctx.fillRect(x,y,i%11===0?3:2,i%11===0?3:2); }
+    ctx.globalAlpha=1;
+  }
+  const bodies={stadium:[640,215,58],tokyo:[1120,92,36],temple:[108,72,40],Libreville:[640,286,56]},body=bodies[id]||bodies.stadium;
+  if(theme.celestial==="moon"){
+    ctx.globalAlpha=.9; ctx.drawImage(glowSprite("#90caf9"),body[0]-body[2]*2.2,body[1]-body[2]*2.2,body[2]*4.4,body[2]*4.4); ctx.globalAlpha=1;
+    ctx.fillStyle="#eef6ff"; ctx.beginPath(); ctx.arc(body[0],body[1],body[2]*.72,0,7); ctx.fill();
+    ctx.fillStyle="rgba(5,12,38,.88)"; ctx.beginPath(); ctx.arc(body[0]-body[2]*.3,body[1]-body[2]*.12,body[2]*.62,0,7); ctx.fill();
+  }else{
+    const sunColor=theme.celestial==="sunLow"?"#ffb74d":"#fff59d";
+    ctx.globalAlpha=.88; ctx.drawImage(glowSprite(sunColor),body[0]-body[2]*2.5,body[1]-body[2]*2.5,body[2]*5,body[2]*5); ctx.globalAlpha=1;
+    ctx.fillStyle=theme.celestial==="sunLow"?"#ffd166":"#fffde7"; ctx.beginPath(); ctx.arc(body[0],body[1],body[2]*(theme.celestial==="sunLow"?.78:.66),0,7); ctx.fill();
+    if(qualityLevel>0){ ctx.strokeStyle=theme.celestial==="sunLow"?"rgba(255,170,80,.35)":"rgba(255,255,210,.35)"; ctx.lineWidth=3; for(let i=0;i<6;i++){ const a=i*Math.PI/3+renderTicker*.002; ctx.beginPath(); ctx.moveTo(body[0]+Math.cos(a)*body[2]*.85,body[1]+Math.sin(a)*body[2]*.85); ctx.lineTo(body[0]+Math.cos(a)*body[2]*1.18,body[1]+Math.sin(a)*body[2]*1.18); ctx.stroke(); } }
+  }
+  ctx.save(); ctx.globalCompositeOperation="screen"; ctx.globalAlpha=currentArenaMood==="nuit"?.16:.22; ctx.fillStyle=theme.horizon;
+  ctx.beginPath(); ctx.ellipse(640,392,760,92,0,0,7); ctx.fill(); ctx.restore();
+  ctx.restore();
 }
 /* Foule, nuages, pluie, pétales */
 const crowd=[];
@@ -316,10 +374,11 @@ function drawLibreville(){
 }
 function drawBackground(){
   if(currentArena.id==="stadium")drawStadium(); else if(currentArena.id==="tokyo")drawTokyo(); else if(currentArena.id==="Libreville")drawLibreville(); else drawTemple();
+  drawArenaMoodAtmosphere();
 }
 function drawFloor(){
   const id=currentArena.id,theme=FLOOR_THEMES[id]||FLOOR_THEMES.stadium,line=theme.line;
-  const fg=arenaCache.floor||cachedLinearGradient("floor:"+id,0,GROUND-22,0,H+180,[[0,theme.top],[.25,theme.mid],[1,theme.bot]]);
+  const fg=arenaCache.floor||cachedLinearGradient("floor:"+id+":"+currentArenaMood,0,GROUND-22,0,H+180,[[0,shade(theme.top,arenaMoodTheme().floorShift||0)],[.25,shade(theme.mid,arenaMoodTheme().floorShift||0)],[1,theme.bot]]);
   ctx.fillStyle=fg; ctx.fillRect(-420,GROUND-22,2120,360);
   ctx.fillStyle=line; ctx.globalAlpha=.9; ctx.fillRect(-420,GROUND-22,2120,5); ctx.globalAlpha=1;
   if(id==="tokyo"){ ctx.save(); ctx.globalAlpha=.16; ["#00e5ff","#ff2e88","#ffc400"].forEach((c,i)=>{ctx.fillStyle=c;ctx.fillRect(90+i*420,GROUND-16,120,150);}); ctx.globalAlpha=.22; ctx.fillStyle="#b3e5fc"; [180,520,860,1120].forEach(x=>{ctx.beginPath();ctx.ellipse(x,GROUND+58,95,14,0,0,7);ctx.fill();}); ctx.restore(); }
@@ -477,9 +536,43 @@ function drawFighter(f){
   if(f.counterWindowT>0&&isCombat()){ ctx.save(); ctx.font="1000 12px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle="rgba(90,50,0,.82)"; rr(f.rx-43,f.ry-236*ch.scale,86,20,10); ctx.fill(); ctx.fillStyle="#ffc400"; ctx.fillText("⚡ RIPOSTE !",f.rx,f.ry-222*ch.scale); ctx.restore(); }
   if(isCombat()||state==="intro"){ ctx.save(); ctx.font="1000 11px 'Segoe UI',Arial"; ctx.textAlign="center"; const label=f.name.toUpperCase(),wdt=Math.max(72,cachedTextWidth(label,"1000 11px 'Segoe UI',Arial")+18); ctx.fillStyle="rgba(0,0,0,.46)"; rr(f.rx-wdt/2,f.ry-212*ch.scale,wdt,19,9); ctx.fill(); ctx.fillStyle="#fff"; ctx.fillText(label,f.rx,f.ry-198*ch.scale); ctx.restore(); }
 }
+const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume"};
+function signatureVfxStyle(owner){ return SIGNATURE_VFX[(owner&&owner.char&&owner.char.id)||""]||"énergie"; }
+function drawSignatureVfx(pr){
+  const owner=pr.owner||{},style=signatureVfxStyle(owner),trail=(owner.skin&&owner.skin.trail)||"#ffc400";
+  const dir=Math.sign(pr.vx||owner.facing||1)||1,count=qualityLevel===0?2:qualityLevel===1?3:5,r=Math.max(10,pr.r||16);
+  renderStats.signatureVfx++; renderStats.lastSignatureVfx=((owner.char&&owner.char.id)||"inconnu")+":"+style;
+  ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";
+  if(style==="foudre"){
+    ctx.strokeStyle="#ffe082"; ctx.lineWidth=2.4; ctx.globalAlpha=.9;
+    for(let i=0;i<count;i++){ const a=renderTicker*.07+i*1.26,x=pr.rx+Math.cos(a)*r*.78,y=pr.ry+Math.sin(a)*r*.58; ctx.beginPath(); ctx.moveTo(x-7,y+5); ctx.lineTo(x,y-3); ctx.lineTo(x-3,y-3); ctx.lineTo(x+5,y-10); ctx.stroke(); }
+  }else if(style==="traînées"){
+    ctx.strokeStyle=trail; ctx.lineWidth=3; ctx.globalAlpha=.75;
+    for(let i=0;i<count;i++){ const y=pr.ry+(i-(count-1)/2)*r*.28; ctx.beginPath(); ctx.moveTo(pr.rx-dir*r*.35,y); ctx.lineTo(pr.rx-dir*r*(1.5+i*.16),y+Math.sin(renderTicker*.12+i)*2); ctx.stroke(); }
+  }else if(style==="éclats sismiques"){
+    ctx.fillStyle="#ffccbc"; ctx.strokeStyle=trail; ctx.lineWidth=2;
+    for(let i=0;i<count;i++){ const a=i*1.35+renderTicker*.025,x=pr.rx+Math.cos(a)*r*.85,y=pr.ry+Math.sin(a)*r*.62; ctx.beginPath(); ctx.moveTo(x,y-r*.22); ctx.lineTo(x+r*.2,y+r*.14); ctx.lineTo(x-r*.18,y+r*.18); ctx.closePath(); ctx.fill(); ctx.stroke(); }
+    ctx.globalAlpha=.42; ctx.beginPath(); ctx.ellipse(pr.rx,Math.min(GROUND-4,pr.ry+r),r*(1.15+Math.sin(renderTicker*.08)*.08),r*.3,0,0,7); ctx.stroke();
+  }else if(style==="orbites"){
+    ctx.fillStyle="#ffffff"; ctx.strokeStyle=trail; ctx.lineWidth=1.6;
+    for(let i=0;i<count;i++){ const a=renderTicker*.1+i*(6.28/count),x=pr.rx+Math.cos(a)*r*.95,y=pr.ry+Math.sin(a)*r*.62; ctx.beginPath(); ctx.arc(x,y,2.6,0,7); ctx.fill(); ctx.beginPath(); ctx.ellipse(pr.rx,pr.ry,r*.95,r*.62,a*.12,0,7); ctx.globalAlpha=.22; ctx.stroke(); ctx.globalAlpha=1; }
+  }else if(style==="couronne royale"){
+    ctx.fillStyle="#ffc400"; ctx.strokeStyle="#fff3b0"; ctx.lineWidth=1.6; const y=pr.ry-r*.92+Math.sin(renderTicker*.07)*2;
+    ctx.beginPath(); ctx.moveTo(pr.rx-r*.62,y+r*.42); ctx.lineTo(pr.rx-r*.62,y); ctx.lineTo(pr.rx-r*.28,y+r*.22); ctx.lineTo(pr.rx,y-r*.18); ctx.lineTo(pr.rx+r*.28,y+r*.22); ctx.lineTo(pr.rx+r*.62,y); ctx.lineTo(pr.rx+r*.62,y+r*.42); ctx.closePath(); ctx.fill(); ctx.stroke();
+    ctx.globalAlpha=.65; ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r*1.05,0,7); ctx.stroke();
+  }else if(style==="écume"){
+    ctx.fillStyle="#e0f7fa"; ctx.strokeStyle=trail; ctx.lineWidth=1.8;
+    for(let i=0;i<count;i++){ const x=pr.rx-dir*i*r*.34,y=pr.ry+Math.sin(renderTicker*.09+i*1.4)*r*.34; ctx.beginPath(); ctx.arc(x,y,r*(.18+(i%3)*.05),0,7); ctx.fill(); }
+    ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r*1.02,renderTicker*.03,renderTicker*.03+4.4); ctx.stroke();
+  }else{
+    ctx.strokeStyle=trail; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r,0,7); ctx.stroke();
+  }
+  ctx.restore();
+}
 function drawProjectiles(){
   for(const pr of projectiles){
     const kind=pr.kind||"bolt",size=pr.r*(kind==="judgment"?4.8:4.2);
+    drawSignatureVfx(pr);
     ctx.save(); ctx.globalAlpha=.95;
     if(kind==="wave"){
       ctx.drawImage(glowSprite(pr.owner.skin.trail),pr.rx-size/2,GROUND-size/2-24,size,size);
@@ -516,7 +609,7 @@ function drawEffects(){
 }
 function drawPostProcess(){
   // Passe POST (V2.3 Kenzo) : teinte colorée par arène, vignette, alertes, barres cinéma.
-  renderStats.lastPost=currentArena.id+":q"+qualityLevel;
+  renderStats.lastPost=currentArena.id+":"+currentArenaMood+":q"+qualityLevel; renderStats.arenaMood=currentArenaMood;
   if(qualityLevel>0&&arenaCache.grade){ ctx.save(); try{ctx.globalCompositeOperation="soft-light";}catch(e){} ctx.fillStyle=arenaCache.grade; ctx.fillRect(0,0,W,H); ctx.restore(); }
   if(vignetteGrad){ ctx.fillStyle=vignetteGrad; ctx.fillRect(0,0,W,H); }
   const Low=(p1.health/p1.maxHealth<.25||p2.health/p2.maxHealth<.25)&&isCombat();
@@ -593,6 +686,7 @@ function loop(ts){
   if(dt>250)dt=16.7; // retour d’onglet / pause navigateur
   renderDtFactor=clamp(dt/16.667,.25,3); renderTicker+=renderDtFactor; rafCount++;
   if(dt>0)fpsEMA+=(1000/dt-fpsEMA)*.05;
+  renderStats.fpsEstimate=Math.round(fpsEMA); renderStats.frameBudgetOk=fpsEMA>=45||qualityLevel===0; renderStats.arenaMood=currentArenaMood;
   // Qualité automatique régulière
   if(SETTINGS.quality==="auto"&&rafCount%100===0){
     if(fpsEMA<45&&qualityLevel>0){ qualityLevel--; resizeCanvas(); autoGoodChecks=0; }
