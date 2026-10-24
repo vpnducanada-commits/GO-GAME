@@ -1,4 +1,4 @@
-# 🗺️ ROADMAP OFFICIELLE — GÉDÉON - Godson ARENA
+# 🗺️ ROADMAP OFFICIELLE — Godson FURY ARENA *(anciennement GÉDÉON - Godson ARENA)*
 
 *Mise à jour par le Manager & Développeur principal. Propriétaire : Gideon - Godson.*
 
@@ -123,13 +123,21 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V5.1 — « Godson FURY — M1 Signature » *(LIVRÉ le 24/10/2026 — 357 assertions source / 592 vérifications, suite verte)*
+
+- **Nouveau nom officiel** choisi avec l’équipe : **Godson FURY ARENA — L’Arène des Légendes** (signature Gédéon - Godson conservée).
+- **Travail individuel des 41 combattants** : chacun reçoit un **M1 spécifique** de 3 à 5 coups (168 coups nommés uniques), avec tempo, portée, puissance, avance et final propres.
+- **Combo accessible** : il suffit de marteler **POING** au sol pour dérouler la chaîne en vrai combo ; liaison réglée frame par frame et prouvée en simulation pour les 41/41.
+- Bot utilisateur de son propre M1, traînées qui s’intensifient, arsenal/aperçus/VS/aide mis à jour, replays pré-V5.1 relus avec l’ancien poing. Voir `docs/SPRINT_V51_M1_SIGNATURE.md`.
+- 🔜 **V5.2 Graphismes AAA II** (ombres portées, impacts sprites, tenues fidèles aux planches), puis tournoi à brackets/saisons et Online public selon validation réseau réelle.
+
 ## ✅ V5.0 — « Édition Jeu Complet » *(LIVRÉ le 24/10/2026 — 342 assertions source / 577 vérifications, suite verte)*
 
 - **Carrière Godson** : XP, niveaux 1→50, rangs, monnaie Godson, titres équipables et 12 quêtes relient Campagne, Championnat, Survie, Défis et Online dans une seule boucle de progression.
 - **Championnat Godson** : l'Arcade devient 3 circuits (Stade 5, Monde 8, Légendes 12 combats) à adversaires uniques, arènes imposées, difficulté croissante et boss final (GODSON PRIME sur Légendes).
 - **Hub principal vivant** : niveau, barre XP, Godson, titre et prochain objectif toujours visibles ; écran Carrière avec circuits, quêtes, récompenses et parcours complet du jeu.
 - Anciens profils migrés honorifiquement (XP/Godson selon l'historique) ; déterminisme et replays préservés. Voir `docs/SPRINT_V50_JEU_COMPLET.md`.
-- 🔜 **V5.1 Graphismes AAA II** : ombres portées directionnelles, impacts en sprites, tenues fidèles aux planches (capuches, robes, fourrures). **V5.2** : tournoi à brackets + saisons de carrière. **V5.3** : Online public selon validation réseau réelle entre deux appareils.
+- 🔜 Le cap V5.1 a ensuite été réaffecté par le propriétaire au nouveau nom et aux M1 individuels ; Graphismes AAA II devient la priorité V5.2.
 
 ## ✅ V4.4 — « Navigation Pro & Tenues de combat » *(LIVRÉ le 24/10/2026 — 327 assertions source / 561 vérifications, suite verte)*
 

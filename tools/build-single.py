@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""Génère la version autonome 1 fichier de GÉDÉON - Godson ARENA PRO.
+"""Génère la version autonome 1 fichier de Godson FURY ARENA.
 Fusionne index.html + src/style.css + src/*.js en un seul HTML partageable.
 La version est lue depuis GAME_VERSION dans src/engine.js : aucune
 constante de release ne doit être recopiée à la main dans ce builder.
 Usage : python3 tools/build-single.py
-Signé : Gideon - Godson
+Signé : Gédéon - Godson
 """
 from pathlib import Path
 import re
@@ -32,7 +32,7 @@ for name in ("engine.js", "render.js", "ui.js"):
         "<script>\n" + js + "\n</script>",
     )
 
-out = ROOT / f"Gedeon-GODSON-Arena-V{short_version}-PRO.html"
-header = f"<!-- GÉDÉON - Godson ARENA V{short_version} PRO — version autonome 1 fichier — signé Gideon - Godson © 2026 -->\n"
+out = ROOT / f"Godson-FURY-Arena-V{short_version}-PRO.html"
+header = f"<!-- Godson FURY ARENA V{short_version} — L’Arène des Légendes — version autonome 1 fichier — signé Gédéon - Godson © 2026 -->\n"
 out.write_text(header + html, encoding="utf-8")
 print(f"OK -> {out.name} ({out.stat().st_size/1024:.0f} Ko)")

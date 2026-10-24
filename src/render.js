@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.4 PRO — GRAPHISMES AAA, TENUES PEINTES & ROSTER 41
+   Godson FURY ARENA V5.1 — GRAPHISMES AAA, M1 SIGNATURE & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -286,7 +286,7 @@ function drawStadium(){
   ctx.fillStyle="rgba(255,255,255,.1)"; for(let r=0;r<5;r++)ctx.fillRect(-220,252+r*27,1720,2);
   // Bandeau LED défilant
   ctx.save(); ctx.fillStyle="#050816"; ctx.fillRect(-220,382,1720,30); ctx.font="1000 19px 'Segoe UI',Arial"; ctx.textAlign="left";
-  const msg=" ✦ GÉDÉON - Godson ARENA ✦ COMBAT 1V1 ✦ COMBOS • DASH • SUPER ATTAQUES ";
+  const msg=" ✦ Godson FURY ARENA ✦ COMBAT 1V1 ✦ M1 SIGNATURE • COMBOS • DASH • SUPER ATTAQUES ";
   const tw=cachedTextWidth(msg,"1000 19px 'Segoe UI',Arial"),off=-((renderTicker*1.15)%tw);
   ctx.fillStyle="#69f0ae"; for(let x=off-tw;x<W+220;x+=tw)ctx.fillText(msg,x,404); ctx.restore();
   ctx.fillStyle="rgba(11,14,42,.68)"; ctx.fillRect(-220,428,1720,50); ctx.fillStyle="rgba(255,255,255,.13)"; ctx.fillRect(-220,428,1720,3);
@@ -699,9 +699,10 @@ function drawFighter(f){
   const sk=f.skin,ch=f.char,elapsed=f.attackT>0?f.attackDur-f.attackT:0,atk=f.attack;
   const motion=fighterMotion(f),phase=motion.attack,human=humanProfile(f);
   renderStats.humanProfiles=Object.keys(HUMAN_PROFILES).length; renderStats.lastHumanProfile=ch.id;
-  const punchExt=(f.attackType==="punch"||f.attackType==="airPunch")?phase*48:0;
-  const kickExt=(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")?phase*54:0;
-  const upperExt=f.attackType==="uppercut"?phase*44:0;
+  const m1Boost=atk&&atk.m1?(4+(atk.m1Step||0)*3+(atk.m1Final?7:0)):0;
+  const punchExt=(f.attackType==="punch"||f.attackType==="airPunch")?phase*(48+m1Boost):0;
+  const kickExt=(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")?phase*(54+m1Boost):0;
+  const upperExt=f.attackType==="uppercut"?phase*(44+m1Boost):0;
   if(f.crouchBlend==null)f.crouchBlend=0;
   f.crouchBlend=smoothMotionValue(f.crouchBlend,(f.crouching||f.attackType==="uppercut"||f.attackType==="sweep")?1:0,14);
   const cb=f.crouchBlend;
@@ -884,13 +885,25 @@ function drawFighter(f){
   }
   // Traînées d’attaque
   if(atk&&elapsed>=atk.start&&elapsed<=atk.end+2&&f.attackType!=="special"&&f.attackType!=="super"&&f.attackType!=="exspecial"){
-    ctx.save(); ctx.globalAlpha=.55; ctx.strokeStyle=sk.trail; ctx.lineWidth=f.attackType.includes("kick")||f.attackType==="sweep"?9:7; ctx.lineCap="round";
+    const isM1=!!atk.m1;
+    if(isM1){ renderStats.m1Trail=(renderStats.m1Trail||0)+1; renderStats.m1Fx=ch.id+":"+(atk.m1Fx||"signature")+":"+(atk.m1Step||0); }
+    ctx.save(); ctx.globalAlpha=isM1?.74:.55; ctx.strokeStyle=sk.trail; ctx.lineWidth=(f.attackType.includes("kick")||f.attackType==="sweep"?9:7)+(isM1?1.5+(atk.m1Step||0)+(atk.m1Final?2:0):0); ctx.lineCap="round";
     ctx.beginPath();
     if(f.attackType==="uppercut"){ctx.moveTo(shX+22,shY+30);ctx.quadraticCurveTo(shX+46,shY-12,shX+34,shY-48);}
     else if(f.attackType==="sweep"){ctx.moveTo(hipX+15,-12);ctx.quadraticCurveTo(hipX+58,-20,hipX+92,-8);}
     else if(f.attackType.includes("kick")){ctx.moveTo(hipX+18,-62);ctx.quadraticCurveTo(hipX+64,-92,hipX+98,-72);}
     else {ctx.moveTo(shX+26,shY+13);ctx.lineTo(shX+78,shY+11);}
-    ctx.stroke(); ctx.restore();
+    ctx.stroke();
+    if(isM1){ // seconde traînée décalée : la chaîne s'intensifie visuellement coup après coup
+      ctx.globalAlpha=.34; ctx.lineWidth=3; ctx.beginPath();
+      const off=5+(atk.m1Step||0)*3;
+      if(f.attackType==="uppercut"){ctx.moveTo(shX+22-off,shY+30);ctx.quadraticCurveTo(shX+46-off,shY-12,shX+34-off,shY-48);}
+      else if(f.attackType==="sweep"){ctx.moveTo(hipX+15,-12-off);ctx.quadraticCurveTo(hipX+58,-20-off,hipX+92,-8-off);}
+      else if(f.attackType.includes("kick")){ctx.moveTo(hipX+18,-62+off);ctx.quadraticCurveTo(hipX+64,-92+off,hipX+98,-72+off);}
+      else {ctx.moveTo(shX+26,shY+13-off);ctx.lineTo(shX+78,shY+11-off);}
+      ctx.stroke();
+    }
+    ctx.restore();
   }
   try{ctx.filter="none";}catch(e){}
   ctx.restore();

@@ -1,4 +1,4 @@
-# ✅ STRATÉGIE QA & QUALITÉ — Gideon - Godson ARENA
+# ✅ STRATÉGIE QA & QUALITÉ — Godson FURY ARENA
 
 **Lead QA / Performance / Release** : Sarah  
 **Autorité** : Sarah dispose d’un **veto qualité** sur toute release qui échoue aux seuils ci-dessous.
@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 448 Ko (budget relevé en V5.0 sur décision d’équipe — édition Jeu Complet : carrière, championnat, quêtes ; 404 Ko réels en V5.0), sans asset externe.
+- ✅ Bundle officiel ≤ 448 Ko (budget relevé en V5.0 sur décision d’équipe — édition Jeu Complet ; 418 Ko réels en V5.1 avec les 41 M1 individuels), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 

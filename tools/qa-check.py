@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
-"""QA statique Gideon–Godson Arena V2 — Lead QA : Sarah.
+"""QA statique Godson FURY ARENA — Lead QA : Sarah.
 Retourne 0 si tous les contrôles critiques passent, 1 sinon.
 Usage : python3 tools/qa-check.py [--bundle FICHIER]
 """
 from pathlib import Path
-import re, subprocess, sys
+import json, re, subprocess, sys
 
 ROOT = Path(__file__).resolve().parents[1]
 fails, warns = [], []
@@ -79,7 +79,10 @@ check("Pipeline de rendu en 7 passes (Kenzo)", order == ["background","floor","s
 # 9. Budgets de poids
 bundle_arg = None
 if "--bundle" in sys.argv: bundle_arg = Path(sys.argv[sys.argv.index("--bundle") + 1])
-bundles = sorted(ROOT.glob("Gedeon*-Arena-V*.html"))
+def _bundle_version(p):
+    m = re.search(r"-V([0-9]+(?:\.[0-9]+){0,2})-PRO\.html$", p.name)
+    return tuple(int(x) for x in m.group(1).split(".")) if m else (0,)
+bundles = sorted(ROOT.glob("*Arena-V*.html"), key=_bundle_version)
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
@@ -92,7 +95,7 @@ if target and target.exists():
     n_scripts = len(re.findall(r'<script(?:\s[^>]*)?>', b))
     check("Bundle : 3 scripts intégrés", n_scripts == 3, f"{n_scripts} balise(s) script")
 else:
-    check("Bundle présent", False, "aucun fichier Gedeon*-Arena-V*.html", warn=True)
+    check("Bundle présent", False, "aucun fichier *Arena-V*.html", warn=True)
 
 # 10. Signature officielle
 check("Signature « Gideon - Godson » présente (HTML+rendu)", ("Gideon - Godson" in html) and ("Gideon - Godson" in js["render"]))
@@ -148,24 +151,33 @@ check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à 
 
 # 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
 #     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
-aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html or 'V5.0' in html)
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html)
 check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
 
 # 25. Roster complet des planches V4.3 : les 35 designs des 3 planches du propriétaire
 #     jouables (41 combattants avec les 6 historiques), morphologies dédiées.
 board_ids = ("Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion")
-roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"]) and ('PRO' in html or 'V5.0' in html) and 'ROSTER PLANCHES COMPLET' in css
+roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or 'GAME_VERSION="5.1.0"' in js["engine"]) and ('PRO' in html or 'V5.0' in html or 'V5.1' in html) and 'ROSTER PLANCHES COMPLET' in css
 check("Roster complet des planches V4.3 présent", roster_ok, "35 personnages des planches + 41 morphologies + grille de sélection dense")
 
 # 26. Navigation Pro & tenues de combat peintes V4.4 : recherche/filtres roster,
 #     barres d'action fixes, grilles à défilement interne, vêtements peints.
-nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and ('GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"]) and ('V4.4 PRO' in html or 'V5.0' in html)
+nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and ('GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or 'GAME_VERSION="5.1.0"' in js["engine"]) and ('V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html)
 check("Navigation Pro & tenues peintes V4.4 présents", nav_ok, "recherche + filtres par famille + actions fixes + ouverture/col/plis peints")
 
 # 27. Édition Jeu Complet V5.0 : carrière persistante (XP/niveaux/Godson/titres),
 #     championnat 3 circuits, quêtes réclamables, boutique et hub de progression.
-career_ok = all(x in js["engine"] for x in ('GAME_VERSION="5.0.0"','CHAMPIONSHIP_CIRCUITS','function careerLevelFromXp','function awardCareerForMatch','function arcadeTotal')) and all(x in js["ui"] for x in ('function renderCareer()','CAREER_QUESTS','CAREER_SHOP','function startChampionship','function careerNextObjective')) and all(x in html for x in ('id="menuCareer"','id="btnCareer"','id="hubXpFill"','id="circuitList"','id="questList"','id="careerShop"')) and all(x in css for x in ('.careerHub','.xpBar','.circuitCard','.questCard')) and 'V5.0' in html
+career_ok = all(x in js["engine"] for x in ('CHAMPIONSHIP_CIRCUITS','function careerLevelFromXp','function awardCareerForMatch','function arcadeTotal')) and ('GAME_VERSION="5.0.0"' in js["engine"] or 'GAME_VERSION="5.1.0"' in js["engine"]) and all(x in js["ui"] for x in ('function renderCareer()','CAREER_QUESTS','CAREER_SHOP','function startChampionship','function careerNextObjective')) and all(x in html for x in ('id="menuCareer"','id="btnCareer"','id="hubXpFill"','id="circuitList"','id="questList"','id="careerShop"')) and all(x in css for x in ('.careerHub','.xpBar','.circuitCard','.questCard')) and ('V5.0' in html or 'V5.1' in html)
 check("Édition Jeu Complet V5.0 présente", career_ok, "carrière XP/Godson + championnat 5/8/12 combats + quêtes + récompenses + hub vivant")
+
+# 28. Godson FURY & M1 Signature V5.1 : nouveau nom, 41 chaînes M1 individuelles,
+#     exécutées par martelage du bouton Poing, avec traînées et aide dédiées.
+_m1m = re.search(r'const M1_RAW=(\[.*?\]);\nfunction normalizeM1Signature', js["engine"], re.S)
+try: _m1raw = json.loads(_m1m.group(1)) if _m1m else []
+except Exception: _m1raw = []
+_m1labels = [st[1] for d in _m1raw for st in d[7]] if _m1raw else []
+m1_ok = len(_m1raw)==41 and len({d[0] for d in _m1raw})==41 and len({d[1] for d in _m1raw})==41 and len(_m1labels)==168 and len(set(_m1labels))==168 and all(3<=len(d[7])<=5 and d[7][0][0]=="P" for d in _m1raw) and all(x in js["engine"] for x in ('GAME_VERSION="5.1.0"','GAME_TITLE="Godson FURY ARENA"','function startM1Attack','function m1SignatureFor','function m1Enabled','m1Advance')) and 'M1 Signature — martèle POING' in js["ui"] and 'renderStats.m1Trail' in js["render"] and 'Godson FURY ARENA V5.1' in html and 'POING • M1' in html and '.m1Move' in css
+check("Godson FURY & M1 Signature V5.1 présents", m1_ok, "41 chaînes individuelles • 168 coups uniques • combo par appuis répétés sur Poing • nouveau nom")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

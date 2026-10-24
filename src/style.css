@@ -460,3 +460,8 @@ body.combatImmersif #btnPauseFloat{display:grid}
 .journeyList{list-style:none;display:grid;gap:8px}.journeyList li{display:flex;justify-content:space-between;gap:10px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.13);border-radius:12px;padding:9px 11px;font-size:12.5px}.journeyList span{text-align:right;font-weight:900;color:#bfe7ff}
 .careerNote{font-size:12px;line-height:1.55;opacity:.9;margin-top:10px}
 @media(orientation:landscape) and (max-height:580px){.careerPanel{max-height:76dvh}.careerHero b{font-size:21px}.careerHub{padding:9px 12px}.careerHubId b{font-size:19px}.careerHubBottom .btn{min-width:190px;padding:10px 14px}}
+
+
+/* ================= V5.1 — Godson FURY : M1 SIGNATURE ================= */
+.moveList .m1Move{display:block;background:linear-gradient(100deg,rgba(255,122,0,.35),rgba(255,46,136,.28),rgba(0,145,234,.25));border-color:rgba(255,196,0,.72);border-radius:14px;padding:8px 11px;margin:6px 0;line-height:1.55}
+.moveList .m1Move b{color:#ffe082}

@@ -1,11 +1,13 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V5.0 — ÉDITION JEU COMPLET
+   Godson FURY ARENA V5.1 — M1 SIGNATURE & ÉDITION JEU COMPLET
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
-   projections, EX, Godson Cancel et lockstep en ligne GO GAME.
+   projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="5.0.0";
+const GAME_VERSION="5.1.0";
+const GAME_TITLE="Godson FURY ARENA";
+const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game");
 let ctx=canvas.getContext("2d",{alpha:false}); // « let » : les portraits de sélection V3.7 échangent temporairement le contexte
@@ -503,6 +505,48 @@ const ATTACKS={
   throw:   {dur:25,start:5, end:8, dmg:12,range:82, knock:10, hitstun:20,blockstun:0, hitstop:38, energy:10,label:"Projection",hard:true,knockdown:true,throw:true}
 };
 const CANCELS={ punch:["punch","kick","uppercut","sweep","special","exspecial"], kick:["special","exspecial"], uppercut:["special","exspecial"], sweep:[], airPunch:["airKick"], airKick:[], special:[], exspecial:[], super:[], throw:[] };
+/* ---------------- M1 SIGNATURE V5.1 : UNE CHAÎNE PAR COMBATTANT ----------------
+   Demande prioritaire du propriétaire : chaque personnage possède son M1.
+   On le joue simplement en appuyant de façon répétée sur POING au sol.
+   Format compact d'une ligne : [id, nom de la chaîne, effet visuel, tempo,
+   bonus de portée, puissance propre, type de final, [[type, nom du coup], ...]].
+   P=Poing, K=Pied (Kick), U=Uppercut, S=Balayage (Sweep). La normalisation
+   transforme ensuite ces données d'auteur en frame data complète. */
+const M1_STEP_TYPES={P:"punch",K:"kick",U:"uppercut",S:"sweep"};
+const M1_RAW=[["gideon","Foudre du Champion","foudre",0.9,5,1.0,"launch",[["P","Jab Fulgurant"],["P","Direct du Champion"],["K","Fouet du Stade"],["U","Jugement Ascendant"]]],["kira","Danse de la Foudre","traînées",0.74,3,0.9,"down",[["P","Griffe Éclair"],["P","Double Crochet"],["K","Talon Foudre"],["P","Rafale Kira"],["S","Balayage Tempête"]]],["titan","Marteau de la Montagne","éclats sismiques",1.12,7,1.12,"launch",[["P","Poing Sismique"],["K","Botte de Fer"],["U","Éruption Titan"]]],["nova","Pulsar Arcanique","orbites",0.86,8,0.95,"burst",[["P","Étincelle Nova"],["P","Rayon Court"],["K","Talon Orbital"],["P","Cœur Pulsar"]]],["godson-prime","Jugement Royal","couronne royale",0.82,8,1.08,"down",[["P","Sceptre Droit"],["K","Botte Royale"],["P","Main du Trône"],["U","Ascension Prime"],["K","Chute Royale"]]],["Zara","Marée de Libreville","écume",0.84,7,1.0,"burst",[["P","Vague Courte"],["K","Lame de Marée"],["S","Ressac Bas"],["K","Raz-de-Marée"]]],["kael","Croisade d’Acier","lames",0.94,14,1.05,"launch",[["P","Estoc d’Acier"],["P","Taille d’Honneur"],["K","Botte Blindée"],["U","Levée du Serment"]]],["sora","Rune Tourbillonnante","runes",0.88,9,0.96,"down",[["P","Sceau Arcanique"],["P","Glyphe Frappeur"],["U","Comète Montante"],["K","Chute Pourpre"]]],["ael","Protocole Sept","circuits",0.76,6,0.94,"launch",[["P","Percuteur 01"],["P","Double Servo"],["P","Servo Croisé"],["K","Propulseur AEL"],["U","Éjection Orbitale"]]],["Lira","Route Sauvage","lames",0.85,9,0.98,"down",[["P","Couteau de Route"],["K","Pas de Piste"],["P","Crochet d’Exploratrice"],["S","Chute du Canyon"]]],["zed","Traque Silencieuse","traînées",0.82,7,0.95,"burst",[["P","Flèche Courte"],["P","Crochet du Traqueur"],["K","Botte de Piste"],["K","Coup Fatal"]]],["nyx","Surcharge Atelier","circuits",0.8,5,0.94,"burst",[["P","Clé Dynamique"],["P","Impulsion Tech"],["K","Talon Magnétique"],["P","Décharge Atelier"]]],["vorak","Berserk Sauvage","éclats sismiques",1.1,7,1.13,"down",[["P","Griffe Sauvage"],["K","Botte Bestiale"],["P","Fracas Vorak"]]],["aerin","Vent des Cimes","traînées",0.75,6,0.9,"burst",[["P","Flèche Vive"],["P","Double Rameau"],["K","Talon des Cimes"],["P","Feuille Frappeuse"],["K","Rafale Verte"]]],["korben","Maintenance Orbitale","circuits",0.92,6,1.02,"launch",[["P","Marteau de Bord"],["K","Botte à Propulsion"],["P","Visseuse Korben"],["U","Lancement Orbital"]]],["lyra","Aurore Sacrée","orbites",0.87,7,0.97,"launch",[["P","Main Solaire"],["P","Halo Frappeur"],["K","Talon de Lumière"],["U","Lever d’Aurore"]]],["drakesh","Contrat du Chasseur","circuits",0.88,9,1.02,"burst",[["P","Crosse Rapide"],["K","Botte de Prime"],["P","Tir à Bout Portant"],["K","Exécution du Contrat"]]],["selene","Abordage Stellaire","lames",0.78,10,0.94,"burst",[["P","Sabre Court"],["P","Double Entaille"],["S","Crochet de Pirate"],["K","Botte d’Abordage"],["P","Trésor Perdu"]]],["taiko","Méditation de l’Ombre","lames",0.83,8,0.98,"down",[["P","Paume Silencieuse"],["U","Ombre Montante"],["P","Frappe du Lotus"],["S","Chute de Lune"]]],["vex","Hydraulique Maximale","éclats sismiques",1.08,7,1.1,"launch",[["P","Piston Vex"],["K","Botte Hydraulique"],["U","Soulèvement Cyber"]]],["elara","Songe Éveillé","runes",0.84,8,0.92,"burst",[["P","Toucher Onirique"],["P","Miroir de Rêve"],["U","Lune Montante"],["P","Réveil Brutal"]]],["brax","Éboulement Vivant","éclats sismiques",1.14,8,1.14,"down",[["P","Poing de Granit"],["S","Ravine Basse"],["K","Avalanche Brax"]]],["kazu","Voie du Vent","lames",0.85,12,1.0,"launch",[["P","Iai Court"],["P","Coupe du Vent"],["K","Talon du Samouraï"],["U","Montée du Dragon"]]],["sera","Intrusion Express","circuits",0.72,4,0.9,"down",[["P","Ping Frappeur"],["P","Double Paquet"],["P","Cheval de Troie"],["K","Botte Root"],["S","Crash Système"]]],["vorga","Sables Déchus","écume",0.9,8,1.02,"burst",[["P","Griffe du Désert"],["S","Dune Basse"],["P","Main Déchue"],["K","Tempête de Sable"]]],["nox","Étreinte Sylvestre","runes",0.86,7,0.95,"burst",[["P","Rameau Frappeur"],["K","Botte Racine"],["U","Cime Montante"],["P","Cœur de Forêt"]]],["raven","Visée Parfaite","circuits",0.84,8,0.97,"launch",[["P","Crosse Tactique"],["P","Double Point"],["K","Talon de Tireuse"],["U","Détente Verticale"]]],["zep","Pression Abyssale","circuits",0.91,7,1.0,"down",[["P","Harpon Court"],["K","Botte Ballast"],["P","Crochet des Abysses"],["S","Vague de Fond"]]],["astrid","Trône Déchu","couronne royale",0.83,10,1.04,"down",[["P","Lame Noble"],["P","Seconde Lame"],["K","Botte d’Argent"],["U","Couronne Montante"],["K","Sentence Royale"]]],["selenia","Bénédiction des Rôdeurs","traînées",0.8,7,0.94,"burst",[["P","Flèche de Ronce"],["P","Double Rôdeuse"],["K","Talon Sacré"],["P","Flèche Finale"]]],["drakar","Hiver du Clan","éclats sismiques",1.1,10,1.11,"down",[["P","Hache Courte"],["K","Botte de Givre"],["S","Balayage du Nord"]]],["nyx-ombre","Sentence des Ombres","traînées",0.73,6,0.93,"launch",[["P","Dague Furtive"],["P","Seconde Dague"],["S","Ombre Basse"],["P","Point Vital"],["U","Sentence de l’Ordre"]]],["Kairos","Orage Temporel","foudre",0.87,7,1.0,"burst",[["P","Éclair Retardé"],["U","Orbe Montant"],["P","Seconde Frappe"],["K","Foudre Finale"]]],["Zara-nova","Protocole Colonie","circuits",0.77,5,0.94,"launch",[["P","Riveteuse Nova"],["P","Double Outil"],["K","Botte Antigrav"],["P","Clé Orbitale"],["U","Éjection Nova"]]],["brutus","Marteau de la Légion","éclats sismiques",1.12,8,1.13,"down",[["P","Poing Blindé"],["K","Botte de Légion"],["P","Marteau de Fer"]]],["aria","Chœur Céleste","orbites",0.82,7,0.96,"down",[["P","Note de Lumière"],["P","Accord Sacré"],["U","Hymne Ascendant"],["K","Chœur Final"]]],["krak","Fureur des Marais","éclats sismiques",1.13,7,1.14,"launch",[["P","Griffe du Marais"],["S","Boue Basse"],["U","Krak Soulève"]]],["luna","Exploration Lunaire","circuits",0.84,6,0.95,"burst",[["P","Sonde Courte"],["P","Bras d’Exploration"],["K","Botte Lunaire"],["P","Signal Lunaire"]]],["velen","Contrat Rempli","traînées",0.78,7,0.98,"launch",[["P","Lame du Syndicat"],["S","Coupe Basse"],["P","Frappe Discrète"],["K","Talon du Tueur"],["U","Exécution Velen"]]],["lyra-azur","Chevauchée Dragonaile","couronne royale",0.8,9,1.03,"down",[["P","Griffe d’Azur"],["K","Botte Écaille"],["P","Souffle Court"],["U","Aile Montante"],["K","Chute du Dragon"]]],["orion","Théorie Appliquée","foudre",0.89,7,0.97,"launch",[["P","Calcul Frappeur"],["P","Hypothèse Orion"],["K","Botte Expérimentale"],["U","Conclusion Verticale"]]]];
+function normalizeM1Signature(rawDef){
+  const [id,name,fx,tempo,reach,power,finalKind,rawSteps]=rawDef;
+  const steps=rawSteps.map((rawStep,idx)=>{
+    const type=M1_STEP_TYPES[rawStep[0]]||"punch",final=idx===rawSteps.length-1;
+    return {
+      type,label:rawStep[1],final,finalKind:final?finalKind:"",
+      dmgMul:(final?1.16:(idx===0?.84:.90+idx*.02))*power,
+      durMul:tempo*(final?1.05:.90+idx*.02),
+      rangeAdd:reach+(type==="kick"?4:type==="sweep"?5:type==="uppercut"?1:0)+(final?3:0),
+      advance:(idx===0?.65:(final?.95:.52))*(tempo>1?1.15:1),
+      hitstunAdd:final?1:7,
+      knockAdd:final?(finalKind==="burst"?2.4:1.4):-1.15
+    };
+  });
+  return {id,name,fx,tempo,reach,power,finalKind,steps,pattern:steps.map(st=>st.type).join(">"),labels:steps.map(st=>st.label)};
+}
+const M1_SIGNATURES={}; M1_RAW.forEach(d=>{ M1_SIGNATURES[d[0]]=normalizeM1Signature(d); });
+function m1SignatureFor(source){
+  const id=source&&source.char?source.char.id:(source&&source.id?source.id:source);
+  return M1_SIGNATURES[id]||M1_SIGNATURES.gideon;
+}
+function versionAtLeast(v,min){
+  const a=String(v||"0").split(".").map(n=>parseInt(n,10)||0),b=String(min).split(".").map(n=>parseInt(n,10)||0);
+  for(let i=0;i<3;i++){ if((a[i]||0)>(b[i]||0))return true; if((a[i]||0)<(b[i]||0))return false; }
+  return true;
+}
+function m1Enabled(){
+  if(!replayPlayback.active||!replayPlayback.data)return true;
+  const v=replayPlayback.data.gameVersion;
+  return !v||versionAtLeast(v,"5.1.0"); // les replays antérieurs gardent l'ancien poing générique
+}
+function resetM1Chain(f){ f.m1Next=0; f.m1Step=-1; f.m1ChainT=0; }
+
 const DIFFS={
   facile:{label:"Facile",react:24,agg:.42,block:.15,spec:.25,jump:.06,mistake:.38,speed:.9,combo:.18,dash:.08,parry:.04},
   moyen:{label:"Moyen",react:13,agg:.66,block:.42,spec:.6,jump:.13,mistake:.16,speed:1,combo:.55,dash:.3,parry:.17},
@@ -586,7 +630,7 @@ class Fighter{
     this.skin={...this.char.skin}; this.letter=this.char.letter;
     this.name=side===1?"Gédéon":"Adversaire"; this.displayName=this.name;
     this.maxHealth=this.char.hp; this.roundWins=0;
-    this.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0,throws:0,cancels:0,ex:0};
+    this.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0,throws:0,cancels:0,ex:0,m1Hits:0,m1Chains:0,m1Finishers:0};
     this.reset();
   }
   reset(){
@@ -600,6 +644,7 @@ class Fighter{
     this.combo=0; this.comboT=0; this.comboDamage=0; this.comboSeq=[]; this.lastHitBy=null;
     this.dashT=0; this.dashDir=1; this.dashCD=0; this.airDashed=false; this.godsonCancelReady=true; this.inputDir=0; this.lastVXSign=0; this.attackEx=false; this.throwDir=1;
     this.bufType=null; this.bufT=0; this.jumpBufT=0; this.dashBufT=0; this.dashBufDir=1; this.coyote=0; this.jumpCut=false;
+    this.m1Next=0; this.m1Step=-1; this.m1ChainT=0;
     this.lastTapDir=0; this.lastTapFrame=-99; this.holdDir=0; this.holdT=0;
     this.anim=replayRand()*100; this.walkPhase=0; this.squashT=0; this.blinkT=80+replayRand()*120;
     this.prev={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
@@ -653,7 +698,7 @@ const playerHabits={jumps:0,blocks:0,dashes:0};
 function isCombat(){ return state==="fight"||state==="training"; }
 function placeMenuFighters(){ p1.x=p1.px=p1.rx=390; p2.x=p2.px=p2.rx=890; p1.y=p1.py=p1.ry=GROUND; p2.y=p2.py=p2.ry=GROUND; p1.facing=1; p2.facing=-1; }
 
-/* ---------------- DUELS EN LIGNE : LOCKSTEP DÉTERMINISTE GO GAME ----------------
+/* ---------------- DUELS EN LIGNE : LOCKSTEP DÉTERMINISTE Godson FURY ----------------
    On échange uniquement les entrées finales (8 bits/frame), jamais les
    positions : mêmes entrées + même état initial = même match des deux côtés.
    Un délai d'entrée court pipelinise les frames ; des hashs périodiques
@@ -823,6 +868,8 @@ function updateBot(){
     bot.lastFollowId=me.attackId;
     const wait=Math.max(2,(me.attack.end-(me.attackDur-me.attackT))+2);
     if(botDiff==="difficile"&&me.energy>=25&&me.godsonCancelReady&&Math.random()<.24){ botQueue("dash",wait); botQueue("punch",wait+11); }
+    else if(me.attack&&me.attack.m1&&!me.attack.m1Final)botQueue("punch",wait); // M1 Signature : le bot martèle Poing pour poursuivre SA chaîne
+    else if(me.attack&&me.attack.m1Final&&me.energy>=50)botQueue("special",wait);
     else if(me.attackType==="punch")botQueue(Math.random()<.65?"kick":"uppercut",wait);
     else if(me.attackType==="kick"&&me.energy>=50)botQueue("special",wait);
     else if(me.attackType==="uppercut"&&botDiff==="difficile"){ botQueue("jump",wait+1); botQueue("kick",wait+13); }
@@ -865,11 +912,12 @@ function desiredAttack(f,inp){
   if(f.grounded&&pressed(f,inp,"punch")&&pressed(f,inp,"kick"))return "throw";
   if(pressed(f,inp,"special")&&pressed(f,inp,"punch"))return "exspecial";
   if(pressed(f,inp,"special"))return "special";
-  if(pressed(f,inp,"punch"))return !f.grounded?"airPunch":(inp.block?"uppercut":"punch");
+  if(pressed(f,inp,"punch"))return !f.grounded?"airPunch":(inp.block?"uppercut":(m1Enabled()?"m1":"punch"));
   if(pressed(f,inp,"kick"))return !f.grounded?"airKick":(inp.block?"sweep":"kick");
   return null;
 }
 function startAttack(f,type){
+  if(type==="m1")return startM1Attack(f);
   if(f.dead||f.downT>0)return false;
   let atkType=type; f.attackEx=false;
   if(type==="exspecial"){
@@ -891,6 +939,40 @@ function startAttack(f,type){
   if(f.grounded&&atkType==="sweep")f.vx+=f.facing*.8;
   if(atkType==="throw"){ f.throwDir=f.inputDir===-f.facing?-f.facing:f.facing; f.attack.throwDir=f.throwDir; f.vx+=f.facing*1.7; }
   if(atkType==="punch"||atkType==="airPunch"||atkType==="throw")SFX.punch(); else if(atkType!=="special"&&atkType!=="super"&&atkType!=="exspecial")SFX.kick();
+  if(!f.attack.m1)resetM1Chain(f); // toute technique manuelle remplace la chaîne en cours
+  return true;
+}
+function startM1Attack(f){
+  if(f.dead||f.downT>0)return false;
+  if(!f.grounded)return startAttack(f,"airPunch");
+  const sig=m1SignatureFor(f);
+  let idx=f.m1ChainT>0?clamp(f.m1Next||0,0,sig.steps.length-1):0;
+  const step=sig.steps[idx];
+  if(!startAttack(f,step.type))return false;
+  const atk=f.attack; if(!atk)return false;
+  atk.dur=Math.max(8,Math.round(atk.dur*step.durMul));
+  atk.start=Math.max(2,Math.round(atk.start*Math.min(1,step.durMul*.94)));
+  atk.end=Math.max(atk.start+1,Math.round(atk.end*step.durMul));
+  f.attackDur=f.attackT=atk.dur;
+  atk.dmg=Math.max(1,Math.round(atk.dmg*step.dmgMul));
+  atk.range=(atk.range||0)+step.rangeAdd;
+  atk.hitstun=(atk.hitstun||11)+step.hitstunAdd;
+  atk.blockstun=(atk.blockstun||6)+(step.final?2:1);
+  atk.knock=Math.max(1.2,(atk.knock||4)+step.knockAdd);
+  atk.energy=Math.max(3,Math.round((atk.energy||6)*(step.final?1.05:.82)));
+  atk.hitstop=step.final?Math.min(28,Math.max(18,atk.hitstop||20)):Math.min(atk.hitstop||14,step.type==="punch"?13:18);
+  atk.low=step.type==="sweep";
+  if(!step.final){ atk.launcher=0; atk.knockdown=false; }
+  else {
+    atk.hard=true;
+    if(step.finalKind==="launch"&&!atk.launcher)atk.launcher=9.5;
+    if(step.finalKind==="down")atk.knockdown=true;
+  }
+  atk.m1=true; atk.m1Step=idx; atk.m1Final=!!step.final; atk.m1Name=sig.name; atk.m1Label=step.label; atk.m1Fx=sig.fx; atk.m1Pattern=sig.pattern; atk.m1Advance=step.advance;
+  atk.label="M1 "+(idx+1)+"/"+sig.steps.length+" — "+step.label;
+  f.m1Step=idx; f.m1Next=(idx+1)%sig.steps.length; f.m1ChainT=step.final?26:58;
+  f.vx+=f.facing*step.advance;
+  if(idx===0)f.stats.m1Chains=(f.stats.m1Chains||0)+1;
   return true;
 }
 function abilitySpecs(f,isSuper,isEx){
@@ -972,6 +1054,8 @@ function spawnProjectile(f){
   else if(isEx){ shake=Math.max(shake,5); cinematic=Math.max(cinematic,8); }
 }
 function comboSequenceName(f){
+  if(f.attack&&f.attack.m1Final&&f.combo>=3)return "👊 M1 SIGNATURE — "+String(f.attack.m1Name||"").toUpperCase();
+  if(f.attack&&f.attack.m1&&f.combo>=4)return "🔥 M1 "+String(f.char.name||"").toUpperCase()+" x"+f.combo;
   const s=f.comboSeq.join(">");
   if(s.includes("uppercut")&&(s.includes("airKick")||s.includes("airPunch")))return "☁️ JONGLE CÉLESTE";
   if(s.endsWith("super")||s.endsWith("special"))return "⚡ FINISH ÉNERGÉTIQUE";
@@ -989,7 +1073,7 @@ function applyDamage(att,def,atk,typeLabel){
     // ✨ PARRY PARFAITE : garde déclenchée à la dernière fraction de seconde
     def.parryT=0; def.parryFlashT=16; def.counterWindowT=30; def.blockStun=0; def.kvx=0;
     def.energy=Math.min(100,def.energy+12*def.char.energyGain); def.stats.parries=(def.stats.parries||0)+1; def.stats.blocked++;
-    att.hitConfirmed=false; att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
+    att.hitConfirmed=false; resetM1Chain(att); att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
     spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
     hitStopT=Math.max(hitStopT,38); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
@@ -1017,6 +1101,8 @@ function applyDamage(att,def,atk,typeLabel){
   def.comboVuln=true; def.lastHitBy=att; def.energy=Math.min(100,def.energy+4*def.char.energyGain);
   att.energy=Math.min(100,att.energy+(atk.energy||6)*att.char.energyGain);
   att.hitConfirmed=true; att.comboDamage+=dmg; att.stats.damage+=dmg; att.stats.hits++;
+  if(atk.m1){ att.stats.m1Hits=(att.stats.m1Hits||0)+1; if(atk.m1Final)att.stats.m1Finishers=(att.stats.m1Finishers||0)+1; }
+  resetM1Chain(def);
   att.stats.maxCombo=Math.max(att.stats.maxCombo,att.combo); att.stats.maxComboDamage=Math.max(att.stats.maxComboDamage,att.comboDamage);
   if(isLocalCareerFighter(att)){ PROFILE.stats.bestCombo=Math.max(PROFILE.stats.bestCombo,att.combo); PROFILE.stats.bestComboDamage=Math.max(PROFILE.stats.bestComboDamage,att.comboDamage);
     if(att.combo>=5)unlock("combo5","Combo x5"); if(att.combo>=6)unlock("combo6","Défi Tempête Gideon — Combo x6"); if(att.comboDamage>=30)unlock("combo30","30 dégâts en un combo"); }
@@ -1030,7 +1116,7 @@ function applyDamage(att,def,atk,typeLabel){
     if(atk.launcher){ def.vy=-atk.launcher; def.grounded=false; def.juggleT=36; }
     else if(!def.grounded){ def.vy=Math.min(def.vy,-3.7+Math.min(2,att.combo*.22)); def.juggleT=Math.max(def.juggleT,22); }
     else if(atk.knockdown){ def.vy=-5; def.grounded=false; def.knockdownPending=true; }
-    else if(atk.hard&&def.grounded)def.vy=-2.6;
+    else if(atk.hard&&def.grounded&&!(atk.m1&&!atk.m1Final))def.vy=-2.6; // les maillons M1 gardent la cible au sol pour que le combo reste vrai
   }
   spark(midX,hitY,atk.hard?att.skin.trail:"#fff59d",atk.hard?22:14,atk.hard?6:4.4); spark(midX,hitY,"#ff5252",7,3.2);
   floater(def.x,def.y-184*def.char.scale,(isRiposte?"Riposte ! -":isCounter?"CONTRE ! -":"-")+dmg,isRiposte?"#ffc400":isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter||isRiposte);
@@ -1061,13 +1147,14 @@ function startDash(f,dir){
   const dashOpponent=f===p1?p2:p1;
   if(f.grounded&&dashOpponent&&Math.sign(dashOpponent.x-f.x)===-f.dashDir)f.invulnT=Math.max(f.invulnT,6); // backdash défensif bref
   if(!f.grounded){ f.airDashed=true; f.vy=Math.min(f.vy,0); }
-  f.attackT=0; f.attackType=null; f.attack=null;
+  f.attackT=0; f.attackType=null; f.attack=null; resetM1Chain(f);
   dust(f.x,f.y,6); SFX.dash(); if(f===p1)playerHabits.dashes++;
 }
 function updateFighter(f,inp,op){
   f.px=f.x; f.py=f.y; f.anim++;
   if(f.hitFlash>0)f.hitFlash--; if(f.squashT>0)f.squashT--; if(f.dashCD>0)f.dashCD--; if(f.invulnT>0)f.invulnT--; if(f.juggleT>0)f.juggleT--;
   if(f.bufT>0)f.bufT--; if(f.jumpBufT>0)f.jumpBufT--; if(f.dashBufT>0)f.dashBufT--;
+  if(f.m1ChainT>0){ f.m1ChainT--; if(f.m1ChainT===0)resetM1Chain(f); }
   if(f.parryT>0)f.parryT--; if(f.parryFlashT>0)f.parryFlashT--; if(f.counterWindowT>0)f.counterWindowT--;
   if(f.comboT>0){ f.comboT--; if(f.comboT===0){f.combo=0;f.comboDamage=0;f.comboSeq=[];f.godsonCancelReady=true;} }
   if(--f.blinkT<-7)f.blinkT=90+replayRand()*140;
@@ -1079,6 +1166,7 @@ function updateFighter(f,inp,op){
   if(f.dashT>0){ f.dashT--; if(simFrame%2===0)addGhost(f); }
   if(f.attackT>0){
     f.attackT--; const el=f.attackDur-f.attackT;
+    if(f.attack&&f.attack.m1&&f.grounded&&el>0&&el<=f.attack.start)f.x+=f.facing*(0.9+(f.attack.m1Advance||0)*.5); // tracking M1 : le combattant recolle pendant le démarrage
     if(!f.spawned&&f.attack&&el>=f.attack.start){ f.spawned=true; spawnProjectile(f); }
     tryMeleeHit(f,op);
     if(f.attackT===0){ f.attackType=null; f.attack=null; f.hitConfirmed=false; }
@@ -1092,7 +1180,7 @@ function updateFighter(f,inp,op){
   if(tapDir!==0){ if(f.lastTapDir===tapDir&&simFrame-f.lastTapFrame<=18){ f.dashBufT=9; f.dashBufDir=tapDir; } f.lastTapDir=tapDir; f.lastTapFrame=simFrame; }
   if(pressed(f,inp,"dash")){ f.dashBufT=9; f.dashBufDir=inp.left?-1:(inp.right?1:f.facing); }
   f.inputDir=(inp.right?1:0)-(inp.left?1:0); // direction brute immédiate : projections avant/arrière réactives
-  const want=desiredAttack(f,inp); if(want){ f.bufType=want; f.bufT=10; }
+  const want=desiredAttack(f,inp); if(want){ f.bufType=want; f.bufT=want==="m1"?18:10; } // 18 frames : martelage humain toléré
   f.crouching=!!inp.block&&f.grounded&&f.attackT<=0&&f.dashT<=0;
   f.blocking=canAct&&f.crouching;
   if(canAct&&f.dashBufT>0&&f.attackT>0&&f.hitConfirmed&&f.godsonCancelReady&&f.energy>=25&&f.dashCD<=0){
@@ -1104,6 +1192,10 @@ function updateFighter(f,inp,op){
   // --- Attaque tamponnée / annulation de combo ---
   if(canAct&&f.bufT>0&&f.bufType&&f.dashT<=3){
     if(f.attackT<=0){ if(startAttack(f,f.bufType))f.bufT=0; else f.bufT=0; }
+    else if(f.bufType==="m1"&&f.attack&&f.attack.m1&&!f.attack.m1Final){
+      const el=f.attackDur-f.attackT,cancelAt=Math.max((f.attack.start||3)+1,(f.attack.end||f.attack.start||4)-2);
+      if(el>=cancelAt&&startAttack(f,"m1"))f.bufT=0; // le martelage enchaîne même si le coup précédent a manqué
+    }
     else if(f.hitConfirmed&&f.attack){ const el=f.attackDur-f.attackT; const target=f.bufType==="special"?"special":f.bufType;
       if(el>=f.attack.end&&(CANCELS[f.attackType]||[]).includes(target)){ f.vx+=f.facing*1.6; if(startAttack(f,f.bufType))f.bufT=0; } }
   }
@@ -1203,7 +1295,7 @@ function announce(text,sub,ko){
   a.style.display="grid"; t.style.animation="none"; void t.offsetWidth; t.style.animation="";
 }
 function hideAnnounce(){ const a=$("announce"); if(a)a.style.display="none"; }
-function resetFighterStats(){ fighters.forEach(f=>f.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0,throws:0,cancels:0,ex:0}); }
+function resetFighterStats(){ fighters.forEach(f=>f.stats={damage:0,hits:0,attacks:0,maxCombo:0,maxComboDamage:0,blocked:0,parries:0,throws:0,cancels:0,ex:0,m1Hits:0,m1Chains:0,m1Finishers:0}); }
 function applySurvivalScaling(){
   p1.powerMul=1; p2.powerMul=1;
   if(mode!=="survival")return;
@@ -1244,7 +1336,7 @@ function beginMatch(){
   if(mode==="training"){
     p1.reset(); p2.reset(); projectiles=[]; timerSec=0; state="training"; announceT=95;
     $("roundLabel").textContent="ENTRAÎNEMENT";
-    announce("ENTRAÎNEMENT","Teste tes combos — vie et temps illimités");
+    announce("ENTRAÎNEMENT","Martèle POING pour découvrir ton M1 Signature — vie et temps illimités");
     if(typeof snapHUD==="function")snapHUD();
     if(typeof resetCamera==="function")resetCamera(true);
   } else resetRound();

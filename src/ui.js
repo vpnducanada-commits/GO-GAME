@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V5.0 — JEU COMPLET : CARRIÈRE, CHAMPIONNAT & GO GAME ONLINE
+   Godson FURY ARENA V5.1 — M1 SIGNATURE, CARRIÈRE, CHAMPIONNAT & ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -155,8 +155,8 @@ function renderCareer(){
     "<li><b>🏆 Championnat Godson</b><span>"+(c.circuits.stade||0)+" Stade • "+(c.circuits.monde||0)+" Monde • "+(c.circuits.legendes||0)+" Légendes</span></li>"+
     "<li><b>🌊 Survie</b><span>Record : vague "+(s.bestSurvivalWave||0)+"</span></li>"+
     "<li><b>🎯 Défis techniques</b><span>"+completedChallenges()+"/"+CHALLENGE_DEFS.length+" terminés</span></li>"+
-    "<li><b>🌐 GO GAME Online</b><span>Duels privés et classement mondial dans le menu Online</span></li></ol>"+
-    "<p class='careerNote'>La carrière progresse dans tous les modes locaux et en ligne. Les Godson débloquent titres et récompenses ; aucun achat réel n'existe dans GO GAME.</p>";
+    "<li><b>🌐 Godson FURY Online</b><span>Duels privés et classement mondial dans le menu Online</span></li></ol>"+
+    "<p class='careerNote'>La carrière progresse dans tous les modes locaux et en ligne. Les Godson débloquent titres et récompenses ; aucun achat réel n'existe dans Godson FURY.</p>";
 }
 function openCareer(){ audio(); renderCareer(); showOnly("menuCareer"); }
 function startChampionship(circuitId){ audio(); setupArcadeRun(circuitId||"stade"); enterSelect("arcade"); showToast("🏆 "+arcade.circuitName+" — "+arcadeTotal()+" combats vers la couronne !"); }
@@ -223,7 +223,7 @@ function updatePreviewBoxes(previewP2Index){
     const sk=effectiveSkin(c,side),box=$("previewBoxP"+side); if(!box)return;
     box.style.setProperty("--cc",sk.primary); box.style.setProperty("--ca",sk.accent);
     $("previewNameP"+side).textContent=random?"🎲 ALÉATOIRE":c.name;
-    $("previewTitleP"+side).textContent=random?"Adversaire surprise":(c.title+" • "+(c.superName||""));
+    const sig=m1SignatureFor(c); $("previewTitleP"+side).textContent=random?"Adversaire surprise":(c.title+" • 👊 M1 "+sig.name+" ("+sig.steps.length+" coups)");
     $("previewStatsP"+side).innerHTML=random?"":statRows(c);
   };
   fill(1,selCharP1,false);
@@ -274,7 +274,7 @@ document.addEventListener("keydown",e=>{
 /* Navigation Pro V4.4 (Lena) : recherche + filtres par famille sur les 41 cartes. */
 function rosterMatches(c){
   if(!c)return false;
-  if(rosterSearch&&!(c.name+" "+c.title).toLowerCase().includes(rosterSearch))return false;
+  if(rosterSearch){ const sig=m1SignatureFor(c); if(!(c.name+" "+c.title+" "+sig.name+" "+sig.labels.join(" ")).toLowerCase().includes(rosterSearch))return false; }
   switch(rosterFilter){
     case "rapide": return c.speed>=1.12;
     case "colosse": return c.hp>=112;
@@ -385,8 +385,11 @@ function updateLaunchSummary(){
 }
 function renderMoveList(){
   const el=$("moveList"); if(!el)return;
-  const c=CHARACTERS[selCharP1]||CHARACTERS[0];
+  const c=CHARACTERS[selCharP1]||CHARACTERS[0],sig=m1SignatureFor(c);
+  const icons={punch:"👊",kick:"🦵",uppercut:"⬆️",sweep:"⬇️"};
+  const chain=sig.steps.map(st=>(icons[st.type]||"👊")+" "+escapeHTML(st.label)).join(" → ");
   el.innerHTML="<b>🥋 Arsenal de "+escapeHTML(c.name)+"</b> "+
+    "<span class='m1Move'>👊 M1 Signature — martèle POING : <b>"+escapeHTML(sig.name)+"</b> ("+sig.steps.length+" coups)<br>"+chain+"</span>"+
     "<span>Spécial 50% : "+escapeHTML(c.specName||"Spécial")+"</span>"+
     "<span>EX 75% : Spécial + Poing</span>"+
     "<span>SUPER 100% : "+escapeHTML(c.superName||"Super")+"</span>"+
@@ -453,7 +456,7 @@ function prepareMatch(keepPrepared){
 function showVS(keepPrepared){
   audio(); prepareMatch(!!keepPrepared); SFX.confirm();
   $("hud").style.display="none"; $("trainingBar").style.display="none";
-  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.style.borderColor=f.skin.accent; a.style.boxShadow="0 0 34px "+f.skin.primary+",0 22px 50px rgba(0,0,0,.55)"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title+" • "+(f.char.superName||""); };
+  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.style.borderColor=f.skin.accent; a.style.boxShadow="0 0 34px "+f.skin.primary+",0 22px 50px rgba(0,0,0,.55)"; $(name).textContent=f.name; const sig=m1SignatureFor(f); $(char).textContent=f.char.name+" — "+f.char.title+" • 👊 M1 "+sig.name+" ("+sig.steps.length+" coups)"; };
   setSide("vsAvatar1","vsName1","vsChar1",p1); setSide("vsAvatar2","vsName2","vsChar2",p2);
   syncVSPortraitsToFighters();
   $("vsArena").textContent="🏟️ "+currentArena.name+" • "+arenaMoodLabel(currentArenaMood)+(mode==="arcade"?" • "+(arcade.circuitName||"Championnat")+" "+arcade.stage+"/"+arcadeTotal():mode==="story"?" • Histoire "+story.step+"/"+story.total:mode==="survival"?" • 🌊 Vague "+survival.wave:"");
@@ -468,7 +471,7 @@ let lastReplayUiKey="";
 function replayModeLabel(d){
   if(!d)return "";
   const c=d.context||{};
-  return d.mode==="story"?"Histoire "+(c.storyStep||"?")+"/6":d.mode==="survival"?"Survie — vague "+(c.survivalWave||1):d.mode==="arcade"?"Championnat "+(c.arcadeStage||1)+"/"+(c.arcadeTotal||5):d.mode==="online"?"Duel en ligne GO GAME":d.mode==="2p"?"2 Joueurs":"Bot "+((DIFFS[d.botDiff]||{}).label||d.botDiff||"");
+  return d.mode==="story"?"Histoire "+(c.storyStep||"?")+"/6":d.mode==="survival"?"Survie — vague "+(c.survivalWave||1):d.mode==="arcade"?"Championnat "+(c.arcadeStage||1)+"/"+(c.arcadeTotal||5):d.mode==="online"?"Duel en ligne Godson FURY":d.mode==="2p"?"2 Joueurs":"Bot "+((DIFFS[d.botDiff]||{}).label||d.botDiff||"");
 }
 function replaySummary(d){
   if(!d)return "Aucun replay enregistré";
@@ -591,7 +594,7 @@ function bindReplayUI(){
   $("replaySpeed").addEventListener("change",e=>{ replayPlayback.speed=+e.target.value||1; updateReplayBar(true); });
 }
 
-/* ---------------- GO GAME ONLINE : SUPABASE + WEBRTC LOCKSTEP ----------------
+/* ---------------- Godson FURY ONLINE : SUPABASE + WEBRTC LOCKSTEP ----------------
    Décision Studio : REST/Auth Supabase sans librairie externe, salon privé
    signalé par la base, puis DataChannel WebRTC pour les inputs 60 Hz.
    Le jeu local ne dépend jamais du réseau : chaque appel Online est opt-in. */
@@ -619,7 +622,7 @@ async function onlineRun(task){
   if(onlineState.busy)return;
   onlineSetBusy(true);
   try{ await task(); }
-  catch(err){ const msg=onlineErrorText(err); onlineSetStatus("⚠️ "+msg); showToast("🌐 GO GAME : "+msg); }
+  catch(err){ const msg=onlineErrorText(err); onlineSetStatus("⚠️ "+msg); showToast("🌐 Godson FURY : "+msg); }
   finally{ onlineSetBusy(false); syncOnlineUI(); }
 }
 function onlineStoreSession(data){
@@ -669,10 +672,10 @@ async function refreshOnlineSession(){
 }
 async function ensureOnlineSession(){
   if(!onlineState.session)loadOnlineSession();
-  if(!onlineState.session||!onlineState.session.access_token)throw new Error("Connecte ton compte GO GAME d’abord");
+  if(!onlineState.session||!onlineState.session.access_token)throw new Error("Connecte ton compte Godson FURY d’abord");
   if(onlineState.session.expires_at&&onlineState.session.expires_at<Date.now()+30000){
     const ok=await refreshOnlineSession().catch(()=>false);
-    if(!ok){ clearOnlineSession(); throw new Error("Session expirée — reconnecte ton compte GO GAME"); }
+    if(!ok){ clearOnlineSession(); throw new Error("Session expirée — reconnecte ton compte Godson FURY"); }
   }
   if(!onlineState.session.user||!onlineState.session.user.id){
     const user=await onlineRequest("/auth/v1/user",{retry:false});
@@ -689,7 +692,7 @@ function onlineCredentials(){
 }
 async function onlineSignUp(){
   const creds=onlineCredentials();
-  onlineSetStatus("✨ Création du compte GO GAME…");
+  onlineSetStatus("✨ Création du compte Godson FURY…");
   const data=await onlineRequest("/auth/v1/signup",{method:"POST",auth:false,body:creds});
   if(!onlineStoreSession(data))await onlineSignInWith(creds);
   onlineSetStatus("✅ Compte créé et connecté. Publie maintenant ton profil mondial.");
@@ -701,17 +704,17 @@ async function onlineSignInWith(creds){
   return data;
 }
 async function onlineSignIn(){
-  onlineSetStatus("🔐 Connexion GO GAME…");
+  onlineSetStatus("🔐 Connexion Godson FURY…");
   await onlineSignInWith(onlineCredentials());
   await fetchOnlineProfile().catch(()=>null);
-  onlineSetStatus("✅ Connecté à GO GAME. Bon retour dans l’Arène, champion !");
+  onlineSetStatus("✅ Connecté à Godson FURY. Bon retour dans l’Arène, champion !");
 }
 async function onlineSignOut(){
   await leaveOnlineRoom(true).catch(()=>{});
   if(onlineState.session&&onlineState.session.access_token)await onlineRequest("/auth/v1/logout",{method:"POST",retry:false}).catch(()=>{});
   clearOnlineSession();
   onlineSetStatus("Hors ligne — le jeu local reste entièrement disponible.");
-  showToast("🌐 Déconnecté de GO GAME");
+  showToast("🌐 Déconnecté de Godson FURY");
 }
 async function fetchOnlineProfile(){
   const user=await ensureOnlineSession();
@@ -762,7 +765,7 @@ function populateOnlineFighters(){
 function syncOnlineUI(){
   const user=onlineState.session&&onlineState.session.user,profile=onlineState.profile;
   const summary=onlineEl("onlineAccountSummary");
-  if(summary)summary.textContent=user?(profile?("✅ "+profile.display_name+" • "+(profile.country_code||"GA")+" • Main : "+(profile.main_fighter||"GÉDÉON")):("✅ Compte connecté ("+(user.email||"joueur GO GAME")+"). Publie ton profil pour rejoindre le classement.")):"Aucun compte connecté. Le classement public reste lisible, le jeu local reste 100 % jouable hors ligne.";
+  if(summary)summary.textContent=user?(profile?("✅ "+profile.display_name+" • "+(profile.country_code||"GA")+" • Main : "+(profile.main_fighter||"GÉDÉON")):("✅ Compte connecté ("+(user.email||"joueur Godson FURY")+"). Publie ton profil pour rejoindre le classement.")):"Aucun compte connecté. Le classement public reste lisible, le jeu local reste 100 % jouable hors ligne.";
   const start=onlineEl("btnOnlineStartDuel");
   if(start)start.disabled=onlineState.busy||!(onlineState.isHost&&onlineState.room&&onlineState.room.guest_id&&onlineState.channel&&onlineState.channel.readyState==="open"&&!onlineState.started);
   const net=onlineEl("onlineNetStats");
@@ -787,7 +790,7 @@ async function uploadOnlineSave(){
   const row={user_id:user.id,slot:"main",save_data:exportProfileData(),game_version:GAME_VERSION};
   await onlineRequest("/rest/v1/cloud_saves?on_conflict=user_id,slot",{method:"POST",headers:{Prefer:"return=representation,resolution=merge-duplicates"},body:row});
   onlineSetCloudStatus("✅ Sauvegarde cloud envoyée le "+new Date().toLocaleString("fr-FR")+" (profil local V"+GAME_VERSION+").");
-  showToast("☁️ Sauvegarde GO GAME envoyée");
+  showToast("☁️ Sauvegarde Godson FURY envoyée");
 }
 async function downloadOnlineSave(){
   const user=await ensureOnlineSession();
@@ -820,8 +823,8 @@ async function refreshOnlinePublicReplays(){
 }
 function renderOnlinePublicReplays(){
   const list=onlineEl("onlineReplayList"); if(!list)return;
-  if(!onlineState.publicReplays.length){ list.innerHTML="<div class='onlineEmpty'>Aucun replay public pour le moment. Publie le premier grand match GO GAME !</div>"; return; }
-  list.innerHTML=onlineState.publicReplays.map(r=>"<article class='replayCard'><div class='replayCardTop'><b>🎬 "+escapeHTML(r.title||"Replay GO GAME")+"</b><span>PUBLIC</span></div><small>🗓️ "+escapeHTML(new Date(r.created_at).toLocaleString("fr-FR"))+" • Version "+escapeHTML(r.game_version||"?")+" • 🔐 #"+escapeHTML(r.replay_hash||"sans-hash")+"</small><div class='replayActions'><button data-cloud-replay='"+escapeHTML(r.id)+"'>▶ Importer &amp; lire</button></div></article>").join("");
+  if(!onlineState.publicReplays.length){ list.innerHTML="<div class='onlineEmpty'>Aucun replay public pour le moment. Publie le premier grand match Godson FURY !</div>"; return; }
+  list.innerHTML=onlineState.publicReplays.map(r=>"<article class='replayCard'><div class='replayCardTop'><b>🎬 "+escapeHTML(r.title||"Replay Godson FURY")+"</b><span>PUBLIC</span></div><small>🗓️ "+escapeHTML(new Date(r.created_at).toLocaleString("fr-FR"))+" • Version "+escapeHTML(r.game_version||"?")+" • 🔐 #"+escapeHTML(r.replay_hash||"sans-hash")+"</small><div class='replayActions'><button data-cloud-replay='"+escapeHTML(r.id)+"'>▶ Importer &amp; lire</button></div></article>").join("");
   list.querySelectorAll("[data-cloud-replay]").forEach(btn=>btn.onclick=()=>onlineRun(()=>importOnlineReplay(btn.dataset.cloudReplay)));
 }
 async function importOnlineReplay(id){
@@ -876,13 +879,13 @@ function setupOnlineChannel(channel){
     const cfg=(onlineState.room&&onlineState.room.config)||{};
     const opponentName=onlineState.isHost?(cfg.guestName||"ton adversaire"):(cfg.hostName||"ton adversaire");
     onlineSetRoomStatus("✅ Canal de duel ouvert avec "+opponentName+". "+(onlineState.isHost?"Tu peux lancer le duel.":"En attente du lancement par l’hôte."));
-    sendOnlineChannel({t:"hello",name:onlineState.profile?onlineState.profile.display_name:"Joueur GO GAME",version:GAME_VERSION});
+    sendOnlineChannel({t:"hello",name:onlineState.profile?onlineState.profile.display_name:"Joueur Godson FURY",version:GAME_VERSION});
     sendOnlinePing(); syncOnlineUI();
   };
   channel.onmessage=event=>{
     let msg=null; try{ msg=JSON.parse(event.data); }catch(e){ return; }
     if(receiveOnlineNetMessage(msg)&&(msg.t==="input"||msg.t==="inputs"||msg.t==="check"))return;
-    if(msg.t==="hello")onlineSetRoomStatus("🤝 Adversaire connecté : "+String(msg.name||"Joueur GO GAME").slice(0,24)+" • Version "+String(msg.version||"?"));
+    if(msg.t==="hello")onlineSetRoomStatus("🤝 Adversaire connecté : "+String(msg.name||"Joueur Godson FURY").slice(0,24)+" • Version "+String(msg.version||"?"));
     else if(msg.t==="ping")sendOnlineChannel({t:"pong",id:msg.id,ts:msg.ts});
     else if(msg.t==="pong"&&msg.id===onlineState.pingSeq){
       const now=(typeof performance!=="undefined"?performance.now():Date.now());
@@ -990,7 +993,7 @@ async function createOnlineRoom(){
   await insertOnlineSignal("offer",{type:pc.localDescription.type,sdp:pc.localDescription.sdp});
   startOnlinePolling();
   onlineSetRoomStatus("🏟️ Salon créé : code "+code+" — envoie-le à ton adversaire. En attente de connexion…");
-  onlineSetStatus("🌐 Salon GO GAME "+code+" ouvert. Ton adversaire peut le rejoindre.");
+  onlineSetStatus("🌐 Salon Godson FURY "+code+" ouvert. Ton adversaire peut le rejoindre.");
   syncOnlineUI();
 }
 async function joinOnlineRoom(){
@@ -1020,7 +1023,7 @@ function launchOnlineMatch(config){
   if(!config||onlineState.started)return false;
   if(!config.hostId||!config.guestId||String(config.matchKey||"").length<8){ onlineSetRoomStatus("⚠️ Configuration du duel incomplète (joueur ou clé de match manquant)."); return false; }
   if(config.version!==GAME_VERSION){
-    onlineSetRoomStatus("⚠️ Versions incompatibles : hôte V"+String(config.version||"?")+", ton jeu V"+GAME_VERSION+". Mettez tous les deux GO GAME à jour.");
+    onlineSetRoomStatus("⚠️ Versions incompatibles : hôte V"+String(config.version||"?")+", ton jeu V"+GAME_VERSION+". Mettez tous les deux Godson FURY à jour.");
     showToast("🌐 Duel refusé : versions du jeu différentes.");
     sendOnlineChannel({t:"bye"});
     return false;
@@ -1040,7 +1043,7 @@ function launchOnlineMatch(config){
   buildDisplayNames(); p1.reset(); p2.reset(); placeMenuFighters();
   showOnly(null); beginMatch();
   $("roundLabel").textContent="🌐 DUEL EN LIGNE • "+String(config.hostName||"J1").toUpperCase()+" VS "+String(config.guestName||"J2").toUpperCase();
-  showToast("🌐 Duel GO GAME synchronisé — que le meilleur gagne !");
+  showToast("🌐 Duel Godson FURY synchronisé — que le meilleur gagne !");
   return true;
 }
 async function submitOnlineMatchResult(winner){
@@ -1090,7 +1093,7 @@ async function leaveOnlineRoom(updateRemote){
 }
 async function openOnline(){
   audio(); populateOnlineFighters();
-  if(!onlineEl("onlineDisplayName").value)onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion GO GAME").slice(0,24);
+  if(!onlineEl("onlineDisplayName").value)onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion Godson FURY").slice(0,24);
   if(selArenaId!=="random")onlineEl("onlineArena").value=selArenaId;
   onlineEl("onlineMood").value=selArenaMood;
   showOnly("menuOnline"); syncOnlineUI();
@@ -1103,7 +1106,7 @@ function initOnlineClient(){
   loadOnlineSession(); populateOnlineFighters();
   const user=onlineState.session&&onlineState.session.user;
   if(user&&user.email)onlineEl("onlineEmail").value=user.email;
-  onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion GO GAME").slice(0,24);
+  onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion Godson FURY").slice(0,24);
   onlineEl("onlineCountry").value="GA";
   if(selArenaId!=="random")onlineEl("onlineArena").value=selArenaId;
   onlineEl("onlineMood").value=selArenaMood;
@@ -1225,7 +1228,7 @@ function matchScore(f,op){ return fighterMatchScore(f,op); }
 function gradeFromScore(score){ return score>=520?"S":score>=420?"A":score>=315?"B":score>=210?"C":"D"; }
 function matchGrade(f,op){ return gradeFromScore(matchScore(f,op)); }
 function modeDisplayName(){
-  return mode==="story"?"Histoire "+story.step+"/"+story.total:mode==="survival"?"Survie vague "+survival.wave:mode==="arcade"?"Championnat "+arcade.stage+"/"+arcadeTotal():mode==="online"?"Duel en ligne GO GAME":mode==="2p"?"2 Joueurs":mode==="training"?"Entraînement":"Bot "+DIFFS[botDiff].label;
+  return mode==="story"?"Histoire "+story.step+"/"+story.total:mode==="survival"?"Survie vague "+survival.wave:mode==="arcade"?"Championnat "+arcade.stage+"/"+arcadeTotal():mode==="online"?"Duel en ligne Godson FURY":mode==="2p"?"2 Joueurs":mode==="training"?"Entraînement":"Bot "+DIFFS[botDiff].label;
 }
 function recordSurvivalRun(){
   if(survival.recorded)return;
@@ -1312,7 +1315,7 @@ function showEndScreen(winner){
   }
   if(mode==="online"){
     rematch.classList.add("hidden"); change.classList.add("hidden"); next.classList.add("hidden");
-    kicker="🌐 DUEL EN LIGNE GO GAME TERMINÉ";
+    kicker="🌐 DUEL EN LIGNE Godson FURY TERMINÉ";
   }
   $("endKicker").textContent=kicker;
   $("endStats").innerHTML=statTable(winner);
@@ -1494,4 +1497,4 @@ if(selArenaId!=="random")setArenaById(selArenaId);
 bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); bindOnlineUI(); populateSettings(); populateCustomize(); initOnlineClient();
 buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary(); renderMoveList();
 buildPips(); goMenu(); startLoop();
-console.log("%cGÉDÉON - Godson ARENA V"+GAME_VERSION+" PRO%c signé Gideon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");
+console.log("%c"+GAME_TITLE+" V"+GAME_VERSION+" — "+GAME_SUBTITLE+"%c signé Gédéon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");

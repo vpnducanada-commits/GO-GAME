@@ -1,7 +1,47 @@
-# 📜 CHANGELOG — GÉDÉON - Godson ARENA
+# 📜 CHANGELOG — Godson FURY ARENA *(anciennement GÉDÉON - Godson ARENA / GO GAME)*
 
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
+
+## [5.1.0] — 2026-10-24 — « Godson FURY — M1 Signature »
+
+Directives du propriétaire : **trouver un autre nom**, travailler **individuellement
+chaque personnage**, donner à chacun un **M1 spécifique**, et permettre les combos
+**simplement en appuyant de manière répétée sur le bouton d’attaque**.
+
+### Changé — Nouveau nom officiel
+- Le jeu devient **Godson FURY ARENA — L’Arène des Légendes**. La signature
+  **« Gédéon - Godson »** reste présente dans le jeu, les documents et les crédits.
+- Le bundle autonome devient `Godson-FURY-Arena-V5.1-PRO.html` ; l’adresse GitHub
+  Pages et les sauvegardes existantes ne changent pas.
+
+### Ajouté — M1 Signature pour les 41 combattants (Marco + moteur)
+- **41 chaînes M1 écrites individuellement** : 3 coups lourds pour les colosses,
+  4 coups pour la majorité du roster, 5 coups pour les rapides et les légendes.
+- **168 coups nommés uniques** (ex. Gideon : Jab Fulgurant → Direct du Champion →
+  Fouet du Stade → Jugement Ascendant ; KAEL : Croisade d’Acier ; Nyx Ombre :
+  Sentence des Ombres en 5 coups).
+- Exécution accessible : **martèle POING au sol** et la chaîne du personnage se
+  déroule (poings, pieds, uppercuts et balayages animés), avec avance de tracking,
+  recul réduit entre maillons et final propre (launcher, knockdown ou burst).
+- Le compteur reconnaît un **vrai combo complet** : la liaison a été réglée frame
+  par frame (hitstun de liaison, pas de décollage parasite avant le final).
+- Le bot poursuit désormais **sa propre chaîne M1** après un coup confirmé.
+
+### Ajouté — Présentation du M1 (Kenzo/Lena)
+- Traînées signature qui **s’intensifient coup après coup** et extension des
+  membres croissante dans la chaîne ; le final affiche
+  « M1 SIGNATURE — <nom de la chaîne> ».
+- L’arsenal de sélection, les aperçus, l’écran VS et l’aide affichent le M1 du
+  combattant ; la recherche roster trouve aussi un héros par le nom de son M1.
+- Bouton tactile renommé **POING • M1** ; l’entraînement invite à marteler POING.
+
+### Compatibilité / garanti
+- Les replays d’avant la V5.1 relisent l’ancien poing générique (ils ne sont pas
+  réinterprétés en M1) ; Online reste verrouillé à version identique.
+- **357 assertions / 592 vérifications** vertes — dont la simulation réelle du
+  martelage pour les **41/41** chaînes jusqu’au final —, contrôle QA n°28,
+  bundle **418 Ko**.
 
 ## [5.0.0] — 2026-10-24 — « Édition Jeu Complet »
 
