@@ -9,7 +9,7 @@
 |---|---|---|
 | Syntaxe | `node --check` | les 3 modules JS et les scripts du bundle |
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
-| Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry, rendus, sauvegardes, déterminisme, migration/rotation des replays, matrice Arena Moods, VFX et tactile multi-touch |
+| Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry/EX/projections/cancels, rendus, sauvegardes, déterminisme, replays, Arena Moods, tactile et client Online contre API simulée |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
 | Release | Git + tag | arbre propre, commit et version traçables |
 
@@ -17,8 +17,8 @@
 
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
-- ✅ Zéro dépendance réseau dans le jeu livré.
-- ✅ Bundle officiel < 200 Ko tant qu’aucun asset externe n’est introduit.
+- ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
+- ✅ Bundle officiel ≤ 320 Ko depuis l’ajout du client GO GAME complet, sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 
@@ -39,6 +39,7 @@
 - Manettes : J1 et J2 si disponibles.
 - Plein écran, changement d’onglet, reprise de pause.
 - Profil vierge et profil migré depuis la version précédente.
+- Online réel : deux comptes, deux navigateurs/appareils, Wi-Fi et données mobiles, salon créé/rejoint, désynchronisation impossible à classer et déconnexion propre.
 
 ## Rapport QA de sprint
 

@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GÉDÉON - Godson ARENA V2.8 PRO | Combat 1v1, Histoire, Arcade, Arena Moods & Replay Studio — signé Gideon - Godson</title>
+<title>GÉDÉON - Godson ARENA V3.0 PRO | GO GAME Online, Combat 1v1, Histoire, Arcade & Replay Studio — signé Gideon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V2.8 PRO</em></h1>
+        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V3.0 PRO</em></h1>
         <p>Combat 1v1 • 60 FPS • Haute résolution</p>
       </div>
     </div>
@@ -82,6 +82,7 @@
       <div><span class="vBadge">VERSION 2.8 PRO — ARENA MOODS 🌤️</span></div>
       <div class="signed">✍️ Créé &amp; signé par <span>Gédéon - Godson</span> © 2026</div>
       <button class="storyBanner" id="btnModeStory"><span class="sbIc">📖</span><span class="sbTx"><b>MODE HISTOIRE — Saga Godson : Chapitres 1 &amp; 2</b><small id="storyProgressLabel">6 combats scénarisés • Zara à Libreville • GODSON PRIME en boss ultime 👑</small></span><span class="sbGo">JOUER ▶</span></button>
+      <button class="storyBanner onlineBanner" id="btnOnline"><span class="sbIc">🌐</span><span class="sbTx"><b>GO GAME ONLINE — Duels, classement mondial &amp; cloud</b><small id="onlineMenuStatus">Salon privé par code • profil cloud • replays partagés • résultats co-vérifiés</small></span><span class="sbGo">OUVRIR ▶</span></button>
       <div class="modeCards">
         <button class="modeCard mc-bot" id="btnModeBot"><span class="ic">🤖</span><b>VERSUS BOT</b><small>1v1 contre l’IA — Facile, Moyen ou Difficile</small></button>
         <button class="modeCard mc-2p" id="btnMode2P"><span class="ic">👥</span><b>2 JOUEURS</b><small>Duel local sur le même clavier ou 2 manettes</small></button>
@@ -98,7 +99,7 @@
         <button class="btn dark" id="btnSettings">⚙️ Réglages</button>
       </div>
       <p class="miniNote" id="replayInfo">🎬 Termine un match pour pouvoir le revoir ici, image par image, exactement comme il s’est joué.</p>
-      <p class="miniNote" id="menuStats">Nouveau V2.8 : joue chaque arène en Jour, Crépuscule ou Nuit, découvre les VFX signatures des 6 combattants et profite d’un tactile multi-touch plus fiable !</p>
+      <p class="miniNote" id="menuStats">Nouveau V3.0 GO GAME : duels en ligne privés, classement mondial co-vérifié, cloud, projections, EX uniques et Godson Cancel — avec Arena Moods, VFX signatures et tactile multi-touch !</p>
     </div>
 
     <!-- DIFFICULTÉ BOT -->
@@ -127,6 +128,7 @@
         <button class="btn dark" id="btnSelectBack">⬅ Retour</button>
         <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
       </div>
+      <div class="moveList" id="moveList" aria-live="polite"></div>
     </div>
 
     <!-- ÉCRAN VS -->
@@ -174,6 +176,75 @@
         <p style="margin-top:10px;font-size:12.5px;opacity:.88;line-height:1.55">Les 8 derniers matchs tournent automatiquement ; touche ⭐ sur un grand combat pour le protéger du nettoyage. Les replays restent sur cet appareil et ne modifient jamais ton profil pendant la lecture.</p>
       </div>
       <button class="btn dark" id="btnReplaysBack">⬅ Retour</button>
+    </div>
+
+    <!-- GO GAME ONLINE -->
+    <div class="overlay hidden" id="menuOnline">
+      <div class="panel onlinePanel">
+        <h3>🌐 GO GAME Online — Duel, classement &amp; cloud</h3>
+        <div class="onlineStatus" id="onlineStatus">Hors ligne — connecte ton compte GO GAME pour activer le cloud et les duels.</div>
+        <div class="onlineGrid">
+          <section class="onlineCard">
+            <h4>👤 Compte &amp; profil mondial</h4>
+            <p id="onlineAccountSummary">Aucun compte connecté. Le mode local reste 100 % jouable hors ligne.</p>
+            <div class="onlineForm">
+              <div><label>Email</label><input type="email" id="onlineEmail" autocomplete="email" placeholder="joueur@exemple.com"></div>
+              <div><label>Mot de passe</label><input type="password" id="onlinePassword" autocomplete="current-password" placeholder="6 caractères minimum"></div>
+              <div><label>Pseudo public</label><input type="text" id="onlineDisplayName" maxlength="24" placeholder="Champion GO GAME"></div>
+              <div><label>Pays (code)</label><input type="text" id="onlineCountry" maxlength="2" value="GA"></div>
+              <div class="wide"><label>Combattant principal</label><select id="onlineMainFighter"></select></div>
+            </div>
+            <div class="onlineActions">
+              <button class="btn blue onlineBtn" id="btnOnlineSignUp">✨ Créer mon compte</button>
+              <button class="btn green onlineBtn" id="btnOnlineSignIn">🔐 Se connecter</button>
+              <button class="btn gold onlineBtn" id="btnOnlineSaveProfile">💾 Publier mon profil</button>
+              <button class="btn dark onlineBtn" id="btnOnlineSignOut">🚪 Déconnexion</button>
+            </div>
+            <small>Le mot de passe est envoyé uniquement à Supabase Auth ; il n’est jamais stocké par le jeu.</small>
+          </section>
+
+          <section class="onlineCard">
+            <h4>⚔️ Duel en ligne — salon privé</h4>
+            <p id="onlineRoomStatus">Crée un salon et envoie son code à ton adversaire, ou rejoins le sien.</p>
+            <div class="onlineForm">
+              <div><label>Code du salon</label><input type="text" id="onlineRoomCode" maxlength="8" placeholder="Ex : K7P3QX" autocomplete="off"></div>
+              <div><label>Ton combattant</label><select id="onlineFighter"></select></div>
+              <div><label>Arène (hôte)</label><select id="onlineArena"><option value="stadium">Stade Godson — Sunset</option><option value="tokyo">Néon Tokyo — Pluie</option><option value="temple">Temple Céleste — Jour</option><option value="Libreville">Plage de Libreville — Coucher de soleil</option></select></div>
+              <div><label>Ambiance (hôte)</label><select id="onlineMood"><option value="auto">🎨 Auto</option><option value="jour">☀️ Jour</option><option value="crepuscule">🌇 Crépuscule</option><option value="nuit">🌙 Nuit</option></select></div>
+            </div>
+            <div class="onlineActions">
+              <button class="btn orange onlineBtn" id="btnOnlineCreateRoom">🏟️ Créer un salon</button>
+              <button class="btn blue onlineBtn" id="btnOnlineJoinRoom">🎟️ Rejoindre</button>
+              <button class="btn green onlineBtn" id="btnOnlineStartDuel">🚀 Lancer le duel</button>
+              <button class="btn dark onlineBtn" id="btnOnlineLeaveRoom">Quitter</button>
+            </div>
+            <p class="onlineNetStats" id="onlineNetStats">Réseau : en attente • Netcode lockstep déterministe, pause désactivée pendant le duel.</p>
+          </section>
+
+          <section class="onlineCard">
+            <h4>🏆 Classement mondial vérifié</h4>
+            <div class="onlineActions"><button class="btn dark onlineBtn" id="btnOnlineRefreshLeaderboard">🔄 Actualiser le classement</button></div>
+            <div id="onlineLeaderboardList" class="onlineList"><div class="onlineEmpty">Classement vide pour le moment : les premiers duels co-vérifiés ouvriront le tableau.</div></div>
+            <small>Seuls les résultats confirmés par les deux joueurs avec le même hash final entrent au classement.</small>
+          </section>
+
+          <section class="onlineCard">
+            <h4>☁️ Sauvegarde &amp; replays cloud</h4>
+            <p id="onlineCloudStatus">Cloud prêt après connexion. L’envoi remplace ta sauvegarde cloud ; le téléchargement remplace ce profil local après confirmation.</p>
+            <div class="onlineActions">
+              <button class="btn blue onlineBtn" id="btnOnlineUploadSave">⬆️ Envoyer ma sauvegarde</button>
+              <button class="btn gold onlineBtn" id="btnOnlineDownloadSave">⬇️ Télécharger ma sauvegarde</button>
+            </div>
+            <label class="checkRow" style="margin:10px 0"><input type="checkbox" id="onlineReplayPublic" checked> Publier le replay en public</label>
+            <div class="onlineActions">
+              <button class="btn green onlineBtn" id="btnOnlinePublishReplay">🎬 Publier mon dernier replay</button>
+              <button class="btn dark onlineBtn" id="btnOnlineRefreshReplays">🔎 Replays publics</button>
+            </div>
+            <div id="onlineReplayList" class="onlineList"><div class="onlineEmpty">Aucun replay public chargé.</div></div>
+          </section>
+        </div>
+      </div>
+      <button class="btn dark" id="btnOnlineBack">⬅ Retour</button>
     </div>
 
     <!-- DÉFIS & CARRIÈRE -->
@@ -256,6 +327,9 @@
             ⬇ + Pied = <b>Balayage</b> (met au sol)<br>
             En l’air : Poing/Pied = attaques aériennes<br>
             Dash = esquive rapide + foncer sur l’adversaire<br>
+            🤼 <b>Projection</b> : Poing + Pied ensemble au corps-à-corps (traverse la garde ; ←/→ choisit le sens)<br>
+            ✨ <b>EX Spécial</b> : Spécial + Poing ensemble avec 75% d’énergie = version renforcée unique<br>
+            ⚡ <b>Godson Cancel</b> : après un coup confirmé, Dash pendant l’attaque annule la récupération pour 25% d’énergie (1× par combo)<br>
             ✨ <b>PARRY</b> : tape la garde juste avant l’impact (bouclier doré) = 0 dégât + riposte +35% !</div>
           <div><b>🔥 COMBOS À APPRENDRE</b><br>
             Poing → Poing → Pied<br>
@@ -317,7 +391,7 @@
     <div class="card"><b>✨ Pro :</b> 6 combattants, 4 arènes dont la Plage de Libreville, saga en 2 chapitres, 6 défis, caméra dynamique, ralenti K.O., Arena Moods Jour/Crépuscule/Nuit, Replay Studio vérifié et sauvegardes auto.</div>
   </div>
 
-  <footer>🎮 <strong>GÉDÉON - Godson ARENA V2.8 PRO</strong> — Combat 1v1 haute résolution : Histoire • Survie • Versus Bot • 2 Joueurs • Arcade • Entraînement • Arena Moods • Replay Studio • Hall of Fame<br>✍️ Créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon • Manager &amp; Développeur principal : Assistant Arena (officiel)</footer>
+  <footer>🎮 <strong>GÉDÉON - Godson ARENA V3.0 PRO — GO GAME</strong> — Combat 1v1 haute résolution : Duel en ligne • Classement mondial • Cloud • Histoire • Survie • Versus Bot • 2 Joueurs • Arcade • Entraînement • Arena Moods • Replay Studio • Hall of Fame<br>✍️ Créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon • Manager &amp; Développeur principal : Assistant Arena (officiel)</footer>
 </div>
 
 <script src="src/engine.js"></script>

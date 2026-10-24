@@ -23,6 +23,7 @@ if (!supabaseUrl || !publishableKey) {
 const endpoints = [
   '/rest/v1/leaderboard?select=*&limit=5',
   '/rest/v1/player_profiles?select=id,display_name,country_code&limit=5',
+  '/rest/v1/shared_replays?select=id,title,is_public,replay_hash,game_version,created_at&is_public=eq.true&order=created_at.desc&limit=5',
 ];
 
 let failures = 0;

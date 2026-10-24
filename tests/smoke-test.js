@@ -58,6 +58,7 @@ function runScript(file) {
 ['src/engine.js', 'src/render.js', 'src/ui.js'].forEach(runScript);
 
 const ev = expr => vm.runInContext(expr, vmCtx);
+let v3AsyncWork = null;
 const assert = (cond, msg) => { console.log((cond ? '  ✅ ' : '  ❌ ') + msg); if (!cond) errors.push('ASSERT: ' + msg); };
 const click = id => window.document.getElementById(id).click();
 function step(n) { for (let i = 0; i < n; i++) { ev('updateGameLogic()'); ev('prepareInterpolation(1)'); ev('updateCamera(16)'); ev('render()'); ev('updateHUD()'); } }
@@ -451,11 +452,214 @@ try {
   assert(ev('currentArenaMood') === 'jour' && ev('selArenaMood') === 'jour', 'ambiance du joueur restaurée à la sortie du replay');
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
+  console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
+  assert(ev('GAME_VERSION') === '3.0.0' && window.document.querySelector('h1').textContent.includes('V3.0 PRO'), 'version V3.0.0 affichée et exposée au moteur');
+  const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
+  assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
+  const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
+  assert(ev('PROFILE.names.p1') !== 'Copie uniquement', 'export cloud = copie profonde, jamais une référence mutable du profil');
+
+  ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
+  click('btnMode2P');
+  assert(window.document.getElementById('moveList').textContent.includes('EX 75%') && window.document.getElementById('moveList').textContent.includes('Projection') && window.document.getElementById('moveList').textContent.includes('Godson Cancel'), 'move list V3 : EX, projection et Godson Cancel expliqués à la sélection');
+  window.document.querySelectorAll('#rosterP1 .charCard')[1].click();
+  assert(ev('selCharP1') === 1 && window.document.getElementById('moveList').textContent.includes('Kira'), 'move list mise à jour selon le combattant P1');
+  window.document.querySelectorAll('#rosterP1 .charCard')[0].click();
+  ev('SETTINGS.roundsWin=2; SETTINGS.roundTime=99; SETTINGS.speed=1;');
+  click('btnLaunchFight'); ev('skipVS()'); step(170);
+  assert(ev('state') === 'fight', 'combat V3 lancé pour les nouvelles techniques');
+
+  /* Projection : elle doit traverser une garde tenue et mettre au sol. */
+  ev('keys.clear(); resetFighterStats(); p1.reset(); p2.reset(); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; projectiles=[];');
+  ev('keys.add("ArrowDown")'); step(3);
+  assert(ev('p2.blocking') === true, 'projection V3 : la cible tient réellement sa garde avant le test');
+  const hpBeforeThrow = ev('p2.health');
+  holdCodes(['KeyF', 'KeyG'], 2); step(24); ev('keys.delete("ArrowDown")');
+  assert(ev('p1.stats.throws') === 1 && ev('p2.health') < hpBeforeThrow, 'projection Poing+Pied : traverse la garde, dégâts et statistique comptabilisés');
+
+  /* EX : une variante renforcée et marquée pour chacun des 6 combattants. */
+  const expectedExCounts = [1, 4, 2, 2, 3, 3];
+  for (let i = 0; i < 6; i++) {
+    ev(`applyCharacterTo(p1,${i}); p1.reset(); p1.x=420; p2.x=880; p1.y=p2.y=GROUND; projectiles=[]; p1.attackType="exspecial"; p1.attackEx=true; spawnProjectile(p1);`);
+    assert(ev('projectiles.length') === expectedExCounts[i] && ev('projectiles.every(p=>p.ex)') === true, 'EX unique et marqué : ' + ev('CHARACTERS[' + i + '].name'));
+  }
+  ev('keys.clear(); resetFighterStats(); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); p1.x=420; p2.x=880; p1.y=p2.y=GROUND; p1.energy=80; projectiles=[];'); step(2);
+  holdCodes(['KeyH', 'KeyF'], 2);
+  assert(ev('p1.attackType') === 'exspecial' && ev('p1.stats.ex') === 1 && ev('p1.energy') < 12, 'entrée EX Spécial+Poing : 75 % d’énergie consommés');
+  step(14);
+  assert(ev('projectiles.some(p=>p.ex&&p.pierce)') === true, 'EX de Gideon : projectile renforcé et perforant réellement tiré');
+  const hpBeforeExHit = ev('p2.health'); step(55);
+  assert(ev('p2.health') < hpBeforeExHit, 'EX de Gideon : le projectile touche et inflige des dégâts');
+
+  /* Godson Cancel : seulement après confirmation, pour 25 %, une fois par combo. */
+  ev('keys.clear(); resetFighterStats(); p1.reset(); p2.reset(); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.energy=60; projectiles=[];'); step(2);
+  press('KeyF', 2); step(5);
+  assert(ev('p1.hitConfirmed') === true && ev('p1.attackT') > 0, 'Godson Cancel : coup confirmé pendant la récupération');
+  const energyBeforeCancel = ev('p1.energy');
+  press('ShiftLeft', 2);
+  assert(ev('p1.stats.cancels') === 1 && ev('p1.dashT') > 0 && ev('p1.energy') < energyBeforeCancel - 20 && ev('p1.godsonCancelReady') === false, 'Godson Cancel : dash immédiat, -25 % et verrou anti-infini');
+  ev('resetFighterStats(); p1.reset(); p2.reset(); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.facing=1; startDash(p1,-1);');
+  assert(ev('p1.dashT') > 0 && ev('p1.invulnT') >= 6, 'backdash défensif : brève protection en reculant');
+  ev('bot.press={}; bot.queue=[]; bot.blockT=0; bot.downT=0; botAction("throw"); updateBot();');
+  assert(ev('bot.input.punch') === true && ev('bot.input.kick') === true, 'IA V3 : le bot sait déclencher une projection');
+  ev('bot.press={}; bot.queue=[]; bot.blockT=0; bot.downT=0; botAction("exspecial"); updateBot();');
+  assert(ev('bot.input.special') === true && ev('bot.input.punch') === true, 'IA V3 : le bot sait déclencher un EX');
+  ev('qualityLevel=2; perfFxScale=.5; render();');
+  assert(Math.abs(ev('particleMul()') - .5) < .001 && Number.isFinite(ev('renderStats.frameMs')) && !!ev('renderStats.perfTier'), 'performance V3 : échelle FX adaptative et métriques CPU exposées');
+  ev('perfFxScale=1; keys.clear(); goMenu();');
+
+  /* Lockstep invité : les touches physiques du P1 local doivent piloter le
+     combattant invité (côté 2), pendant que les bits distants pilotent l’hôte. */
+  const onlineHostId = '11111111-1111-4111-8111-111111111111';
+  const onlineGuestId = '22222222-2222-4222-8222-222222222222';
+  const onlineConfigExpr = `({version:GAME_VERSION,seed:987654321,matchKey:"TESTV3-12345678",hostId:"${onlineHostId}",guestId:"${onlineGuestId}",hostName:"Hôte V3",guestName:"Invitée V3",hostChar:0,guestChar:1,hostInitial:"HV",guestInitial:"IV",hostSkin:{primary:"#123456",accent:"#abcdef"},guestSkin:{primary:"#654321",accent:"#fedcba"},arena:"Libreville",arenaMood:"nuit",settings:{roundTime:120,roundsWin:3},inputDelay:3})`;
+  ev(`onlineState.session=null; onlineState.profile=null; onlineState.isHost=false; onlineState.started=false; onlineState.room={code:"TESTV3",status:"playing",guest_id:"${onlineGuestId}"}; onlineState.channel=null; onlineState.peer=null; window.__onlineSent=[]; onlineTransportSend=m=>{window.__onlineSent.push({...m}); return true;}; SETTINGS.roundTime=60; SETTINGS.roundsWin=2; SETTINGS.speed=1.12;`);
+  assert(ev(`launchOnlineMatch(${onlineConfigExpr})`) === true && ev('mode') === 'online' && ev('onlineSession.localSide') === 2 && ev('replayRecorder.seed') === 987654321, 'duel invité lancé avec seed, côté local et config partagés');
+  assert(ev('p1.name') === 'Hôte V3' && ev('p2.name') === 'Invitée V3' && ev('p1.skin.primary') === '#123456' && ev('p2.skin.primary') === '#654321' && ev('SETTINGS.roundTime') === 120 && ev('SETTINGS.roundsWin') === 3, 'identités, tenues et règles de l’hôte appliquées des deux côtés');
+  ev('loop(lastTs||0)');
+  assert(ev('renderStats.speedScale') === 1 && ev('renderStats.onlineFrame') === ev('onlineSession.frame'), 'en ligne : vitesse verrouillée à 100 % malgré le turbo local');
+  ev('keys.clear(); keys.add("KeyF"); updateGameLogic(); keys.delete("KeyF"); updateGameLogic(); updateGameLogic();');
+  ev('p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.vx=p2.vx=0; p1.attackT=p2.attackT=0; p1.attack=p2.attack=null; state="fight"; receiveOnlineNetMessage({t:"input",f:3,b:0}); updateGameLogic();');
+  assert(ev('p2.attackType') === 'punch' && ev('window.__onlineSent.some(m=>m.t==="input"&&m.f===3&&m.b===16)') === true, 'lockstep invité : le poing local échantillonné est appliqué au combattant invité');
+  const simBeforeOnlineStall = ev('simFrame');
+  assert(ev('updateGameLogic()') === false && ev('simFrame') === simBeforeOnlineStall && ev('onlineSession.stalls') >= 1, 'lockstep : aucune frame simulée sans l’input distant');
+  ev('receiveOnlineNetMessage({t:"input",f:4,b:16}); updateGameLogic();');
+  assert(ev('p1.attackType') === 'punch', 'lockstep hôte : les bits distants pilotent le combattant hôte');
+  ev('togglePause()');
+  assert(ev('state') !== 'pause', 'pause interdite pendant un duel en ligne');
+  ev('onOnlineDesync=()=>{}; onlineSession.frame=300; onlineSession.nextInputFrame=400; onlineSession.localInputs.set(300,0); onlineSession.remoteInputs.set(300,0); updateGameLogic(); onlineSession.localInputs.set(301,0); onlineSession.remoteInputs.set(301,0); receiveOnlineNetMessage({t:"check",f:300,h:onlineSession.localChecks.get(300)==="00000000"?"11111111":"00000000"});');
+  assert(ev('updateGameLogic()') === false && ev('onlineSession.desync') === true, 'checksum différé : une divergence tardive arrête le duel avant classement');
+  ev('stopOnlineSession("disconnect"); onlineState.room=null; onlineState.started=false; onlineTransportSend=null; SETTINGS.speed=1; goMenu();');
+  assert(ev('SETTINGS.roundTime') === 60 && ev('SETTINGS.roundsWin') === 2, 'réglages locaux restaurés après déconnexion du lockstep');
+  assert(ev(`launchOnlineMatch({version:"2.8.0",seed:1,matchKey:"OLDV123456",hostId:"${onlineHostId}",guestId:"${onlineGuestId}",hostChar:0,guestChar:1,arena:"stadium",arenaMood:"jour",settings:{roundTime:99,roundsWin:2},inputDelay:3})`) === false && window.document.getElementById('onlineRoomStatus').textContent.includes('incompatibles'), 'duel refusé si les deux versions du jeu diffèrent');
+
+  /* Fin de match hôte : les réglages distants ne doivent jamais être persistés. */
+  ev(`onlineState.session=null; onlineState.isHost=true; onlineState.started=false; onlineState.room={code:"TESTV3",status:"playing",guest_id:"${onlineGuestId}"}; window.__onlineSent=[]; onlineTransportSend=m=>{window.__onlineSent.push({...m}); return true;}; SETTINGS.roundTime=60; SETTINGS.roundsWin=2;`);
+  assert(ev(`launchOnlineMatch(${onlineConfigExpr})`) === true, 'duel hôte relancé pour la fin de match en ligne');
+  ev('updateGameLogic(); updateGameLogic(); updateGameLogic();');
+  const matchesBeforeOnlineFinish = ev('PROFILE.stats.matches');
+  ev('finishMatch(p1)');
+  assert(ev('state') === 'matchEnd' && ev('onlineSession.active') === false && ev('SETTINGS.roundTime') === 60 && ev('SETTINGS.roundsWin') === 2 && ev('PROFILE.stats.matches') === matchesBeforeOnlineFinish + 1, 'fin en ligne : stats locales comptées et réglages restaurés avant sauvegarde');
+  assert(window.document.getElementById('btnRematch').classList.contains('hidden') && window.document.getElementById('btnEndSelect').classList.contains('hidden'), 'fin en ligne : pas de revanche locale non synchronisée proposée');
+  ev('goMenu();');
+  assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
+
+  /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
+     applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */
+  v3AsyncWork = (async () => {
+    console.log('\n— V3.0 : client Supabase, salons WebRTC & cloud (API simulée) —');
+    const waitMs = ms => new Promise(resolve => setTimeout(resolve, ms));
+    const asyncUserId = '11111111-1111-4111-8111-111111111111';
+    const asyncOtherId = '22222222-2222-4222-8222-222222222222';
+    const fetchCalls = [];
+    let asyncProfile = null;
+    let asyncRoom = { code: 'TEST42', host_id: asyncOtherId, guest_id: null, status: 'open', config: { version: ev('GAME_VERSION'), seed: 424242, matchKey: 'TEST42-424242', hostId: asyncOtherId, hostName: 'Hôte Cloud', hostChar: 2, arena: 'tokyo', arenaMood: 'nuit', settings: { roundTime: 99, roundsWin: 2 }, inputDelay: 5 } };
+    const jsonResponse = (data, status = 200) => ({ ok: status >= 200 && status < 300, status, text: async () => JSON.stringify(data) });
+    class FakeDataChannel {
+      constructor() { this.readyState = 'open'; this.sent = []; }
+      send(data) { this.sent.push(data); }
+      close() { this.readyState = 'closed'; if (this.onclose) this.onclose(); }
+    }
+    class FakePeerConnection {
+      constructor() { this.connectionState = 'connected'; this.localDescription = null; this.remoteDescription = null; }
+      createDataChannel() { return new FakeDataChannel(); }
+      async createOffer() { return { type: 'offer', sdp: 'fake-offer' }; }
+      async createAnswer() { return { type: 'answer', sdp: 'fake-answer' }; }
+      async setLocalDescription(desc) { this.localDescription = desc; }
+      async setRemoteDescription(desc) { this.remoteDescription = desc; }
+      async addIceCandidate() {}
+      close() { this.connectionState = 'closed'; }
+    }
+    window.RTCPeerConnection = FakePeerConnection;
+    window.webkitRTCPeerConnection = FakePeerConnection;
+    window.fetch = async (url, options = {}) => {
+      const method = options.method || 'GET';
+      const body = options.body ? JSON.parse(options.body) : null;
+      fetchCalls.push({ url: String(url), method, body, headers: options.headers || {} });
+      if (url.includes('/auth/v1/signup') || url.includes('/auth/v1/token')) return jsonResponse({ access_token: 'fake-access-token', refresh_token: 'fake-refresh-token', expires_in: 3600, user: { id: asyncUserId, email: 'champion@example.com' } });
+      if (url.includes('/auth/v1/user')) return jsonResponse({ id: asyncUserId, email: 'champion@example.com' });
+      if (url.includes('/auth/v1/logout')) return jsonResponse({});
+      if (url.includes('/rest/v1/player_profiles')) {
+        if (method === 'POST') { asyncProfile = body; return jsonResponse([asyncProfile]); }
+        return jsonResponse(asyncProfile ? [asyncProfile] : []);
+      }
+      if (url.includes('/rest/v1/leaderboard')) return jsonResponse([{ player_id: asyncOtherId, display_name: 'Champion Mondial', country_code: 'GA', wins: 4, losses: 1, matches: 5 }]);
+      if (url.includes('/rest/v1/cloud_saves')) return jsonResponse(method === 'POST' ? [body] : [{ user_id: asyncUserId, slot: 'main', save_data: ev('exportProfileData()'), game_version: ev('GAME_VERSION') }]);
+      if (url.includes('/rest/v1/shared_replays')) {
+        if (method === 'POST') return jsonResponse([{ id: '33333333-3333-4333-8333-333333333333', ...body }]);
+        if (url.includes('replay_data')) return jsonResponse([{ id: '44444444-4444-4444-8444-444444444444', title: 'Replay Cloud Test', replay_data: ev('lastReplayData'), replay_hash: ev('lastReplayData.finalHash'), game_version: ev('GAME_VERSION') }]);
+        return jsonResponse([{ id: '44444444-4444-4444-8444-444444444444', title: 'Replay Cloud Test', is_public: true, replay_hash: ev('lastReplayData.finalHash'), game_version: ev('GAME_VERSION'), created_at: new Date().toISOString() }]);
+      }
+      if (url.includes('/rest/v1/online_signals')) {
+        if (method === 'POST') return jsonResponse(null, 201);
+        return jsonResponse([{ id: 'signal-offer-1', room_code: 'TEST42', sender_id: asyncOtherId, kind: 'offer', payload: { type: 'offer', sdp: 'fake-offer' } }]);
+      }
+      if (url.includes('/rest/v1/rpc/join_online_room')) {
+        asyncRoom = { ...asyncRoom, guest_id: asyncUserId, status: 'locked', config: { ...asyncRoom.config, ...(body.guest_config || {}), guestId: asyncUserId } };
+        return jsonResponse(asyncRoom);
+      }
+      if (url.includes('/rest/v1/online_rooms')) {
+        if (method === 'POST') { asyncRoom = { code: body.code, host_id: body.host_id, guest_id: null, status: body.status, config: body.config }; return jsonResponse([asyncRoom]); }
+        if (method === 'PATCH') { asyncRoom = { ...asyncRoom, ...body }; return jsonResponse([asyncRoom]); }
+        return jsonResponse([asyncRoom]);
+      }
+      if (url.includes('/functions/v1/submit-match-result')) return jsonResponse({ status: 'waiting_counterparty' });
+      return jsonResponse([]);
+    };
+
+    click('btnOnline'); await waitMs(25);
+    assert(!window.document.getElementById('menuOnline').classList.contains('hidden') && window.document.getElementById('onlineLeaderboardList').textContent.includes('Champion Mondial'), 'panneau GO GAME : classement public chargé sans compte');
+    window.document.getElementById('onlineEmail').value = 'champion@example.com';
+    window.document.getElementById('onlinePassword').value = 'secret6';
+    window.document.getElementById('onlineDisplayName').value = 'Champion Async';
+    window.document.getElementById('onlineCountry').value = 'GA';
+    window.document.getElementById('onlineMainFighter').value = '5';
+    await ev('onlineSignUp()');
+    assert(ev('onlineState.session.access_token') === 'fake-access-token' && ev('onlineState.profile.display_name') === 'Champion Async' && String(window.localStorage.getItem(ev('GO_GAME_SESSION_KEY')) || '').includes('fake-access-token'), 'Supabase Auth simulée : compte, session persistée et profil publié');
+    await ev('uploadOnlineSave()');
+    assert(fetchCalls.some(c => c.url.includes('/rest/v1/cloud_saves') && c.method === 'POST' && c.body.save_data && c.body.save_data.names) && window.document.getElementById('onlineCloudStatus').textContent.includes('envoyée'), 'cloud save : profil complet envoyé dans le slot main');
+    window.document.getElementById('onlineReplayPublic').checked = true;
+    await ev('publishOnlineReplay()');
+    assert(fetchCalls.some(c => c.url.includes('/rest/v1/shared_replays') && c.method === 'POST' && c.body.replay_hash) && window.document.getElementById('onlineReplayList').textContent.includes('Replay Cloud Test'), 'replays cloud : publication et liste publique actualisée');
+    await ev('importOnlineReplay("44444444-4444-4444-8444-444444444444")');
+    assert(ev('replayPlayback.active') === true, 'replay cloud public importé et lecture lancée');
+    ev('stopReplayPlayback(true); goMenu();'); click('btnOnline'); await waitMs(5);
+
+    window.document.getElementById('onlineRoomCode').value = 'TEST42';
+    window.document.getElementById('onlineFighter').value = '5';
+    await ev('joinOnlineRoom()'); await waitMs(30);
+    assert(ev('onlineState.isHost') === false && ev('onlineState.room.guest_id') === asyncUserId && fetchCalls.some(c => c.url.includes('/rest/v1/online_signals') && c.method === 'POST' && c.body.kind === 'answer'), 'signalisation WebRTC : salon rejoint par RPC et réponse SDP envoyée');
+    await ev('leaveOnlineRoom(true)');
+    assert(ev('onlineState.room') === null && asyncRoom.status === 'closed', 'salon invité quitté et fermé côté serveur simulé');
+
+    window.document.getElementById('onlineRoomCode').value = '';
+    window.document.getElementById('onlineArena').value = 'Libreville';
+    window.document.getElementById('onlineMood').value = 'nuit';
+    await ev('createOnlineRoom()');
+    assert(/^[A-Z0-9]{6}$/.test(ev('onlineState.room.code')) && ev('onlineState.isHost') === true && fetchCalls.some(c => c.url.includes('/rest/v1/online_signals') && c.method === 'POST' && c.body.kind === 'offer'), 'salon hôte : code généré, room créée et offre SDP publiée');
+    asyncRoom.guest_id = asyncOtherId; asyncRoom.status = 'locked'; asyncRoom.config = { ...asyncRoom.config, guestId: asyncOtherId, guestName: 'Rivale Cloud', guestChar: 1 };
+    await ev('pollOnlineRoom()');
+    ev('if(onlineState.channel&&onlineState.channel.onopen)onlineState.channel.onopen(); syncOnlineUI();');
+    assert(window.document.getElementById('btnOnlineStartDuel').disabled === false && window.document.getElementById('onlineRoomStatus').textContent.includes('Rivale Cloud'), 'salon hôte : adversaire détecté, canal ouvert et lancement activé');
+    await ev('leaveOnlineRoom(true)');
+
+    ev(`onlineSession.config={matchKey:"ASYNCV3-123456",hostId:"${asyncUserId}",guestId:"${asyncOtherId}",hostChar:0,guestChar:1,arena:"stadium",arenaMood:"crepuscule"};`);
+    await ev('submitOnlineMatchResult(p1)');
+    assert(fetchCalls.some(c => c.url.includes('/functions/v1/submit-match-result') && c.body.match_key === 'ASYNCV3-123456' && c.body.verification_hash) && window.document.getElementById('onlineStatus').textContent.includes('attente'), 'résultat classé : claim envoyé à l’Edge Function, en attente du co-signataire');
+    await ev('onlineSignOut()');
+    assert(ev('onlineState.session') === null && window.localStorage.getItem(ev('GO_GAME_SESSION_KEY')) === null, 'déconnexion GO GAME : session locale effacée');
+  })();
+
 } catch (e) {
   errors.push('EXCEPTION TEST: ' + e.stack);
 }
 
-console.log('\n================ RÉSULTAT ================');
-if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
-console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');
-process.exit(0);
+function finishTestRun() {
+  console.log('\n================ RÉSULTAT ================');
+  if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
+  console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');
+  process.exit(0);
+}
+if (v3AsyncWork) {
+  v3AsyncWork.catch(e => errors.push('EXCEPTION TEST V3 ASYNC: ' + e.stack)).finally(finishTestRun);
+} else finishTestRun();

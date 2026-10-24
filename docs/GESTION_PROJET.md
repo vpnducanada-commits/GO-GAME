@@ -25,19 +25,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 (futur) expérience connectée.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 GO GAME Online & Combat Pro.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V2.8 (actuel) |
+| Indicateur | Cible | V3.0 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 151 assertions source ✅ + gate QA statique |
-| Taille version 1-fichier | < 200 Ko | ≤ 250 Ko (gate) ✅ |
-| Dépendances externes | 0 | 0 ✅ |
+| Tests automatisés | 100 % verts | 194 assertions source / 218 vérifications affichées ✅ + gate QA statique |
+| Taille version 1-fichier | ≤ 320 Ko avec client Online | 293 Ko ✅ |
+| Dépendances externes | 0 pour jouer en local ; Supabase/WebRTC uniquement en Online opt-in | Conforme ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
-| Modes / Personnages / Arènes | en croissance | 6 (+ Défis) / 6 / 4 |
+| Modes / Personnages / Arènes | en croissance | 6 locaux + Duel Online (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Sprint 08 « Arena Moods & Polish » livré (V2.8). Voir `docs/SPRINT_08_ARENA_MOODS.md` et `docs/ROADMAP.md`. La V2.8 reste la version jouable stable. Après validation du Product Owner, les fondations V3 GO GAME sont ouvertes : dépôt GitHub `GO-GAME`, backend Supabase initial versionné et testé (`docs/V3_GO_GAME_FONDATIONS.md`). Le Sprint 09 « Compétition locale » reste le cap contenu local ; le branchement client Online suivra les tickets V3-01 → V3-07.
+Track V3 « GO GAME Online & Combat Pro » livrée (V3.0). Voir `docs/SPRINT_V3_GO_GAME_ONLINE.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/ROADMAP.md`. Le jeu local reste autonome hors ligne ; les duels privés, le cloud et le classement co-vérifié sont branchés sur Supabase + WebRTC. Le Sprint 09 « Compétition locale » reste le prochain cap de contenu local.
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

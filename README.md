@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V2.8 PRO « Arena Moods & Polish »
+# 🎮 GÉDÉON - Godson ARENA — V3.0 PRO « GO GAME Online & Combat Pro »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V2.8-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. |
+| ⭐ **`Gedeon-GODSON-Arena-V3.0-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; GO GAME Online demande une connexion. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
 
@@ -24,6 +24,7 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 - 🎯 **Défis & carrière** *(nouveau V2.4)* : combo x6, 3 parry, 10 victoires, Survie vague 5, Arcade et saga complète, avec barres de progression
 - 🎬 **Replay Studio** *(V2.6 + bibliothèque V2.7)* : conserve plusieurs matchs exactement comme ils se sont joués — *lockstep*, pause, vitesses 0,5×/1×/2×/4×, favoris protégés, renommage, suppression et **hash de vérification**. Le replay ne modifie jamais ton profil.
 - 🏅 **Hall of Fame** : Top 10 local de tes meilleurs scores + grades de carrière (Débutant → 👑 Légende Godson)
+- 🌐 **GO GAME Online** *(nouveau V3.0)* : compte Supabase, profil mondial, **salon privé par code**, duel WebRTC en lockstep, classement uniquement co-vérifié, sauvegarde cloud et replays publics/privés. Les deux joueurs doivent utiliser la même version du jeu.
 
 ## 🥋 Les 6 combattants
 | Personnage | Style | Spécial (50%) / SUPER (100%) uniques |
@@ -48,10 +49,19 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 | Dash | `Maj` ou double-direction | `Maj droite` / `O` |
 | Pause | `P` / `Échap` | — |
 
-🔥 **Techniques** : ⬇+Poing = Uppercut (lance en l'air) → saut + Pied = jongle • ⬇+Pied = Balayage • Poing → Pied → Spécial (annulations) • CONTRE = +25% • Énergie 100% = SUPER unique • ✨ **Parry** : tape la garde juste avant l'impact (bouclier doré) = 0 dégât + riposte à +35% !
+🔥 **Techniques** : ⬇+Poing = Uppercut (lance en l'air) → saut + Pied = jongle • ⬇+Pied = Balayage • Poing → Pied → Spécial (annulations) • 🤼 **Projection** = Poing+Pied au corps-à-corps (traverse la garde, direction = sens) • ✨ **EX** = Spécial+Poing à 75% • ⚡ **Godson Cancel** = Dash après impact confirmé pour 25% (1×/combo) • CONTRE = +25% • Énergie 100% = SUPER unique • ✨ **Parry** : tape la garde juste avant l'impact (bouclier doré) = 0 dégât + riposte à +35% !
 
 ## ⚙️ Personnalisation & progression
 Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto selon FPS, durée/rounds/vitesse des matchs — tout est **sauvegardé automatiquement**, avec statistiques de carrière, 6 défis, succès, tenue « Coucher de soleil de Libreville » déblocable et classement Hall of Fame.
+
+## 🌐 GO GAME Online & combat pro (V3.0)
+- **Compte & profil** : inscription/connexion email via Supabase Auth, pseudo public unique, pays et combattant principal. Le mot de passe n’est jamais stocké par le jeu.
+- **Duel privé** : l’hôte crée un code de salon, choisit l’arène/ambiance et les règles ; l’invité rejoint avec le code. Supabase sert à la signalisation, puis les navigateurs échangent directement leurs inputs via **WebRTC**.
+- **Netcode lockstep** : seuls des masques d’inputs de 8 bits circulent, avec délai adaptatif, checksums périodiques et arrêt propre en cas de désynchronisation/déconnexion. La pause et le turbo local sont désactivés pour garder les deux simulations identiques.
+- **Classement anti-triche** : aucun navigateur ne peut insérer directement un résultat vérifié. Les deux clients envoient un claim à l’Edge Function `submit-match-result` ; le classement n’est mis à jour que si joueurs, vainqueur et hash final concordent.
+- **Cloud** : sauvegarde/restauration du profil et publication/import de replays déterministes, publics ou privés.
+- **Combat enrichi** : projection anti-garde avant/arrière, EX unique pour les 6 combattants, Godson Cancel, backdash défensif, scaling anti-combo infini, bot qui projette/utilise les EX et arsenal affiché à la sélection.
+- **Performance** : métriques CPU/logic/render, échelle FX adaptative et qualité automatique renforcée pour protéger les 60 FPS sans sacrifier la lisibilité.
 
 ## 🕺 Animation humaine & décors vivants (V2.5)
 - **Corps vivant** : respiration visible, tête qui suit l’adversaire, épaules et hanches qui se tordent séparément, poids transféré d’un appui à l’autre.
@@ -82,15 +92,16 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V2.8 « Arena Moods & Polish »** : 12 combinaisons d’arène/heure avec ciel, sol, poste et atmosphère dédiés ; VFX de projectiles propres aux 6 combattants ; tactile multi-touch par identifiants de pointeur. Le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés.
+**V3.0 « GO GAME Online & Combat Pro »** : duels privés WebRTC lockstep, classement mondial co-vérifié, profils/sauvegardes/replays cloud, projections, EX uniques et Godson Cancel. Arena Moods V2.8, le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés — et tout le jeu local reste jouable hors ligne.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V2.8-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V3.0-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
-├── tests/smoke-test.js   → 151 assertions d’exécution automatisées ✅
-└── tools/ build-single.py • qa-check.py (gate de release Sarah)
+├── tests/smoke-test.js   → 194 assertions source / 218 vérifications affichées ✅
+├── supabase/ migrations • Edge Function • configuration publique
+└── tools/ build-single.py • qa-check.py • supabase-smoke.mjs
 ```
 Chaque livraison suit la **Definition of Done** du manager : syntaxe vérifiée, tests 100% verts, build régénéré, documentation à jour, commit Git + tag de version.
 

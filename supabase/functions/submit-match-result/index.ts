@@ -1,7 +1,11 @@
 // GO GAME — validation co-signée d'un résultat de duel en ligne.
 // Un résultat classé n'est créé que si les DEUX joueurs soumettent le même
 // match_key, le même vainqueur et le même hash final déterministe.
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
+//
+// Implémentation volontairement sans import externe : Auth et PostgREST sont
+// appelés avec fetch. Le fichier peut donc être déployé tel quel par l'API
+// Supabase sans étape de transpile/bundle susceptible de provoquer un
+// BOOT_ERROR avant même l'exécution du handler.
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,42 +13,65 @@ const corsHeaders = {
   "Access-Control-Allow-Methods": "POST, OPTIONS",
 };
 
-function json(body: Record<string, unknown>, status = 200) {
+function json(body, status = 200) {
   return new Response(JSON.stringify(body), {
     status,
     headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
 }
-function clean(value: unknown, max = 120): string {
+function clean(value, max = 120) {
   return String(value ?? "").trim().slice(0, max);
 }
-function uuidOrNull(value: unknown): string | null {
+function uuidOrNull(value) {
   const v = clean(value, 40);
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(v) ? v : null;
+}
+async function readJson(response) {
+  const text = await response.text();
+  if (!text) return null;
+  try { return JSON.parse(text); } catch (_err) { return text; }
+}
+function errorDetail(data) {
+  if (!data) return "";
+  if (typeof data === "string") return data.slice(0, 240);
+  return String(data.message || data.error_description || data.error || data.detail || "").slice(0, 240);
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   if (req.method !== "POST") return json({ error: "method_not_allowed" }, 405);
 
-  const supabaseUrl = Deno.env.get("SUPABASE_URL") ?? "";
-  const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? "";
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "";
+  const supabaseUrl = (Deno.env.get("SUPABASE_URL") ?? "").replace(/\/$/, "");
+  const anonKey = Deno.env.get("SUPABASE_ANON_KEY") ?? Deno.env.get("SUPABASE_PUBLISHABLE_KEY") ?? "";
+  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? Deno.env.get("SUPABASE_SECRET_KEY") ?? "";
   if (!supabaseUrl || !anonKey || !serviceKey) return json({ error: "server_not_configured" }, 500);
 
   const authHeader = req.headers.get("Authorization") ?? "";
   if (!authHeader.startsWith("Bearer ")) return json({ error: "missing_bearer_token" }, 401);
 
-  const userClient = createClient(supabaseUrl, anonKey, {
-    global: { headers: { Authorization: authHeader } },
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-  const { data: userData, error: userError } = await userClient.auth.getUser();
-  const user = userData?.user;
-  if (userError || !user) return json({ error: "invalid_session" }, 401);
+  async function adminRest(path, options = {}) {
+    const headers = {
+      apikey: serviceKey,
+      Authorization: `Bearer ${serviceKey}`,
+      "Content-Type": "application/json",
+    };
+    if (options.prefer) headers.Prefer = options.prefer;
+    const response = await fetch(`${supabaseUrl}/rest/v1/${path}`, {
+      method: options.method || "GET",
+      headers,
+      body: options.body == null ? undefined : JSON.stringify(options.body),
+    });
+    return { ok: response.ok, status: response.status, data: await readJson(response) };
+  }
 
-  const body = await req.json().catch(() => null) as Record<string, unknown> | null;
-  if (!body) return json({ error: "invalid_json" }, 400);
+  const userResponse = await fetch(`${supabaseUrl}/auth/v1/user`, {
+    headers: { apikey: anonKey, Authorization: authHeader },
+  });
+  const user = await readJson(userResponse);
+  if (!userResponse.ok || !user || !user.id) return json({ error: "invalid_session" }, 401);
+
+  const body = await req.json().catch(() => null);
+  if (!body || typeof body !== "object") return json({ error: "invalid_json" }, 400);
 
   const matchKey = clean(body.match_key ?? body.matchKey, 120);
   const playerOneId = uuidOrNull(body.player_one_id ?? body.playerOneId);
@@ -68,16 +95,9 @@ Deno.serve(async (req) => {
   const arenaMoodRaw = clean(body.arena_mood ?? body.arenaMood, 24).toLowerCase();
   const arenaMood = ["auto", "jour", "crepuscule", "nuit"].includes(arenaMoodRaw) ? arenaMoodRaw : null;
 
-  const admin = createClient(supabaseUrl, serviceKey, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  });
-
   if (replayId) {
-    const { data: replay } = await admin
-      .from("shared_replays")
-      .select("owner_id,replay_hash")
-      .eq("id", replayId)
-      .maybeSingle();
+    const replayResult = await adminRest(`shared_replays?select=owner_id,replay_hash&id=eq.${encodeURIComponent(replayId)}&limit=1`);
+    const replay = replayResult.ok && Array.isArray(replayResult.data) ? replayResult.data[0] : null;
     if (!replay || ![playerOneId, playerTwoId].includes(replay.owner_id) || (replay.replay_hash && replayHash && replay.replay_hash !== replayHash)) {
       replayId = null;
     }
@@ -101,25 +121,21 @@ Deno.serve(async (req) => {
     claim: { game_version: clean(body.game_version ?? body.gameVersion, 24), submitted_at: new Date().toISOString() },
   };
 
-  const { error: claimError } = await admin
-    .from("match_result_claims")
-    .upsert(claim, { onConflict: "match_key,player_id" });
-  if (claimError) return json({ error: "claim_failed", detail: claimError.message }, 500);
+  const claimResult = await adminRest("match_result_claims?on_conflict=match_key,player_id", {
+    method: "POST",
+    prefer: "resolution=merge-duplicates,return=minimal",
+    body: claim,
+  });
+  if (!claimResult.ok) return json({ error: "claim_failed", detail: errorDetail(claimResult.data) }, 500);
 
-  const { data: existing } = await admin
-    .from("match_results")
-    .select("id")
-    .eq("match_key", matchKey)
-    .maybeSingle();
+  const existingResult = await adminRest(`match_results?select=id&match_key=eq.${encodeURIComponent(matchKey)}&limit=1`);
+  if (!existingResult.ok) return json({ error: "existing_lookup_failed", detail: errorDetail(existingResult.data) }, 500);
+  const existing = Array.isArray(existingResult.data) ? existingResult.data[0] : null;
   if (existing) return json({ status: "already_verified", match_id: existing.id });
 
-  const { data: counterClaim, error: counterError } = await admin
-    .from("match_result_claims")
-    .select("*")
-    .eq("match_key", matchKey)
-    .eq("player_id", opponentId)
-    .maybeSingle();
-  if (counterError) return json({ error: "counterclaim_lookup_failed", detail: counterError.message }, 500);
+  const counterResult = await adminRest(`match_result_claims?select=*&match_key=eq.${encodeURIComponent(matchKey)}&player_id=eq.${encodeURIComponent(opponentId)}&limit=1`);
+  if (!counterResult.ok) return json({ error: "counterclaim_lookup_failed", detail: errorDetail(counterResult.data) }, 500);
+  const counterClaim = Array.isArray(counterResult.data) ? counterResult.data[0] : null;
   if (!counterClaim) return json({ status: "waiting_counterparty" });
 
   const same = counterClaim.player_one_id === playerOneId &&
@@ -133,9 +149,10 @@ Deno.serve(async (req) => {
     (counterClaim.arena_mood === arenaMood || !counterClaim.arena_mood || !arenaMood);
   if (!same) return json({ status: "mismatch", error: "counterparty_claim_differs" }, 409);
 
-  const { data: inserted, error: insertError } = await admin
-    .from("match_results")
-    .insert({
+  const insertedResult = await adminRest("match_results", {
+    method: "POST",
+    prefer: "return=representation",
+    body: {
       match_key: matchKey,
       player_one_id: playerOneId,
       player_two_id: playerTwoId,
@@ -148,13 +165,13 @@ Deno.serve(async (req) => {
       verified: true,
       verification_hash: verificationHash,
       replay_id: replayId ?? counterClaim.replay_id ?? null,
-    })
-    .select("id")
-    .single();
+    },
+  });
 
-  if (insertError) {
-    if ((insertError as { code?: string }).code === "23505") return json({ status: "already_verified" });
-    return json({ error: "verified_insert_failed", detail: insertError.message }, 500);
+  if (!insertedResult.ok) {
+    if (insertedResult.data && insertedResult.data.code === "23505") return json({ status: "already_verified" });
+    return json({ error: "verified_insert_failed", detail: errorDetail(insertedResult.data) }, 500);
   }
-  return json({ status: "verified", match_id: inserted.id });
+  const inserted = Array.isArray(insertedResult.data) ? insertedResult.data[0] : insertedResult.data;
+  return json({ status: "verified", match_id: inserted && inserted.id ? inserted.id : null });
 });

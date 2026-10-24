@@ -83,7 +83,9 @@ bundles = sorted(ROOT.glob("Gedeon*-Arena-V*.html"))
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
-    check("Bundle autonome ≤ 250 Ko", size_kb <= 250, f"{target.name} = {size_kb} Ko")
+    # V3 ajoute le client Online complet : budget relevé de 250 à 320 Ko,
+    # toujours très inférieur à une page web moyenne et sans ressource externe.
+    check("Bundle autonome ≤ 320 Ko", size_kb <= 320, f"{target.name} = {size_kb} Ko")
     b = target.read_text(encoding="utf-8", errors="ignore")
     ext_b = [u for u in re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', b)]
     check("Bundle 100 % autonome (0 ressource externe)", not ext_b, str(ext_b[:3]) if ext_b else "vérifié")
@@ -102,6 +104,16 @@ check("Système de replay déterministe présent", all(h in all_js for h in repl
 # 12. Arena Moods, VFX signatures et tactile multi-touch V2.8
 mood_hooks = ["ARENA_MOOD_THEMES", "resolveArenaMood", "setArenaMood", "drawArenaMoodAtmosphere", "drawSignatureVfx", "setTouchPointer", "clearTouchInputs"]
 check("Arena Moods + VFX signatures + tactile présents", all(h in all_js for h in mood_hooks) and "arenaMoodRow" in html, "4 arènes × 3 ambiances + signatures + pointer IDs")
+
+# 13. GO GAME Online V3 : auth/cloud/classement + salon WebRTC lockstep
+online_hooks = ["onlineRequest", "onlineSignUp", "saveOnlineProfile", "refreshOnlineLeaderboard", "uploadOnlineSave", "downloadOnlineSave", "publishOnlineReplay", "importOnlineReplay", "createOnlineRoom", "joinOnlineRoom", "launchOnlineMatch", "submitOnlineMatchResult", "prepareOnlineFrame", "receiveOnlineNetMessage", "resetOnlineSession"]
+combat_hooks = ['"throw"', '"exspecial"', "godsonCancelReady", "abilitySpecs", "renderMoveList"]
+check("GO GAME Online + combat V3 présents", all(h in all_js for h in online_hooks + combat_hooks) and "menuOnline" in html and "btnOnline" in html and "moveList" in html, "Supabase REST + WebRTC + lockstep + Projection/EX/Godson Cancel")
+
+# 14. Aucun secret serveur dans le client livré au navigateur
+client_blob = html + all_js
+secret_hits = [p for p in ("sb_secret_", "service_role", "SUPABASE_SERVICE_ROLE_KEY") if p in client_blob]
+check("Aucun secret serveur dans le client", not secret_hits, "trouvés : " + ", ".join(secret_hits) if secret_hits else "clé publishable uniquement")
 
 print("\n— Rapport QA (Sarah) : " + ("RELEASE REFUSÉE ❌" if fails else "RELEASE AUTORISÉE ✅") + f" ({len(fails)} refus, {len(warns)} avertissement(s))")
 sys.exit(1 if fails else 0)

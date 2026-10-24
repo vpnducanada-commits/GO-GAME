@@ -29,14 +29,35 @@ tools/qa-check.py      → contrôles statiques et budgets de release
    - Personnages, attaques, IA, arènes et campagne sont décrits par des tables de données.
    - Toute nouvelle habileté doit passer par les descripteurs existants avant d’ajouter un cas spécial.
 
-3. **Aucune dépendance runtime**
+3. **Aucune dépendance runtime pour le jeu local**
    - Audio synthétisé en WebAudio.
    - Graphismes dessinés en Canvas.
    - Sauvegarde locale protégée par wrappers `try/catch`.
+   - GO GAME Online est strictement opt-in : REST/Auth Supabase avec `fetch`, aucune librairie embarquée, clé publishable + RLS uniquement.
 
 4. **Livrable unique toujours régénérable**
    - La version modulaire sert au développement.
    - `tools/build-single.py` produit le fichier autonome officiel de release.
+
+## Architecture GO GAME Online (V3.0)
+
+```text
+Navigateur A                         Supabase GO GAME                         Navigateur B
+    │                                      │                                       │
+    ├─ Auth / profils / cloud / replays ──▶ REST + RLS ◀─ Auth / profils / cloud ──┤
+    ├─ crée online_rooms + offre SDP ─────▶ online_signals ◀─ RPC join + réponse ──┤
+    │                                      │                                       │
+    └──────────── DataChannel WebRTC : inputs 8 bits + hashs lockstep ────────────┘
+    │                                      │                                       │
+    └─ claim de résultat ─────────────────▶ Edge Function ◀─ claim de résultat ──┘
+                                             │
+                                  match_results vérifié + leaderboard
+```
+
+- La simulation reste la même que les replays : seed et configuration communs, seuls les inputs finaux sont échangés.
+- `prepareOnlineFrame()` refuse de simuler une frame incomplète ; le rendu continue d’afficher la dernière frame valide.
+- Les checksums sont conservés jusqu’à réception de la paire distante, puis comparés et libérés.
+- Aucun résultat classé ne peut être inséré par le navigateur : seule l’Edge Function crée la ligne vérifiée après concordance des deux claims.
 
 ## Pipeline de rendu haute qualité
 
@@ -72,7 +93,8 @@ Le rendu est organisé en passes explicites, pilotées par `RENDER_PIPELINE` dan
 
 | Sujet | Plan |
 |---|---|
-| Replays | ✅ V2.6–V2.8 : lockstep + graine seedée + hashs ; bibliothèque rotative ; ambiance d’arène capturée et restaurée |
+| Replays | ✅ V2.6–V3.0 : lockstep + graine seedée + hashs ; bibliothèque rotative ; ambiance capturée ; publication/import cloud |
+| Online public | Salons privés uniquement en V3.0 ; matchmaking public, TURN dédié et revanche synchronisée restent des extensions possibles |
 | Fichiers JS volumineux | conserver 3 modules lisibles tant que les tests restent rapides ; éclater par domaine si un fichier dépasse durablement ~900 lignes |
 | Audio | conserver la synthèse WebAudio ; aucun asset externe sans décision du Product Owner |
 

@@ -19,6 +19,7 @@
 | TITAN | Mur offensif | 120 PV, puissance, portée | lent, récupération longue | onde au sol / séisme |
 | Nova | Contrôle d’espace | énergie rapide, projectiles guidés | PV moyens | orbe chercheuse / pluie de météores |
 | GODSON PRIME | Récompense légendaire | complet et spectaculaire | déblocage tardif | double vague / triple jugement |
+| Zara | Marée mobile de Libreville | vitesse, portée, énergie | PV/défense moyens | Lames de Marée / raz-de-marée au sol |
 
 ## Frame data de référence
 
@@ -29,10 +30,22 @@
 | Uppercut ⬇+Poing | moyen | 11 | lanceur de jongle / anti-aérien |
 | Balayage ⬇+Pied | moyen | 8 | ouverture basse, mise au sol |
 | Spécial 50% | variable | 14 éq. | identité du personnage |
+| EX Spécial 75% | rapide/moyen | 17 éq. | version renforcée unique, route intermédiaire entre Spécial et SUPER |
+| Projection | très rapide, courte portée | 12 | réponse à la garde tenue, repositionnement et mise au sol |
+| Godson Cancel | après impact confirmé | coût 25% | dash qui annule la récupération, 1 fois par combo |
 | SUPER 100% | spectaculaire | 23–25 éq. | fin de round, moment signature |
 | Parry | fenêtre ~150 ms | 0 encaissé | défense experte, riposte +35% |
 
 *Les dégâts réels appliquent puissance du personnage, réduction de combo et bonus CONTRE/Riposte.*
+
+## Systèmes V3.0 — profondeur sans casser la lisibilité
+
+- **Projection** : Poing+Pied au corps-à-corps. Elle traverse la garde, mais exige d’être collé à une cible au sol et non déjà en hitstun ; la direction tenue choisit une projection avant ou arrière.
+- **EX** : Spécial+Poing à 75 %. Chaque personnage reçoit une vraie variante (nombre, guidage, perforation ou taille), reconnaissable à son anneau doré.
+- **Godson Cancel** : Dash pendant une attaque confirmée. Il coûte 25 %, reste verrouillé jusqu’à la fin du combo et transforme un hit en course de pression plutôt qu’en saut d’animation gratuit.
+- **Anti-infini** : scaling de dégâts dès 0,92 puis plancher à 45 %, hitstun de jongle décroissant, backdash défensif et mise au sol protégée.
+- **IA** : le bot peut projeter une garde, choisir un EX à distance et, en Difficile, tenter occasionnellement un Godson Cancel.
+- **Online** : salon privé, mêmes règles des deux côtés, vitesse 100 %, pause désactivée et classement uniquement après accord des deux simulations.
 
 ## Boucles de rétention
 
@@ -43,6 +56,7 @@
 | Arcade | 10–20 min | titre de champion, succès |
 | Survie | 3–15 min | record de vague, score cumulé |
 | Carrière | long terme | grades Débutant → Légende Godson |
+| Duel GO GAME Online | 2–5 min | rang mondial co-vérifié, replay partageable |
 
 ## Règles d’équilibrage de Nadia
 
@@ -54,9 +68,9 @@
 
 ## Prochains chantiers design validés
 
-1. Chapitre 2 : rival récurrent et choix de dialogue simples.
-2. Défis : objectifs courts mesurables (combo, parry, vague de Survie).
-3. 6e personnage : profil “zoner technique” distinct de Nova, à prototyper sur données avant dessin.
+1. Sprint 09 « Compétition locale » : tournoi en tableau, défi tournant et équilibrage fondé sur les données de combat.
+2. Online public éventuel : matchmaking, revanche synchronisée et spectateurs seulement après retours réseau réels sur les salons privés V3.0.
+3. Nouveaux défis courts autour des projections, EX et Godson Cancels.
 
 ---
 ✍️ Design officiel — Studio Gideon - Godson ARENA.

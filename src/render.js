@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V2.8 PRO — RENDU HAUT GRAPHISME
+   GÉDÉON - Godson ARENA V3.0 PRO — RENDU HAUT GRAPHISME
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,7 +8,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -439,7 +439,7 @@ function drawFighter(f){
   ctx.scale(visualFace*sx,sy);
   if(f.hitFlash>0){ try{ctx.filter="brightness(2.05) saturate(.45)";}catch(e){} }
   const hipY=lerp(-76,-57,cb)+bob,shY=lerp(-126,-102,cb)+bob,headY=lerp(-148,-123,cb)+bob;
-  const attackShift=(f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"?phase*6:0);
+  const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0);
   const hipX=motion.lean*9+motion.weight*1.15-motion.hurt*2,shX=motion.lean*25+motion.weight*2.1+attackShift+motion.guard*3-motion.hurt*6,headX=8+shX*.62+motion.head*9-motion.hurt*3;
   // Cape de Nova et de GODSON PRIME
   if((ch.style==="nova"||ch.style==="prime")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*(6+motion.run*5)-((f.vx||0)+(f.kvx||0))*(f.facing||1)*1.7-motion.dash*9; const cg=cachedLinearGradient("cape:"+sk.dark+":"+sk.accent+":"+Math.round(shY/4),0,shY,0,-8,[[0,sk.dark],[1,sk.accent]]); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(shX-13,shY+4); ctx.quadraticCurveTo(shX-44+wv,-62,hipX-35+wv*1.3,-8); ctx.quadraticCurveTo(hipX-14,-28,hipX-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
@@ -507,7 +507,11 @@ function drawFighter(f){
   }else if(guardMix>.08&&f.attackT<=0){
     const g=guardMix,frontSwing=-armSwing*.35*(1-g);
     limb(shX+8,shY+4,lerp(shX+24+frontSwing,shX+27,g),lerp(shY+16,shY+15,g),lerp(shX+34+frontSwing*1.35,shX+24,g),lerp(shY+12+Math.sin(motion.breath)*1.2,shY+33,g),armW,sk.primary,sk.glove,gloveR);
-  }else if(f.attackType==="special"||f.attackType==="super"){
+  }else if(f.attackType==="throw"){
+    const ext=phase*30;
+    limb(shX+8,shY+4,shX+27+ext*.35,shY+10,shX+48+ext,shY+9,armW,sk.primary,sk.glove,gloveR);
+    limb(shX-2,shY+7,shX+20+ext*.3,shY+28,shX+42+ext,shY+25,armW-1,sk.dark,sk.glove,gloveR-1);
+  }else if(f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"){
     const ext=phase*21;
     limb(shX+8,shY+4,shX+26,shY+11,shX+39+ext,shY+14,armW,sk.primary,sk.glove,gloveR);
     limb(shX-2,shY+6,shX+18,shY+27,shX+36+ext,shY+18,armW-1,sk.dark,sk.glove,gloveR-1);
@@ -520,7 +524,7 @@ function drawFighter(f){
     limb(shX+8,shY+4,shX+24+punchExt*.35+frontSwing*.4,shY+16+guardDrift,shX+34+punchExt+frontSwing,shY+12+guardDrift,armW,sk.primary,sk.glove,gloveR);
   }
   // Traînées d’attaque
-  if(atk&&elapsed>=atk.start&&elapsed<=atk.end+2&&f.attackType!=="special"&&f.attackType!=="super"){
+  if(atk&&elapsed>=atk.start&&elapsed<=atk.end+2&&f.attackType!=="special"&&f.attackType!=="super"&&f.attackType!=="exspecial"){
     ctx.save(); ctx.globalAlpha=.55; ctx.strokeStyle=sk.trail; ctx.lineWidth=f.attackType.includes("kick")||f.attackType==="sweep"?9:7; ctx.lineCap="round";
     ctx.beginPath();
     if(f.attackType==="uppercut"){ctx.moveTo(shX+22,shY+30);ctx.quadraticCurveTo(shX+46,shY-12,shX+34,shY-48);}
@@ -574,6 +578,7 @@ function drawProjectiles(){
     const kind=pr.kind||"bolt",size=pr.r*(kind==="judgment"?4.8:4.2);
     drawSignatureVfx(pr);
     ctx.save(); ctx.globalAlpha=.95;
+    if(pr.ex){ ctx.save(); ctx.strokeStyle="rgba(255,213,79,.9)"; ctx.lineWidth=2.4; ctx.beginPath(); ctx.arc(pr.rx,pr.ry,pr.r*1.18+Math.sin(renderTicker*.14)*1.5,0,7); ctx.stroke(); ctx.restore(); }
     if(kind==="wave"){
       ctx.drawImage(glowSprite(pr.owner.skin.trail),pr.rx-size/2,GROUND-size/2-24,size,size);
       ctx.fillStyle="#0087a5"; ctx.beginPath(); ctx.ellipse(pr.rx,GROUND+3,pr.r*1.35,pr.r*.72,0,Math.PI,0); ctx.fill();
@@ -637,7 +642,7 @@ function render(){
   ctx.save(); ctx.translate(W/2+shX,GROUND+shY); ctx.scale(cam.zoom,cam.zoom); ctx.translate(-cam.x,-GROUND);
   runRenderPass("floor",drawFloor);
   runRenderPass("shadows",()=>{ drawReflection(p1); drawReflection(p2); drawGhosts(); });
-  runRenderPass("entities",()=>{ const order=[p1,p2].sort((a,b)=>b.ry-a.ry); drawFighter(order[0]); drawFighter(order[1]); });
+  runRenderPass("entities",()=>{ const first=p1.ry>=p2.ry?p1:p2,second=first===p1?p2:p1; drawFighter(first); drawFighter(second); });
   runRenderPass("projectiles",drawProjectiles);
   runRenderPass("effects",drawEffects);
   ctx.restore();
@@ -686,26 +691,43 @@ function loop(ts){
   if(dt>250)dt=16.7; // retour d’onglet / pause navigateur
   renderDtFactor=clamp(dt/16.667,.25,3); renderTicker+=renderDtFactor; rafCount++;
   if(dt>0)fpsEMA+=(1000/dt-fpsEMA)*.05;
-  renderStats.fpsEstimate=Math.round(fpsEMA); renderStats.frameBudgetOk=fpsEMA>=45||qualityLevel===0; renderStats.arenaMood=currentArenaMood;
-  // Qualité automatique régulière
+  perfFxScale=qualityLevel===2?(fpsEMA<38?.55:(fpsEMA<50?.8:1)):(qualityLevel===1?(fpsEMA<38?.72:1):1);
+  renderStats.fpsEstimate=Math.round(fpsEMA); renderStats.effectScale=perfFxScale;
+  renderStats.perfTier=qualityLevel===2?"ultra":(qualityLevel===1?"équilibrée":"performance");
+  renderStats.frameBudgetOk=(fpsEMA>=45&&renderStats.frameMs<21)||qualityLevel===0; renderStats.arenaMood=currentArenaMood;
+  renderStats.onlineFrame=onlineSession?onlineSession.frame:0; renderStats.onlineStalls=onlineSession?onlineSession.stalls:0; renderStats.onlineDesync=!!(onlineSession&&onlineSession.desync);
+  // Qualité automatique régulière : FPS navigateur + temps CPU réel (utile sur écrans 120 Hz)
   if(SETTINGS.quality==="auto"&&rafCount%100===0){
-    if(fpsEMA<45&&qualityLevel>0){ qualityLevel--; resizeCanvas(); autoGoodChecks=0; }
-    else if(fpsEMA>58&&qualityLevel<2){ if(++autoGoodChecks>=7){qualityLevel++;resizeCanvas();autoGoodChecks=0;} }
+    if((fpsEMA<45||renderStats.frameMs>21)&&qualityLevel>0){ qualityLevel--; resizeCanvas(); autoGoodChecks=0; }
+    else if(fpsEMA>58&&renderStats.frameMs<12.5&&qualityLevel<2){ if(++autoGoodChecks>=7){qualityLevel++;resizeCanvas();autoGoodChecks=0;} }
     else autoGoodChecks=0;
   }
-  if(SETTINGS.showFps&&rafCount%12===0){ const txt=Math.round(fpsEMA)+" FPS • Q"+qualityLevel; if(txt!==lastFpsShown){lastFpsShown=txt;$("fpsChip").textContent=txt;} }
+  if(SETTINGS.showFps&&rafCount%12===0){ const txt=Math.round(fpsEMA)+" FPS • "+renderStats.frameMs.toFixed(1)+" ms • Q"+qualityLevel; if(txt!==lastFpsShown){lastFpsShown=txt;$("fpsChip").textContent=txt;} }
+  const onlineLive=mode==="online"&&onlineSession&&onlineSession.active&&!replayPlayback.active;
+  renderStats.speedScale=onlineLive?1:(replayPlayback.active?replayPlayback.speed:SETTINGS.speed);
+  if(onlineLive){ hitStopT=0; slowmoT=0; }
   if(state==="pause"||(replayPlayback.active&&replayPlayback.paused)){ prepareInterpolation(1); updateCamera(0); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
-  if(hitStopT>0){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
-  let scale=replayPlayback.active?replayPlayback.speed:SETTINGS.speed;
-  if(slowmoT>0){ slowmoT-=dt/16.667; scale*=.34; }
+  if(hitStopT>0&&!onlineLive){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
+  let scale=renderStats.speedScale;
+  if(slowmoT>0&&!onlineLive){ slowmoT-=dt/16.667; scale*=.34; }
   acc+=dt*scale;
   const step=1000/60; let n=0;
   const maxSteps=replayPlayback.active?Math.max(3,Math.ceil(replayPlayback.speed)+1):3;
-  while(acc>=step&&n<maxSteps){ updateGameLogic(); acc-=step; n++; }
+  const cpuNow=()=> (typeof performance!=="undefined"&&performance.now)?performance.now():0;
+  const logicStart=cpuNow();
+  while(acc>=step&&n<maxSteps){ if(updateGameLogic()===false){ acc=0; break; } acc-=step; n++; }
   if(n===maxSteps&&acc>=step)acc=0;
+  const logicEnd=cpuNow();
   prepareInterpolation(clamp(acc/step,0,1));
   updateCamera(dt);
   render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar();
+  const frameEnd=cpuNow();
+  if(frameEnd&&logicStart){
+    const logicMs=Math.max(0,logicEnd-logicStart),renderMs=Math.max(0,frameEnd-logicEnd),totalMs=Math.max(0,frameEnd-logicStart);
+    renderStats.logicMs+=(logicMs-renderStats.logicMs)*.12;
+    renderStats.renderMs+=(renderMs-renderStats.renderMs)*.12;
+    renderStats.frameMs+=(totalMs-renderStats.frameMs)*.12;
+  }
 }
 function startLoop(){ resizeCanvas(); requestAnimationFrame(loop); }
 rebuildArenaCache();

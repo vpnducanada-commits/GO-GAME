@@ -211,6 +211,24 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 .replayCard p{font-size:12.5px;line-height:1.5;opacity:.93;margin:7px 0 5px}.replayCard small{display:block;font-size:11px;line-height:1.5;color:#bfe7ff;font-weight:800}
 .replayActions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.replayActions button{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.11);color:#fff;border-radius:999px;padding:7px 10px;font-size:11.5px;font-weight:1000;cursor:pointer}.replayActions button:hover,.replayActions button:focus-visible{filter:brightness(1.22);border-color:#fff;outline:none}.replayActions button[data-action="play"]{background:linear-gradient(135deg,#ff7a00,#ff2e88);border-color:rgba(255,255,255,.55)}.replayActions button[data-action="delete"]{background:rgba(255,23,68,.18)}
 .replayLibraryEmpty{grid-column:1/-1;text-align:center;padding:24px 12px;border:1.5px dashed rgba(255,255,255,.28);border-radius:16px;line-height:1.65;opacity:.92}
+/* V3.0 — GO GAME Online, move list et présentation connectée */
+.onlineBanner{border-color:rgba(0,229,255,.78);background:linear-gradient(100deg,rgba(0,62,110,.94),rgba(53,25,140,.9) 55%,rgba(0,112,72,.92))}
+.moveList{width:min(98%,980px);background:rgba(3,12,34,.66);border:1px solid rgba(0,229,255,.38);border-radius:16px;padding:10px 13px;font-size:12.5px;line-height:1.6;color:#dff7ff;box-shadow:inset 0 1px 0 rgba(255,255,255,.16),0 12px 28px rgba(0,0,0,.28)}
+.moveList b{color:#ffe082}.moveList span{display:inline-block;margin:2px 4px;padding:3px 8px;border-radius:999px;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);font-weight:900}
+.onlinePanel{max-width:1040px;width:min(98%,1040px);max-height:78vh;overflow-y:auto}
+.onlineStatus{text-align:center;font-weight:1000;color:#dff7ff;background:linear-gradient(90deg,rgba(0,145,234,.22),rgba(124,58,237,.2),rgba(0,200,83,.16));border:1px solid rgba(0,229,255,.5);border-radius:13px;padding:10px 12px;margin-bottom:12px;line-height:1.5}
+.onlineGrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:820px){.onlineGrid{grid-template-columns:1fr}}
+.onlineCard{background:rgba(255,255,255,.055);border:1.5px solid rgba(255,255,255,.16);border-radius:18px;padding:13px;min-width:0}
+.onlineCard h4{font-size:16px;margin-bottom:8px;color:#fff}.onlineCard p{font-size:12.5px;line-height:1.55;opacity:.92}.onlineCard small{display:block;margin-top:9px;font-size:11px;line-height:1.5;color:#bfe7ff;font-weight:800}
+.onlineForm{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-top:10px}.onlineForm .wide{grid-column:1/-1}
+@media(max-width:560px){.onlineForm{grid-template-columns:1fr}.onlineForm .wide{grid-column:auto}}
+.onlineForm label{display:block;font-weight:900;margin-bottom:5px;color:#ffe082;font-size:12px}
+.onlineForm input,.onlineForm select{width:100%;background:rgba(255,255,255,.1);border:1.5px solid rgba(255,255,255,.3);color:#fff;border-radius:11px;padding:10px 11px;font-size:14px;font-weight:700}.onlineForm select option{color:#111}
+.onlineForm input:focus,.onlineForm select:focus{outline:2px solid rgba(0,229,255,.8);outline-offset:1px;border-color:#fff}
+.onlineActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.onlineBtn{min-width:0!important;padding:10px 13px!important;font-size:13px!important;border-radius:13px!important;flex:1 1 150px}.onlineBtn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.onlineList{display:flex;flex-direction:column;gap:9px;margin-top:10px;max-height:300px;overflow-y:auto;padding-right:3px}.onlineList .replayCard{box-shadow:none}.onlineEmpty{text-align:center;padding:17px 10px;border:1.5px dashed rgba(255,255,255,.26);border-radius:14px;line-height:1.6;opacity:.9;font-size:12.5px}
+.onlineNetStats{margin-top:9px;color:#bfe7ff;font-weight:800}
 
 /* Tactile PRO */
 #touchUI{position:absolute;left:0;right:0;bottom:0;z-index:8;display:none;justify-content:space-between;align-items:flex-end;padding:9px max(10px,env(safe-area-inset-right)) max(12px,env(safe-area-inset-bottom)) max(10px,env(safe-area-inset-left));pointer-events:none}

@@ -68,12 +68,19 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 📱 **Tactile multi-touch** par `pointerId`, retour visuel enfoncé et nettoyage anti-touches collées
 - ✅ **Matrice Sarah** : 12 combinaisons d’arène/ambiance, replay Nuit forcée vérifié et préférence du joueur restaurée
 
+## ✅ TRACK V3 — V3.0 « GO GAME Online & Combat Pro » *(LIVRÉ le 24/10/2026 — 194 assertions source, suite verte)*
+- 🌐 **GO GAME Online complet** : comptes Supabase, profils mondiaux, cloud saves et replays cloud
+- ⚔️ **Salons privés WebRTC** : code d’invitation, signalisation Supabase et duel pair-à-pair en lockstep
+- 🏆 **Classement co-vérifié** : claims identiques des deux joueurs et hash final validés par Edge Function
+- 🥋 **Combat Pro** : Projection anti-garde, 6 EX uniques, Godson Cancel, backdash défensif et IA enrichie
+- 📈 **Performance** : métriques CPU logique/rendu, FX adaptatifs et verrouillage réseau à 60 Hz/100 %
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
 
-## 🌐 V3.0 « Connecté » *(fondations GO GAME engagées après validation PO)*
-Le Product Owner a validé la préparation serveur : dépôt GitHub **GO-GAME** alimenté, projet Supabase **GO GAME** créé en `eu-central-1`, tables profils/sauvegardes/replays/résultats et vue classement protégées par RLS. Voir `docs/V3_GO_GAME_FONDATIONS.md` et `docs/BACKEND_SUPABASE_GO_GAME.md`. La V2.8 locale reste la version jouable stable ; le client Online sera branché progressivement (auth/profil, cloud save, leaderboard, replays partagés, puis duels lockstep).
+## 🌐 Après la V3.0 *(pistes, non engagées)*
+Le socle connecté est livré et documenté dans `docs/V3_GO_GAME_FONDATIONS.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/SPRINT_V3_GO_GAME_ONLINE.md`. Les suites possibles sont le matchmaking public, un TURN dédié, la revanche synchronisée, les spectateurs et la relecture serveur des replays de tournoi. Le Sprint 09 local reste le prochain cap de contenu hors ligne.
 
 ## ⚠️ Risques & réponses
 | Risque | Réponse du manager |

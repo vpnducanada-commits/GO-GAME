@@ -3,6 +3,28 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.0.0] — 24 octobre 2026 — « GO GAME Online & Combat Pro » (Track V3)
+### GO GAME Online — Manager + Kenzo + Nadia
+- 🌐 **Panneau GO GAME complet** : inscription/connexion Supabase Auth par email, session persistée et rafraîchie, pseudo public unique, pays et combattant principal. Le jeu local reste intégralement disponible hors ligne et sans compte.
+- ⚔️ **Duels privés en ligne** : salon par code, choix d’arène/ambiance/règles par l’hôte, signalisation WebRTC stockée dans Supabase, puis **DataChannel pair-à-pair** pour le combat.
+- 🎮 **Netcode lockstep déterministe** : échange de masques d’inputs 8 bits, délai d’entrée adaptatif estimé par ping, pipeline anti-blocage, hashs d’état périodiques comparés dès réception, déconnexion et désynchronisation gérées proprement.
+- 🏆 **Classement mondial co-vérifié** : les deux clients envoient un claim signé par leur session à l’Edge Function `submit-match-result` ; un résultat n’entre au classement que si joueurs, vainqueur, combattants et hash final concordent. Aucune écriture directe de résultat vérifié depuis le navigateur.
+- ☁️ **Cloud GO GAME** : envoi/restauration du profil local, publication privée ou publique du dernier replay, découverte et import des replays publics dans le Replay Studio.
+- 🛡️ **Garde-fous de duel** : même version obligatoire, règles de l’hôte validées, pause et vitesse turbo désactivées pendant le lockstep, réglages locaux restaurés avant toute sauvegarde de fin de match.
+
+### Combat professionnel — Nadia + Manager
+- 🤼 **Projection** Poing+Pied au corps-à-corps : traverse la garde, met au sol, choisit le sens avec la direction tenue et possède sa statistique de fin de match. Le bot l’utilise contre les gardes abusives.
+- ✨ **EX Spéciaux uniques** Spécial+Poing pour 75 % d’énergie : variantes renforcées et visuellement marquées pour les 6 combattants, sans remplacer les Supers à 100 %.
+- ⚡ **Godson Cancel** : après un coup confirmé, un Dash annule la récupération pour 25 % d’énergie, une seule fois par combo, afin de créer de vraies routes avancées sans boucle infinie.
+- 💨 Backdash défensif bref, scaling de dégâts/hitstun anti-infini, dérapage plus lisible et bot capable d’EX, projections et cancels selon la difficulté.
+- 🥋 **Move list contextuelle** sur l’écran de sélection : coût du Spécial/EX/Super, projection, Godson Cancel, dash aérien, backdash et parry du combattant choisi.
+
+### Performance & présentation — Kenzo + Sarah
+- 📈 Métriques CPU séparées logique/rendu/frame, tier de performance et état online dans `renderStats` ; la qualité automatique tient compte à la fois des FPS de l’écran et du temps CPU réel.
+- ✨ Échelle FX adaptative, anneaux dorés des projectiles EX, poses dédiées projection/EX et tri des combattants sans allocation temporaire.
+- 🧪 Suite portée à **194 assertions source / 218 vérifications affichées** : techniques V3 en combat réel, lockstep hôte/invité, stall réseau, checksum différé, restauration des réglages, puis Auth/REST/salons/signaux/cloud exercés contre une API simulée déterministe. Un test réel séparé avec deux comptes QA jetables a aussi vérifié le salon, la RPC, les signaux, le double claim et le classement, avant nettoyage complet.
+- 🛡️ Gate QA enrichie : hooks GO GAME permanents, scan anti-secret du client et budget bundle explicite de 320 Ko pour le client Online complet (bundle V3.0 : 293 Ko).
+
 ## [2.8.0] — 23 octobre 2026 — « Arena Moods & Polish » (Sprint 08)
 ### Ambiances d’arène — Kenzo
 - 🌤️ **Arena Moods** : les 4 arènes peuvent se jouer en **Auto, Jour, Crépuscule ou Nuit**. Auto conserve l’intention originale : Stade et Libreville au crépuscule, Tokyo la nuit, Temple le jour.
