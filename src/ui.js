@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.1 PRO — ARCADE PLEIN ÉCRAN, VS PLEIN CORPS & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.2 PRO — ARCADE PLEIN ÉCRAN, GRAPHISMES AAA & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

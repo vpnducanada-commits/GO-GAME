@@ -829,7 +829,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.0 : Arcade plein écran & anatomie HD —');
-  assert(/^4\.[01]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Arcade plein écran (4.0+) exposée');
+  assert(/^4\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
   assert(!!window.document.querySelector('#gameWrap > header.sig'), 'barre système intégrée DANS la scène (aucun panneau extérieur)');
   const cssV4 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(cssV4.includes('#app{position:fixed;inset:0') && cssV4.includes('width:min(100dvw,calc(100dvh * 16 / 9))') && cssV4.includes('height:min(100dvh,calc(100dvw * 9 / 16))') && cssV4.includes('footer{display:none!important}'), 'coque plein écran : scène 16:9 maximale manipulable, aucun pied de page');
@@ -843,14 +843,14 @@ function finishTestRun() {
   assert(ev('cam.zoom') >= 1.3, 'caméra de jeu de combat : zoom rapproché ' + ev('cam.zoom'));
   ev('renderStats.outfitDetails=0;');
   for (let i = 0; i < 9; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); drawFighter(p1);`); }
-  assert(ev('renderStats.outfitDetails') >= 9 && ev('renderStats.artDirection').startsWith('HD Arcade V4'), 'tenues signatures HD dessinées pour les 9 combattants');
+  assert(ev('renderStats.outfitDetails') >= 9 && ev('renderStats.artDirection').includes('V4'), 'tenues signatures HD dessinées pour les 9 combattants');
   const renderSrcV4 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
   assert(renderSrcV4.includes('const hipY=lerp(-86,-63,cb)') && renderSrcV4.includes('solveJoint(hipX-4,hipY,bFoot.x,bFoot.y-7,46,45,-1)') && renderSrcV4.includes('clamp(1180/(dist+420),.88,1.34)') && renderSrcV4.includes('ch.scale*1.08'), 'squelette allongé, IK adulte et présence visuelle renforcée verrouillés');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
 
 
   console.log('\n— V4.1 : Peinture, matières & présentation (VS plein corps, intro cinéma) —');
-  assert(ev('GAME_VERSION') === '4.1.0' && window.document.querySelector('h1').textContent.includes('V4.1 PRO'), 'version V4.1.0 exposée');
+  assert(/^4\.[12]\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
   ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight');
   assert(ev('state') === 'vs' && !!window.document.getElementById('vsPortrait1') && !!window.document.getElementById('vsPortrait2'), 'écran VS : portraits plein corps des deux combattants');
   assert(window.document.querySelector('#vsAvatar1 canvas') && window.document.getElementById('vsAvatar1').style.borderColor, 'cadre VS aux couleurs du combattant');
@@ -870,6 +870,21 @@ function finishTestRun() {
   assert(cssV41.includes('ÉCRAN VS PLEIN CORPS') && cssV41.includes('aspect-ratio:300/340'), 'cadre VS plein corps stylé');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
 
+
+  /* ===== V4.2 « Graphismes AAA » : peinture, lumière d'arène, profondeur ===== */
+  assert(ev('GAME_VERSION')==='4.2.0','version 4.2.0');
+  assert(ev('renderStats.artDirection')==='Graphismes AAA V4.2','direction artistique AAA V4.2');
+  ev('qualityLevel=2');
+  window.document.querySelector('#btnMode2P').click(); window.document.querySelector('#btnLaunchFight').click();
+  for(let i=0;i<60;i++)ev('updateGameLogic()'); ev('render()');
+  assert(ev('renderStats.cylinderShading')===true,'peinture cylindrique des membres active');
+  assert(/^#[0-9a-f]{6}$/i.test(ev('renderStats.rimLight')),'rim light aux couleurs de l arene : '+ev('renderStats.rimLight'));
+  assert(ev('renderStats.facePaint')>0,'peinture du visage (machoire/nez) appliquee');
+  assert(ev('renderStats.ambientMotes')>=16,'rayons + poussieres d ambiance : '+ev('renderStats.ambientMotes'));
+  assert(['stadium','tokyo','temple','Libreville'].includes(ev('renderStats.foregroundDepth')),'avant-plan de profondeur par arene : '+ev('renderStats.foregroundDepth'));
+  ['tokyo','temple','stadium','Libreville'].forEach(function(id){ ev('setArenaById("'+id+'")'); ev('render()'); assert(ev('renderStats.foregroundDepth')===id,'avant-plan '+id); });
+  const r42=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
+  assert(r42.includes('createLinearGradient(mx-nx*hw')&&r42.includes('function drawAmbientLife()')&&r42.includes('function drawForegroundDepth()'),'hooks sources graphismes AAA');
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
   console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');

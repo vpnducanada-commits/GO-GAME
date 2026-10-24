@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.1 PRO — RENDU HD ARCADE, PEINTURE & MATIÈRES
+   GÉDÉON - Godson ARENA V4.2 PRO — GRAPHISMES AAA : PEINTURE, LUMIÈRE & PROFONDEUR
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,7 +8,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,introBanners:0,artDirection:"HD Arcade V4.1",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -400,9 +400,20 @@ function drawLibreville(){
   for(let i=0;i<5;i++){ const x=((renderTicker*(0.48+i*.06)+i*340)%1550)-130,y=88+i*25+Math.sin(renderTicker*.04+i)*7,w=6+Math.sin(renderTicker*.3+i)*3; ctx.beginPath(); ctx.moveTo(x-11,y+w*.4); ctx.quadraticCurveTo(x-4,y-w,x,y); ctx.quadraticCurveTo(x+4,y-w,x+11,y+w*.4); ctx.stroke(); }
   ctx.restore();
 }
+function drawAmbientLife(){
+  if(qualityLevel===0){ renderStats.ambientMotes=0; return; }
+  const n=qualityLevel===2?26:16; renderStats.ambientMotes=n;
+  ctx.save(); try{ctx.globalCompositeOperation="screen";}catch(e){}
+  ctx.fillStyle=currentArenaMood==="nuit"?"rgba(130,170,255,.05)":"rgba(255,230,170,.06)";
+  for(let i=0;i<3;i++){ const x=210+i*370+Math.sin(renderTicker*.004+i*1.7)*26; ctx.beginPath(); ctx.moveTo(x,-20); ctx.lineTo(x+120,-20); ctx.lineTo(x+310,GROUND); ctx.lineTo(x+90,GROUND); ctx.closePath(); ctx.fill(); }
+  ctx.fillStyle=currentArenaMood==="nuit"?"#bcd6ff":"#ffe9b0";
+  for(let i=0;i<n;i++){ const sp=.12+pseudo(i*13+3)*.3,x=((pseudo(i*41+7)*1500+renderTicker*sp*9)%1500)-110,y=90+pseudo(i*29+5)*430+Math.sin(renderTicker*.011+i*1.3)*16; ctx.globalAlpha=.1+.3*Math.abs(Math.sin(renderTicker*.02+i*1.7)); ctx.beginPath(); ctx.arc(x,y,1.1+pseudo(i*7+1)*1.9,0,7); ctx.fill(); }
+  ctx.restore(); ctx.globalAlpha=1;
+}
 function drawBackground(){
   if(currentArena.id==="stadium")drawStadium(); else if(currentArena.id==="tokyo")drawTokyo(); else if(currentArena.id==="Libreville")drawLibreville(); else drawTemple();
   drawArenaMoodAtmosphere();
+  drawAmbientLife();
 }
 function drawFloor(){
   const id=currentArena.id,theme=FLOOR_THEMES[id]||FLOOR_THEMES.stadium,line=theme.line;
@@ -425,7 +436,7 @@ function drawFloor(){
 }
 
 /* ---------------- DESSIN DES COMBATTANTS PRO ---------------- */
-function drawShadow(f){ const air=GROUND-f.ry,s=Math.max(.34,1-air/430)*f.char.scale; ctx.save(); ctx.fillStyle="rgba(0,0,0,"+(.42*s)+")"; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+10,60*s,13*s,0,0,7); ctx.fill(); ctx.restore(); }
+function drawShadow(f){ const air=GROUND-f.ry,s=Math.max(.34,1-air/430)*f.char.scale; ctx.save(); const floorTheme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium; ctx.globalAlpha=.13*s; ctx.fillStyle=floorTheme.line; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+11,86*s,17*s,0,0,7); ctx.fill(); ctx.globalAlpha=1; ctx.fillStyle="rgba(0,0,0,"+(.42*s)+")"; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+10,60*s,13*s,0,0,7); ctx.fill(); ctx.restore(); }
 function drawReflection(f){
   if(qualityLevel===0)return;
   ctx.save(); ctx.globalAlpha=currentArena.id==="tokyo"?.2:currentArena.id==="Libreville"?.16:.1; ctx.translate(f.rx,GROUND+18+(GROUND-f.ry)*.18); ctx.scale(f.facing*f.char.scale,-.32*f.char.scale);
@@ -471,7 +482,13 @@ function taperedSegment(x1,y1,x2,y2,w1,w2,color,highlight){
   ctx.quadraticCurveTo(x2+dx/len*w2*.22,y2+dy/len*w2*.22,x2-nx*w2/2,y2-ny*w2/2);
   ctx.quadraticCurveTo((x1+x2)/2-nx*(w1+w2)*.27,(y1+y2)/2-ny*(w1+w2)*.27,x1-nx*w1/2,y1-ny*w1/2);
   ctx.quadraticCurveTo(x1-dx/len*w1*.2,y1-dy/len*w1*.2,x1+nx*w1/2,y1+ny*w1/2);
-  ctx.fillStyle=color; ctx.fill(); ctx.strokeStyle="rgba(5,8,16,.38)"; ctx.lineWidth=1.25; ctx.stroke();
+  let segFill=color;
+  if(qualityLevel>0&&typeof color==="string"&&color.charAt(0)==="#"){
+    const mx=(x1+x2)/2,my=(y1+y2)/2,hw=Math.max(w1,w2)/2,gr=ctx.createLinearGradient(mx-nx*hw,my-ny*hw,mx+nx*hw,my+ny*hw);
+    gr.addColorStop(0,shade(color,-48)); gr.addColorStop(.38,shade(color,26)); gr.addColorStop(.72,color); gr.addColorStop(1,shade(color,-30));
+    segFill=gr; renderStats.cylinderShading=true;
+  }
+  ctx.fillStyle=segFill; ctx.fill(); ctx.strokeStyle="rgba(5,8,16,.38)"; ctx.lineWidth=1.25; ctx.stroke();
   ctx.save(); ctx.lineCap="round";
   ctx.globalAlpha=.23; ctx.strokeStyle="#000000"; ctx.lineWidth=Math.max(1.6,w1*.21); ctx.beginPath(); ctx.moveTo(lerp(x1,x2,.13)+nx*w1*.21,lerp(y1,y2,.13)+ny*w1*.21); ctx.lineTo(lerp(x1,x2,.84)+nx*w2*.19,lerp(y1,y2,.84)+ny*w2*.19); ctx.stroke();
   ctx.globalAlpha=highlight?.3:.17; ctx.strokeStyle="#ffffff"; ctx.lineWidth=Math.max(1.3,w1*.16); ctx.beginPath(); ctx.moveTo(lerp(x1,x2,.13)-nx*w1*.2,lerp(y1,y2,.13)-ny*w1*.2); ctx.lineTo(lerp(x1,x2,.82)-nx*w2*.18,lerp(y1,y2,.82)-ny*w2*.18); ctx.stroke();
@@ -556,6 +573,9 @@ function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
   ctx.closePath(); ctx.fillStyle=sk.skin; ctx.fill(); ctx.strokeStyle="rgba(25,12,6,.42)"; ctx.lineWidth=1.8; ctx.stroke();
   ctx.save(); ctx.globalAlpha=.22; ctx.fillStyle=shade(sk.skin,-46); ctx.beginPath(); ctx.ellipse(-r*.48,r*.13,r*.27,r*.58,-.18,0,7); ctx.fill(); ctx.restore();
   ctx.save(); ctx.globalAlpha=.2; ctx.fillStyle="#ffffff"; ctx.beginPath(); ctx.ellipse(r*.34,r*.24,r*.2,r*.1,-.45,0,7); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha=.16; ctx.fillStyle=shade(sk.skin,-52); ctx.beginPath(); ctx.ellipse(r*.16,r*.8,r*.44,r*.15,-.12,0,7); ctx.fill(); ctx.restore();
+  ctx.save(); ctx.globalAlpha=.22; ctx.strokeStyle="#ffffff"; ctx.lineWidth=1.2; ctx.beginPath(); ctx.moveTo(r*.7,-r*.04); ctx.quadraticCurveTo(r*.9,r*.16,r*.93,r*.33); ctx.stroke(); ctx.restore();
+  renderStats.facePaint=(renderStats.facePaint||0)+1;
   if(human.beard>0){ ctx.save(); ctx.globalAlpha=human.beard*.34; ctx.fillStyle=sk.hair; ctx.beginPath(); ctx.moveTo(-r*.35,r*.42); ctx.quadraticCurveTo(r*.18,r*.98,r*.68,r*.58); ctx.quadraticCurveTo(r*.48,r*.88,r*.05,r*.88); ctx.quadraticCurveTo(-r*.28,r*.76,-r*.35,r*.42); ctx.fill(); ctx.restore(); }
   // Coiffures signatures, dessinées comme des masses et mèches plutôt qu'un casque.
   ctx.fillStyle=sk.hair;
@@ -723,6 +743,9 @@ function drawFighter(f){
   ctx.quadraticCurveTo(hipX,hipY+13,hipBack.x,hipBack.y+4);
   ctx.quadraticCurveTo(waistX-hipHalf*.8,waistY,shoulderBack.x,shoulderBack.y);
   ctx.closePath(); ctx.fill(); ctx.strokeStyle="rgba(0,0,0,.42)"; ctx.lineWidth=2.1; ctx.stroke();
+  const rimColor=currentArenaMood==="nuit"?"#7fb2ff":currentArenaMood==="jour"?"#fff3b0":"#ffb37a";
+  renderStats.rimLight=rimColor;
+  ctx.save(); ctx.globalAlpha=.55; ctx.strokeStyle=rimColor; ctx.lineWidth=2.3; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(shoulderBack.x+1,shoulderBack.y+2); ctx.quadraticCurveTo(waistX-hipHalf*.78,waistY,hipBack.x+1,hipBack.y+3); ctx.stroke(); ctx.restore();
   // Volume du bassin/vêtement et ceinture articulée sur les hanches.
   ctx.fillStyle=sk.pants; ctx.beginPath();
   ctx.moveTo(hipBack.x-1,hipBack.y+1); ctx.lineTo(hipFront.x+1,hipFront.y+1);
@@ -917,6 +940,29 @@ function drawEffects(){
   for(const fl of floaters){ let dy=0; for(const pl of placed){ if(Math.abs(pl.x-fl.x)<170&&Math.abs(pl.y-(fl.y-dy))<30)dy+=27; } placed.push({x:fl.x,y:fl.y-dy}); if(dy>spreadMax)spreadMax=dy; ctx.save(); ctx.globalAlpha=Math.min(1,fl.life/28); ctx.font="1000 "+(fl.big?27:18)+"px 'Segoe UI',Arial"; ctx.lineWidth=5; ctx.strokeStyle="rgba(0,0,0,.68)"; ctx.strokeText(fl.text,fl.x,fl.y-dy); ctx.fillStyle=fl.c; ctx.fillText(fl.text,fl.x,fl.y-dy); ctx.restore(); }
   renderStats.floaterSpread=spreadMax;
 }
+function drawForegroundDepth(){
+  if(qualityLevel===0)return;
+  const id=currentArena.id; renderStats.foregroundDepth=id;
+  ctx.save();
+  ctx.fillStyle="rgba(2,4,10,.3)";
+  ctx.beginPath(); ctx.ellipse(-70,H+34,250,88,-.16,0,7); ctx.fill();
+  ctx.beginPath(); ctx.ellipse(W+70,H+38,270,94,.15,0,7); ctx.fill();
+  if(id==="tokyo"){
+    ctx.fillStyle="rgba(2,4,12,.52)"; ctx.fillRect(W-44,110,18,H-110); ctx.fillRect(W-122,142,78,118);
+    const flick=.35+.4*Math.abs(Math.sin(renderTicker*.05))*(pseudo((renderStats.frame/9)|0)>.18?1:.25);
+    ctx.globalAlpha=flick; ctx.fillStyle="#ff2e88"; ctx.fillRect(W-112,156,58,9); ctx.fillStyle="#00e5ff"; ctx.fillRect(W-112,178,40,7); ctx.globalAlpha=1;
+  }else if(id==="temple"){
+    ctx.fillStyle="rgba(12,6,4,.42)"; ctx.fillRect(-8,0,34,300); ctx.fillRect(W-26,0,34,300);
+    ctx.fillStyle="rgba(255,190,90,.16)"; ctx.fillRect(24,0,3,300); ctx.fillRect(W-29,0,3,300);
+  }else if(id==="stadium"){
+    ctx.fillStyle="rgba(3,6,16,.4)"; ctx.fillRect(-20,H-26,300,40); ctx.fillRect(W-280,H-26,300,40);
+    ctx.fillStyle="rgba(0,229,255,.35)"; ctx.fillRect(-20,H-28,300,3); ctx.fillRect(W-280,H-28,300,3);
+  }else{
+    ctx.strokeStyle="rgba(6,26,12,.55)"; ctx.lineWidth=9; ctx.lineCap="round";
+    for(let i=0;i<4;i++){ const a=.35+i*.3; ctx.beginPath(); ctx.moveTo(-16,-8); ctx.quadraticCurveTo(Math.cos(a)*120,26+Math.sin(a)*20,Math.cos(a)*205,58+Math.sin(a)*44); ctx.stroke(); }
+  }
+  ctx.restore();
+}
 function drawPostProcess(){
   // Passe POST (V2.3 Kenzo) : teinte colorée par arène, vignette, alertes, barres cinéma.
   renderStats.lastPost=currentArena.id+":"+currentArenaMood+":q"+qualityLevel; renderStats.arenaMood=currentArenaMood;
@@ -933,6 +979,7 @@ function drawPostProcess(){
   }
   const bars=(state==="intro"||state==="roundEnd"||cinematic>0)?34:0;
   if(bars){ ctx.fillStyle="#000"; ctx.fillRect(0,0,W,bars); ctx.fillRect(0,H-bars,W,bars); }
+  drawForegroundDepth();
   /* Intro cinématographique V4.1 (Lena) : bandeaux nominatifs façon grande licence. */
   if(state==="intro"&&p1&&p2&&typeof introT!=="undefined"){
     const tIn=clamp(1-introT/132,0,1),slide=(1-easeOutCubic(clamp(tIn*2.2,0,1)))*360,bAlpha=clamp(Math.min(tIn*3,(introT-28)/16),0,1);

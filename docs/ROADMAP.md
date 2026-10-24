@@ -121,7 +121,14 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 ## ✅ V4.0 — « Arcade plein écran & anatomie HD » *(LIVRÉ le 24/10/2026 — 287 assertions source / 331 vérifications, suite verte)*
 - 🖥️ Nouvelle direction du propriétaire (« quitter le mini-jeu ») : coque **100 % viewport**, scène 16:9 maximale, barre système intégrée à la scène et masquée en combat, aucun pied de page ni panneau extérieur.
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
-- 🔜 Trajectoire V4 : V4.1 livrée ci-dessous ; V4.2 compétition locale/tournoi ; V4.3 approfondissement Online public (matchmaking/spectateurs selon validation réseau réelle).
+- 🔜 Trajectoire V4 : V4.1 et V4.2 livrées ci-dessous. Sur décision du propriétaire (24/10/2026), la priorité passe d'abord au visuel AAA — références Tekken, Street Fighter, KOF, Marvel vs Capcom, Mortal Kombat : V4.3 Graphismes AAA II (volumes peints torse/vêtements, ombres directionnelles, impacts en sprites) ; puis V4.4 compétition locale/tournoi ; V4.5 approfondissement Online public (selon validation réseau réelle).
+
+## ✅ V4.2 — « Graphismes AAA » *(LIVRÉ le 24/10/2026 — 306 assertions source / 354 vérifications, suite verte)*
+
+- **Peinture cylindrique** des membres (dégradé ombre → lumière → ombre), **rim light aux couleurs de l'arène** et halo de contact teinté, **visage peint** (mâchoire/arête du nez).
+- **Atmosphère vivante** : rayons de lumière et poussières flottantes dans chaque arène.
+- **Avant-plans de profondeur** par arène (néon clignotant tokyo, piliers du temple, barrières du stade, palmes de Libreville).
+- Budget bundle relevé à 384 Ko (mandat visuel) ; gameplay, déterminisme et Online inchangés.
 
 ## ✅ V4.1 — « Peinture & Présentation » *(LIVRÉ le 24/10/2026 — 297 assertions source / 341 vérifications, suite verte)*
 - 🆚 Écran VS **plein corps animé et face à face**, cadres aux couleurs des combattants ; intro de round avec **bandeaux nominatifs** glissants façon grande licence.

@@ -83,9 +83,9 @@ bundles = sorted(ROOT.glob("Gedeon*-Arena-V*.html"))
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
-    # Budget relevé à 352 Ko en V3.6 (3 champions : moteur, morphologies, VFX signatures),
-    # toujours très inférieur à une page web moyenne et sans ressource externe.
-    check("Bundle autonome ≤ 352 Ko", size_kb <= 352, f"{target.name} = {size_kb} Ko")
+    # Budget relevé à 352 Ko en V3.6 (3 champions), puis à 384 Ko en V4.2 sur décision
+    # du propriétaire (mandat graphismes AAA : peinture, lumière, profondeur de scène).
+    check("Bundle autonome ≤ 384 Ko", size_kb <= 384, f"{target.name} = {size_kb} Ko")
     b = target.read_text(encoding="utf-8", errors="ignore")
     ext_b = [u for u in re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', b)]
     check("Bundle 100 % autonome (0 ressource externe)", not ext_b, str(ext_b[:3]) if ext_b else "vérifié")
@@ -139,12 +139,17 @@ check("Sélection & Corps pleins V3.7 présents", selection_ok, "portraits anim�
 
 # 22. Arcade plein écran & anatomie HD V4.0
 header_in_stage = html.find('id="gameWrap"') < html.find('<header class="sig">') < html.find('id="bootLoader"')
-shell_ok = header_in_stage and all(x in css for x in ('#app{position:fixed;inset:0','width:min(100dvw,calc(100dvh * 16 / 9))','height:min(100dvh,calc(100dvw * 9 / 16))','footer{display:none!important}','body.combatImmersif header.sig{display:none!important}')) and 'classList.toggle("combatImmersif",!!on)' in js["ui"] and all(x in js["render"] for x in ('headR:15.3','const hipY=lerp(-86,-63,cb)','clamp(1180/(dist+420),.88,1.34)','outfitDetails','HD Arcade V4'))
+shell_ok = header_in_stage and all(x in css for x in ('#app{position:fixed;inset:0','width:min(100dvw,calc(100dvh * 16 / 9))','height:min(100dvh,calc(100dvw * 9 / 16))','footer{display:none!important}','body.combatImmersif header.sig{display:none!important}')) and 'classList.toggle("combatImmersif",!!on)' in js["ui"] and all(x in js["render"] for x in ('headR:15.3','const hipY=lerp(-86,-63,cb)','clamp(1180/(dist+420),.88,1.34)','outfitDetails','artDirection:'))
 check("Arcade plein écran & anatomie HD V4.0 présents", shell_ok, "viewport 100 % jeu + barre système intégrée/masquée en combat + proportions adultes + caméra 1,34×")
 
 # 23. Peinture & présentation V4.1 (VS plein corps, intro cinéma, matières)
 vs_ok = all(x in html for x in ('vsPortrait1','vsPortrait2')) and all(x in js["ui"] for x in ('ensureVSRigs','syncVSPortraitsToFighters','updateVSPortraits','f.facing=f.side===2?-1:1')) and all(x in js["render"] for x in ('updateVSPortraits()','Peinture & matières V4.1','Intro cinématographique V4.1','materialDetails')) and 'ÉCRAN VS PLEIN CORPS' in css
 check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à face + bandeaux d'intro + matières par style")
+
+# 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
+#     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and 'GAME_VERSION="4.2.0"' in js["engine"] and 'V4.2 PRO' in html
+check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

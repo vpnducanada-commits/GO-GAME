@@ -3,6 +3,30 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [4.2.0] — 2026-10-24 — « Graphismes AAA »
+
+Recentrage décidé par le propriétaire : toute l'équipe se focalise d'abord sur le visuel,
+avec pour références Tekken, Street Fighter, KOF, Marvel vs Capcom et Mortal Kombat.
+
+### Ajouté
+- **Peinture cylindrique des membres** : chaque segment (cuisses, mollets, bras, avant-bras)
+  est rempli d'un dégradé ombre → lumière → ombre calculé dans l'axe du membre — le volume
+  « tube peint » des sprites AAA, sans coût d'image (désactivé en qualité basse).
+- **Lumière d'arène sur les combattants** : rim light aux couleurs de l'ambiance (bleue la
+  nuit, dorée le jour, orangée au crépuscule) le long du dos, et halo de contact au sol teinté
+  par l'arène sous chaque combattant.
+- **Peinture du visage** : ombre portée sous la mâchoire et lumière sur l'arête du nez.
+- **Atmosphère vivante** : trois rayons de lumière traversent chaque arène et des poussières
+  dorées (ou bleutées la nuit) dérivent dans l'air — pur rendu, zéro effet sur la simulation.
+- **Avant-plans de profondeur par arène** : poteau + enseigne néon clignotante (tokyo), piliers
+  de pierre (temple), barrières lumineuses (stade), palmes en silhouette (Libreville), coins bas
+  hors foyer — la scène gagne un vrai premier plan façon AAA.
+- **Budget bundle relevé à 384 Ko** (décision propriétaire : mandat visuel AAA), verrouillé au gate QA.
+
+### Inchangé / garanti
+- Gameplay, hitboxes, déterminisme, replays, Online, lisibilité des impacts et toutes les
+  acquisitions V4.0/V4.1 — prouvés par 306 assertions de smoke test et le gate QA (24 contrôles).
+
 ## [4.1.0] — 24 octobre 2026 — « Peinture & Présentation » (trajectoire V4, chantier 1)
 ### Écran VS plein corps — Lena
 - 🆚 Fini les médaillons avec une lettre : les deux combattants du match s’affichent **en pied, animés par le moteur**, dans des cadres aux couleurs de leur personnage — et **face à face** (orientation vérifiée par capture et verrouillée par test).
