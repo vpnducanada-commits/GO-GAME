@@ -453,7 +453,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'génération V3 affichée et exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -545,7 +545,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 41, '41 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -584,7 +584,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -602,7 +602,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -629,7 +629,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -644,7 +644,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^[34]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version V3.5+ affichée et exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -773,7 +773,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|4\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6,9).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 41, 'identifiants uniques pour les 41 combattants');
@@ -801,7 +801,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|4\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.0')), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -829,7 +829,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.0 : Arcade plein écran & anatomie HD —');
-  assert(/^4\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
+  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
   assert(!!window.document.querySelector('#gameWrap > header.sig'), 'barre système intégrée DANS la scène (aucun panneau extérieur)');
   const cssV4 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(cssV4.includes('#app{position:fixed;inset:0') && cssV4.includes('width:min(100dvw,calc(100dvh * 16 / 9))') && cssV4.includes('height:min(100dvh,calc(100dvw * 9 / 16))') && cssV4.includes('footer{display:none!important}'), 'coque plein écran : scène 16:9 maximale manipulable, aucun pied de page');
@@ -850,7 +850,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.1 : Peinture, matières & présentation (VS plein corps, intro cinéma) —');
-  assert(/^4\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
+  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
   ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight');
   assert(ev('state') === 'vs' && !!window.document.getElementById('vsPortrait1') && !!window.document.getElementById('vsPortrait2'), 'écran VS : portraits plein corps des deux combattants');
   assert(window.document.querySelector('#vsAvatar1 canvas') && window.document.getElementById('vsAvatar1').style.borderColor, 'cadre VS aux couleurs du combattant');
@@ -872,7 +872,7 @@ function finishTestRun() {
 
 
   /* ===== V4.2 « Graphismes AAA » : peinture, lumière d'arène, profondeur ===== */
-  assert(/^4\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
+  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
   assert(ev('renderStats.artDirection')==='Graphismes AAA V4.2','direction artistique AAA V4.2');
   ev('qualityLevel=2');
   window.document.querySelector('#btnMode2P').click(); window.document.querySelector('#btnLaunchFight').click();
@@ -888,7 +888,7 @@ function finishTestRun() {
 
   /* ===== V4.3 « Roster complet des planches » : les 35 designs du propriétaire jouables ===== */
   console.log('\n— V4.3 : Roster complet des planches (41 combattants) —');
-  assert(/^4\.[34]\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
+  assert(/^(4\.[34]|5\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
   assert(ev('CHARACTERS.length')===41,'roster complet : 41 combattants jouables');
   const boardIds=["Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion"];
   assert(ev('(()=>{const ids='+JSON.stringify(boardIds)+'; return ids.every(id=>CHARACTERS.some(c=>c.id===id));})()')===true,'les 35 personnages des 3 planches du propriétaire sont dans le roster');
@@ -912,7 +912,7 @@ function finishTestRun() {
 
   /* ===== V4.4 « Navigation Pro & tenues de combat peintes » ===== */
   console.log('\n— V4.4 : Navigation Pro & tenues de combat peintes —');
-  assert(ev('GAME_VERSION')==='4.4.0','version 4.4.0');
+  assert(/^(4\.4|5\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.4+');
   ev('goMenu()'); click('btnMode2P');
   assert(!!window.document.getElementById('rosterSearch')&&window.document.querySelectorAll('.filterChip').length>=6,'recherche + filtres par famille présents dans la sélection');
   assert(window.document.querySelectorAll('.stickyActions').length>=2,'barres d’action fixes : Personnages et Arène toujours atteignables');
@@ -931,6 +931,34 @@ function finishTestRun() {
   for(let i=0;i<20;i++)ev('updateGameLogic()');
   ev('renderStats.torsoPaint=0; render()');
   assert(ev('renderStats.torsoPaint')>=2,'tenues de combat peintes (ouverture, col, plis) sur les deux combattants');
+  ev('goMenu()');
+
+  /* ===== V5.0 « Édition Jeu Complet » : carrière, championnat, quêtes & récompenses ===== */
+  console.log('\n— V5.0 : Édition Jeu Complet (carrière & championnat) —');
+  assert(ev('GAME_VERSION')==='5.0.0','version 5.0.0 — édition jeu complet');
+  assert(ev('careerLevelFromXp(0)===1&&careerLevelFromXp(100)===2&&careerLevelFromXp(300)===3&&careerLevelFromXp(1000)===5')===true,'niveaux de carrière : seuils XP 0/100/300/1000 respectés');
+  assert(ev('(()=>{const p=normalizeProfileData({stats:{wins:10,losses:2,matches:12,arcadeClears:1,bestSurvivalWave:3},story:{chapter1Completed:true}}); return p.career.xp>0&&p.career.Godson>0&&p.career.circuits.stade===0&&Array.isArray(p.career.titles);})()')===true,'migration V5 : un ancien profil reçoit XP, Godson et circuits');
+  ev('PROFILE.career={xp:90,Godson:20,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""}; PROFILE.stats.matches=1; saveProfile();');
+  assert(ev('claimCareerQuest("first-steps")')===true&&ev('PROFILE.career.xp')===140&&ev('PROFILE.career.Godson')===70&&ev('claimCareerQuest("first-steps")')===false,'quête réclamée une seule fois : +50 XP, +50 Godson, niveau 2');
+  ev('PROFILE.career.xp=1000; PROFILE.career.Godson=1000; PROFILE.unlocks.prime=false; saveProfile();');
+  assert(ev('buyCareerItem("unlock-prime")')===true&&ev('PROFILE.unlocks.prime')===true&&ev('PROFILE.career.Godson')===400,'boutique carrière : GODSON PRIME débloqué pour 600 Godson au niveau 5');
+  assert(ev('buyCareerItem("title-Libreville")')===true&&ev('PROFILE.career.title')==='Champion de Libreville'&&ev('PROFILE.career.Godson')===250,'boutique carrière : titre acheté et équipé');
+  ev('setupArcadeRun("stade")');
+  assert(ev('arcade.seq.length')===5&&ev('arcadeTotal()')===5&&ev('arcade.seq.every(x=>x.arena&&x.diff)')===true,'Circuit Stade : 5 combats avec arène et difficulté par étape');
+  ev('setupArcadeRun("monde")');
+  assert(ev('arcade.seq.length')===8&&ev('arcadeTotal()')===8&&ev('arcade.circuit')==='monde'&&ev('arcade.seq[7].boss')===true,'Circuit Monde : 8 combats et boss final');
+  ev('setupArcadeRun("legendes")');
+  assert(ev('arcade.seq.length')===12&&ev('arcadeTotal()')===12&&ev('arcade.seq[11].char')===4,'Circuit des Légendes : 12 combats, GODSON PRIME en finale');
+  assert(ev('new Set(arcade.seq.map(x=>x.char)).size')===12,'Championnat : 12 adversaires uniques sur le circuit Légendes');
+  ev('goMenu()'); click('btnCareer');
+  assert(!window.document.getElementById('menuCareer').classList.contains('hidden')&&window.document.querySelectorAll('[data-circuit]').length===3&&window.document.querySelectorAll('[data-quest]').length>=12&&window.document.querySelectorAll('[data-shop]').length>=6,'écran Carrière complet : 3 circuits, 12 quêtes, boutique de récompenses');
+  assert(window.document.getElementById('hubCareerLevel').textContent.includes('NIVEAU')&&window.document.getElementById('hubCareerCoins').textContent.includes('Godson'),'hub principal : niveau, XP et monnaie de carrière visibles');
+  ev('document.querySelector("[data-circuit=\\"monde\\"]").click()');
+  assert(ev('state')==='select'&&ev('pendingMode')==='arcade'&&ev('arcade.circuit')==='monde','depuis la Carrière, le Circuit Monde lance la sélection du championnat');
+  ev('mode="bot"; botDiff="moyen"; PROFILE.career.xp=0; PROFILE.career.Godson=0; PROFILE.career.fighterWins={}; p1.stats.maxCombo=7; p1.stats.parries=3; p1.health=p1.maxHealth; awardCareerForMatch(p1);');
+  assert(ev('PROFILE.career.xp')>=100&&ev('PROFILE.career.Godson')>=30&&ev('lastCareerReward.levelAfter')>=2&&ev('Object.keys(PROFILE.career.fighterWins).length')===1,'récompense de match : victoire performante = XP, Godson, niveau et combattant victorieux suivis');
+  const eng5=fs.readFileSync(path.join(root,'src/engine.js'),'utf8'),ui5=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
+  assert(eng5.includes('CHAMPIONSHIP_CIRCUITS')&&eng5.includes('function awardCareerForMatch')&&ui5.includes('function renderCareer()')&&ui5.includes('CAREER_QUESTS'),'hooks sources V5 : circuits, récompenses, quêtes et écran carrière');
   ev('goMenu()');
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }

@@ -121,7 +121,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 ## ✅ V4.0 — « Arcade plein écran & anatomie HD » *(LIVRÉ le 24/10/2026 — 287 assertions source / 331 vérifications, suite verte)*
 - 🖥️ Nouvelle direction du propriétaire (« quitter le mini-jeu ») : coque **100 % viewport**, scène 16:9 maximale, barre système intégrée à la scène et masquée en combat, aucun pied de page ni panneau extérieur.
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
-- 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Next : V4.5 Graphismes AAA II (ombres portées directionnelles, impacts en sprites, tenues fidèles aux planches : capuches, robes, fourrures) ; puis V4.6 compétition locale/tournoi ; V4.7 approfondissement Online public (selon validation réseau réelle).
+- 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
+
+## ✅ V5.0 — « Édition Jeu Complet » *(LIVRÉ le 24/10/2026 — 342 assertions source / 577 vérifications, suite verte)*
+
+- **Carrière Godson** : XP, niveaux 1→50, rangs, monnaie Godson, titres équipables et 12 quêtes relient Campagne, Championnat, Survie, Défis et Online dans une seule boucle de progression.
+- **Championnat Godson** : l'Arcade devient 3 circuits (Stade 5, Monde 8, Légendes 12 combats) à adversaires uniques, arènes imposées, difficulté croissante et boss final (GODSON PRIME sur Légendes).
+- **Hub principal vivant** : niveau, barre XP, Godson, titre et prochain objectif toujours visibles ; écran Carrière avec circuits, quêtes, récompenses et parcours complet du jeu.
+- Anciens profils migrés honorifiquement (XP/Godson selon l'historique) ; déterminisme et replays préservés. Voir `docs/SPRINT_V50_JEU_COMPLET.md`.
+- 🔜 **V5.1 Graphismes AAA II** : ombres portées directionnelles, impacts en sprites, tenues fidèles aux planches (capuches, robes, fourrures). **V5.2** : tournoi à brackets + saisons de carrière. **V5.3** : Online public selon validation réseau réelle entre deux appareils.
 
 ## ✅ V4.4 — « Navigation Pro & Tenues de combat » *(LIVRÉ le 24/10/2026 — 327 assertions source / 561 vérifications, suite verte)*
 

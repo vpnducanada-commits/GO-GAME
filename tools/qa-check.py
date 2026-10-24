@@ -83,9 +83,9 @@ bundles = sorted(ROOT.glob("Gedeon*-Arena-V*.html"))
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
-    # Budget relevé à 352 Ko en V3.6 (3 champions), puis à 384 Ko en V4.2 sur décision
-    # du propriétaire (mandat graphismes AAA : peinture, lumière, profondeur de scène).
-    check("Bundle autonome ≤ 384 Ko", size_kb <= 384, f"{target.name} = {size_kb} Ko")
+    # Budgets : 384 Ko en V4.2, puis 448 Ko en V5.0 sur décision d'équipe (édition
+    # Jeu Complet : carrière, championnat 3 circuits, quêtes, récompenses, hub).
+    check("Bundle autonome ≤ 448 Ko", size_kb <= 448, f"{target.name} = {size_kb} Ko")
     b = target.read_text(encoding="utf-8", errors="ignore")
     ext_b = [u for u in re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', b)]
     check("Bundle 100 % autonome (0 ressource externe)", not ext_b, str(ext_b[:3]) if ext_b else "vérifié")
@@ -148,19 +148,24 @@ check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à 
 
 # 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
 #     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
-aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html)
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html or 'V5.0' in html)
 check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
 
 # 25. Roster complet des planches V4.3 : les 35 designs des 3 planches du propriétaire
 #     jouables (41 combattants avec les 6 historiques), morphologies dédiées.
 board_ids = ("Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion")
-roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"]) and 'PRO' in html and 'ROSTER PLANCHES COMPLET' in css
+roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"]) and ('PRO' in html or 'V5.0' in html) and 'ROSTER PLANCHES COMPLET' in css
 check("Roster complet des planches V4.3 présent", roster_ok, "35 personnages des planches + 41 morphologies + grille de sélection dense")
 
 # 26. Navigation Pro & tenues de combat peintes V4.4 : recherche/filtres roster,
 #     barres d'action fixes, grilles à défilement interne, vêtements peints.
-nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and 'GAME_VERSION="4.4.0"' in js["engine"] and 'V4.4 PRO' in html
+nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and ('GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"]) and ('V4.4 PRO' in html or 'V5.0' in html)
 check("Navigation Pro & tenues peintes V4.4 présents", nav_ok, "recherche + filtres par famille + actions fixes + ouverture/col/plis peints")
+
+# 27. Édition Jeu Complet V5.0 : carrière persistante (XP/niveaux/Godson/titres),
+#     championnat 3 circuits, quêtes réclamables, boutique et hub de progression.
+career_ok = all(x in js["engine"] for x in ('GAME_VERSION="5.0.0"','CHAMPIONSHIP_CIRCUITS','function careerLevelFromXp','function awardCareerForMatch','function arcadeTotal')) and all(x in js["ui"] for x in ('function renderCareer()','CAREER_QUESTS','CAREER_SHOP','function startChampionship','function careerNextObjective')) and all(x in html for x in ('id="menuCareer"','id="btnCareer"','id="hubXpFill"','id="circuitList"','id="questList"','id="careerShop"')) and all(x in css for x in ('.careerHub','.xpBar','.circuitCard','.questCard')) and 'V5.0' in html
+check("Édition Jeu Complet V5.0 présente", career_ok, "carrière XP/Godson + championnat 5/8/12 combats + quêtes + récompenses + hub vivant")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

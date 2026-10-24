@@ -260,7 +260,7 @@ function drawBillboard(title,sub){
   ctx.font="1000 12.5px 'Segoe UI',Arial"; ctx.fillStyle="#ffe082"; ctx.fillText("★ Arena Championship ★",640,69);
   ctx.font="800 10px 'Segoe UI',Arial"; ctx.fillStyle="rgba(255,255,255,.85)"; ctx.fillText(sub,640,87); ctx.restore();
 }
-function modeLabel(){ return state==="menu"||state==="select"?"CHOISIS TON MODE DE JEU":(mode==="story"?"MODE HISTOIRE • COMBAT "+story.step+"/"+story.total:mode==="survival"?"MODE SURVIE • VAGUE "+survival.wave:mode==="arcade"?"MODE ARCADE • ÉTAGE "+arcade.stage+"/5":mode==="training"?"MODE ENTRAÎNEMENT":mode==="bot"?"MODE BOT • "+DIFFS[botDiff].label.toUpperCase():"MODE 2 JOUEURS"); }
+function modeLabel(){ return state==="menu"||state==="select"?"CHOISIS TON MODE DE JEU":(mode==="story"?"MODE HISTOIRE • COMBAT "+story.step+"/"+story.total:mode==="survival"?"MODE SURVIE • VAGUE "+survival.wave:mode==="arcade"?((arcade.circuitName||"CHAMPIONNAT Godson").toUpperCase()+" • COMBAT "+arcade.stage+"/"+arcadeTotal()):mode==="training"?"MODE ENTRAÎNEMENT":mode==="bot"?"MODE BOT • "+DIFFS[botDiff].label.toUpperCase():"MODE 2 JOUEURS"); }
 function drawStadium(){
   ctx.fillStyle=arenaCache.sky; ctx.fillRect(-220,-60,1720,H+120);
   ctx.save(); ctx.globalAlpha=.95; ctx.drawImage(glowSprite("#ff9800"),640-235,215-235,470,470); ctx.restore();

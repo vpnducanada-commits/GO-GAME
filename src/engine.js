@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.4 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V5.0 — ÉDITION JEU COMPLET
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="4.4.0";
+const GAME_VERSION="5.0.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game");
 let ctx=canvas.getContext("2d",{alpha:false}); // « let » : les portraits de sélection V3.7 échangent temporairement le contexte
@@ -29,12 +29,20 @@ function defaultProfile(){ return {
   stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0,bestParriesMatch:0,totalParries:0},
   unlocks:{prime:false,librevilleSkin:false},
   story:{progressStep:1,completed:false,clears:0,chapter1Completed:false,chapter2Completed:false,chapter2Clears:0},
+  career:{xp:0,Godson:0,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""},
   leaderboard:[],
   ach:{}
 };}
 function normalizeProfileData(p){
   const d=defaultProfile(),src=p&&typeof p==="object"?p:{};
   const normalized={...d,...src,settings:{...d.settings,...(src.settings||{})},names:{...d.names,...(src.names||{})},initials:{...d.initials,...(src.initials||{})},customColors:{...d.customColors,...(src.customColors||{})},selection:{...d.selection,...(src.selection||{})},stats:{...d.stats,...(src.stats||{})},unlocks:{...d.unlocks,...(src.unlocks||{})},story:{...d.story,...(src.story||{})},leaderboard:Array.isArray(src.leaderboard)?src.leaderboard:[],ach:src.ach||{}};
+  const rawCareer=(src.career&&typeof src.career==="object")?src.career:{};
+  normalized.career={...d.career,...rawCareer,circuits:{...d.career.circuits,...(rawCareer.circuits||{})},questsClaimed:{...(rawCareer.questsClaimed||{})},fighterWins:{...(rawCareer.fighterWins||{})},titles:Array.isArray(rawCareer.titles)?rawCareer.titles.slice(0,24):[]};
+  if(!src.career){
+    // Migration V5 : les anciens champions conservent leur passé sous forme d'XP et de Godson.
+    normalized.career.xp=(normalized.stats.wins||0)*45+(normalized.stats.matches||0)*12+(normalized.stats.arcadeClears||0)*250+(normalized.stats.bestSurvivalWave||0)*20+(normalized.story.chapter1Completed?250:0)+(normalized.story.chapter2Completed?350:0);
+    normalized.career.Godson=(normalized.stats.wins||0)*8+(normalized.stats.arcadeClears||0)*100;
+  }
   // Migration V2.4 : avant le Chapitre 2, story.completed signifiait « Chapitre 1 terminé ».
   if(normalized.story.completed&&!normalized.story.chapter2Completed){
     normalized.story.chapter1Completed=true; normalized.story.completed=false; normalized.story.progressStep=4;
@@ -46,6 +54,59 @@ try{ const raw=store.get(); if(raw)PROFILE=normalizeProfileData(JSON.parse(raw))
 let SETTINGS=PROFILE.settings;
 function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
 function exportProfileData(){ return JSON.parse(JSON.stringify(PROFILE)); }
+/* ---------------- CARRIÈRE V5 : XP, NIVEAUX, MONNAIE & TITRES ----------------
+   La carrière relie tous les modes : chaque match terminé fait progresser le
+   joueur, les championnats et la campagne offrent les plus grosses primes. */
+let lastCareerReward=null;
+function careerData(){
+  if(!PROFILE.career||typeof PROFILE.career!=="object")PROFILE.career=defaultProfile().career;
+  const c=PROFILE.career;
+  c.xp=Math.max(0,Math.floor(+c.xp||0)); c.Godson=Math.max(0,Math.floor(+c.Godson||0));
+  if(!c.circuits||typeof c.circuits!=="object")c.circuits={stade:0,monde:0,legendes:0};
+  if(!c.questsClaimed||typeof c.questsClaimed!=="object")c.questsClaimed={};
+  if(!c.fighterWins||typeof c.fighterWins!=="object")c.fighterWins={};
+  if(!Array.isArray(c.titles))c.titles=[];
+  if(typeof c.title!=="string")c.title="";
+  return c;
+}
+function careerXpForLevel(level){ level=clamp(Math.floor(level)||1,1,50); return 50*level*(level-1); }
+function careerLevelFromXp(xp){ xp=Math.max(0,Math.floor(+xp||0)); return clamp(Math.floor((Math.sqrt(1+8*xp/100)-1)/2)+1,1,50); }
+function careerRankForLevel(level){ return level>=35?"🌌 Mythe Godson":level>=25?"👑 LÉGENDE Godson":level>=18?"🏆 Grand Maître":level>=12?"🐉 Maître de l’Arène":level>=8?"⚔️ Expert":level>=5?"🥊 Combattant confirmé":level>=3?"🌱 Espoir de l’Arène":"🎓 Débutant"; }
+function careerProgress(){
+  const c=careerData(),xp=c.xp,level=careerLevelFromXp(xp),floor=careerXpForLevel(level),next=level>=50?floor:careerXpForLevel(level+1),span=Math.max(1,next-floor),into=xp-floor;
+  return {xp,coins:c.Godson,level,rank:careerRankForLevel(level),floor,next,into,needed:span,pct:level>=50?100:clamp(Math.round(into/span*100),0,100),title:c.title||""};
+}
+function awardCareer(xp,coins,reason){
+  const c=careerData(),before=careerLevelFromXp(c.xp);
+  c.xp+=Math.max(0,Math.round(xp||0)); c.Godson+=Math.max(0,Math.round(coins||0)); c.lastReward=reason||"Récompense de carrière";
+  const after=careerLevelFromXp(c.xp);
+  lastCareerReward={xp:Math.max(0,Math.round(xp||0)),coins:Math.max(0,Math.round(coins||0)),reason:c.lastReward,levelBefore:before,levelAfter:after,levelUp:after>before};
+  return lastCareerReward;
+}
+function awardCareerForMatch(winner){
+  if(replayPlayback.active||mode==="training")return null;
+  const c=careerData();
+  let subject=p1,localWin=winner===p1,xp=20,coins=12,reason="Match terminé";
+  if(mode==="online"){ subject=onlineSession.localSide===2?p2:p1; localWin=winner===subject; xp=28; coins=16; reason="Duel en ligne"; }
+  else if(mode==="2p"){ subject=winner||p1; localWin=true; xp=18; coins=10; reason="Duel local entre joueurs"; }
+  else if(mode==="bot"){ xp=22; coins=14; reason="Versus Bot "+(DIFFS[botDiff]?DIFFS[botDiff].label:botDiff); if(botDiff==="moyen")xp+=8; if(botDiff==="difficile")xp+=20; }
+  else if(mode==="story"){ xp=38; coins=24; reason="Campagne — combat "+story.step+"/"+story.total; if(localWin&&story.step===3){xp+=90;coins+=70;} if(localWin&&story.step>=story.total){xp+=220;coins+=180;} }
+  else if(mode==="survival"){ xp=14+Math.min(30,survival.wave*2); coins=8+Math.min(30,survival.wave*2); reason="Survie — vague "+survival.wave; }
+  else if(mode==="arcade"){
+    const circuit=CHAMPIONSHIP_CIRCUITS[arcade.circuit]||CHAMPIONSHIP_CIRCUITS.stade;
+    xp=30; coins=18; reason=circuit.name+" — combat "+arcade.stage+"/"+arcadeTotal();
+    c.bestStage=Math.max(c.bestStage||0,arcade.stage);
+    if(localWin&&arcade.stage>=arcadeTotal()){ xp+=circuit.xp||250; coins+=circuit.coins||150; reason="🏆 "+circuit.name+" remporté"; }
+  }
+  if(localWin){ xp+=mode==="survival"?18:42; coins+=mode==="survival"?8:24; }
+  if(subject&&subject.stats){
+    if((subject.stats.maxCombo||0)>=6)xp+=15;
+    if((subject.stats.parries||0)>=3)xp+=15;
+    if(localWin&&subject.maxHealth&&subject.health/subject.maxHealth>.5)xp+=10;
+    if(localWin&&mode!=="2p"&&subject.char&&subject.char.id)c.fighterWins[subject.char.id]=(c.fighterWins[subject.char.id]||0)+1;
+  }
+  return awardCareer(xp,coins,reason);
+}
 function applyProfileData(data){
   PROFILE=normalizeProfileData(data); SETTINGS=PROFILE.settings;
   selCharP1=PROFILE.selection.charP1||0;
@@ -187,7 +248,7 @@ function captureReplayMeta(seed){
   return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,arenaMood:currentArenaMood,arenaMoodPreference:selArenaMood,
     char1:p1.charIndex,char2:p2.charIndex,names:{p1:p1.name,p2:p2.name},
     settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},
-    context:{storyStep:story.step,arcadeStage:arcade.stage,survivalWave:survival.wave,survivalScore:survival.score},
+    context:{storyStep:story.step,arcadeStage:arcade.stage,arcadeTotal:arcadeTotal(),arcadeCircuit:arcade.circuit||"stade",survivalWave:survival.wave,survivalScore:survival.score},
     start:{p1:snap(p1),p2:snap(p2)}};
 }
 function startReplayRecording(seed){
@@ -415,6 +476,14 @@ const ARENA_MOODS={
   nuit:{id:"nuit",label:"Nuit",icon:"🌙",short:"Étoiles, lune et néons renforcés"}
 };
 const ARENA_DEFAULT_MOODS={stadium:"crepuscule",tokyo:"nuit",temple:"jour",Libreville:"crepuscule"};
+/* ---------------- CHAMPIONNAT Godson V5 : 3 CIRCUITS ----------------
+   Le mode Arcade devient un championnat structuré : adversaires uniques,
+   arènes imposées en tournée, difficulté croissante et boss final. */
+const CHAMPIONSHIP_CIRCUITS={
+  stade:{id:"stade",name:"Circuit Stade Godson",icon:"🏟️",stages:5,xp:250,coins:150,arenas:["stadium","tokyo","temple","Libreville","stadium"],diffs:["facile","facile","moyen","moyen","difficile"],bossPool:[2,3,6],desc:"5 combats pour entrer dans la légende locale."},
+  monde:{id:"monde",name:"Circuit Monde des Planches",icon:"🌍",stages:8,xp:500,coins:300,arenas:["stadium","temple","tokyo","Libreville","temple","stadium","tokyo","Libreville"],diffs:["facile","moyen","moyen","moyen","difficile","difficile","difficile","difficile"],bossPool:[36,21,34,28],desc:"8 champions des planches sur toutes les arènes."},
+  legendes:{id:"legendes",name:"Circuit des Légendes",icon:"👑",stages:12,xp:1000,coins:650,arenas:["stadium","tokyo","temple","Libreville","tokyo","temple","Libreville","stadium","temple","tokyo","stadium","Libreville"],diffs:["moyen","moyen","difficile","difficile","difficile","difficile","difficile","difficile","difficile","difficile","difficile","difficile"],bossPool:[4],desc:"12 combats, presque tous en Difficile. GODSON PRIME garde la couronne."}
+};
 function resolveArenaMood(arenaId,preference){ return preference&&preference!=="auto"&&ARENA_MOODS[preference]?preference:(ARENA_DEFAULT_MOODS[arenaId]||"jour"); }
 function arenaMoodLabel(mood){ const m=ARENA_MOODS[mood]||ARENA_MOODS.auto; return m.icon+" "+m.label; }
 let selArenaMood=ARENA_MOODS[PROFILE.selection.arenaMood]?PROFILE.selection.arenaMood:"auto";
@@ -560,7 +629,7 @@ function buildDisplayNames(){
   else if(mode==="training")p2.name="Mannequin";
   else if(mode==="story")p2.name=currentStoryFight().foeName;
   else if(mode==="survival")p2.name=(survival.next&&survival.next.boss?"👑 BOSS — Vague ":"🌊 Vague ")+survival.wave;
-  else if(mode==="arcade")p2.name="BOT — Étage "+arcade.stage+"/5";
+  else if(mode==="arcade")p2.name="BOT "+arcade.stage+"/"+arcadeTotal();
   else p2.name="BOT "+DIFFS[botDiff].label.toUpperCase();
   p1.displayName=p1.name+" • "+p1.char.name;
   p2.displayName=p2.name+" • "+p2.char.name;
@@ -569,7 +638,8 @@ function buildDisplayNames(){
 /* ---------------- ÉTAT GLOBAL ---------------- */
 let state="menu",prevState="menu",mode="bot",pendingMode="bot",botDiff="moyen";
 let selCharP1=PROFILE.selection.charP1||0, selCharP2=(PROFILE.selection.charP2==null?1:PROFILE.selection.charP2), selArenaId=PROFILE.selection.arena||"stadium";
-let arcade={stage:1,seq:[],lastWin:false};
+let arcade={stage:1,seq:[],lastWin:false,total:5,circuit:"stade",circuitName:"Circuit Stade Godson"};
+function arcadeTotal(){ return Math.max(1,arcade.total||(arcade.seq&&arcade.seq.length)||5); }
 let story={step:1,total:STORY_CAMPAIGN.fights.length,lastWin:false};
 let survival={wave:1,score:0,lastWaveScore:0,lastWin:false,next:null,carryHealth:null,carryEnergy:0,recorded:false,runCounted:false};
 function roundsToWin(){ return mode==="survival"?1:SETTINGS.roundsWin; }
@@ -1148,8 +1218,8 @@ function resetRound(){
   projectiles=[]; floaters=[]; rings=[]; ghosts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
   timerSec=SETTINGS.roundTime; timerFrames=0; state="intro"; introT=132; announcedFight=false; lastWinner=null; cinematic=70;
   if(typeof buildPips==="function")buildPips();
-  $("roundLabel").textContent=mode==="arcade"?("ARCADE "+arcade.stage+"/5 • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
-  announce(mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),mode==="arcade"?("Étage "+arcade.stage+" / 5"):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
+  $("roundLabel").textContent=mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
+  announce(mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),mode==="arcade"?((arcade.circuitName||"Championnat Godson")+" — combat "+arcade.stage+" / "+arcadeTotal()):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
   if(typeof resetCamera==="function")resetCamera(true);
   if(typeof snapHUD==="function")snapHUD();
 }
@@ -1215,7 +1285,7 @@ function finishMatch(winner){
     if(typeof submitOnlineMatchResult==="function")setTimeout(()=>submitOnlineMatchResult(winner),0);
   } else if(mode==="2p")PROFILE.stats.matches++;
   arcade.lastWin=(winner===p1);
-  if(mode==="arcade"&&winner===p1&&arcade.stage>=5){ PROFILE.stats.arcadeClears++; unlock("arcade","Champion du mode Arcade"); }
+  if(mode==="arcade"&&winner===p1&&arcade.stage>=arcadeTotal()){ PROFILE.stats.arcadeClears++; const cc=careerData(); const cid=arcade.circuit||"stade"; cc.circuits[cid]=(cc.circuits[cid]||0)+1; unlock("arcade","Champion du mode Arcade"); unlock("circuit-"+cid,"Champion — "+((CHAMPIONSHIP_CIRCUITS[cid]||{}).name||cid)); }
   if(mode==="story"){
     story.lastWin=(winner===p1);
     if(winner===p1){
@@ -1252,6 +1322,7 @@ function finishMatch(winner){
     }
     survival.score+=survival.lastWaveScore;
   }
+  awardCareerForMatch(winner);
   saveProfile();
   if(typeof showEndScreen==="function")showEndScreen(winner);
 }

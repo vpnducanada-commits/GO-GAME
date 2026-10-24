@@ -3,6 +3,43 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [5.0.0] — 2026-10-24 — « Édition Jeu Complet »
+
+Nouvelle ambition du propriétaire : **l'objectif n'est plus de créer un mini-jeu,
+mais un jeu.** La V5 relie enfin les modes existants en une progression durable :
+jouer → progresser → débloquer → viser la couronne.
+
+### Ajouté — Carrière Godson (le cœur de la V5)
+- **XP, niveaux 1→50 et rangs** (Débutant → Mythe Godson) gagnés dans tous les modes :
+  Campagne, Championnat, Bot, 2 Joueurs, Survie et Online ; bonus de performance
+  (grande victoire, combo, parades, santé restante).
+- **Godson** : monnaie de carrière dépensée en **titres honorifiques équipables** et
+  récompenses (tenue de Libreville, accès anticipé à GODSON PRIME) — aucun achat réel.
+- **12 quêtes de carrière** réclamables une seule fois (victoires, combo, polyvalence,
+  Survie, Campagne, circuits, ascension) avec primes XP/Godson.
+- **Migration honorifique** : les anciens profils convertissent victoires, Arcade,
+  Survie et chapitres en XP/Godson de départ.
+- Écran de fin enrichi : gain XP/Godson et passage de niveau annoncés après chaque match.
+
+### Ajouté — Championnat Godson (successeur du mode Arcade)
+- **3 circuits** : Stade Godson (5 combats), Monde des Planches (8), Légendes (12,
+  GODSON PRIME en finale) — adversaires uniques, arènes imposées en tournée,
+  difficulté croissante, boss final et grosses primes de couronne.
+- L'ancienne Arcade 5 étapes devient le circuit Stade ; tous les compteurs « /5 » sont
+  généralisés (HUD, VS, replays, Hall, fins de match, enseigne d'arène).
+
+### Ajouté — Hub principal (Lena)
+- **Carte carrière vivante** au menu : rang, niveau, barre d'XP, Godson, titre équipé et
+  **prochain objectif** toujours visible.
+- Menu structuré en sections « Jouer » et « Progression & collection », écran Carrière
+  complet (circuits, quêtes, récompenses, parcours du jeu).
+
+### Inchangé / garanti
+- Déterminisme, replays, lockstep Online, hitboxes et sauvegardes intacts ; les replays
+  anciens restent lisibles (le circuit entre dans le contexte d'enregistrement).
+- **342 assertions / 577 vérifications** vertes, nouveau contrôle QA n°27, bundle
+  **404 Ko** (budget officiellement relevé à 448 Ko pour l'édition complète).
+
 ## [4.4.0] — 2026-10-24 — « Navigation Pro & Tenues de combat »
 
 Retour du propriétaire : la navigation et l'affichage n'étaient pas encore au niveau,
