@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.2 — ÉCRAN ADAPTATIF, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V5.3 — GRAPHISMES AAA II, JOYSTICK PRO & M1 SIGNATURE
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="5.2.0";
+const GAME_VERSION="5.3.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -693,7 +693,7 @@ let dummyMode="immobile";
 let round=1,timerSec=99,timerFrames=0,matchElapsed=0,simFrame=0,timeGlobal=0;
 let introT=0,roundEndT=0,announcedFight=false,announceT=0,lastWinner=null,lastFinishType="";
 let shake=0,slowmoT=0,hitStopT=0,crowdExcite=0,cinematic=0;
-let particles=[],projectiles=[],floaters=[],rings=[],ghosts=[];
+let particles=[],projectiles=[],floaters=[],rings=[],ghosts=[],impactBursts=[];
 const playerHabits={jumps:0,blocks:0,dashes:0};
 function isCombat(){ return state==="fight"||state==="training"; }
 function placeMenuFighters(){ p1.x=p1.px=p1.rx=390; p2.x=p2.px=p2.rx=890; p1.y=p1.py=p1.ry=GROUND; p2.y=p2.py=p2.ry=GROUND; p1.facing=1; p2.facing=-1; }
@@ -785,6 +785,14 @@ function pushParticle(p){ if(particles.length>=particleCap())particles.splice(0,
 function spark(x,y,color,n,pow){ n=Math.max(1,Math.round(n*particleMul())); for(let i=0;i<n;i++){ const a=Math.random()*6.28,s=(.5+Math.random())*(pow||4); pushParticle({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s-1,life:16+Math.random()*16,max:32,r:1.8+Math.random()*3.2,c:color,grav:.12}); } }
 function dust(x,y,n){ n=Math.max(1,Math.round(n*particleMul())); for(let i=0;i<n;i++)pushParticle({x:x+(Math.random()-.5)*38,y:y-2,vx:(Math.random()-.5)*2.5,vy:-Math.random()*1.4,life:20+Math.random()*18,max:38,r:3.6+Math.random()*6.5,c:"rgba(214,205,195,.5)",grav:-.012}); }
 function ring(x,y,c){ if(rings.length<24)rings.push({x,y,r:8,life:15,c}); }
+/* V5.3 (Kenzo) : événements d'impact typés, convertis en sprites par le rendu.
+   Strictement visuel : aucun impact sprite n'entre dans replayStateHash(). */
+function impactBurst(x,y,kind,color,power,dir){
+  if(impactBursts.length>=18)impactBursts.shift();
+  const p=clamp(power||1,.55,1.9),life=Math.round((kind==="m1final"?19:kind==="ground"?15:13)+p*3);
+  const burst={x,y,kind:kind||"light",color:color||"#fff59d",power:p,dir:dir||1,life,max:life,seed:(((simFrame*37+Math.round(x)*3+Math.round(y))%997)+997)%997/997};
+  impactBursts.push(burst); return burst;
+}
 function floater(x,y,text,c,big){ if(floaters.length>14)floaters.shift(); floaters.push({x,y,text,c:c||"#fff",life:52,vy:-1.1,big:!!big}); }
 function confetti(){ const n=Math.round(120*particleMul()); for(let i=0;i<n;i++)pushParticle({x:Math.random()*W,y:-10-Math.random()*170,vx:(Math.random()-.5)*2,vy:1.4+Math.random()*2.6,life:125+Math.random()*90,max:215,r:2.8+Math.random()*4,c:["#ffc400","#ff2e88","#00a2ff","#00e676","#fff"][(Math.random()*5)|0],grav:.014,rect:true,rot:Math.random()*6}); }
 function firework(x,y){ const c=["#ffc400","#ff2e88","#00e5ff","#69f0ae"][(Math.random()*4)|0]; spark(x,y,c,34,5.5); ring(x,y,c); }
@@ -1074,7 +1082,7 @@ function applyDamage(att,def,atk,typeLabel){
     def.parryT=0; def.parryFlashT=16; def.counterWindowT=30; def.blockStun=0; def.kvx=0;
     def.energy=Math.min(100,def.energy+12*def.char.energyGain); def.stats.parries=(def.stats.parries||0)+1; def.stats.blocked++;
     att.hitConfirmed=false; resetM1Chain(att); att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
-    spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
+    spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400"); impactBurst(def.x+def.facing*44,hitY,"parry","#ffc400",1.45,def.facing);
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
     hitStopT=Math.max(hitStopT,38); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
     if(isLocalCareerFighter(def)){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
@@ -1084,7 +1092,7 @@ function applyDamage(att,def,atk,typeLabel){
     const chip=def.health>1?1:0;
     def.health-=chip; def.blockStun=Math.max(def.blockStun,atk.blockstun||6); def.kvx=att.facing*(atk.knock||4)*.32*def.char.knockRes;
     def.energy=Math.min(100,def.energy+5*def.char.energyGain); def.stats.blocked++; att.hitConfirmed=true;
-    spark(def.x+def.facing*42,hitY,"#bfe7ff",9,3); ring(def.x+def.facing*42,hitY,"#81d4fa"); SFX.block();
+    spark(def.x+def.facing*42,hitY,"#bfe7ff",9,3); ring(def.x+def.facing*42,hitY,"#81d4fa"); impactBurst(def.x+def.facing*42,hitY,"block","#81d4fa",.85,def.facing); SFX.block();
     floater(def.x,def.y-184*def.char.scale,"BLOQUÉ !","#bfe7ff");
     return;
   }
@@ -1119,6 +1127,8 @@ function applyDamage(att,def,atk,typeLabel){
     else if(atk.hard&&def.grounded&&!(atk.m1&&!atk.m1Final))def.vy=-2.6; // les maillons M1 gardent la cible au sol pour que le combo reste vrai
   }
   spark(midX,hitY,atk.hard?att.skin.trail:"#fff59d",atk.hard?22:14,atk.hard?6:4.4); spark(midX,hitY,"#ff5252",7,3.2);
+  const burstKind=isThrow?"throw":(atk.m1Final?"m1final":atk.m1?"m1":(isCounter||isRiposte)?"counter":(typeLabel==="special"||typeLabel==="super"||typeLabel==="exspecial")?"projectile":atk.hard?"heavy":"light");
+  impactBurst(midX,hitY,burstKind,(atk.hard||atk.m1)?att.skin.trail:((isCounter||isRiposte)?"#ff9100":"#fff59d"),atk.m1Final?1.75:atk.hard?1.3:atk.m1?1.08+(atk.m1Step||0)*.08:(isCounter||isRiposte)?1.35:.92,att.facing);
   floater(def.x,def.y-184*def.char.scale,(isRiposte?"Riposte ! -":isCounter?"CONTRE ! -":"-")+dmg,isRiposte?"#ffc400":isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter||isRiposte);
   const seqName=comboSequenceName(att); if(att.combo>=3&&seqName)floater(att.x,att.y-212*att.char.scale,seqName,"#ffc400");
   shake=Math.max(shake,(atk.hard?7:3.4)*((isCounter||isRiposte)?1.15:1)); crowdExcite=95;
@@ -1225,7 +1235,7 @@ function updateFighter(f,inp,op){
   f.x+=f.vx+f.kvx; f.y+=f.vy; f.kvx*=(f.grounded?.76:.94);
   if(f.y>=GROUND){
     if(!f.grounded){ if(f.vy>5)dust(f.x,GROUND,6); f.squashT=8; f.airDashed=false;
-      if(f.knockdownPending&&f.health>0){ f.knockdownPending=false; f.downT=42; f.comboVuln=false; ring(f.x,GROUND-4,"#fff"); }
+      if(f.knockdownPending&&f.health>0){ f.knockdownPending=false; f.downT=42; f.comboVuln=false; ring(f.x,GROUND-4,"#fff"); impactBurst(f.x,GROUND-6,"ground","#ffffff",1.05,f.facing); }
       if(f.hitStun>0&&!f.knockdownPending)f.comboVuln=false;
     }
     f.y=GROUND; f.vy=0; f.grounded=true;
@@ -1248,7 +1258,7 @@ function updateProjectiles(){
   for(let i=0;i<projectiles.length;i++)for(let j=i+1;j<projectiles.length;j++){
     const a=projectiles[i],b=projectiles[j];
     if(a.owner!==b.owner&&Math.abs(a.x-b.x)<a.r+b.r&&Math.abs(a.y-b.y)<46){
-      spark((a.x+b.x)/2,(a.y+b.y)/2,"#ffffff",24,5.2); ring((a.x+b.x)/2,(a.y+b.y)/2,"#fff"); SFX.boom();
+      spark((a.x+b.x)/2,(a.y+b.y)/2,"#ffffff",24,5.2); ring((a.x+b.x)/2,(a.y+b.y)/2,"#fff"); impactBurst((a.x+b.x)/2,(a.y+b.y)/2,"clash","#ffffff",1.25,1); SFX.boom();
       if(a.pierce&&!b.pierce)clashRemove.add(j);
       else if(b.pierce&&!a.pierce)clashRemove.add(i);
       else { clashRemove.add(i); clashRemove.add(j); }
@@ -1269,7 +1279,7 @@ function updateProjectiles(){
     let remove=pr.life<=0||pr.x<-55||pr.x>W+55||pr.y>H+70;
     // Explosion des météores au sol
     if(!remove&&pr.kind==="meteor"&&pr.y>=GROUND-13){
-      spark(pr.x,GROUND-8,pr.owner.skin.trail,20,5.2); ring(pr.x,GROUND-8,"#fff"); dust(pr.x,GROUND,7); SFX.boom();
+      spark(pr.x,GROUND-8,pr.owner.skin.trail,20,5.2); ring(pr.x,GROUND-8,"#fff"); impactBurst(pr.x,GROUND-10,"ground",pr.owner.skin.trail,1.45,Math.sign(pr.vx)||1); dust(pr.x,GROUND,7); SFX.boom();
       if(!def.dead&&def.downT<=0&&def.invulnT<=0&&def.dashT<=7&&Math.abs(pr.x-def.x)<76&&def.y>GROUND-95)applyDamage(pr.owner,def,pr.atk,pr.super?"super":(pr.ex?"exspecial":"special"));
       remove=true;
     }
@@ -1284,6 +1294,7 @@ function updateEffects(){
   for(let i=floaters.length-1;i>=0;i--){ const f=floaters[i]; f.y+=f.vy; if(--f.life<=0)floaters.splice(i,1); }
   for(let i=rings.length-1;i>=0;i--){ const r=rings[i]; r.r+=5.4; if(--r.life<=0)rings.splice(i,1); }
   for(let i=ghosts.length-1;i>=0;i--){ if(--ghosts[i].life<=0)ghosts.splice(i,1); }
+  for(let i=impactBursts.length-1;i>=0;i--){ if(--impactBursts[i].life<=0)impactBursts.splice(i,1); }
   shake*=.86; if(shake<.25)shake=0;
   if(crowdExcite>0)crowdExcite--; if(cinematic>0)cinematic--;
 }
@@ -1307,7 +1318,7 @@ function applySurvivalScaling(){
 function resetRound(){
   const w1=p1.roundWins,w2=p2.roundWins;
   p1.reset(); p2.reset(); p1.roundWins=w1; p2.roundWins=w2; applySurvivalScaling();
-  projectiles=[]; floaters=[]; rings=[]; ghosts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
+  projectiles=[]; floaters=[]; rings=[]; ghosts=[]; impactBursts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
   timerSec=SETTINGS.roundTime; timerFrames=0; state="intro"; introT=132; announcedFight=false; lastWinner=null; cinematic=70;
   if(typeof buildPips==="function")buildPips();
   $("roundLabel").textContent=mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);

@@ -3,6 +3,32 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [5.3.0] — 2026-10-24 — « Graphismes AAA II »
+
+Cap visuel décidé par le studio après la V5.2 : **ancrer les combattants au sol**,
+rendre chaque impact plus spectaculaire et porter les tenues des planches sur les
+41 héros — sans toucher au gameplay.
+
+### Ajouté — Ombres portées et lumière de sol (Kenzo)
+- Ombres **directionnelles en 3 couches** selon Jour/Crépuscule/Nuit et l’arène,
+  contacts séparés sous les pieds, rétrécissement naturel pendant les sauts.
+- Halos de scène entre les combattants et reflets colorés par signature sur le sol.
+
+### Ajouté — Sprites d’impact procéduraux (Kenzo + Nadia)
+- Bursts typés et mis en cache : léger, lourd, projection, contre/riposte,
+  projectile, choc de projectiles, **garde hexagonale**, **parry diamant doré**,
+  **M1**, **final M1 à anneaux fragmentés** et impact au sol en éventail.
+- Effets strictement visuels : hash replay/Online, hitboxes et équilibrage inchangés.
+
+### Ajouté — Tenues des planches pour les 41 combattants (Marco)
+- Table explicite de **41 motifs** (couronne, vague, lame, circuit, rune, montagne,
+  Givre, aile, viseur…) dessinés dans un médaillon de tenue aux couleurs du héros.
+- Bande de tenue signature et initiale personnalisée du joueur conservée.
+
+### Garanti
+- **384 assertions / 619 vérifications** vertes, contrôle QA n°30, bundle **447 Ko**.
+  Détail : `docs/SPRINT_V53_GRAPHISMES_AAA2.md`.
+
 ## [5.2.0] — 2026-10-24 — « Écran Adaptatif & Joystick Pro »
 
 Directives du propriétaire : **joystick à gauche**, nouvel ajustement du **format

@@ -123,12 +123,19 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V5.3 — « Graphismes AAA II » *(LIVRÉ le 24/10/2026 — 384 assertions source / 619 vérifications, suite verte)*
+
+- **Ombres portées directionnelles** : 3 couches, direction/longueur par ambiance et arène, contacts des pieds, atténuation en l’air, halos et reflets colorés au sol.
+- **Sprites d’impact procéduraux** : léger/lourd/projection/contre/projectile/clash/garde/parry/M1/final M1/sol, cache borné à 48 sprites et hash déterministe prouvé inchangé.
+- **Tenues des planches** : motif explicite et médaillon signature pour les 41 combattants, initiale du joueur conservée. Voir `docs/SPRINT_V53_GRAPHISMES_AAA2.md`.
+- 🔜 **V5.4 Tournoi & Saisons** (brackets locaux, saisons de carrière et récompenses), puis Online public selon validation réseau réelle entre deux réseaux distincts.
+
 ## ✅ V5.2 — « Écran Adaptatif & Joystick Pro » *(LIVRÉ le 24/10/2026 — 371 assertions source / 606 vérifications, suite verte)*
 
 - **Consultation complète de l’équipe** à la demande du propriétaire : Lena (joystick au pouce gauche, contrôles aux bords physiques), Nadia (mapping 8 directions + Dash dédié), Kenzo (aucun étirement, logique 1280×720), Marco (grand POING•M1, centre dégagé), Sarah (multi-touch et simulations réelles).
 - **Joystick analogique gauche** : course, saut, garde/modificateur et diagonales ; anciens boutons directionnels supprimés. Cluster droit : Spécial, Dash, Garde, Pied et grand POING•M1.
 - **Trois formats persistants** : Adaptatif par défaut (scène nette + touches aux bords + safe-areas), Cinéma 16:9 et Plein cadre recadré. Voir `docs/SPRINT_V52_ECRAN_JOYSTICK.md`.
-- 🔜 **V5.3 Graphismes AAA II** (ombres portées, impacts sprites, tenues fidèles aux planches), puis tournoi à brackets/saisons et Online public selon validation réseau réelle.
+- ↪️ La V5.3 Graphismes AAA II a ensuite été livrée ci-dessus ; le cap suivant devient le Tournoi & Saisons V5.4.
 
 ## ✅ V5.1 — « Godson FURY — M1 Signature » *(LIVRÉ le 24/10/2026 — 357 assertions source / 592 vérifications, suite verte)*
 

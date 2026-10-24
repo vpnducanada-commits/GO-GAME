@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.2 — ÉCRAN ADAPTATIF, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V5.3 — GRAPHISMES AAA II, JOYSTICK PRO & M1 SIGNATURE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -1241,7 +1241,7 @@ function goMenu(){
   if(typeof leaveOnlineRoom==="function"&&(onlineSession.active||(typeof onlineState!=="undefined"&&onlineState.room&&state==="matchEnd")))leaveOnlineRoom(true);
   state="menu"; mode="bot"; stopMusic(); hideAnnounce();
   $("hud").style.display="none"; $("trainingBar").style.display="none"; $("touchUI").style.display="none";
-  p1.roundWins=0; p2.roundWins=0; projectiles=[]; particles=[]; floaters=[]; rings=[]; ghosts=[];
+  p1.roundWins=0; p2.roundWins=0; projectiles=[]; particles=[]; floaters=[]; rings=[]; ghosts=[]; impactBursts=[];
   applyCharacterTo(p1,selCharP1); applyCharacterTo(p2,selCharP2<0?1:selCharP2);
   p1.reset(); p2.reset(); buildDisplayNames(); placeMenuFighters(); resetCamera(true);
   if(selArenaId!=="random")setArenaById(selArenaId);

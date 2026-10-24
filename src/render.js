@@ -1,14 +1,15 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.1 — GRAPHISMES AAA, M1 SIGNATURE & ROSTER 41
+   Godson FURY ARENA V5.3 — GRAPHISMES AAA II, M1 SIGNATURE & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
 let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
+const impactSpriteCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA II V5.3",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:""};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -433,16 +434,55 @@ function drawFloor(){
   ctx.save(); ctx.translate(640,GROUND+55); ctx.scale(1,.35);
   ctx.beginPath(); ctx.arc(0,0,172,0,7); ctx.strokeStyle=id==="temple"?"rgba(142,36,24,.75)":"rgba(255,196,0,.62)"; ctx.lineWidth=7; ctx.stroke();
   ctx.font="1000 51px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle=id==="temple"?"rgba(90,30,15,.5)":"rgba(255,255,255,.2)"; ctx.fillText("Gideon - Godson",0,15); ctx.restore();
+  /* Graphismes AAA II : la lumière de scène se pose entre les combattants et
+     chaque signature colore légèrement le sol, sans coût de dégradé par frame. */
+  if(qualityLevel>0&&p1&&p2){
+    const mid=(p1.rx+p2.rx)/2; renderStats.floorLightPools=3;
+    ctx.save(); try{ctx.globalCompositeOperation="screen";}catch(e){}
+    ctx.globalAlpha=currentArenaMood==="nuit"?.13:.1; ctx.drawImage(glowSprite(line),mid-275,GROUND-17,550,82);
+    [p1,p2].forEach(f=>{ ctx.globalAlpha=.08; ctx.drawImage(glowSprite(f.skin.trail),f.rx-88,GROUND-5,176,42); });
+    ctx.restore();
+  } else renderStats.floorLightPools=0;
 }
 
 /* ---------------- DESSIN DES COMBATTANTS PRO ---------------- */
-function drawShadow(f){ const air=GROUND-f.ry,s=Math.max(.34,1-air/430)*f.char.scale; ctx.save(); const floorTheme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium; ctx.globalAlpha=.13*s; ctx.fillStyle=floorTheme.line; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+11,86*s,17*s,0,0,7); ctx.fill(); ctx.globalAlpha=1; ctx.fillStyle="rgba(0,0,0,"+(.42*s)+")"; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+10,60*s,13*s,0,0,7); ctx.fill(); ctx.restore(); }
+function arenaShadowVector(){
+  const base=currentArenaMood==="jour"?{x:-.22,len:.78,soft:.8}:currentArenaMood==="nuit"?{x:.26,len:.55,soft:.62}:{x:-.58,len:1.22,soft:.92};
+  if(currentArena.id==="tokyo")base.x+=.18;
+  if(currentArena.id==="Libreville"&&currentArenaMood==="crepuscule")base.x-=.12;
+  if(currentArena.id==="temple"&&currentArenaMood==="jour")base.x-=.08;
+  renderStats.shadowDirection=base.x<-.35?"longue-gauche":base.x>.2?"courte-droite":"zenithale";
+  return base;
+}
+function drawShadow(f){
+  const air=Math.max(0,GROUND-(f.ry==null?f.y:f.ry)),heightFactor=clamp(1-air/460,.25,1),vec=arenaShadowVector();
+  const floorTheme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium;
+  const bodyScale=f.char.scale*(.92+(f.char.bulk||1)*.13)*((f.downT>0||f.dead)?1.28:f.crouching?1.1:1);
+  const layers=qualityLevel===0?1:qualityLevel===1?2:3;
+  renderStats.dynamicShadows=(renderStats.dynamicShadows||0)+1; renderStats.shadowLayers=layers; renderStats.shadowHeightFactor=Math.round(heightFactor*100)/100;
+  ctx.save();
+  if(layers>=3){ ctx.globalAlpha=.09*vec.soft*heightFactor; ctx.fillStyle=floorTheme.line; ctx.beginPath(); ctx.ellipse(f.rx+vec.x*18*bodyScale,GROUND+12,96*bodyScale,19*bodyScale,vec.x*.06,0,7); ctx.fill(); }
+  if(layers>=2){
+    const castX=f.rx+vec.x*(34+air*.17)*bodyScale,castW=82*bodyScale*vec.len*(.68+heightFactor*.42),castH=(10+8*heightFactor)*bodyScale;
+    ctx.globalAlpha=.13+.13*heightFactor; ctx.fillStyle="#000000"; ctx.beginPath(); ctx.ellipse(castX,GROUND+11,castW,castH,vec.x*.08,0,7); ctx.fill();
+  }
+  ctx.globalAlpha=1; ctx.fillStyle="rgba(0,0,0,"+(.18+.28*heightFactor)+")"; ctx.beginPath(); ctx.ellipse(f.rx,GROUND+10,58*bodyScale*(.55+heightFactor*.45),12.5*bodyScale,0,0,7); ctx.fill();
+  if(qualityLevel>0&&f.grounded&&!f.dead&&f.downT<=0){
+    const stride=Math.sin(f.walkPhase||0)*12*clamp(Math.abs((f.vx||0)+(f.kvx||0))/6,0,1),spread=f.crouching?25:20;
+    ctx.fillStyle="rgba(0,0,0,.3)";
+    [-spread-stride,spread+stride].forEach(off=>{ ctx.beginPath(); ctx.ellipse(f.rx+(f.facing||1)*off,GROUND+11,16*bodyScale,5*bodyScale,0,0,7); ctx.fill(); });
+  }
+  ctx.restore();
+}
 function drawReflection(f){
   if(qualityLevel===0)return;
   ctx.save(); ctx.globalAlpha=currentArena.id==="tokyo"?.2:currentArena.id==="Libreville"?.16:.1; ctx.translate(f.rx,GROUND+18+(GROUND-f.ry)*.18); ctx.scale(f.facing*f.char.scale,-.32*f.char.scale);
   ctx.fillStyle=f.skin.primary; ctx.beginPath(); ctx.moveTo(-20,-138); ctx.quadraticCurveTo(0,-148,20,-138); ctx.quadraticCurveTo(17,-106,18,-86); ctx.lineTo(-18,-86); ctx.quadraticCurveTo(-17,-110,-20,-138); ctx.fill();
   ctx.fillStyle=f.skin.skin; ctx.beginPath(); ctx.ellipse(7,-163,14,16,0,0,7); ctx.fill();
   ctx.strokeStyle=f.skin.pants; ctx.lineWidth=14; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-7,-88); ctx.lineTo(-14,-42); ctx.lineTo(-18,-4); ctx.moveTo(8,-88); ctx.lineTo(16,-39); ctx.lineTo(23,-4); ctx.stroke(); ctx.restore();
+  ctx.save(); try{ctx.globalCompositeOperation="screen";}catch(e){} ctx.globalAlpha=currentArena.id==="tokyo"?.16:currentArena.id==="Libreville"?.13:.08;
+  ctx.drawImage(glowSprite(f.skin.trail),f.rx-82,GROUND+13+(GROUND-f.ry)*.1,164,38); ctx.restore();
+  renderStats.floorReflections=(renderStats.floorReflections||0)+1;
 }
 function limb(x1,y1,x2,y2,x3,y3,w,c,endC,endR){
   ctx.lineCap="round"; ctx.lineJoin="round";
@@ -500,6 +540,87 @@ const HUMAN_PROFILES={
 };
 const HUMAN_PROFILE_LOOKUP={}; Object.keys(HUMAN_PROFILES).forEach(k=>{ HUMAN_PROFILE_LOOKUP[k.toLowerCase()]=HUMAN_PROFILES[k]; });
 function humanProfile(f){ const key=String((f&&f.char&&f.char.id)||"gideon").toLowerCase(); return HUMAN_PROFILE_LOOKUP[key]||HUMAN_PROFILES.gideon; }
+/* Tenues des planches AAA II (Marco) : chaque combattant porte un motif de
+   tenue issu de son identité visuelle. La table est explicite pour les 41
+   héros : aucun nouveau personnage ne doit retomber sur un badge générique. */
+const BOARD_OUTFIT_MOTIFS={
+  "gideon":"eclair","kira":"eclair","titan":"montagne","nova":"orbite","godson-prime":"couronne","zara":"vague",
+  "kael":"lame","sora":"rune","ael":"circuit","lira":"boussole","zed":"fleche","nyx":"circuit",
+  "vorak":"hache","aerin":"feuille","korben":"circuit","lyra":"soleil","drakesh":"viseur","selene":"lune",
+  "taiko":"lune","vex":"circuit","elara":"rune","brax":"montagne","kazu":"lame","sera":"circuit",
+  "vorga":"sablier","nox":"feuille","raven":"viseur","zep":"vague","astrid":"couronne","selenia":"feuille",
+  "drakar":"Givre","nyx-ombre":"lame","kairos":"eclair","zara-nova":"circuit","brutus":"bouclier","aria":"soleil",
+  "krak":"montagne","luna":"circuit","velen":"lame","lyra-azur":"aile","orion":"orbite"
+};
+function boardOutfitMotif(f){
+  const id=String((f&&f.char&&f.char.id)||"gideon").toLowerCase();
+  if(BOARD_OUTFIT_MOTIFS[id])return BOARD_OUTFIT_MOTIFS[id];
+  const style=(f&&f.char&&f.char.style)||"hero";
+  return style==="titan"?"montagne":style==="synthetique"?"circuit":style==="magicienne"||style==="nova"?"rune":style==="guerrier"?"lame":style==="Zara"?"vague":"eclair";
+}
+function drawBoardMotif(kind,x,y,size,color){
+  const u=(size||10)/10;
+  ctx.save(); ctx.translate(x,y); ctx.scale(u,u); ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=1.55/u; ctx.lineCap="round"; ctx.lineJoin="round";
+  if(kind==="eclair"){
+    ctx.beginPath(); ctx.moveTo(2,-9); ctx.lineTo(-4,1); ctx.lineTo(0,1); ctx.lineTo(-2,9); ctx.lineTo(5,-2); ctx.lineTo(1,-2); ctx.closePath(); ctx.fill();
+  }else if(kind==="montagne"){
+    ctx.beginPath(); ctx.moveTo(-9,7); ctx.lineTo(-4,-3); ctx.lineTo(-1,2); ctx.lineTo(3,-6); ctx.lineTo(9,7); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(1.1,-3.2); ctx.lineTo(3,-6); ctx.lineTo(4.9,-3.2); ctx.stroke();
+  }else if(kind==="orbite"){
+    ctx.beginPath(); ctx.arc(0,0,3.1,0,7); ctx.fill(); ctx.beginPath(); ctx.ellipse(0,0,8.4,3,-.45,0,7); ctx.stroke();
+    ctx.beginPath(); ctx.arc(6.2,-2.8,1.5,0,7); ctx.fill();
+  }else if(kind==="couronne"){
+    ctx.beginPath(); ctx.moveTo(-8,6); ctx.lineTo(-7,-4); ctx.lineTo(-3,1); ctx.lineTo(0,-7); ctx.lineTo(3,1); ctx.lineTo(7,-4); ctx.lineTo(8,6); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-7,8.4); ctx.lineTo(7,8.4); ctx.stroke();
+  }else if(kind==="vague"){
+    [-3.4,2.8].forEach(yy=>{ ctx.beginPath(); ctx.moveTo(-8,yy); ctx.quadraticCurveTo(-4,yy-4,0,yy); ctx.quadraticCurveTo(4,yy+4,8,yy-1); ctx.stroke(); });
+  }else if(kind==="lame"){
+    ctx.rotate(-.62); ctx.beginPath(); ctx.moveTo(0,-9); ctx.lineTo(3,-2); ctx.lineTo(1,3); ctx.lineTo(-1,3); ctx.lineTo(-3,-2); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-4,4.2); ctx.lineTo(4,4.2); ctx.moveTo(0,4.2); ctx.lineTo(0,8.4); ctx.stroke();
+  }else if(kind==="rune"){
+    ctx.beginPath(); ctx.moveTo(0,-8.6); ctx.lineTo(6.8,0); ctx.lineTo(0,8.6); ctx.lineTo(-6.8,0); ctx.closePath(); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-5); ctx.lineTo(0,5); ctx.moveTo(-3.8,-2.4); ctx.lineTo(3.8,2.4); ctx.moveTo(3.8,-2.4); ctx.lineTo(-3.8,2.4); ctx.stroke();
+  }else if(kind==="circuit"){
+    ctx.strokeRect(-4,-4,8,8);
+    [[-4,0,-8,0],[4,0,8,0],[0,-4,0,-8],[0,4,0,8]].forEach(l=>{ ctx.beginPath(); ctx.moveTo(l[0],l[1]); ctx.lineTo(l[2],l[3]); ctx.stroke(); ctx.beginPath(); ctx.arc(l[2],l[3],1.25,0,7); ctx.fill(); });
+    ctx.beginPath(); ctx.arc(0,0,1.5,0,7); ctx.fill();
+  }else if(kind==="boussole"){
+    [[0,-9,2.2,-2.2,0,0,-2.2,-2.2],[9,0,2.2,2.2,0,0,2.2,-2.2],[0,9,-2.2,2.2,0,0,2.2,2.2],[-9,0,-2.2,-2.2,0,0,-2.2,2.2]].forEach(t=>{ ctx.beginPath(); ctx.moveTo(t[0],t[1]); ctx.lineTo(t[2],t[3]); ctx.lineTo(t[4],t[5]); ctx.lineTo(t[6],t[7]); ctx.closePath(); ctx.fill(); });
+  }else if(kind==="fleche"){
+    ctx.rotate(-.48); ctx.beginPath(); ctx.moveTo(-8,6); ctx.lineTo(7,-6); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8.6,-7.4); ctx.lineTo(3.5,-6.8); ctx.lineTo(6.6,-2.8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(-7.6,6.4); ctx.lineTo(-3.4,5.4); ctx.moveTo(-7.2,6.8); ctx.lineTo(-6,2.8); ctx.stroke();
+  }else if(kind==="hache"){
+    ctx.rotate(.48); ctx.beginPath(); ctx.moveTo(0,-8.4); ctx.lineTo(0,9); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,-7); ctx.lineTo(7,-5.2); ctx.quadraticCurveTo(8.6,-1,7,2.4); ctx.lineTo(0,.8); ctx.closePath(); ctx.fill();
+  }else if(kind==="feuille"){
+    ctx.beginPath(); ctx.moveTo(0,8.4); ctx.quadraticCurveTo(-8.4,.4,0,-8.8); ctx.quadraticCurveTo(8.4,.4,0,8.4); ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,.35)"; ctx.beginPath(); ctx.moveTo(0,7.4); ctx.quadraticCurveTo(1.4,0,0,-7.2); ctx.stroke();
+  }else if(kind==="soleil"){
+    ctx.beginPath(); ctx.arc(0,0,3.5,0,7); ctx.fill();
+    for(let i=0;i<8;i++){ const a=i*Math.PI/4; ctx.beginPath(); ctx.moveTo(Math.cos(a)*5.2,Math.sin(a)*5.2); ctx.lineTo(Math.cos(a)*8.6,Math.sin(a)*8.6); ctx.stroke(); }
+  }else if(kind==="viseur"){
+    ctx.beginPath(); ctx.arc(0,0,6.1,0,7); ctx.stroke(); ctx.beginPath(); ctx.arc(0,0,1.35,0,7); ctx.fill();
+    [[0,-8.8,0,-4.8],[0,4.8,0,8.8],[-8.8,0,-4.8,0],[4.8,0,8.8,0]].forEach(l=>{ ctx.beginPath(); ctx.moveTo(l[0],l[1]); ctx.lineTo(l[2],l[3]); ctx.stroke(); });
+  }else if(kind==="lune"){
+    ctx.beginPath(); ctx.arc(0,0,8,-1.12,1.12); ctx.arc(3.4,0,6.2,1.05,-1.05,true); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.arc(5.6,-5.2,1.2,0,7); ctx.fill();
+  }else if(kind==="sablier"){
+    ctx.beginPath(); ctx.moveTo(-6,-8); ctx.lineTo(6,-8); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-6,8); ctx.lineTo(6,8); ctx.lineTo(0,0); ctx.closePath(); ctx.fill();
+  }else if(kind==="Givre"){
+    for(let i=0;i<3;i++){ const a=i*Math.PI/3; ctx.beginPath(); ctx.moveTo(-Math.cos(a)*8.4,-Math.sin(a)*8.4); ctx.lineTo(Math.cos(a)*8.4,Math.sin(a)*8.4); ctx.stroke(); }
+    ctx.beginPath(); ctx.arc(0,0,2.1,0,7); ctx.stroke();
+  }else if(kind==="bouclier"){
+    ctx.beginPath(); ctx.moveTo(0,-8.8); ctx.lineTo(7,-6.2); ctx.quadraticCurveTo(7,3.4,0,8.8); ctx.quadraticCurveTo(-7,3.4,-7,-6.2); ctx.closePath(); ctx.fill();
+    ctx.strokeStyle="rgba(0,0,0,.32)"; ctx.beginPath(); ctx.moveTo(0,-6.6); ctx.lineTo(0,6.8); ctx.stroke();
+  }else if(kind==="aile"){
+    [-4.6,-1,2.6].forEach((yy,i)=>{ ctx.beginPath(); ctx.moveTo(-7.6,6.6-i); ctx.quadraticCurveTo(-1.5,yy,8.4,yy-2.4); ctx.quadraticCurveTo(2.6,yy+2.5,-5.4,7.2-i*.7); ctx.stroke(); });
+  }else{
+    ctx.beginPath(); ctx.moveTo(0,-8.4); ctx.lineTo(7,0); ctx.lineTo(0,8.4); ctx.lineTo(-7,0); ctx.closePath(); ctx.fill();
+  }
+  ctx.restore();
+}
 function solveJoint(ax,ay,cx,cy,l1,l2,bend){
   const dx=cx-ax,dy=cy-ay; let d=Math.hypot(dx,dy)||.001;
   d=clamp(d,Math.abs(l1-l2)+.01,l1+l2-.01);
@@ -854,11 +975,25 @@ function drawFighter(f){
     ctx.globalAlpha=.85; ctx.strokeStyle=sk.accent; ctx.lineWidth=2.2; const bx=shX-shoulderHalf*.66,by=shY+16; ctx.beginPath(); ctx.moveTo(bx+5,by); ctx.lineTo(bx-2,by+10); ctx.lineTo(bx+2.5,by+10); ctx.lineTo(bx-4,by+21); ctx.stroke();
   }
   renderStats.materialDetails=(renderStats.materialDetails||0)+1; ctx.restore();
-  const emblemX=shX+4,emblemY=shY+24;
-  ctx.fillStyle="rgba(255,255,255,.94)"; ctx.beginPath(); ctx.arc(emblemX,emblemY,9.5,0,7); ctx.fill(); ctx.strokeStyle="rgba(0,0,0,.25)"; ctx.stroke();
-  ctx.fillStyle=sk.dark; ctx.font="1000 11px Arial"; ctx.textAlign="center";
-  // Contre-miroir : la lettre reste lisible quand le combattant regarde à gauche.
-  ctx.save(); ctx.translate(emblemX,emblemY+4); ctx.scale(Math.sign(visualFace)||1,1); ctx.fillText(f.letter,0,0); ctx.restore();
+  const emblemX=shX+4,emblemY=shY+24,boardMotif=boardOutfitMotif(f);
+  ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";
+  if(qualityLevel>0){
+    ctx.globalAlpha=.46; ctx.strokeStyle=sk.accent; ctx.lineWidth=3.1;
+    ctx.beginPath(); ctx.moveTo(shoulderFront.x-4,shoulderFront.y+8); ctx.quadraticCurveTo(waistX+2,waistY,hipBack.x+4,hipBack.y-1); ctx.stroke();
+    ctx.globalAlpha=.8; ctx.fillStyle=sk.accent;
+    [.24,.5,.76].forEach(t=>{ ctx.beginPath(); ctx.arc(lerp(shoulderFront.x-4,hipBack.x+4,t),lerp(shoulderFront.y+8,hipBack.y-1,t),1.5,0,7); ctx.fill(); });
+    ctx.globalAlpha=.42; ctx.drawImage(glowSprite(sk.accent),emblemX-19,emblemY-19,38,38); ctx.globalAlpha=1;
+  }
+  ctx.fillStyle=shade(sk.dark,-8); ctx.beginPath(); ctx.arc(emblemX,emblemY,11.2,0,7); ctx.fill();
+  ctx.strokeStyle=sk.accent; ctx.lineWidth=2.4; ctx.stroke();
+  ctx.fillStyle=shade(sk.primary,-18); ctx.beginPath(); ctx.arc(emblemX,emblemY,8.7,0,7); ctx.fill();
+  drawBoardMotif(boardMotif,emblemX,emblemY,10.6,"#ffffff");
+  ctx.fillStyle="rgba(255,255,255,.94)"; ctx.beginPath(); ctx.arc(emblemX+9.5,emblemY+9.5,5.6,0,7); ctx.fill(); ctx.strokeStyle="rgba(0,0,0,.28)"; ctx.lineWidth=1; ctx.stroke();
+  ctx.fillStyle=sk.dark; ctx.font="1000 7px Arial"; ctx.textAlign="center";
+  // Contre-miroir : l'initiale du joueur reste lisible quand le combattant regarde à gauche.
+  ctx.save(); ctx.translate(emblemX+9.5,emblemY+12); ctx.scale(Math.sign(visualFace)||1,1); ctx.fillText(f.letter,0,0); ctx.restore();
+  renderStats.boardOutfit=ch.id+":"+boardMotif; renderStats.boardOutfits=(renderStats.boardOutfits||0)+1;
+  ctx.restore();
   drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down);
   // Bras avant selon pose
   const armW=16.4*human.limb;
@@ -987,7 +1122,73 @@ function drawProjectiles(){
     ctx.restore();
   }
 }
+/* Sprites d'impact AAA II : générés une fois par type/couleur, puis dessinés
+   en un seul drawImage rotatif. Le cache est borné pour protéger les mobiles. */
+function impactSprite(kind,color){
+  const kinds=["light","heavy","block","parry","throw","counter","projectile","clash","m1","m1final","ground"];
+  const safeKind=kinds.includes(kind)?kind:"light";
+  const safeColor=/^#[0-9a-f]{3}([0-9a-f]{3})?$/i.test(color||"")?color:"#fff59d";
+  const key=safeKind+":"+safeColor;
+  if(impactSpriteCache.has(key))return impactSpriteCache.get(key);
+  if(impactSpriteCache.size>48)impactSpriteCache.clear();
+  const c=document.createElement("canvas"); c.width=c.height=160; const g=c.getContext("2d");
+  if(!g)return glowSprite(safeColor);
+  g.translate(80,80); g.lineCap="round"; g.lineJoin="round";
+  const glow=g.createRadialGradient(0,0,2,0,0,78);
+  glow.addColorStop(0,"rgba(255,255,255,.96)"); glow.addColorStop(.22,safeColor); glow.addColorStop(.58,"rgba(255,255,255,.12)"); glow.addColorStop(1,"rgba(0,0,0,0)");
+  g.fillStyle=glow; g.fillRect(-80,-80,160,160);
+  const dark=safeColor.length===7?shade(safeColor,-42):safeColor;
+  const spike=(angle,len,width,fill,base)=>{
+    g.save(); g.rotate(angle); g.fillStyle=fill; g.strokeStyle="rgba(0,0,0,.2)"; g.lineWidth=1;
+    g.beginPath(); g.moveTo(base||7,0); g.lineTo(len,-width); g.lineTo(len*.72,0); g.lineTo(len,width); g.closePath(); g.fill(); g.stroke(); g.restore();
+  };
+  if(safeKind==="ground"){
+    for(let i=0;i<10;i++){
+      const a=Math.PI+i*(Math.PI/9),len=34+pseudo(i*17+safeColor.length)*30,w=4+pseudo(i*23)*4;
+      g.save(); g.translate(0,28); spike(a,len,w,i%3===0?"#ffffff":(i%3===1?safeColor:dark),2); g.restore();
+    }
+    g.globalAlpha=.48; g.fillStyle=safeColor; g.beginPath(); g.ellipse(0,31,48,11,0,0,7); g.fill(); g.globalAlpha=1;
+  }else{
+    const count=safeKind==="light"?8:safeKind==="m1final"||safeKind==="clash"?14:safeKind==="heavy"||safeKind==="projectile"?12:safeKind==="block"?7:10;
+    for(let i=0;i<count;i++){
+      const a=i/count*Math.PI*2+pseudo(i*13+safeKind.length)*.22;
+      let len=(safeKind==="light"?38:safeKind==="block"?42:52)+pseudo(i*29+safeColor.length)*(safeKind==="m1final"?27:19);
+      if(safeKind==="m1"||safeKind==="m1final")len*=1+Math.abs(Math.cos(a))*.28;
+      spike(a,len,3.2+pseudo(i*7)*4+(safeKind==="heavy"?1.6:0),i%3===0?"#ffffff":(i%3===1?safeColor:dark),6);
+    }
+  }
+  g.strokeStyle=safeColor;
+  for(let i=0;i<3;i++){ g.globalAlpha=.42-i*.08; g.lineWidth=4.5-i; g.beginPath(); g.arc(0,0,28+i*13,pseudo(i*31+safeColor.length)*5,pseudo(i*31+safeColor.length)*5+1.15+pseudo(i*17)*1.2); g.stroke(); }
+  g.globalAlpha=1;
+  if(safeKind==="block"){
+    g.strokeStyle="#ffffff"; g.lineWidth=5; g.beginPath();
+    for(let i=0;i<6;i++){ const a=i*Math.PI/3+Math.PI/6,x=Math.cos(a)*34,y=Math.sin(a)*34; if(i===0)g.moveTo(x,y); else g.lineTo(x,y); }
+    g.closePath(); g.stroke();
+  }else if(safeKind==="parry"){
+    g.strokeStyle="#ffffff"; g.lineWidth=5; g.beginPath(); g.moveTo(0,-38); g.lineTo(29,0); g.lineTo(0,38); g.lineTo(-29,0); g.closePath(); g.stroke();
+  }else if(safeKind==="m1final"){
+    g.strokeStyle="#ffffff"; g.lineWidth=3; [48,61].forEach((r,i)=>{ for(let k=0;k<4;k++){ const a=i*.45+k*1.57; g.beginPath(); g.arc(0,0,r,a,a+.72); g.stroke(); } });
+  }
+  g.fillStyle="#ffffff"; g.beginPath(); g.arc(0,safeKind==="ground"?26:0,safeKind==="heavy"||safeKind==="m1final"?13:9.5,0,7); g.fill();
+  impactSpriteCache.set(key,c); renderStats.impactSpriteCacheSize=impactSpriteCache.size;
+  return c;
+}
+function drawImpactBursts(){
+  renderStats.impactBurstsDrawn=0;
+  if(typeof impactBursts==="undefined"||!impactBursts.length){ renderStats.impactSpriteCacheSize=impactSpriteCache.size; return; }
+  for(const b of impactBursts){
+    const age=clamp(1-b.life/Math.max(1,b.max||b.life||1),0,1),pop=easeOutCubic(age);
+    const size=(b.kind==="ground"?122:98)*(b.power||1)*(.56+pop*.82)*(qualityLevel===0?.72:1);
+    ctx.save(); ctx.translate(b.x,b.y); ctx.globalAlpha=clamp(1.16-age*1.25,0,1)*(qualityLevel===0?.78:1);
+    if(b.kind==="ground"){ ctx.scale(b.dir||1,1); ctx.rotate(((b.seed||0)-.5)*.08); }
+    else ctx.rotate((b.seed||0)*6.283+age*.48*(b.dir||1));
+    ctx.drawImage(impactSprite(b.kind,b.color),-size/2,-size/2,size,size);
+    ctx.restore(); renderStats.impactBurstsDrawn++; renderStats.lastImpactFx=b.kind+":"+(b.color||"");
+  }
+  renderStats.impactSpriteCacheSize=impactSpriteCache.size;
+}
 function drawEffects(){
+  drawImpactBursts();
   for(const r of rings){ ctx.globalAlpha=Math.max(0,r.life/15); ctx.strokeStyle=r.c; ctx.lineWidth=4; ctx.beginPath(); ctx.arc(r.x,r.y,r.r,0,7); ctx.stroke(); }
   for(const p of particles){ ctx.globalAlpha=Math.max(0,Math.min(1,p.life/(p.max||30))); ctx.fillStyle=p.c; if(p.rect){ctx.save();ctx.translate(p.x,p.y);ctx.rotate((p.rot||0)+renderTicker*.06);ctx.fillRect(-p.r,-p.r*.55,p.r*2,p.r*1.1);ctx.restore();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();} }
   ctx.globalAlpha=1;
