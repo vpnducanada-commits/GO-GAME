@@ -1,16 +1,16 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.3 — GRAPHISMES AAA II, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V6.0 — RÉALITÉ 3D, JOYSTICK PRO & M1 SIGNATURE
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="5.3.0";
+const GAME_VERSION="6.0.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game");
-let ctx=canvas.getContext("2d",{alpha:false}); // « let » : les portraits de sélection V3.7 échangent temporairement le contexte
+let ctx=canvas.getContext("2d",{alpha:true}); // alpha : en mode 3D, ce canvas devient l’overlay transparent au-dessus de WebGL ; « let » pour les portraits V3.7
 const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
@@ -24,7 +24,7 @@ const store={
   del(){ try{window.localStorage.removeItem(SAVE_KEY);}catch(e){} }
 };
 function defaultProfile(){ return {
-  settings:{musicVol:70,sfxVol:90,quality:"auto",screenFormat:"adaptatif",roundTime:99,roundsWin:2,speed:1,shake:100,showFps:false,reduceFlash:false},
+  settings:{musicVol:70,sfxVol:90,quality:"auto",screenFormat:"adaptatif",renderer3d:"auto",roundTime:99,roundsWin:2,speed:1,shake:100,showFps:false,reduceFlash:false},
   names:{p1:"Gideon",p2:"Joueur 2"}, initials:{p1:"G",p2:"R"},
   customColors:{p1:null,p2:null},
   selection:{charP1:0,charP2:1,arena:"stadium",arenaMood:"auto"},

@@ -10,6 +10,7 @@ const root = path.join(__dirname, '..');
 let html = fs.readFileSync(path.join(root, 'index.html'), 'utf8');
 html = html.replace('<script src="src/engine.js"></script>', () => '<script>' + fs.readFileSync(path.join(root, 'src/engine.js'), 'utf8') + '</script>');
 html = html.replace('<script src="src/render.js"></script>', () => '<script>' + fs.readFileSync(path.join(root, 'src/render.js'), 'utf8') + '</script>');
+html = html.replace('<script src="src/render3d.js"></script>', () => '<script>' + fs.readFileSync(path.join(root, 'src/render3d.js'), 'utf8') + '</script>');
 html = html.replace('<script src="src/ui.js"></script>', () => '<script>' + fs.readFileSync(path.join(root, 'src/ui.js'), 'utf8') + '</script>');
 html = html.replace('<link rel="stylesheet" href="src/style.css">', '');
 
@@ -55,7 +56,7 @@ function runScript(file) {
   try { vm.runInContext(code, vmCtx, { filename: file }); console.log('Chargé :', file); }
   catch (e) { errors.push(file + ' -> ' + e.stack.split('\n')[0]); }
 }
-['src/engine.js', 'src/render.js', 'src/ui.js'].forEach(runScript);
+['src/engine.js', 'src/render.js', 'src/render3d.js', 'src/ui.js'].forEach(runScript);
 
 const ev = expr => vm.runInContext(expr, vmCtx);
 let v3AsyncWork = null;
@@ -453,7 +454,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'génération V3 affichée et exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -545,7 +546,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 41, '41 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -584,7 +585,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -602,7 +603,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -629,7 +630,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -644,7 +645,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version V3.5+ affichée et exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -773,7 +774,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6,9).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 41, 'identifiants uniques pour les 41 combattants');
@@ -801,7 +802,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.3')), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -829,7 +830,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.0 : Arcade plein écran & anatomie HD —');
-  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
+  assert(/^[456]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
   assert(!!window.document.querySelector('#gameWrap > header.sig'), 'barre système intégrée DANS la scène (aucun panneau extérieur)');
   const cssV4 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(cssV4.includes('#app{position:fixed;inset:0') && cssV4.includes('width:min(100dvw,calc(100dvh * 16 / 9))') && cssV4.includes('height:min(100dvh,calc(100dvw * 9 / 16))') && cssV4.includes('footer{display:none!important}'), 'coque plein écran : scène 16:9 maximale manipulable, aucun pied de page');
@@ -850,7 +851,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.1 : Peinture, matières & présentation (VS plein corps, intro cinéma) —');
-  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
+  assert(/^[456]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
   ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight');
   assert(ev('state') === 'vs' && !!window.document.getElementById('vsPortrait1') && !!window.document.getElementById('vsPortrait2'), 'écran VS : portraits plein corps des deux combattants');
   assert(window.document.querySelector('#vsAvatar1 canvas') && window.document.getElementById('vsAvatar1').style.borderColor, 'cadre VS aux couleurs du combattant');
@@ -872,8 +873,8 @@ function finishTestRun() {
 
 
   /* ===== V4.2 « Graphismes AAA » : peinture, lumière d'arène, profondeur ===== */
-  assert(/^[45]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
-  assert(/^Graphismes AAA/.test(ev('renderStats.artDirection')),'direction artistique AAA (V4.2+)');
+  assert(/^[456]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
+  assert(/Graphismes AAA/.test(ev('renderStats.artDirection')),'direction artistique AAA (V4.2+)');
   ev('qualityLevel=2');
   window.document.querySelector('#btnMode2P').click(); window.document.querySelector('#btnLaunchFight').click();
   for(let i=0;i<60;i++)ev('updateGameLogic()'); ev('render()');
@@ -888,7 +889,7 @@ function finishTestRun() {
 
   /* ===== V4.3 « Roster complet des planches » : les 35 designs du propriétaire jouables ===== */
   console.log('\n— V4.3 : Roster complet des planches (41 combattants) —');
-  assert(/^(4\.[34]|5\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
+  assert(/^(4\.[34]|[56]\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
   assert(ev('CHARACTERS.length')===41,'roster complet : 41 combattants jouables');
   const boardIds=["Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion"];
   assert(ev('(()=>{const ids='+JSON.stringify(boardIds)+'; return ids.every(id=>CHARACTERS.some(c=>c.id===id));})()')===true,'les 35 personnages des 3 planches du propriétaire sont dans le roster');
@@ -912,7 +913,7 @@ function finishTestRun() {
 
   /* ===== V4.4 « Navigation Pro & tenues de combat peintes » ===== */
   console.log('\n— V4.4 : Navigation Pro & tenues de combat peintes —');
-  assert(/^(4\.4|5\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.4+');
+  assert(/^(4\.4|[56]\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.4+');
   ev('goMenu()'); click('btnMode2P');
   assert(!!window.document.getElementById('rosterSearch')&&window.document.querySelectorAll('.filterChip').length>=6,'recherche + filtres par famille présents dans la sélection');
   assert(window.document.querySelectorAll('.stickyActions').length>=2,'barres d’action fixes : Personnages et Arène toujours atteignables');
@@ -935,7 +936,7 @@ function finishTestRun() {
 
   /* ===== V5.0 « Édition Jeu Complet » : carrière, championnat, quêtes & récompenses ===== */
   console.log('\n— V5.0 : Édition Jeu Complet (carrière & championnat) —');
-  assert(/^5\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
+  assert(/^[56]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
   assert(ev('careerLevelFromXp(0)===1&&careerLevelFromXp(100)===2&&careerLevelFromXp(300)===3&&careerLevelFromXp(1000)===5')===true,'niveaux de carrière : seuils XP 0/100/300/1000 respectés');
   assert(ev('(()=>{const p=normalizeProfileData({stats:{wins:10,losses:2,matches:12,arcadeClears:1,bestSurvivalWave:3},story:{chapter1Completed:true}}); return p.career.xp>0&&p.career.Godson>0&&p.career.circuits.stade===0&&Array.isArray(p.career.titles);})()')===true,'migration V5 : un ancien profil reçoit XP, Godson et circuits');
   ev('PROFILE.career={xp:90,Godson:20,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""}; PROFILE.stats.matches=1; saveProfile();');
@@ -963,7 +964,7 @@ function finishTestRun() {
 
   /* ===== V5.1 « Godson FURY — M1 Signature » : nouveau nom + 41 chaînes martelables ===== */
   console.log('\n— V5.1 : Godson FURY ARENA & M1 Signature par combattant —');
-  assert(/^5\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA (V5.1+)');
+  assert(/^[56]\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA (V5.1+)');
   assert(ev('Object.keys(M1_SIGNATURES).length')===41&&ev('CHARACTERS.every(c=>!!M1_SIGNATURES[c.id])')===true,'M1 Signature : les 41 combattants possèdent une chaîne dédiée');
   assert(ev('new Set(Object.values(M1_SIGNATURES).map(s=>s.name)).size')===41&&ev('new Set(Object.values(M1_SIGNATURES).flatMap(s=>s.labels)).size')===168,'M1 Signature : 41 noms de chaînes et 168 coups nommés, tous uniques');
   assert(ev('Object.values(M1_SIGNATURES).every(s=>s.steps.length>=3&&s.steps.length<=5&&s.steps[0].type==="punch"&&s.steps[s.steps.length-1].final)')===true,'M1 Signature : 3 à 5 coups, ouverture Poing et final marqué pour chacun');
@@ -1000,11 +1001,11 @@ function finishTestRun() {
   assert(ev('rosterSearch="sentence des ombres"; rosterMatches(CHARACTERS[31])')===true&&ev('rosterMatches(CHARACTERS[0])')===false,'recherche roster : on peut aussi trouver un combattant par le nom de son M1');
   ev('rosterSearch=""; goMenu()');
   const eng51=fs.readFileSync(path.join(root,'src/engine.js'),'utf8'),ui51=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),html51=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&html51.includes('Godson FURY ARENA V5.3'),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
+  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&html51.includes('Godson FURY ARENA V6.0'),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
 
   /* ===== V5.2 « Écran Adaptatif & Joystick Pro » : décision d'équipe Lena/Nadia/Kenzo/Marco/Sarah ===== */
   console.log('\n— V5.2 : joystick gauche, actions à droite & formats d’écran —');
-  assert(/^5\.[23]\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
+  assert(/^(5\.[23]|6\.0)\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
   assert(!!window.document.getElementById('joyBase')&&!!window.document.getElementById('joyKnob'),'joystick tactile présent en bas à gauche avec bouton mobile');
   assert(!window.document.querySelector('.tBtn[data-t="left"]')&&!window.document.querySelector('.tBtn[data-t="right"]')&&!window.document.querySelector('.tBtn[data-t="jump"]'),'anciens boutons directionnels supprimés : le joystick remplace gauche/droite/saut');
   assert([...window.document.querySelectorAll('.actionGroup .tBtn')].map(b=>b.dataset.t).join(',')==='special,dash,block,kick,punch','cluster droit ergonomique : Spécial, Dash, Garde, Pied et grand POING•M1');
@@ -1035,7 +1036,7 @@ function finishTestRun() {
 
   /* ===== V5.3 « Graphismes AAA II » : ombres portées, impacts sprites, tenues des planches ===== */
   console.log('\n— V5.3 : Graphismes AAA II (Kenzo + Marco, render-only) —');
-  assert(ev('GAME_VERSION')==='5.3.0'&&ev('renderStats.artDirection')==='Graphismes AAA II V5.3','direction artistique officielle : Graphismes AAA II V5.3');
+  assert(ev('GAME_VERSION')==='6.0.0'&&ev('renderStats.artDirection').includes('Graphismes AAA II'),'direction artistique : Réalité 3D V6.0 avec repli Graphismes AAA II');
   assert(ev('Object.keys(BOARD_OUTFIT_MOTIFS).length')===41&&ev('CHARACTERS.every(c=>!!BOARD_OUTFIT_MOTIFS[String(c.id).toLowerCase()])')===true,'tenues des planches : motif explicite pour chacun des 41 combattants');
   assert(ev('BOARD_OUTFIT_MOTIFS["godson-prime"]')==='couronne'&&ev('BOARD_OUTFIT_MOTIFS["zara"]')==='vague'&&ev('BOARD_OUTFIT_MOTIFS["kael"]')==='lame'&&ev('BOARD_OUTFIT_MOTIFS["lyra-azur"]')==='aile','motifs fidèles aux identités : couronne royale, vague de Libreville, lame d’acier, aile d’Azur');
   ev('qualityLevel=2; renderStats.boardOutfits=0;');
@@ -1072,6 +1073,37 @@ function finishTestRun() {
   ev('keys.clear(); impactBursts=[]; setArenaById("stadium","auto"); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
   const render53=fs.readFileSync(path.join(root,'src/render.js'),'utf8'),engine53=fs.readFileSync(path.join(root,'src/engine.js'),'utf8');
   assert(render53.includes('BOARD_OUTFIT_MOTIFS')&&render53.includes('function drawBoardMotif')&&render53.includes('function arenaShadowVector')&&render53.includes('function impactSprite')&&render53.includes('function drawImpactBursts')&&engine53.includes('function impactBurst')&&engine53.includes('"m1final"')&&engine53.includes('"parry"'),'hooks sources V5.3 : motifs 41, ombres directionnelles et impacts typés');
+  /* ===== V6.0 « Réalité 3D » : WebGL maison, poses humanoïdes, arènes 3D, repli 2D ===== */
+  console.log('\n— V6.0 : Réalité 3D (Kenzo + Marco + Nadia, moteur WebGL maison) —');
+  assert(ev('GAME_VERSION')==='6.0.0'&&window.document.title.includes('V6.0')&&window.document.querySelector('h1').textContent.includes('V6.0'),'édition officielle V6.0 « Réalité 3D » affichée');
+  assert(ev('SETTINGS.renderer3d')==='auto'&&!!window.document.getElementById('setRenderer3d')&&!!window.document.getElementById('gl3d')&&ev('typeof draw3DScene')==='function'&&ev('typeof buildFighterPose3D')==='function','3D Réalité activée par défaut en automatique, canvas WebGL et réglage présents');
+  assert(ev('(() => { const b=newBatch3D(); addBox3D(b,[0,1,0],[1,2,1],[0,.4,0],parseColor3("#ff8000")); const c=parseColor3("#ff8000"); return b.count===24&&b.idx.length===36&&c[0]===1&&Math.abs(c[1]-128/255)<.002; })()')===true,'moteur 3D : géométrie indexée et couleurs converties sans bibliothèque externe');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=560; p2.rx=760; p1.ry=p2.ry=GROUND; state="fight"; computeCamera3D();');
+  assert(ev('(() => { const a=project3DPoint(worldFromGame3D(560,GROUND-160,0)),b=project3DPoint(worldFromGame3D(760,GROUND-160,0)); return !!a&&!!b&&a.x<b.x&&a.y>120&&a.y<620&&renderStats.camera3d.includes(","); })()')===true,'caméra 3D : perspective et projection écran orientées correctement');
+  const arenaCounts3D=ev('(() => ARENAS.map(a=>{ setArenaById(a.id,"nuit"); const built=buildArenaBatch3D(); return built.opaque.count+":"+built.trans.count; }).join(","))()');
+  assert(arenaCounts3D.split(',').length===4&&arenaCounts3D.split(',').every(v=>parseInt(v.split(':')[0],10)>1000),'les 4 arènes ont un décor 3D volumique complet ('+arenaCounts3D+')');
+  let poses3DOk=true, fighters3DVertices=0;
+  for(let i=0;i<41;i++){
+    const ok=ev(`(() => { applyCharacterTo(p1,${i}); p1.reset(); p1.rx=560; p1.ry=GROUND; const pose=buildFighterPose3D(p1),keys=["pelvis","chest","head","handFront","handBack","footFront","footBack","kneeFront","elbowFront"]; return keys.every(k=>pose.world[k].every(Number.isFinite))&&pose.world.head[1]>pose.world.chest[1]&&pose.world.chest[1]>pose.world.pelvis[1]; })()`);
+    const verts=ev('(() => { const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); return o.count+t.count; })()');
+    poses3DOk=poses3DOk&&ok===true; fighters3DVertices+=verts;
+  }
+  assert(poses3DOk&&fighters3DVertices>80000,'poses humanoïdes 3D valides pour les 41 combattants ('+fighters3DVertices+' sommets générés)');
+  const hashBeforePose3D=ev('replayStateHash()');
+  ev('(() => { const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); computeCamera3D(); return o.count; })()');
+  assert(ev('replayStateHash()')===hashBeforePose3D,'la couche 3D est purement visuelle : déterminisme, replays et Online inchangés');
+  assert(ev('(() => { p1.reset(); p1.rx=560; p1.ry=GROUND; startAttack(p1,"punch"); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+4)); const a=buildFighterPose3D(p1); p1.attack=null; p1.attackType=""; p1.attackT=0; p1.cooldown=0; startAttack(p1,"kick"); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+4)); const b=buildFighterPose3D(p1); p1.attack=null; p1.attackType=""; p1.attackT=0; p1.cooldown=0; return a.phase>.65&&a.local.handFront[0]>.65&&b.phase>.65&&b.local.footFront[0]>.85&&b.local.footFront[1]>.85; })()')===true,'animations 3D : extension réelle du poing et du pied pendant les attaques');
+  assert(ev('(() => { p1.crouching=true; const a=buildFighterPose3D(p1); p1.crouching=false; p1.downT=40; const b=buildFighterPose3D(p1); p1.downT=0; p1.reset(); return a.local.head[1]<1.62&&b.local.head[1]<.45&&b.local.footFront[0]>.7; })()')===true,'mouvements humains 3D : accroupissement, garde et chute au sol ont des poses dédiées');
+  ev('applyRenderer3DSetting("off"); renderStats.passesRun=[]; render();');
+  assert(ev('SETTINGS.renderer3d')==='off'&&ev('renderStats.renderer3dActive')===false&&ev('renderStats.passesRun.join("/")')==='background/floor/shadows/entities/projectiles/effects/post','réglage 2D classique : retour immédiat au pipeline Graphismes AAA II');
+  ev('applyRenderer3DSetting("auto"); renderStats.passesRun=[]; render();');
+  assert(ev('renderStats.renderer3dRequested')===true&&ev('renderStats.passesRun.join("/")')==='background/floor/shadows/entities/projectiles/effects/post','sans vrai WebGL (harnais jsdom), repli 2D propre sans bloquer le combat');
+  assert(ev('draw3DScene()')===false&&ev('renderStats.renderer3dFallback.length')>0,'diagnostic 3D : la raison du repli est exposée, jamais d’écran noir silencieux');
+  assert(ev('(() => { const oldParticles=particles; particles=[{x:640,y:400,life:15,max:30,r:4,c:"#00e5ff"}]; const pts=buildParticles3D(); particles=oldParticles; return pts.count===1&&pts.sizes[0]>.07&&pts.sizes[0]<.1; })()')===true,'particules 3D : diamètre exprimé en mètres monde, aucun point géant à l’écran');
+  const render60=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),css60=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),html60=fs.readFileSync(path.join(root,'index.html'),'utf8'),ui60=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
+  assert(render60.includes('function buildFighterPose3D')&&render60.includes('function buildArenaBatch3D')&&render60.includes('function computeCamera3D')&&render60.includes('webgl2')&&css60.includes('body.render3d-on #gl3d')&&html60.includes('id="setRenderer3d"')&&ui60.includes('function applyRenderer3DSetting'),'hooks sources V6.0 : WebGL, caméra, arènes, CSS et réglage synchronisés');
+  ev('setArenaById("stadium","auto"); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
+
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
   console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');

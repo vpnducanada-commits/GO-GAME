@@ -3,6 +3,45 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [6.0.0] — 2026-10-24 — « Réalité 3D »
+
+Pivot majeur demandé par le propriétaire après la V5.3 : les combats passent en
+**vraie 3D temps réel**, avec des personnages volumiques, des arènes en
+profondeur et une animation humaine articulée — sans modifier la simulation.
+
+### Ajouté — Moteur 3D Réalité (Kenzo)
+- Nouveau module `src/render3d.js` : WebGL maison sans dépendance, shaders,
+  géométrie indexée, batches opaque/transparent/particules et cache d’arènes.
+- Canvas WebGL derrière l’overlay 2D transparent : HUD, textes d’impact,
+  vignette, bandeaux et post-traitement restent nets au-dessus de la scène.
+- Caméra perspective de combat, éclairage directionnel/hémisphérique/spéculaire,
+  rim light, brouillard, ombres de contact et lumières Jour/Crépuscule/Nuit.
+
+### Ajouté — Personnages et mouvements humains (Marco + Nadia)
+- Les 41 combattants deviennent des humanoïdes 3D articulés : torse, bassin,
+  tête, visage, cheveux, bras/jambes en deux segments, genoux, coudes, gants,
+  chaussures, capes, armures, couronne/visière et motifs de tenue.
+- Poses dédiées pour respiration, course, saut, dash, accroupissement, garde,
+  coups/M1, projections, réactions, chutes et victoire, pilotées par les mêmes
+  courbes humaines que le moteur 2D.
+
+### Ajouté — Quatre arènes en profondeur
+- Stade avec tribunes/foule/grand écran, Néon Tokyo et ses immeubles lumineux,
+  Temple Céleste à piliers/lanternes, Plage de Libreville avec océan, palmiers
+  et voiliers. Projectiles, impacts, auras, boucliers et particules passent en 3D.
+
+### Ajouté — Choix et sécurité du rendu (Lena + Sarah)
+- Réglages → **Rendu de combat 3D** : Automatique (défaut), Toujours ou
+  **2D classique**. Sans WebGL ou en cas de FPS durablement insuffisants en
+  automatique, retour propre aux Graphismes AAA II avec diagnostic exposé.
+- Simulation, hitboxes, dégâts, IA, replays, Online et progression inchangés ;
+  hash déterministe prouvé identique avant/après génération des poses 3D.
+
+### Garanti
+- **398 assertions / 633 vérifications** vertes, contrôle QA n°31, captures
+  WebGL réelles des 4 arènes relues, bundle **495 Ko** (budget V6 ≤ 512 Ko).
+  Détail : `docs/SPRINT_V60_REALITE_3D.md`.
+
 ## [5.3.0] — 2026-10-24 — « Graphismes AAA II »
 
 Cap visuel décidé par le studio après la V5.2 : **ancrer les combattants au sol**,

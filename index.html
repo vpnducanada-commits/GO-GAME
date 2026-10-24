@@ -3,20 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Godson FURY ARENA V5.3 | L’Arène des Légendes — signé Gédéon - Godson</title>
+<title>Godson FURY ARENA V6.0 | L’Arène des Légendes — signé Gédéon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body class="screen-adaptatif">
 <div id="app">
 
   <div id="gameWrap">
+    <canvas id="gl3d" width="1280" height="720" aria-label="Rendu de combat 3D Réalité"></canvas>
     <canvas id="game" width="1280" height="720"></canvas>
 
   <header class="sig">
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>Godson <span>FURY</span> ARENA <em>V5.3</em></h1>
+        <h1>Godson <span>FURY</span> ARENA <em>V6.0</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -342,6 +343,7 @@
           <div><label>🔊 Volume effets — <span id="lblSfxVol">90</span>%</label><input type="range" id="setSfxVol" min="0" max="100" value="90"></div>
           <div><label>🎨 Qualité graphique</label><select id="setQuality"><option value="auto">Automatique (recommandé)</option><option value="high">Haute — Ultra fluide</option><option value="medium">Moyenne</option><option value="low">Basse — PC/mobile lent</option></select></div>
           <div><label>🖥️ Format d’écran</label><select id="setScreenFormat"><option value="adaptatif">Adaptatif — scène nette + touches aux bords (recommandé)</option><option value="cinema">Cinéma 16:9 — cadre centré classique</option><option value="plein">Plein cadre — remplit l’écran (léger recadrage)</option></select></div>
+          <div><label>🧊 Rendu de combat 3D</label><select id="setRenderer3d"><option value="auto">3D Réalité — automatique (recommandé)</option><option value="on">3D Réalité — toujours</option><option value="off">2D classique — Graphismes AAA II</option></select></div>
           <div><label>⏱️ Durée d’un round</label><select id="setRoundTime"><option value="60">60 secondes</option><option value="99" selected>99 secondes</option><option value="120">120 secondes</option><option value="0">Illimitée</option></select></div>
           <div><label>🏆 Rounds pour gagner le match</label><select id="setRoundsWin"><option value="1">1 round (rapide)</option><option value="2" selected>2 rounds (classique)</option><option value="3">3 rounds (épique)</option></select></div>
           <div><label>⚡ Vitesse des combats</label><select id="setSpeed"><option value="0.9">90% — posée</option><option value="1" selected>100% — normale</option><option value="1.12">112% — turbo</option></select></div>
@@ -367,7 +369,7 @@
             <kbd>Q</kbd>/<kbd>D</kbd> bouger • <kbd>Z</kbd> saut • <kbd>S</kbd> Garde<br>
             <kbd>F</kbd> poing • <kbd>G</kbd> pied • <kbd>H</kbd> spécial • <kbd>Maj</kbd> dash<br>
             <span style="opacity:.8">QWERTY : A/D/W/S • manette 🎮 • tactile 📱</span><br>
-            📱 <b>Joystick gauche</b> : ◀ ▶ bouger • ▲ sauter • ▼ garde/modificateur • diagonales acceptées</div>
+            📱 <b>Joystick gauche</b> : ◀ ▶ bouger • ▲ sauter • ▼ garde/modificateur • diagonales acceptées<br>🧊 <b>Combat 3D Réalité</b> : personnages et arènes en vraie 3D WebGL (Réglages → Rendu de combat 3D) ; retour 2D automatique si l’appareil ne suit pas.</div>
           <div><b>🟥 JOUEUR 2</b><br>
             Flèches + <kbd>K</kbd> poing • <kbd>L</kbd> pied • <kbd>M</kbd> spécial • <kbd>O</kbd> dash<br>
             <span style="opacity:.8">Pavé numérique 1/2/3 accepté</span></div>
@@ -440,11 +442,12 @@
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Godson FURY ARENA V5.3</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Godson FURY ARENA V6.0</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>
 <script src="src/render.js"></script>
+<script src="src/render3d.js"></script>
 <script src="src/ui.js"></script>
 </body>
 </html>

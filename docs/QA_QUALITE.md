@@ -7,11 +7,11 @@
 
 | Niveau | Outil | Ce qui est vérifié |
 |---|---|---|
-| Syntaxe | `node --check` | les 3 modules JS et les scripts du bundle |
+| Syntaxe | `node --check` | les 4 modules JS (`engine`, `render`, `render3d`, `ui`) et les scripts du bundle |
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
 | Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry/EX/projections/cancels, rendus, sauvegardes, déterminisme, replays, Arena Moods, tactile et client Online contre API simulée |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
-| Visuel | captures hors-navigateur (canvas natif) | lineup des personnages et frame de combat relus par Kenzo avant release graphique (introduit en V3.1) |
+| Visuel | captures navigateur réel (Chromium headless + WebGL) et canvas natif pour la 2D | combats et arènes relus par Kenzo/Marco ; en V6.0, les 4 arènes 3D sont photographiées dans un vrai contexte WebGL |
 | Release | Git + tag | arbre propre, commit et version traçables |
 
 ## Seuils de release non négociables
@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 448 Ko (budget relevé en V5.0 sur décision d’équipe — édition Jeu Complet ; 447 Ko réels en V5.3 avec Graphismes AAA II, joystick/formats et 41 M1 individuels), sans asset externe.
+- ✅ Bundle officiel ≤ 512 Ko (budget relevé en V6.0 sur décision d’équipe pour le moteur WebGL complet ; 495 Ko / 506 816 octets réels, 4 scripts intégrés), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 
@@ -32,6 +32,7 @@
 | Allocations d’objets d’entrée | objets réutilisés par joueur |
 | Dégradés recréés par frame | à éviter : utiliser les caches du pipeline |
 | Cible d’affichage | 60 FPS, dégradation par la qualité auto |
+| Scène 3D V6 | arènes statiques en cache ; environ 20 000–41 000 sommets/frame et 4–5 draw calls batchés sur les captures de référence ; repli auto si FPS durablement bas |
 
 ## Matrice manuelle avant les grosses releases
 
@@ -39,6 +40,7 @@
 - Tactile mobile : joystick gauche (course, saut diagonal, garde), relâchement au neutre, garde brève (parry), dash, attaques et martelage M1 en multi-touch.
 - Formats d’écran : Adaptatif, Cinéma 16:9 et Plein cadre sur téléphone large, tablette, portrait/paysage et plein écran ; vérifier encoches et safe-areas.
 - Graphismes AAA II : ombres au sol et en l’air dans les 3 ambiances, lisibilité des impacts léger/lourd/garde/parry/M1, motifs de tenue en sélection/VS/combat et tenue des 60 FPS en qualité auto.
+- Réalité 3D : réglages Auto/Toujours/2D, perte/récupération WebGL, les 4 arènes × 3 ambiances, projectiles/particules sans point géant, poses de course/saut/garde/M1/chute et retour immédiat au pipeline 2D.
 - Manettes : J1 et J2 si disponibles.
 - Plein écran, changement d’onglet, reprise de pause.
 - Profil vierge et profil migré depuis la version précédente.

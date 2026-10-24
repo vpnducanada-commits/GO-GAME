@@ -576,3 +576,14 @@ body.screen-cinema #touchUI{position:absolute;left:max(10px,env(safe-area-inset-
   .actionGroup .tBtn[data-t="kick"]{width:49px;height:49px}
   .actionGroup .tBtn[data-t="punch"]{width:57px;height:57px}
 }
+
+/* ================= V6.0 — RÉALITÉ 3D (WebGL sous l’overlay 2D) ================= */
+#gl3d{
+  left:50%;top:50%;right:auto;bottom:auto;width:var(--stage-w);height:var(--stage-h);
+  transform:translate(-50%,-50%);z-index:1;display:none;background:#05081d;
+}
+#game{z-index:2}
+body.render3d-on #gl3d{display:block}
+body.screen-cinema #gl3d{left:0;top:0;width:100%;height:100%;transform:none}
+body.screen-plein #gl3d{width:max(100dvw,calc(100dvh * 16 / 9));height:max(100dvh,calc(100dvw * 9 / 16))}
+body.screen-cinema #gameWrap:fullscreen #gl3d{left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%)}

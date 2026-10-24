@@ -123,12 +123,20 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V6.0 — « Réalité 3D » *(LIVRÉ le 24/10/2026 — 398 assertions source / 633 vérifications, suite verte)*
+
+- **Pivot du propriétaire après V5.3** : vraie 3D temps réel plutôt que le tournoi initialement envisagé ; moteur WebGL maison sans dépendance, canvas `#gl3d` sous l’overlay 2D et HUD/joystick inchangés.
+- **41 combattants humanoïdes articulés** : volumes, visages, cheveux, tenues, capes/armures/accessoires, course/saut/garde/coups/M1/chutes pilotés par les profils humains existants.
+- **4 arènes volumiques** : Stade en gradins, Néon Tokyo, Temple Céleste et Plage de Libreville, avec caméra perspective, lumières d’ambiance, ombres de contact, projectiles et impacts 3D.
+- **Sécurité Sarah** : réglage Auto/Toujours/2D, diagnostic et repli AAA II sans WebGL ; captures Chromium/WebGL réelles des 4 arènes ; hash déterministe inchangé. Voir `docs/SPRINT_V60_REALITE_3D.md`.
+- 🔜 **V6.1 Matière & Performance 3D** (détails personnages, mesures mobiles, ombres enrichies), puis **Tournoi & Saisons**. Online public toujours conditionné à un duel WebRTC réel entre deux réseaux distincts.
+
 ## ✅ V5.3 — « Graphismes AAA II » *(LIVRÉ le 24/10/2026 — 384 assertions source / 619 vérifications, suite verte)*
 
 - **Ombres portées directionnelles** : 3 couches, direction/longueur par ambiance et arène, contacts des pieds, atténuation en l’air, halos et reflets colorés au sol.
 - **Sprites d’impact procéduraux** : léger/lourd/projection/contre/projectile/clash/garde/parry/M1/final M1/sol, cache borné à 48 sprites et hash déterministe prouvé inchangé.
 - **Tenues des planches** : motif explicite et médaillon signature pour les 41 combattants, initiale du joueur conservée. Voir `docs/SPRINT_V53_GRAPHISMES_AAA2.md`.
-- 🔜 **V5.4 Tournoi & Saisons** (brackets locaux, saisons de carrière et récompenses), puis Online public selon validation réseau réelle entre deux réseaux distincts.
+- ↪️ Le Tournoi & Saisons alors envisagé en V5.4 a été reporté par le pivot 3D du propriétaire et la livraison V6.0 ci-dessus ; Online public toujours selon validation réseau réelle entre deux réseaux distincts.
 
 ## ✅ V5.2 — « Écran Adaptatif & Joystick Pro » *(LIVRÉ le 24/10/2026 — 371 assertions source / 606 vérifications, suite verte)*
 

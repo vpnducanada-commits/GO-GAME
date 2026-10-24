@@ -24,7 +24,7 @@ html = html.replace(
     '<link rel="stylesheet" href="src/style.css">',
     "<style>\n" + css + "\n</style>",
 )
-for name in ("engine.js", "render.js", "ui.js"):
+for name in ("engine.js", "render.js", "render3d.js", "ui.js"):
     js = engine if name == "engine.js" else (ROOT / "src" / name).read_text(encoding="utf-8")
     assert "</script>" not in js, f"Balise fermante interdite dans {name}"
     html = html.replace(

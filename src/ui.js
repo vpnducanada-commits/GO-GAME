@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.3 — GRAPHISMES AAA II, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V6.0 — RÉALITÉ 3D, JOYSTICK PRO & M1 SIGNATURE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -105,6 +105,18 @@ function applyScreenFormat(format){
   const sel=$("setScreenFormat"); if(sel)sel.value=fmt;
   if(typeof renderStats!=="undefined")renderStats.screenFormat=fmt;
   if(typeof resizeCanvas==="function")resizeCanvas();
+  return fmt;
+}
+/* V6.0 — Rendu de combat : 3D Réalité WebGL (auto/toujours) ou 2D classique.
+   Le choix est purement visuel ; simulation, replays et Online ne changent pas. */
+const RENDERER3D_MODES=["auto","on","off"];
+function applyRenderer3DSetting(mode){
+  const fmt=RENDERER3D_MODES.includes(mode)?mode:(RENDERER3D_MODES.includes(SETTINGS.renderer3d)?SETTINGS.renderer3d:"auto");
+  SETTINGS.renderer3d=fmt;
+  const sel=$("setRenderer3d"); if(sel)sel.value=fmt;
+  if(typeof renderStats!=="undefined"){ renderStats.renderer3dMode=fmt; renderStats.renderer3dRequested=fmt!=="off"; }
+  if(typeof setRenderer3DEnabled==="function")setRenderer3DEnabled(fmt!=="off",fmt);
+  if(fmt==="off")document.body.classList.remove("render3d-on");
   return fmt;
 }
 function showOnly(id){
@@ -1410,7 +1422,7 @@ function handleCampaignNext(){
 function populateSettings(){
   $("setMusicVol").value=SETTINGS.musicVol; $("setSfxVol").value=SETTINGS.sfxVol;
   $("lblMusicVol").textContent=SETTINGS.musicVol; $("lblSfxVol").textContent=SETTINGS.sfxVol;
-  $("setQuality").value=SETTINGS.quality; applyScreenFormat(SETTINGS.screenFormat); $("setRoundTime").value=String(SETTINGS.roundTime);
+  $("setQuality").value=SETTINGS.quality; applyScreenFormat(SETTINGS.screenFormat); applyRenderer3DSetting(SETTINGS.renderer3d); $("setRoundTime").value=String(SETTINGS.roundTime);
   $("setRoundsWin").value=String(SETTINGS.roundsWin); $("setSpeed").value=String(SETTINGS.speed);
   $("setShake").value=SETTINGS.shake; $("lblShake").textContent=SETTINGS.shake;
   $("setShowFps").checked=!!SETTINGS.showFps; $("setReduceFlash").checked=!!SETTINGS.reduceFlash;
@@ -1429,6 +1441,7 @@ function bindSettings(){
   on("setSfxVol",e=>{ SETTINGS.sfxVol=+e.target.value; $("lblSfxVol").textContent=e.target.value; applyAudioSettings(); saveProfile(); });
   on("setQuality",e=>{ SETTINGS.quality=e.target.value; applyQualitySettings(); saveProfile(); showToast("🎨 Qualité : "+e.target.options[e.target.selectedIndex].text); },"change");
   on("setScreenFormat",e=>{ applyScreenFormat(e.target.value); saveProfile(); showToast("🖥️ Format d’écran : "+e.target.options[e.target.selectedIndex].text.split(" — ")[0]); },"change");
+  on("setRenderer3d",e=>{ applyRenderer3DSetting(e.target.value); saveProfile(); showToast(e.target.value==="off"?"🎨 Rendu 2D classique activé":"🧊 Rendu 3D Réalité activé pour les combats"); },"change");
   on("setRoundTime",e=>{ SETTINGS.roundTime=+e.target.value; saveProfile(); },"change");
   on("setRoundsWin",e=>{ SETTINGS.roundsWin=+e.target.value; buildPips(); saveProfile(); },"change");
   on("setSpeed",e=>{ SETTINGS.speed=+e.target.value; saveProfile(); },"change");
@@ -1570,7 +1583,7 @@ pendingMode="bot"; mode="bot";
 if(isCharLocked(CHARACTERS[selCharP1]))selCharP1=0;
 if(selCharP2>=0&&isCharLocked(CHARACTERS[selCharP2]))selCharP2=1;
 if(selArenaId!=="random")setArenaById(selArenaId);
-bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); bindOnlineUI(); populateSettings(); applyScreenFormat(SETTINGS.screenFormat); populateCustomize(); initOnlineClient();
+bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); bindOnlineUI(); populateSettings(); applyScreenFormat(SETTINGS.screenFormat); applyRenderer3DSetting(SETTINGS.renderer3d); populateCustomize(); initOnlineClient();
 buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary(); renderMoveList();
 buildPips(); goMenu(); startLoop();
 console.log("%c"+GAME_TITLE+" V"+GAME_VERSION+" — "+GAME_SUBTITLE+"%c signé Gédéon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");

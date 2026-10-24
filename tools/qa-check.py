@@ -22,7 +22,7 @@ def ids_used(js): return set(re.findall(r'\b(?:el|document\.getElementById)\("([
 try:
     html = read(ROOT / "index.html")
     css = read(ROOT / "src/style.css")
-    js = {n: read(ROOT / f"src/{n}.js") for n in ("engine", "render", "ui")}
+    js = {n: read(ROOT / f"src/{n}.js") for n in ("engine", "render", "render3d", "ui")}
     all_js = "\n".join(js.values())
     check("Fichiers source encodés UTF-8", True, f"HTML {len(html)} car., CSS {len(css)} car.")
 except Exception as e:
@@ -37,7 +37,7 @@ ok, details = True, []
 for n in js:
     r = subprocess.run(["node", "--check", str(ROOT / f"src/{n}.js")], capture_output=True, text=True)
     if r.returncode: ok = False; details.append(f"{n}.js : {r.stderr.strip()[:120]}")
-check("Syntaxe JavaScript valide (3 modules)", ok, " ; ".join(details) if details else "node --check OK")
+check("Syntaxe JavaScript valide (4 modules)", ok, " ; ".join(details) if details else "node --check OK")
 
 # 3. Alignement DOM ↔ JS
 missing = sorted(ids_used(all_js) - ids_in(html))
@@ -86,14 +86,14 @@ bundles = sorted(ROOT.glob("*Arena-V*.html"), key=_bundle_version)
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
-    # Budgets : 384 Ko en V4.2, puis 448 Ko en V5.0 sur décision d'équipe (édition
-    # Jeu Complet : carrière, championnat 3 circuits, quêtes, récompenses, hub).
-    check("Bundle autonome ≤ 448 Ko", size_kb <= 448, f"{target.name} = {size_kb} Ko")
+    # Budgets : 448 Ko jusqu'en V5.3, puis 512 Ko en V6.0 sur décision d'équipe
+    # (moteur WebGL maison complet : géométrie, shaders, poses et 4 arènes 3D).
+    check("Bundle autonome ≤ 512 Ko", size_kb <= 512, f"{target.name} = {size_kb} Ko")
     b = target.read_text(encoding="utf-8", errors="ignore")
     ext_b = [u for u in re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', b)]
     check("Bundle 100 % autonome (0 ressource externe)", not ext_b, str(ext_b[:3]) if ext_b else "vérifié")
     n_scripts = len(re.findall(r'<script(?:\s[^>]*)?>', b))
-    check("Bundle : 3 scripts intégrés", n_scripts == 3, f"{n_scripts} balise(s) script")
+    check("Bundle : 4 scripts intégrés", n_scripts == 4, f"{n_scripts} balise(s) script")
 else:
     check("Bundle présent", False, "aucun fichier *Arena-V*.html", warn=True)
 
@@ -151,23 +151,23 @@ check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à 
 
 # 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
 #     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
-aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();')) and ('artDirection:"Graphismes AAA V4.2"' in js["render"] or 'artDirection:"Graphismes AAA II V5.3"' in js["render"]) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html)
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();')) and ('artDirection:"Graphismes AAA V4.2"' in js["render"] or ('artDirection:"Graphismes AAA II V5.3"' in js["render"] or 'artDirection:"Réalité 3D V6.0 (repli Graphismes AAA II)"' in js["render"])) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html or 'V6.0' in html)
 check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
 
 # 25. Roster complet des planches V4.3 : les 35 designs des 3 planches du propriétaire
 #     jouables (41 combattants avec les 6 historiques), morphologies dédiées.
 board_ids = ("Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion")
-roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"])) and ('PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html) and 'ROSTER PLANCHES COMPLET' in css
+roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"])) and ('PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html or 'V6.0' in html) and 'ROSTER PLANCHES COMPLET' in css
 check("Roster complet des planches V4.3 présent", roster_ok, "35 personnages des planches + 41 morphologies + grille de sélection dense")
 
 # 26. Navigation Pro & tenues de combat peintes V4.4 : recherche/filtres roster,
 #     barres d'action fixes, grilles à défilement interne, vêtements peints.
-nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and ('GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"])) and ('V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html)
+nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and ('GAME_VERSION="4.4.0"' in js["engine"] or 'GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"])) and ('V4.4 PRO' in html or 'V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html or 'V6.0' in html)
 check("Navigation Pro & tenues peintes V4.4 présents", nav_ok, "recherche + filtres par famille + actions fixes + ouverture/col/plis peints")
 
 # 27. Édition Jeu Complet V5.0 : carrière persistante (XP/niveaux/Godson/titres),
 #     championnat 3 circuits, quêtes réclamables, boutique et hub de progression.
-career_ok = all(x in js["engine"] for x in ('CHAMPIONSHIP_CIRCUITS','function careerLevelFromXp','function awardCareerForMatch','function arcadeTotal')) and ('GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"])) and all(x in js["ui"] for x in ('function renderCareer()','CAREER_QUESTS','CAREER_SHOP','function startChampionship','function careerNextObjective')) and all(x in html for x in ('id="menuCareer"','id="btnCareer"','id="hubXpFill"','id="circuitList"','id="questList"','id="careerShop"')) and all(x in css for x in ('.careerHub','.xpBar','.circuitCard','.questCard')) and ('V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html)
+career_ok = all(x in js["engine"] for x in ('CHAMPIONSHIP_CIRCUITS','function careerLevelFromXp','function awardCareerForMatch','function arcadeTotal')) and ('GAME_VERSION="5.0.0"' in js["engine"] or ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"])) and all(x in js["ui"] for x in ('function renderCareer()','CAREER_QUESTS','CAREER_SHOP','function startChampionship','function careerNextObjective')) and all(x in html for x in ('id="menuCareer"','id="btnCareer"','id="hubXpFill"','id="circuitList"','id="questList"','id="careerShop"')) and all(x in css for x in ('.careerHub','.xpBar','.circuitCard','.questCard')) and ('V5.0' in html or 'V5.1' in html or 'V5.2' in html or 'V5.3' in html or 'V6.0' in html)
 check("Édition Jeu Complet V5.0 présente", career_ok, "carrière XP/Godson + championnat 5/8/12 combats + quêtes + récompenses + hub vivant")
 
 # 28. Godson FURY & M1 Signature V5.1 : nouveau nom, 41 chaînes M1 individuelles,
@@ -176,22 +176,29 @@ _m1m = re.search(r'const M1_RAW=(\[.*?\]);\nfunction normalizeM1Signature', js["
 try: _m1raw = json.loads(_m1m.group(1)) if _m1m else []
 except Exception: _m1raw = []
 _m1labels = [st[1] for d in _m1raw for st in d[7]] if _m1raw else []
-m1_ok = len(_m1raw)==41 and len({d[0] for d in _m1raw})==41 and len({d[1] for d in _m1raw})==41 and len(_m1labels)==168 and len(set(_m1labels))==168 and all(3<=len(d[7])<=5 and d[7][0][0]=="P" for d in _m1raw) and ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"]) and all(x in js["engine"] for x in ('GAME_TITLE="Godson FURY ARENA"','function startM1Attack','function m1SignatureFor','function m1Enabled','m1Advance')) and 'M1 Signature — martèle POING' in js["ui"] and 'renderStats.m1Trail' in js["render"] and ('Godson FURY ARENA V5.1' in html or 'Godson FURY ARENA V5.2' in html or 'Godson FURY ARENA V5.3' in html) and 'POING • M1' in html and '.m1Move' in css
+m1_ok = len(_m1raw)==41 and len({d[0] for d in _m1raw})==41 and len({d[1] for d in _m1raw})==41 and len(_m1labels)==168 and len(set(_m1labels))==168 and all(3<=len(d[7])<=5 and d[7][0][0]=="P" for d in _m1raw) and ('GAME_VERSION="5.1.0"' in js["engine"] or 'GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"]) and all(x in js["engine"] for x in ('GAME_TITLE="Godson FURY ARENA"','function startM1Attack','function m1SignatureFor','function m1Enabled','m1Advance')) and 'M1 Signature — martèle POING' in js["ui"] and 'renderStats.m1Trail' in js["render"] and ('Godson FURY ARENA V5.1' in html or 'Godson FURY ARENA V5.2' in html or 'Godson FURY ARENA V5.3' in html or 'Godson FURY ARENA V6.0' in html) and 'POING • M1' in html and '.m1Move' in css
 check("Godson FURY & M1 Signature V5.1 présents", m1_ok, "41 chaînes individuelles • 168 coups uniques • combo par appuis répétés sur Poing • nouveau nom")
 
 # 29. Écran Adaptatif & Joystick Pro V5.2 : consultation complète de l'équipe —
 # joystick analogique à gauche, actions à droite, 3 formats sans déformation,
 # safe-areas et HUD aligné sur la scène logique 16:9.
 _action_order = [html.find('data-t="%s"' % k) for k in ('special','dash','block','kick','punch')]
-screen_ok = ('GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"]) and 'screenFormat:"adaptatif"' in js["engine"] and all(x in js["ui"] for x in ('function joystickKeysForVector','jump:y<-.58','block:y>.52','function setJoystickVector','function resetJoystick','function bindJoystick','function applyScreenFormat','SCREEN_FORMATS=["adaptatif","cinema","plein"]')) and all(x in html for x in ('viewport-fit=cover','class="screen-adaptatif"','id="joyBase"','id="joyKnob"','id="setScreenFormat"','Format d’écran','Joystick gauche')) and all(('data-t="%s"' % k) not in html for k in ('left','right','jump')) and _action_order==sorted(_action_order) and all(n>=0 for n in _action_order) and all(x in css for x in ('--stage-w:min(100dvw','body.screen-adaptatif #gameWrap','body.screen-plein #game','.joyBase{','.joyKnob{','.touchGroup.actionGroup','env(safe-area-inset-left)'))
+screen_ok = ('GAME_VERSION="5.2.0"' in js["engine"] or 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"]) and 'screenFormat:"adaptatif"' in js["engine"] and all(x in js["ui"] for x in ('function joystickKeysForVector','jump:y<-.58','block:y>.52','function setJoystickVector','function resetJoystick','function bindJoystick','function applyScreenFormat','SCREEN_FORMATS=["adaptatif","cinema","plein"]')) and all(x in html for x in ('viewport-fit=cover','class="screen-adaptatif"','id="joyBase"','id="joyKnob"','id="setScreenFormat"','Format d’écran','Joystick gauche')) and all(('data-t="%s"' % k) not in html for k in ('left','right','jump')) and _action_order==sorted(_action_order) and all(n>=0 for n in _action_order) and all(x in css for x in ('--stage-w:min(100dvw','body.screen-adaptatif #gameWrap','body.screen-plein #game','.joyBase{','.joyKnob{','.touchGroup.actionGroup','env(safe-area-inset-left)'))
 check("Écran Adaptatif & Joystick Pro V5.2 présents", screen_ok, "joystick gauche 8 directions • grand POING•M1 à droite • Adaptatif/Cinéma/Plein cadre • aucun étirement")
 
 # 30. Graphismes AAA II V5.3 : ombres portées directionnelles, reflets et halos
 # de sol, sprites d'impact procéduraux typés et motifs de tenue des planches.
 _motifs_m = re.search(r'const BOARD_OUTFIT_MOTIFS=\{(.*?)\};', js["render"], re.S)
 _motif_keys = re.findall(r'"([^"]+)"\s*:', _motifs_m.group(1)) if _motifs_m else []
-aaa2_ok = 'GAME_VERSION="5.3.0"' in js["engine"] and 'artDirection:"Graphismes AAA II V5.3"' in js["render"] and len(_motif_keys)==41 and len(set(_motif_keys))==41 and all(x in js["render"] for x in ('function arenaShadowVector','renderStats.dynamicShadows','renderStats.floorLightPools','renderStats.floorReflections','function drawBoardMotif','function boardOutfitMotif','function impactSprite','function drawImpactBursts','impactSpriteCache.size>48')) and all(x in js["engine"] for x in ('function impactBurst','impactBursts=[]','"m1final"','"parry"','"block"','"ground"','"clash"')) and 'Godson FURY ARENA V5.3' in html
+aaa2_ok = 'GAME_VERSION="5.3.0"' in js["engine"] or 'GAME_VERSION="6.0.0"' in js["engine"] and ('artDirection:"Graphismes AAA II V5.3"' in js["render"] or 'artDirection:"Réalité 3D V6.0 (repli Graphismes AAA II)"' in js["render"]) and len(_motif_keys)==41 and len(set(_motif_keys))==41 and all(x in js["render"] for x in ('function arenaShadowVector','renderStats.dynamicShadows','renderStats.floorLightPools','renderStats.floorReflections','function drawBoardMotif','function boardOutfitMotif','function impactSprite','function drawImpactBursts','impactSpriteCache.size>48')) and all(x in js["engine"] for x in ('function impactBurst','impactBursts=[]','"m1final"','"parry"','"block"','"ground"','"clash"')) and 'Godson FURY ARENA V5.3' in html or 'Godson FURY ARENA V6.0' in html
 check("Graphismes AAA II V5.3 présents", aaa2_ok, "ombres portées par ambiance • impacts sprites typés/cache borné • 41 motifs de tenue des planches")
+
+# 31. Réalité 3D V6.0 : vrai moteur WebGL maison (géométrie indexée, shaders,
+# caméra perspective, poses humanoïdes et 4 arènes volumiques), réglage
+# Auto/Toujours/2D, diagnostic et repli Graphismes AAA II sans écran noir.
+_r3d = js.get("render3d", "")
+v6_ok = 'GAME_VERSION="6.0.0"' in js["engine"] and 'renderer3d:"auto"' in js["engine"] and 'artDirection:"Réalité 3D V6.0 (repli Graphismes AAA II)"' in js["render"] and all(x in _r3d for x in ('function initRenderer3D','function buildArenaBatch3D','function buildFighterPose3D','function addFighter3D','function computeCamera3D','function draw3DScene','function draw3DOverlay','webgl2','typeof gl.COLOR_BUFFER_BIT!=="number"','precision mediump float;attribute vec3 aPos;attribute vec3 aNorm','(p.r||3)*2/95','Uint16Array')) and all(x in js["render"] for x in ('draw3DScene()','draw3DOverlay()','renderer3dActive')) and all(x in js["ui"] for x in ('function applyRenderer3DSetting','setRenderer3d','setRenderer3DEnabled')) and all(x in html for x in ('id="gl3d"','id="setRenderer3d"','src="src/render3d.js"','Rendu de combat 3D')) and 'body.render3d-on #gl3d' in css
+check("Réalité 3D V6.0 présente", v6_ok, "WebGL maison • personnages articulés • caméra combat • 4 arènes 3D • réglage Auto/Toujours/2D")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
