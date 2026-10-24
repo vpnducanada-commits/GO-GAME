@@ -428,12 +428,12 @@ try {
   assert(signatureStyles.size === 41, '41 signatures VFX actives (9 styles de famille, une par combattant)');
   ev('projectiles=[]; qualityLevel=2; resizeCanvas();');
 
-  ev('clearTouchInputs(); setTouchPointer("right",101,true); setTouchPointer("right",102,true);');
-  assert(ev('touchIn.right') === true && ev('touchPointerState.activePointers') === 2 && window.document.querySelector('.tBtn[data-t="right"]').classList.contains('on'), 'tactile multi-touch : deux pointeurs suivis sur le même bouton');
-  ev('setTouchPointer("right",101,false);');
-  assert(ev('touchIn.right') === true && ev('touchPointerState.activePointers') === 1, 'tactile : relâcher un doigt ne coupe pas le second');
-  ev('setTouchPointer("right",102,false); setTouchPointer("punch",103,true); clearTouchInputs();');
-  assert(ev('touchIn.right') === false && ev('touchIn.punch') === false && ev('touchPointerState.activePointers') === 0 && !window.document.querySelector('.tBtn[data-t="punch"]').classList.contains('on'), 'tactile : nettoyage complet anti-boutons collés');
+  ev('clearTouchInputs(); setTouchPointer("punch",101,true); setTouchPointer("punch",102,true);');
+  assert(ev('touchIn.punch') === true && ev('touchPointerState.activePointers') === 2 && window.document.querySelector('.tBtn[data-t="punch"]').classList.contains('on'), 'tactile multi-touch : deux pointeurs suivis sur le même bouton d’action');
+  ev('setTouchPointer("punch",101,false);');
+  assert(ev('touchIn.punch') === true && ev('touchPointerState.activePointers') === 1, 'tactile : relâcher un doigt ne coupe pas le second');
+  ev('setTouchPointer("punch",102,false); setJoystickVector(1,0,103); clearTouchInputs();');
+  assert(ev('touchIn.right') === false && ev('touchIn.punch') === false && ev('joystickState.active') === false && ev('touchPointerState.activePointers') === 0 && !window.document.querySelector('.tBtn[data-t="punch"]').classList.contains('on'), 'tactile : nettoyage complet anti-boutons/joystick collés');
 
   /* Preuve d’intégration : un vrai match en Nuit forcée doit conserver
      cette ambiance dans son replay, même si la préférence change ensuite. */
@@ -453,7 +453,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'génération V3 affichée et exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -545,7 +545,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 41, '41 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -584,7 +584,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -602,7 +602,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -629,7 +629,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -644,7 +644,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version V3.5+ affichée et exposée au moteur');
+  assert(/^[345]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -773,7 +773,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6,9).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 41, 'identifiants uniques pour les 41 combattants');
@@ -801,7 +801,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.1')), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|[45]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V5.2')), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -935,7 +935,7 @@ function finishTestRun() {
 
   /* ===== V5.0 « Édition Jeu Complet » : carrière, championnat, quêtes & récompenses ===== */
   console.log('\n— V5.0 : Édition Jeu Complet (carrière & championnat) —');
-  assert(/^5\.[01]\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
+  assert(/^5\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
   assert(ev('careerLevelFromXp(0)===1&&careerLevelFromXp(100)===2&&careerLevelFromXp(300)===3&&careerLevelFromXp(1000)===5')===true,'niveaux de carrière : seuils XP 0/100/300/1000 respectés');
   assert(ev('(()=>{const p=normalizeProfileData({stats:{wins:10,losses:2,matches:12,arcadeClears:1,bestSurvivalWave:3},story:{chapter1Completed:true}}); return p.career.xp>0&&p.career.Godson>0&&p.career.circuits.stade===0&&Array.isArray(p.career.titles);})()')===true,'migration V5 : un ancien profil reçoit XP, Godson et circuits');
   ev('PROFILE.career={xp:90,Godson:20,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""}; PROFILE.stats.matches=1; saveProfile();');
@@ -963,7 +963,7 @@ function finishTestRun() {
 
   /* ===== V5.1 « Godson FURY — M1 Signature » : nouveau nom + 41 chaînes martelables ===== */
   console.log('\n— V5.1 : Godson FURY ARENA & M1 Signature par combattant —');
-  assert(ev('GAME_VERSION')==='5.1.0'&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA V5.1');
+  assert(/^5\.[12]\.\d+$/.test(ev('GAME_VERSION'))&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA (V5.1+)');
   assert(ev('Object.keys(M1_SIGNATURES).length')===41&&ev('CHARACTERS.every(c=>!!M1_SIGNATURES[c.id])')===true,'M1 Signature : les 41 combattants possèdent une chaîne dédiée');
   assert(ev('new Set(Object.values(M1_SIGNATURES).map(s=>s.name)).size')===41&&ev('new Set(Object.values(M1_SIGNATURES).flatMap(s=>s.labels)).size')===168,'M1 Signature : 41 noms de chaînes et 168 coups nommés, tous uniques');
   assert(ev('Object.values(M1_SIGNATURES).every(s=>s.steps.length>=3&&s.steps.length<=5&&s.steps[0].type==="punch"&&s.steps[s.steps.length-1].final)')===true,'M1 Signature : 3 à 5 coups, ouverture Poing et final marqué pour chacun');
@@ -1000,7 +1000,38 @@ function finishTestRun() {
   assert(ev('rosterSearch="sentence des ombres"; rosterMatches(CHARACTERS[31])')===true&&ev('rosterMatches(CHARACTERS[0])')===false,'recherche roster : on peut aussi trouver un combattant par le nom de son M1');
   ev('rosterSearch=""; goMenu()');
   const eng51=fs.readFileSync(path.join(root,'src/engine.js'),'utf8'),ui51=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),html51=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&html51.includes('Godson FURY ARENA V5.1'),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
+  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&html51.includes('Godson FURY ARENA V5.2'),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
+
+  /* ===== V5.2 « Écran Adaptatif & Joystick Pro » : décision d'équipe Lena/Nadia/Kenzo/Marco/Sarah ===== */
+  console.log('\n— V5.2 : joystick gauche, actions à droite & formats d’écran —');
+  assert(ev('GAME_VERSION')==='5.2.0'&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
+  assert(!!window.document.getElementById('joyBase')&&!!window.document.getElementById('joyKnob'),'joystick tactile présent en bas à gauche avec bouton mobile');
+  assert(!window.document.querySelector('.tBtn[data-t="left"]')&&!window.document.querySelector('.tBtn[data-t="right"]')&&!window.document.querySelector('.tBtn[data-t="jump"]'),'anciens boutons directionnels supprimés : le joystick remplace gauche/droite/saut');
+  assert([...window.document.querySelectorAll('.actionGroup .tBtn')].map(b=>b.dataset.t).join(',')==='special,dash,block,kick,punch','cluster droit ergonomique : Spécial, Dash, Garde, Pied et grand POING•M1');
+  assert(ev('joystickKeysForVector(1,0).right')===true&&ev('joystickKeysForVector(-1,-1).left')===true&&ev('joystickKeysForVector(-1,-1).jump')===true&&ev('joystickKeysForVector(0,1).block')===true&&ev('joystickDirectionLabel(0,1)')==='garde','mapping joystick 8 directions : course, saut diagonal et garde vers le bas');
+  ev('clearTouchInputs(); setJoystickVector(1,0,777);');
+  assert(ev('touchIn.right')===true&&ev('joystickState.direction')==='droite'&&window.document.getElementById('joyBase').classList.contains('active')&&window.document.getElementById('joyKnob').style.transform.includes('34.0px'),'joystick poussé à droite : entrée moteur, état visuel et déplacement du bouton');
+  ev('setJoystickVector(-1,-1,777);');
+  assert(ev('touchIn.left')===true&&ev('touchIn.jump')===true&&ev('joystickState.direction')==='saut-gauche','joystick diagonal haut-gauche : déplacement + saut simultanés');
+  ev('setJoystickVector(0,1,777);');
+  assert(ev('touchIn.block')===true&&ev('joystickState.direction')==='garde','joystick vers le bas : garde / modificateur uppercut-balayage');
+  ev('resetJoystick();');
+  assert(ev('joystickState.active')===false&&ev('touchIn.left')===false&&ev('touchIn.jump')===false&&ev('touchIn.block')===false,'relâcher le joystick remet toutes les directions au neutre');
+  assert(ev('applyScreenFormat("plein")')==='plein'&&window.document.body.classList.contains('screen-plein')&&ev('applyScreenFormat("cinema")')==='cinema'&&window.document.body.classList.contains('screen-cinema')&&ev('applyScreenFormat("adaptatif")')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'trois formats commutables sans recharger : Plein cadre, Cinéma 16:9, Adaptatif');
+
+  ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
+  ev('keys.clear(); clearTouchInputs(); p1.reset(); p2.reset(); p1.x=500; p2.x=900; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1;');
+  const joyX0=ev('p1.x');
+  ev('setJoystickVector(1,0,901);'); step(18);
+  assert(ev('p1.x')>joyX0+20,'combat réel : pousser le joystick à droite déplace le Joueur 1 ('+Math.round(joyX0)+' -> '+Math.round(ev('p1.x'))+')');
+  ev('resetJoystick(); p1.reset(); p2.reset(); p1.x=500; p2.x=900; p1.y=p2.y=GROUND; setJoystickVector(0,-1,902);'); step(4);
+  assert(ev('p1.grounded')===false||ev('p1.vy')<0,'combat réel : pousser le joystick vers le haut fait sauter');
+  ev('resetJoystick();'); step(55);
+  ev('p1.reset(); p2.reset(); p1.x=500; p2.x=900; p1.y=p2.y=GROUND; setJoystickVector(0,1,903);'); step(3);
+  assert(ev('p1.crouching')===true&&ev('p1.blocking')===true,'combat réel : pousser le joystick vers le bas met en garde');
+  ev('resetJoystick(); clearTouchInputs(); goMenu()');
+  const css52=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),ui52=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),html52=fs.readFileSync(path.join(root,'index.html'),'utf8');
+  assert(css52.includes('--stage-w:min(100dvw')&&css52.includes('.joyBase{')&&css52.includes('#touchUI{\n  position:fixed')&&css52.includes('body.screen-plein #game')&&html52.includes('viewport-fit=cover')&&html52.includes('id="setScreenFormat"')&&ui52.includes('function bindJoystick()')&&ui52.includes('function applyScreenFormat'),'hooks sources V5.2 : scène responsive, joystick, safe-areas et réglage de format');
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
   console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');

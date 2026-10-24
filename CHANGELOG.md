@@ -3,6 +3,38 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [5.2.0] — 2026-10-24 — « Écran Adaptatif & Joystick Pro »
+
+Directives du propriétaire : **joystick à gauche**, nouvel ajustement du **format
+du jeu**, de l’écran visuel et des touches, après consultation de **toute l’équipe**.
+
+### Décision d’équipe
+- **Lena** place le joystick au pouce gauche et les actions au pouce droit, aux
+  vrais bords de l’appareil ; **Nadia** valide le mapping 8 directions ;
+  **Kenzo** interdit tout étirement (simulation logique 1280×720 inchangée) ;
+  **Marco** impose un grand bouton POING•M1 et un centre dégagé ; **Sarah**
+  verrouille le multi-touch et les preuves de combat.
+
+### Ajouté — Joystick tactile gauche
+- Base analogique translucide avec bouton mobile : gauche/droite, **haut = saut**,
+  **bas = garde/modificateur**, diagonales simultanées et zone morte anti-dérive.
+- Capture par `pointerId`, retour au neutre à la relâche/perte de capture et
+  nettoyage anti-joystick collé ; les anciens boutons Gauche/Droite/Saut disparaissent.
+- Cluster droit réorganisé : **Spécial, Dash, Garde, Pied et grand POING • M1**,
+  pensé pour diriger d’une main et marteler les combos de l’autre.
+
+### Ajouté — Trois formats d’écran (Réglages → Format d’écran)
+- **Adaptatif (défaut)** : scène 16:9 nette, fond sur tout l’appareil, HUD aligné
+  sur la scène et touches aux bords physiques avec *safe-areas*.
+- **Cinéma 16:9** : cadre centré classique des versions précédentes.
+- **Plein cadre** : remplissage complet par recadrage, sans déformation.
+- `viewport-fit=cover`, variables de scène responsive et plein écran corrigé.
+
+### Garanti
+- Déterminisme, replays, Online, M1, hitboxes et progression inchangés.
+- **371 assertions / 606 vérifications** vertes, contrôle QA n°29, bundle **431 Ko**.
+  Détail et arbitrage : `docs/SPRINT_V52_ECRAN_JOYSTICK.md`.
+
 ## [5.1.0] — 2026-10-24 — « Godson FURY — M1 Signature »
 
 Directives du propriétaire : **trouver un autre nom**, travailler **individuellement

@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.1 — M1 SIGNATURE & ÉDITION JEU COMPLET
+   Godson FURY ARENA V5.2 — ÉCRAN ADAPTATIF, JOYSTICK PRO & M1 SIGNATURE
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="5.1.0";
+const GAME_VERSION="5.2.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -24,7 +24,7 @@ const store={
   del(){ try{window.localStorage.removeItem(SAVE_KEY);}catch(e){} }
 };
 function defaultProfile(){ return {
-  settings:{musicVol:70,sfxVol:90,quality:"auto",roundTime:99,roundsWin:2,speed:1,shake:100,showFps:false,reduceFlash:false},
+  settings:{musicVol:70,sfxVol:90,quality:"auto",screenFormat:"adaptatif",roundTime:99,roundsWin:2,speed:1,shake:100,showFps:false,reduceFlash:false},
   names:{p1:"Gideon",p2:"Joueur 2"}, initials:{p1:"G",p2:"R"},
   customColors:{p1:null,p2:null},
   selection:{charP1:0,charP2:1,arena:"stadium",arenaMood:"auto"},

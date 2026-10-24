@@ -2,11 +2,11 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Godson FURY ARENA V5.1 | L’Arène des Légendes — signé Gédéon - Godson</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<title>Godson FURY ARENA V5.2 | L’Arène des Légendes — signé Gédéon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
-<body>
+<body class="screen-adaptatif">
 <div id="app">
 
   <div id="gameWrap">
@@ -16,7 +16,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>Godson <span>FURY</span> ARENA <em>V5.1</em></h1>
+        <h1>Godson <span>FURY</span> ARENA <em>V5.2</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -30,7 +30,7 @@
   </header>
 
     <div id="bootLoader" role="status" aria-label="Chargement du jeu">
-      <div class="bootLogo"><div class="badge">G</div><div class="bootTitle">GÉDÉON <span>- Godson</span> ARENA</div></div>
+      <div class="bootLogo"><div class="badge">G</div><div class="bootTitle">Godson <span>FURY</span> ARENA</div></div>
       <div class="bootBarWrap"><div class="bootBar"><i id="bootFill"></i></div><div class="bootPct" id="bootPct">0%</div></div>
       <div class="bootStep" id="bootStep">Chargement…</div>
       <div class="bootTip" id="bootTip">💡 Astuce : garde juste avant l’impact = PARRY dorée !</div>
@@ -341,6 +341,7 @@
           <div><label>🎵 Volume musique — <span id="lblMusicVol">70</span>%</label><input type="range" id="setMusicVol" min="0" max="100" value="70"></div>
           <div><label>🔊 Volume effets — <span id="lblSfxVol">90</span>%</label><input type="range" id="setSfxVol" min="0" max="100" value="90"></div>
           <div><label>🎨 Qualité graphique</label><select id="setQuality"><option value="auto">Automatique (recommandé)</option><option value="high">Haute — Ultra fluide</option><option value="medium">Moyenne</option><option value="low">Basse — PC/mobile lent</option></select></div>
+          <div><label>🖥️ Format d’écran</label><select id="setScreenFormat"><option value="adaptatif">Adaptatif — scène nette + touches aux bords (recommandé)</option><option value="cinema">Cinéma 16:9 — cadre centré classique</option><option value="plein">Plein cadre — remplit l’écran (léger recadrage)</option></select></div>
           <div><label>⏱️ Durée d’un round</label><select id="setRoundTime"><option value="60">60 secondes</option><option value="99" selected>99 secondes</option><option value="120">120 secondes</option><option value="0">Illimitée</option></select></div>
           <div><label>🏆 Rounds pour gagner le match</label><select id="setRoundsWin"><option value="1">1 round (rapide)</option><option value="2" selected>2 rounds (classique)</option><option value="3">3 rounds (épique)</option></select></div>
           <div><label>⚡ Vitesse des combats</label><select id="setSpeed"><option value="0.9">90% — posée</option><option value="1" selected>100% — normale</option><option value="1.12">112% — turbo</option></select></div>
@@ -365,7 +366,8 @@
           <div><b>🟦 JOUEUR 1</b><br>
             <kbd>Q</kbd>/<kbd>D</kbd> bouger • <kbd>Z</kbd> saut • <kbd>S</kbd> Garde<br>
             <kbd>F</kbd> poing • <kbd>G</kbd> pied • <kbd>H</kbd> spécial • <kbd>Maj</kbd> dash<br>
-            <span style="opacity:.8">QWERTY : A/D/W/S • manette 🎮 • tactile 📱</span></div>
+            <span style="opacity:.8">QWERTY : A/D/W/S • manette 🎮 • tactile 📱</span><br>
+            📱 <b>Joystick gauche</b> : ◀ ▶ bouger • ▲ sauter • ▼ garde/modificateur • diagonales acceptées</div>
           <div><b>🟥 JOUEUR 2</b><br>
             Flèches + <kbd>K</kbd> poing • <kbd>L</kbd> pied • <kbd>M</kbd> spécial • <kbd>O</kbd> dash<br>
             <span style="opacity:.8">Pavé numérique 1/2/3 accepté</span></div>
@@ -411,17 +413,19 @@
     </div>
 
     <div id="touchUI" aria-label="Commandes tactiles du Joueur 1">
-      <div class="touchGroup">
-        <div class="tBtn" role="button" tabindex="0" aria-label="Aller à gauche" data-t="left"><span>◀</span><small>GAUCHE</small></div>
-        <div class="tBtn" role="button" tabindex="0" aria-label="Aller à droite" data-t="right"><span>▶</span><small>DROITE</small></div>
-        <div class="tBtn" role="button" tabindex="0" aria-label="Sauter" data-t="jump"><span>⬆</span><small>SAUT</small></div>
-        <div class="tBtn" role="button" tabindex="0" aria-label="Garde et parry" data-t="block"><span>🛡</span><small>Garde</small></div>
-        <div class="tBtn" role="button" tabindex="0" aria-label="Dash" data-t="dash"><span>💨</span><small>DASH</small></div>
+      <div class="touchGroup movementGroup">
+        <div id="joyBase" class="joyBase" role="application" tabindex="0" aria-label="Joystick de déplacement : gauche, droite, saut en haut, garde en bas">
+          <span class="joyDir joyUp">▲</span><span class="joyDir joyLeft">◀</span><span class="joyDir joyRight">▶</span><span class="joyDir joyDown">▼</span>
+          <div id="joyKnob" class="joyKnob"><span>✦</span></div>
+          <span class="joyHint">DÉPLACER</span>
+        </div>
       </div>
-      <div class="touchGroup">
-        <div class="tBtn atk" role="button" tabindex="0" aria-label="Poing — appuis répétés pour le combo M1 Signature" data-t="punch"><span>👊</span><small>POING • M1</small></div>
-        <div class="tBtn atk" role="button" tabindex="0" aria-label="Coup de pied" data-t="kick"><span>🦵</span><small>PIED</small></div>
-        <div class="tBtn atk" role="button" tabindex="0" aria-label="Attaque spéciale ou SUPER" data-t="special"><span>✨</span><small>SPÉCIAL</small></div>
+      <div class="touchGroup actionGroup">
+        <div class="tBtn atk specialBtn" role="button" tabindex="0" aria-label="Attaque spéciale ou SUPER" data-t="special"><span>✨</span><small>SPÉCIAL</small></div>
+        <div class="tBtn dashBtn" role="button" tabindex="0" aria-label="Dash" data-t="dash"><span>💨</span><small>DASH</small></div>
+        <div class="tBtn guardBtn" role="button" tabindex="0" aria-label="Garde et parry" data-t="block"><span>🛡</span><small>Garde</small></div>
+        <div class="tBtn atk kickBtn" role="button" tabindex="0" aria-label="Coup de pied" data-t="kick"><span>🦵</span><small>PIED</small></div>
+        <div class="tBtn atk punchBtn" role="button" tabindex="0" aria-label="Poing — appuis répétés pour le combo M1 Signature" data-t="punch"><span>👊</span><small>POING • M1</small></div>
       </div>
     </div>
 
@@ -436,7 +440,7 @@
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Godson FURY ARENA V5.1</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Godson FURY ARENA V5.2</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>

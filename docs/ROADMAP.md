@@ -123,13 +123,20 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V5.2 — « Écran Adaptatif & Joystick Pro » *(LIVRÉ le 24/10/2026 — 371 assertions source / 606 vérifications, suite verte)*
+
+- **Consultation complète de l’équipe** à la demande du propriétaire : Lena (joystick au pouce gauche, contrôles aux bords physiques), Nadia (mapping 8 directions + Dash dédié), Kenzo (aucun étirement, logique 1280×720), Marco (grand POING•M1, centre dégagé), Sarah (multi-touch et simulations réelles).
+- **Joystick analogique gauche** : course, saut, garde/modificateur et diagonales ; anciens boutons directionnels supprimés. Cluster droit : Spécial, Dash, Garde, Pied et grand POING•M1.
+- **Trois formats persistants** : Adaptatif par défaut (scène nette + touches aux bords + safe-areas), Cinéma 16:9 et Plein cadre recadré. Voir `docs/SPRINT_V52_ECRAN_JOYSTICK.md`.
+- 🔜 **V5.3 Graphismes AAA II** (ombres portées, impacts sprites, tenues fidèles aux planches), puis tournoi à brackets/saisons et Online public selon validation réseau réelle.
+
 ## ✅ V5.1 — « Godson FURY — M1 Signature » *(LIVRÉ le 24/10/2026 — 357 assertions source / 592 vérifications, suite verte)*
 
 - **Nouveau nom officiel** choisi avec l’équipe : **Godson FURY ARENA — L’Arène des Légendes** (signature Gédéon - Godson conservée).
 - **Travail individuel des 41 combattants** : chacun reçoit un **M1 spécifique** de 3 à 5 coups (168 coups nommés uniques), avec tempo, portée, puissance, avance et final propres.
 - **Combo accessible** : il suffit de marteler **POING** au sol pour dérouler la chaîne en vrai combo ; liaison réglée frame par frame et prouvée en simulation pour les 41/41.
 - Bot utilisateur de son propre M1, traînées qui s’intensifient, arsenal/aperçus/VS/aide mis à jour, replays pré-V5.1 relus avec l’ancien poing. Voir `docs/SPRINT_V51_M1_SIGNATURE.md`.
-- 🔜 **V5.2 Graphismes AAA II** (ombres portées, impacts sprites, tenues fidèles aux planches), puis tournoi à brackets/saisons et Online public selon validation réseau réelle.
+- ↪️ Le cap V5.2 a ensuite été réaffecté par le propriétaire au joystick et au format d’écran ; Graphismes AAA II devient la priorité V5.3.
 
 ## ✅ V5.0 — « Édition Jeu Complet » *(LIVRÉ le 24/10/2026 — 342 assertions source / 577 vérifications, suite verte)*
 
@@ -137,7 +144,7 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - **Championnat Godson** : l'Arcade devient 3 circuits (Stade 5, Monde 8, Légendes 12 combats) à adversaires uniques, arènes imposées, difficulté croissante et boss final (GODSON PRIME sur Légendes).
 - **Hub principal vivant** : niveau, barre XP, Godson, titre et prochain objectif toujours visibles ; écran Carrière avec circuits, quêtes, récompenses et parcours complet du jeu.
 - Anciens profils migrés honorifiquement (XP/Godson selon l'historique) ; déterminisme et replays préservés. Voir `docs/SPRINT_V50_JEU_COMPLET.md`.
-- 🔜 Le cap V5.1 a ensuite été réaffecté par le propriétaire au nouveau nom et aux M1 individuels ; Graphismes AAA II devient la priorité V5.2.
+- 🔜 Le cap V5.1 a ensuite été réaffecté par le propriétaire au nouveau nom et aux M1 individuels ; Graphismes AAA II est ensuite devenu la priorité V5.3 après le sprint Joystick V5.2.
 
 ## ✅ V4.4 — « Navigation Pro & Tenues de combat » *(LIVRÉ le 24/10/2026 — 327 assertions source / 561 vérifications, suite verte)*
 

@@ -465,3 +465,114 @@ body.combatImmersif #btnPauseFloat{display:grid}
 /* ================= V5.1 — Godson FURY : M1 SIGNATURE ================= */
 .moveList .m1Move{display:block;background:linear-gradient(100deg,rgba(255,122,0,.35),rgba(255,46,136,.28),rgba(0,145,234,.25));border-color:rgba(255,196,0,.72);border-radius:14px;padding:8px 11px;margin:6px 0;line-height:1.55}
 .moveList .m1Move b{color:#ffe082}
+
+/* ================= V5.2 — ÉCRAN ADAPTATIF & JOYSTICK PRO =================
+   Décisions d'équipe : Lena place le joystick au pouce gauche et les actions
+   au pouce droit, aux vrais bords de l'appareil ; Kenzo interdit tout
+   étirement : la simulation reste 16:9, le format choisit seulement son
+   cadrage (Adaptatif par défaut, Cinéma centré, Plein cadre recadré). */
+#gameWrap{
+  --stage-w:min(100dvw,calc(100dvh * 16 / 9));
+  --stage-h:min(100dvh,calc(100dvw * 9 / 16));
+}
+body.screen-adaptatif #gameWrap,body.screen-plein #gameWrap{
+  width:100dvw;height:100dvh;
+  background:
+    radial-gradient(760px 420px at 8% 88%,rgba(0,162,255,.20),transparent 62%),
+    radial-gradient(760px 420px at 92% 88%,rgba(255,46,136,.17),transparent 62%),
+    radial-gradient(900px 520px at 50% -12%,rgba(255,196,0,.12),transparent 58%),
+    linear-gradient(180deg,#03061a,#090d2a 54%,#02040f);
+}
+body.screen-cinema #gameWrap{width:var(--stage-w);height:var(--stage-h)}
+#game{
+  left:50%;top:50%;right:auto;bottom:auto;
+  width:var(--stage-w);height:var(--stage-h);
+  transform:translate(-50%,-50%);
+}
+body.screen-adaptatif #game{box-shadow:0 0 0 1px rgba(255,255,255,.16),0 0 74px rgba(0,162,255,.20),0 0 110px rgba(255,46,136,.10)}
+body.screen-cinema #game{left:0;top:0;width:100%;height:100%;transform:none}
+body.screen-plein #game{width:max(100dvw,calc(100dvh * 16 / 9));height:max(100dvh,calc(100dvw * 9 / 16))}
+body.screen-cinema #gameWrap:fullscreen{width:100%;height:100%}
+body.screen-cinema #gameWrap:fullscreen #game{left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%)}
+/* Le HUD et les annonces restent collés à la scène logique, pas aux bandes latérales. */
+#hud{left:calc(50% - var(--stage-w)/2);top:calc(50% - var(--stage-h)/2);width:var(--stage-w);right:auto;box-sizing:border-box;padding-top:max(13px,env(safe-area-inset-top))}
+#announce{left:calc(50% - var(--stage-w)/2);top:calc(50% - var(--stage-h)/2);width:var(--stage-w);height:var(--stage-h);right:auto;bottom:auto}
+#comboBox{top:calc(50% - var(--stage-h)/2 + var(--stage-h)*.23)}
+#comboBox.left{left:calc(50% - var(--stage-w)/2 + var(--stage-w)*.035)}
+#comboBox.right{right:calc(50% - var(--stage-w)/2 + var(--stage-w)*.035)}
+#trainingBar{top:calc(50% - var(--stage-h)/2 + 104px)}
+#btnPauseFloat{top:calc(50% - var(--stage-h)/2 + max(8px,env(safe-area-inset-top)))}
+#replayBar{bottom:calc((100% - var(--stage-h))/2 + 14px)}
+#toast{bottom:calc((100% - var(--stage-h))/2 + 18px)}
+body.screen-plein #hud{left:0;top:0;width:100%}
+body.screen-plein #announce{left:0;top:0;width:100%;height:100%}
+body.screen-plein #comboBox{top:23%}
+body.screen-plein #comboBox.left{left:3.5%}
+body.screen-plein #comboBox.right{right:3.5%}
+body.screen-plein #trainingBar{top:calc(max(8px,env(safe-area-inset-top)) + 96px)}
+body.screen-plein #btnPauseFloat{top:max(8px,env(safe-area-inset-top))}
+body.screen-plein #replayBar{bottom:max(14px,env(safe-area-inset-bottom))}
+body.screen-plein #toast{bottom:max(18px,env(safe-area-inset-bottom))}
+
+/* Tactile V5.2 : les pouces vivent aux bords physiques en Adaptatif/Plein. */
+#touchUI{
+  position:fixed;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));
+  bottom:max(10px,env(safe-area-inset-bottom));z-index:9;padding:0;opacity:.82;transition:opacity .18s ease;
+}
+#touchUI.touching{opacity:.98}
+body.screen-cinema #touchUI{position:absolute;left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom))}
+.touchGroup.movementGroup{display:block;max-width:none;pointer-events:none;padding-bottom:17px}
+.joyBase{
+  position:relative;width:clamp(106px,30vh,148px);aspect-ratio:1;border-radius:50%;pointer-events:auto;
+  border:2px solid rgba(255,255,255,.38);color:#fff;touch-action:none;user-select:none;-webkit-user-select:none;-webkit-tap-highlight-color:transparent;
+  background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.14) 0 25%,rgba(0,145,234,.13) 42%,rgba(3,6,18,.42) 72%);
+  box-shadow:inset 0 0 0 8px rgba(255,255,255,.045),inset 0 12px 28px rgba(255,255,255,.08),0 14px 34px rgba(0,0,0,.42);
+  backdrop-filter:blur(4px);transition:border-color .12s,box-shadow .12s,filter .12s;
+}
+.joyBase::before,.joyBase::after{content:"";position:absolute;background:linear-gradient(90deg,transparent,rgba(255,255,255,.20),transparent);left:13%;right:13%;top:50%;height:1.5px;transform:translateY(-50%);pointer-events:none}
+.joyBase::after{transform:translateY(-50%) rotate(90deg)}
+.joyBase.active{border-color:rgba(255,196,0,.92);filter:brightness(1.16);box-shadow:inset 0 0 0 8px rgba(255,196,0,.08),0 0 0 4px rgba(255,196,0,.20),0 16px 38px rgba(0,0,0,.5)}
+.joyBase:focus-visible{outline:3px solid #fff;outline-offset:3px}
+.joyDir{position:absolute;font-size:12px;font-weight:1000;color:rgba(255,255,255,.78);text-shadow:0 2px 8px #000;pointer-events:none}
+.joyUp{top:7px;left:50%;transform:translateX(-50%)}
+.joyDown{bottom:7px;left:50%;transform:translateX(-50%)}
+.joyLeft{left:8px;top:50%;transform:translateY(-50%)}
+.joyRight{right:8px;top:50%;transform:translateY(-50%)}
+.joyKnob{
+  position:absolute;left:50%;top:50%;width:47%;aspect-ratio:1;border-radius:50%;display:grid;place-items:center;
+  transform:translate(-50%,-50%);pointer-events:none;color:#221200;font-size:23px;font-weight:1000;
+  background:radial-gradient(circle at 34% 28%,#fff 0 12%,#ffe082 24%,#ffc400 48%,#ff7a00 78%,#ff2e88 112%);
+  border:2px solid rgba(255,255,255,.72);box-shadow:0 10px 24px rgba(0,0,0,.48),inset 0 -8px 16px rgba(120,35,0,.28),inset 0 5px 10px rgba(255,255,255,.55);
+  transition:transform .045s linear,filter .12s;
+}
+.joyBase.active .joyKnob{filter:brightness(1.13) saturate(1.12)}
+.joyHint{position:absolute;left:50%;bottom:-17px;transform:translateX(-50%);font-size:8px;font-weight:1000;letter-spacing:1.6px;color:rgba(255,255,255,.86);text-shadow:0 2px 8px #000;white-space:nowrap;pointer-events:none}
+.touchGroup.actionGroup{
+  display:grid;grid-template-columns:repeat(3,auto);
+  grid-template-areas:". ga-special ga-dash" "ga-block ga-kick ga-punch";
+  gap:7px;align-items:end;justify-items:end;max-width:none;
+}
+.actionGroup .tBtn{width:clamp(49px,13vh,62px);height:clamp(49px,13vh,62px);opacity:.94}
+.actionGroup .tBtn[data-t="kick"]{width:clamp(54px,14.5vh,68px);height:clamp(54px,14.5vh,68px)}
+.actionGroup .tBtn[data-t="punch"]{width:clamp(61px,17vh,80px);height:clamp(61px,17vh,80px);font-size:23px;border-width:2px;box-shadow:0 0 0 3px rgba(255,196,0,.22),0 12px 28px rgba(0,0,0,.48)}
+.actionGroup .tBtn[data-t="special"]{background:linear-gradient(135deg,rgba(124,58,237,.82),rgba(0,145,234,.82))}
+.actionGroup .tBtn[data-t="block"]{background:linear-gradient(135deg,rgba(2,119,189,.72),rgba(0,77,64,.72))}
+.actionGroup .tBtn[data-t="dash"]{background:linear-gradient(135deg,rgba(0,191,165,.72),rgba(0,105,92,.72))}
+.actionGroup .tBtn small{font-size:7.5px;letter-spacing:.35px}
+@media(orientation:landscape) and (max-height:520px){
+  .joyBase{width:clamp(92px,29vh,118px)}
+  .joyKnob{font-size:19px}
+  .touchGroup.movementGroup{padding-bottom:0}
+  .joyHint{display:none}
+  .touchGroup.actionGroup{gap:5px}
+  .actionGroup .tBtn{width:46px;height:46px;font-size:16px}
+  .actionGroup .tBtn[data-t="kick"]{width:52px;height:52px}
+  .actionGroup .tBtn[data-t="punch"]{width:60px;height:60px;font-size:20px}
+}
+@media(max-width:620px){
+  .joyBase{width:98px}
+  .touchGroup.actionGroup{gap:5px}
+  .actionGroup .tBtn{width:45px;height:45px}
+  .actionGroup .tBtn[data-t="kick"]{width:49px;height:49px}
+  .actionGroup .tBtn[data-t="punch"]{width:57px;height:57px}
+}

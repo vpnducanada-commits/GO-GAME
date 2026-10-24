@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V5.1 — M1 SIGNATURE, CARRIÈRE, CHAMPIONNAT & ONLINE
+   Godson FURY ARENA V5.2 — ÉCRAN ADAPTATIF, JOYSTICK PRO & M1 SIGNATURE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -13,12 +13,73 @@ let storyPhase="intro",lastHallRank=0,lastEndWinner=null,recordedMatchKey="";
    qu’un doigt relâché coupe une touche encore tenue par un autre doigt. */
 const touchActivePointers={left:new Set(),right:new Set(),jump:new Set(),block:new Set(),punch:new Set(),kick:new Set(),special:new Set(),dash:new Set()};
 let touchPointerState={activePointers:0,lastKey:"",presses:0};
+/* V5.2 — Joystick tactile gauche (Lena + Nadia) : un seul pouce pilote
+   déplacement, saut et garde/modificateur. Le vecteur analogique est
+   traduit en entrées numériques du moteur avec zone morte et diagonales. */
+const joystickState={active:false,pointerId:null,x:0,y:0,magnitude:0,direction:"neutre",presses:0};
+function joystickKeysForVector(x,y){
+  return {left:x<-.38,right:x>.38,jump:y<-.58,block:y>.52};
+}
+function joystickDirectionLabel(x,y){
+  const k=joystickKeysForVector(x,y);
+  if(k.jump&&k.left)return "saut-gauche"; if(k.jump&&k.right)return "saut-droite"; if(k.jump)return "saut";
+  if(k.block&&k.left)return "garde-gauche"; if(k.block&&k.right)return "garde-droite"; if(k.block)return "garde";
+  if(k.left)return "gauche"; if(k.right)return "droite"; return "neutre";
+}
+function refreshJoystickVisual(){
+  const base=$("joyBase"),knob=$("joyKnob"); if(!base||!knob)return;
+  let maxMove=34;
+  try{ const r=base.getBoundingClientRect(); if(r&&r.width>0)maxMove=Math.max(18,r.width*.27); }catch(e){}
+  knob.style.transform="translate(calc(-50% + "+(joystickState.x*maxMove).toFixed(1)+"px), calc(-50% + "+(joystickState.y*maxMove).toFixed(1)+"px))";
+  base.classList.toggle("active",!!joystickState.active);
+  base.classList.toggle("on",joystickState.magnitude>.16);
+  base.setAttribute("aria-valuetext",joystickState.direction);
+}
+function setJoystickVector(x,y,pointerId){
+  let vx=+x||0,vy=+y||0; const len=Math.hypot(vx,vy);
+  if(len>1){ vx/=len; vy/=len; }
+  if(Math.hypot(vx,vy)<.16){ vx=0; vy=0; }
+  const wasActive=joystickState.active;
+  joystickState.x=vx; joystickState.y=vy; joystickState.magnitude=Math.hypot(vx,vy);
+  joystickState.direction=joystickDirectionLabel(vx,vy);
+  if(pointerId!=null){ joystickState.pointerId=pointerId; joystickState.active=true; if(!wasActive)joystickState.presses++; }
+  const keys=joystickKeysForVector(vx,vy);
+  Object.keys(keys).forEach(k=>setTouchPointer(k,"joystick",!!keys[k]));
+  refreshJoystickVisual();
+  const ui=$("touchUI"); if(ui)ui.classList.toggle("touching",joystickState.active||touchPointerState.activePointers>0);
+  return {...joystickState,keys};
+}
+function resetJoystick(){
+  joystickState.active=false; joystickState.pointerId=null;
+  setJoystickVector(0,0,null);
+  joystickState.active=false; joystickState.pointerId=null; refreshJoystickVisual();
+}
+function bindJoystick(){
+  const base=$("joyBase"); if(!base||base.dataset.bound)return; base.dataset.bound="1";
+  const update=e=>{
+    const r=base.getBoundingClientRect(); if(!r||!r.width)return;
+    const radius=Math.max(24,r.width/2),cx=r.left+r.width/2,cy=r.top+r.height/2;
+    setJoystickVector(((e.clientX||cx)-cx)/radius,((e.clientY||cy)-cy)/radius,e.pointerId);
+  };
+  base.addEventListener("pointerdown",e=>{
+    if(joystickState.active&&joystickState.pointerId!==e.pointerId)return;
+    e.preventDefault(); audio(); try{ base.setPointerCapture(e.pointerId); }catch(err){}
+    joystickState.active=true; joystickState.pointerId=e.pointerId; update(e);
+  });
+  base.addEventListener("pointermove",e=>{ if(joystickState.active&&joystickState.pointerId===e.pointerId){ e.preventDefault(); update(e); } });
+  const off=e=>{ if(joystickState.pointerId===e.pointerId||e.pointerId==null){ e.preventDefault(); resetJoystick(); } };
+  base.addEventListener("pointerup",off); base.addEventListener("pointercancel",off); base.addEventListener("lostpointercapture",off);
+  base.addEventListener("contextmenu",e=>e.preventDefault());
+  window.addEventListener("resize",resetJoystick);
+  window.addEventListener("orientationchange",resetJoystick);
+}
 function refreshTouchPointerState(key){
   const set=touchActivePointers[key]; if(!set)return;
   const on=set.size>0; touchIn[key]=on;
   const btn=document.querySelector('.tBtn[data-t="'+key+'"]');
   if(btn){ btn.classList.toggle("on",on); btn.setAttribute("aria-pressed",on?"true":"false"); }
   touchPointerState.activePointers=Object.values(touchActivePointers).reduce((n,s)=>n+s.size,0);
+  const ui=$("touchUI"); if(ui)ui.classList.toggle("touching",touchPointerState.activePointers>0||joystickState.active);
 }
 function setTouchPointer(key,pointerId,active){
   const set=touchActivePointers[key]; if(!set)return false;
@@ -32,6 +93,19 @@ function clearTouchInputs(){
   Object.keys(touchActivePointers).forEach(k=>{ touchActivePointers[k].clear(); refreshTouchPointerState(k); });
   Object.keys(touchIn).forEach(k=>touchIn[k]=false);
   touchPointerState.activePointers=0; touchPointerState.lastKey="";
+  resetJoystick();
+}
+/* V5.2 — Formats d’écran décidés en équipe : Adaptatif (défaut), Cinéma
+   16:9 classique, Plein cadre recadré sans déformation des personnages. */
+const SCREEN_FORMATS=["adaptatif","cinema","plein"];
+function applyScreenFormat(format){
+  const fmt=SCREEN_FORMATS.includes(format)?format:(SCREEN_FORMATS.includes(SETTINGS.screenFormat)?SETTINGS.screenFormat:"adaptatif");
+  SETTINGS.screenFormat=fmt;
+  SCREEN_FORMATS.forEach(f=>document.body.classList.toggle("screen-"+f,f===fmt));
+  const sel=$("setScreenFormat"); if(sel)sel.value=fmt;
+  if(typeof renderStats!=="undefined")renderStats.screenFormat=fmt;
+  if(typeof resizeCanvas==="function")resizeCanvas();
+  return fmt;
 }
 function showOnly(id){
   MENUS.forEach(m=>$(m).classList.toggle("hidden",m!==id));
@@ -1336,7 +1410,7 @@ function handleCampaignNext(){
 function populateSettings(){
   $("setMusicVol").value=SETTINGS.musicVol; $("setSfxVol").value=SETTINGS.sfxVol;
   $("lblMusicVol").textContent=SETTINGS.musicVol; $("lblSfxVol").textContent=SETTINGS.sfxVol;
-  $("setQuality").value=SETTINGS.quality; $("setRoundTime").value=String(SETTINGS.roundTime);
+  $("setQuality").value=SETTINGS.quality; applyScreenFormat(SETTINGS.screenFormat); $("setRoundTime").value=String(SETTINGS.roundTime);
   $("setRoundsWin").value=String(SETTINGS.roundsWin); $("setSpeed").value=String(SETTINGS.speed);
   $("setShake").value=SETTINGS.shake; $("lblShake").textContent=SETTINGS.shake;
   $("setShowFps").checked=!!SETTINGS.showFps; $("setReduceFlash").checked=!!SETTINGS.reduceFlash;
@@ -1354,6 +1428,7 @@ function bindSettings(){
   on("setMusicVol",e=>{ SETTINGS.musicVol=+e.target.value; $("lblMusicVol").textContent=e.target.value; applyAudioSettings(); saveProfile(); if(SETTINGS.musicVol>0&&AC&&!musicTimer)startMusic(); if(SETTINGS.musicVol<=0)stopMusic(); });
   on("setSfxVol",e=>{ SETTINGS.sfxVol=+e.target.value; $("lblSfxVol").textContent=e.target.value; applyAudioSettings(); saveProfile(); });
   on("setQuality",e=>{ SETTINGS.quality=e.target.value; applyQualitySettings(); saveProfile(); showToast("🎨 Qualité : "+e.target.options[e.target.selectedIndex].text); },"change");
+  on("setScreenFormat",e=>{ applyScreenFormat(e.target.value); saveProfile(); showToast("🖥️ Format d’écran : "+e.target.options[e.target.selectedIndex].text.split(" — ")[0]); },"change");
   on("setRoundTime",e=>{ SETTINGS.roundTime=+e.target.value; saveProfile(); },"change");
   on("setRoundsWin",e=>{ SETTINGS.roundsWin=+e.target.value; buildPips(); saveProfile(); },"change");
   on("setSpeed",e=>{ SETTINGS.speed=+e.target.value; saveProfile(); },"change");
@@ -1471,7 +1546,8 @@ function bindUI(){
   document.querySelectorAll("#trainingBar [data-dummy]").forEach(b=>b.onclick=()=>{ dummyMode=b.dataset.dummy; document.querySelectorAll("#trainingBar [data-dummy]").forEach(x=>x.classList.toggle("on",x===b)); floater(640,240,"Mannequin : "+b.textContent,"#69f0ae"); });
   $("btnTrainReset").onclick=()=>resetTrainingPositions(false);
   $("btnTrainQuit").onclick=goMenu;
-  // Tactile multi-touch : capture du pointeur + état visuel par bouton
+  // Tactile multi-touch : joystick gauche + capture du pointeur par bouton
+  bindJoystick();
   document.querySelectorAll(".tBtn").forEach(b=>{
     const k=b.dataset.t;
     b.setAttribute("aria-pressed","false");
@@ -1494,7 +1570,7 @@ pendingMode="bot"; mode="bot";
 if(isCharLocked(CHARACTERS[selCharP1]))selCharP1=0;
 if(selCharP2>=0&&isCharLocked(CHARACTERS[selCharP2]))selCharP2=1;
 if(selArenaId!=="random")setArenaById(selArenaId);
-bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); bindOnlineUI(); populateSettings(); populateCustomize(); initOnlineClient();
+bindSettings(); bindCustomize(); bindUI(); bindReplayUI(); bindOnlineUI(); populateSettings(); applyScreenFormat(SETTINGS.screenFormat); populateCustomize(); initOnlineClient();
 buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary(); renderMoveList();
 buildPips(); goMenu(); startLoop();
 console.log("%c"+GAME_TITLE+" V"+GAME_VERSION+" — "+GAME_SUBTITLE+"%c signé Gédéon - Godson © 2026 • Manager & Développeur principal : Assistant Arena","font-size:20px;font-weight:900;color:#ffc400","color:#7ee2a8");
