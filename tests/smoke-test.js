@@ -584,7 +584,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^3\.[23]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -602,7 +602,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(ev('GAME_VERSION') === '3.3.0' && window.document.querySelector('h1').textContent.includes('V3.3 PRO'), 'version V3.3.0 affichée et exposée au moteur');
+  assert(/^3\.[34]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -627,6 +627,21 @@ try {
   ev('skipVS()'); step(170);
   assert(ev('state') === 'fight', 'bot : combat démarré au bout du parcours complet');
   ev('goMenu()');
+
+  console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
+  assert(ev('GAME_VERSION') === '3.4.0' && window.document.querySelector('h1').textContent.includes('V3.4 PRO'), 'version V3.4.0 affichée et exposée au moteur');
+  const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
+  assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
+  const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
+  assert(!renderSrc34.includes('f.ry-212'), 'plaque de nom retirée au-dessus des combattants (le HUD suffit)');
+  ev('goMenu(); render()');
+  assert(ev('renderStats.billboardAlpha') === 1, 'écran géant de l’arène pleinement visible dans les menus');
+  click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170); ev('render()');
+  assert(ev('state') === 'fight' && ev('renderStats.billboardAlpha') <= 0.35, 'écran géant effacé pendant le combat : la scène appartient aux personnages');
+  assert(ev('renderStats.spotlightX') > 0, 'halo de scène actif qui suit les combattants');
+  ev('floaters=[{x:640,y:300,text:"A",c:"#ffffff",life:60,big:false},{x:645,y:305,text:"B",c:"#ffffff",life:60,big:false},{x:638,y:298,text:"C",c:"#ffffff",life:60,big:true}]; drawEffects();');
+  assert(ev('renderStats.floaterSpread') >= 24, 'textes flottants décalés au lieu de se chevaucher');
+  ev('floaters=[]; goMenu()');
 
   /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
      applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */

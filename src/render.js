@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.3 PRO — RENDU HAUT GRAPHISME & HUMANITÉ++
+   GÉDÉON - Godson ARENA V3.4 PRO — RENDU HAUT GRAPHISME, ZONE DÉGAGÉE & HUMANITÉ++
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,7 +8,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -131,7 +131,7 @@ function rebuildArenaCache(){
   const mood=arenaMoodTheme(),theme=FLOOR_THEMES[currentArena.id]||FLOOR_THEMES.stadium,shift=mood.floorShift||0;
   arenaCache.sky=mk(mood.sky);
   arenaCache.floor=cachedLinearGradient("floor:"+currentArena.id+":"+currentArenaMood,0,GROUND-22,0,H+180,[[0,shade(theme.top,shift)],[.25,shade(theme.mid,shift)],[1,shade(theme.bot,Math.round(shift*.55))]]);
-  arenaCache.billboard=cachedLinearGradient("billboard",405,32,875,148,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
+  arenaCache.billboard=cachedLinearGradient("billboard",468,14,812,96,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
   arenaCache.grade=mood.grade; arenaCache.moodTheme=mood;
   renderStats.arenaMood=currentArenaMood;
   vignetteGrad=ctx.createRadialGradient(W/2,H/2,H*.38,W/2,H/2,H*.86);
@@ -249,12 +249,16 @@ function updateCamera(dtMs){
 /* ---------------- ARRIÈRE-PLANS ANIMÉS ---------------- */
 function rr(x,y,w,h,r){ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); }
 function drawBillboard(title,sub){
-  ctx.save(); ctx.fillStyle="rgba(5,8,30,.88)"; rr(405,32,470,116,20); ctx.fill();
-  const eg=arenaCache.billboard||cachedLinearGradient("billboard",405,32,875,148,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
-  ctx.strokeStyle=eg; ctx.lineWidth=4; rr(405,32,470,116,20); ctx.stroke();
-  ctx.textAlign="center"; ctx.fillStyle="#fff"; ctx.font="1000 34px 'Segoe UI',Arial"; ctx.fillText(title,640,80);
-  ctx.font="1000 17px 'Segoe UI',Arial"; ctx.fillStyle="#ffe082"; ctx.fillText("★ A R E N A   C H A M P I O N S H I P ★",640,110);
-  ctx.font="800 12px 'Segoe UI',Arial"; ctx.fillStyle="rgba(255,255,255,.88)"; ctx.fillText(sub,640,134); ctx.restore();
+  /* V3.4 : écran géant réduit et discret — plein visible dans les menus,
+     il s'efface pendant le combat pour laisser la scène aux combattants. */
+  const a=state==="fight"?.3:(state==="roundEnd"||state==="matchEnd")?.55:1;
+  renderStats.billboardAlpha=a;
+  ctx.save(); ctx.globalAlpha=a; ctx.fillStyle="rgba(5,8,30,.82)"; rr(468,14,344,82,16); ctx.fill();
+  const eg=arenaCache.billboard||cachedLinearGradient("billboard",468,14,812,96,[[0,"#00a2ff"],[.5,"#7c3aed"],[1,"#ff2e88"]]);
+  ctx.strokeStyle=eg; ctx.lineWidth=3; rr(468,14,344,82,16); ctx.stroke();
+  ctx.textAlign="center"; ctx.fillStyle="#fff"; ctx.font="1000 25px 'Segoe UI',Arial"; ctx.fillText(title,640,48);
+  ctx.font="1000 12.5px 'Segoe UI',Arial"; ctx.fillStyle="#ffe082"; ctx.fillText("★ Arena Championship ★",640,69);
+  ctx.font="800 10px 'Segoe UI',Arial"; ctx.fillStyle="rgba(255,255,255,.85)"; ctx.fillText(sub,640,87); ctx.restore();
 }
 function modeLabel(){ return state==="menu"||state==="select"?"CHOISIS TON MODE DE JEU":(mode==="story"?"MODE HISTOIRE • COMBAT "+story.step+"/"+story.total:mode==="survival"?"MODE SURVIE • VAGUE "+survival.wave:mode==="arcade"?"MODE ARCADE • ÉTAGE "+arcade.stage+"/5":mode==="training"?"MODE ENTRAÎNEMENT":mode==="bot"?"MODE BOT • "+DIFFS[botDiff].label.toUpperCase():"MODE 2 JOUEURS"); }
 function drawStadium(){
@@ -747,7 +751,7 @@ function drawFighter(f){
   if(down||f.dead){ ctx.save(); ctx.fillStyle="#ffd54f"; ctx.font="15px Arial"; ctx.textAlign="center"; for(let i=0;i<3;i++){ const a=renderTicker*.09+i*2.1; ctx.fillText("★",f.rx+Math.cos(a)*24,f.ry-30+Math.sin(a)*7); } ctx.restore(); }
   if(f.blocking||f.parryFlashT>0){ const parryReady=f.parryT>0||f.parryFlashT>0; ctx.save(); ctx.strokeStyle=parryReady?"rgba(255,196,0,.98)":"rgba(129,212,250,.95)"; ctx.fillStyle=parryReady?"rgba(255,196,0,.2)":"rgba(79,195,247,.15)"; ctx.lineWidth=parryReady?5:4; ctx.drawImage(glowSprite(parryReady?"#ffc400":"#4fc3f7"),f.rx+f.facing*36-48,f.ry-102*ch.scale-48,96,96); ctx.beginPath(); ctx.arc(f.rx+f.facing*36,f.ry-96*ch.scale,(50+(f.parryFlashT>0?(16-f.parryFlashT)*1.4:0))*ch.scale,f.facing>0?-.95:Math.PI-.95,f.facing>0?.95:Math.PI+.95); ctx.fill(); ctx.stroke(); ctx.restore(); }
   if(f.counterWindowT>0&&isCombat()){ ctx.save(); ctx.font="1000 12px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle="rgba(90,50,0,.82)"; rr(f.rx-43,f.ry-236*ch.scale,86,20,10); ctx.fill(); ctx.fillStyle="#ffc400"; ctx.fillText("⚡ RIPOSTE !",f.rx,f.ry-222*ch.scale); ctx.restore(); }
-  if(isCombat()||state==="intro"){ ctx.save(); ctx.font="1000 11px 'Segoe UI',Arial"; ctx.textAlign="center"; const label=f.name.toUpperCase(),wdt=Math.max(72,cachedTextWidth(label,"1000 11px 'Segoe UI',Arial")+18); ctx.fillStyle="rgba(0,0,0,.46)"; rr(f.rx-wdt/2,f.ry-212*ch.scale,wdt,19,9); ctx.fill(); ctx.fillStyle="#fff"; ctx.fillText(label,f.rx,f.ry-198*ch.scale); ctx.restore(); }
+  /* V3.4 : plus de plaque de nom au-dessus des combattants — le HUD affiche déjà les noms ; la zone de combat reste dégagée. */
 }
 const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume"};
 function signatureVfxStyle(owner){ return SIGNATURE_VFX[(owner&&owner.char&&owner.char.id)||""]||"énergie"; }
@@ -819,13 +823,18 @@ function drawEffects(){
   for(const p of particles){ ctx.globalAlpha=Math.max(0,Math.min(1,p.life/(p.max||30))); ctx.fillStyle=p.c; if(p.rect){ctx.save();ctx.translate(p.x,p.y);ctx.rotate((p.rot||0)+renderTicker*.06);ctx.fillRect(-p.r,-p.r*.55,p.r*2,p.r*1.1);ctx.restore();}else{ctx.beginPath();ctx.arc(p.x,p.y,p.r,0,7);ctx.fill();} }
   ctx.globalAlpha=1;
   ctx.textAlign="center";
-  for(const fl of floaters){ ctx.save(); ctx.globalAlpha=Math.min(1,fl.life/28); ctx.font="1000 "+(fl.big?27:18)+"px 'Segoe UI',Arial"; ctx.lineWidth=5; ctx.strokeStyle="rgba(0,0,0,.68)"; ctx.strokeText(fl.text,fl.x,fl.y); ctx.fillStyle=fl.c; ctx.fillText(fl.text,fl.x,fl.y); ctx.restore(); }
+  /* V3.4 : les textes flottants proches se décalent au lieu de se chevaucher */
+  const placed=[]; let spreadMax=0;
+  for(const fl of floaters){ let dy=0; for(const pl of placed){ if(Math.abs(pl.x-fl.x)<170&&Math.abs(pl.y-(fl.y-dy))<30)dy+=27; } placed.push({x:fl.x,y:fl.y-dy}); if(dy>spreadMax)spreadMax=dy; ctx.save(); ctx.globalAlpha=Math.min(1,fl.life/28); ctx.font="1000 "+(fl.big?27:18)+"px 'Segoe UI',Arial"; ctx.lineWidth=5; ctx.strokeStyle="rgba(0,0,0,.68)"; ctx.strokeText(fl.text,fl.x,fl.y-dy); ctx.fillStyle=fl.c; ctx.fillText(fl.text,fl.x,fl.y-dy); ctx.restore(); }
+  renderStats.floaterSpread=spreadMax;
 }
 function drawPostProcess(){
   // Passe POST (V2.3 Kenzo) : teinte colorée par arène, vignette, alertes, barres cinéma.
   renderStats.lastPost=currentArena.id+":"+currentArenaMood+":q"+qualityLevel; renderStats.arenaMood=currentArenaMood;
   if(qualityLevel>0&&arenaCache.grade){ ctx.save(); try{ctx.globalCompositeOperation="soft-light";}catch(e){} ctx.fillStyle=arenaCache.grade; ctx.fillRect(0,0,W,H); ctx.restore(); }
   if(vignetteGrad){ ctx.fillStyle=vignetteGrad; ctx.fillRect(0,0,W,H); }
+  /* V3.4 : halo de scène qui suit l'action — les combattants ressortent du décor */
+  if(qualityLevel>0&&isCombat()&&p1&&p2){ const mid=(p1.rx+p2.rx)/2; renderStats.spotlightX=Math.round(mid); ctx.save(); try{ctx.globalCompositeOperation="screen";}catch(e){} ctx.globalAlpha=.08; ctx.drawImage(glowSprite("#ffffff"),mid-280,GROUND-52,560,110); ctx.restore(); }
   const Low=(p1.health/p1.maxHealth<.25||p2.health/p2.maxHealth<.25)&&isCombat();
   if(Low&&!SETTINGS.reduceFlash){ ctx.save(); ctx.globalAlpha=.1+.07*Math.sin(renderTicker*.18); ctx.fillStyle="#ff1744"; ctx.fillRect(0,0,W,8); ctx.fillRect(0,H-8,W,8); ctx.fillRect(0,0,8,H); ctx.fillRect(W-8,0,8,H); ctx.restore(); }
   if(qualityLevel===2&&shake>6.5&&!SETTINGS.reduceFlash){

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.3 PRO — CHARGEMENT, PARCOURS D'ÉCRANS & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.4 PRO — PARCOURS D'ÉCRANS, TACTILE COMPACT & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

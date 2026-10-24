@@ -94,6 +94,11 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🏟️ **Écran Arène dédié** (grandes cartes + Arena Moods ; arène imposée signalée en Histoire/Survie)
 - ✨ Transitions d'écran en fondu glissé, cartes personnages et arènes agrandies ; gameplay et Online inchangés — board : `docs/SPRINT_V33_FLUX_ECRANS.md`
 
+## ✅ V3.4 — « Zone de combat dégagée » *(LIVRÉ le 24/10/2026 — 241 assertions source, suite verte)*
+- 📱 **Tactile v2** : grille compacte aux coins, boutons ~46–52 px semi-transparents, libellés masqués en paysage court — la scène reste visible
+- 🏷️ **Plaques de nom supprimées** en combat (HUD), **écran géant réduit et effacé à 30 %** pendant les combats, **textes flottants espacés** anti-chevauchement
+- 💡 **Halo de scène** qui suit l'action pour faire ressortir les combattants ; board : `docs/SPRINT_V34_ZONE_DEGAGEE.md`
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales

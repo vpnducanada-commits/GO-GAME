@@ -120,6 +120,9 @@ check("Paysage & interface épurée V3.2 présents", all(h in all_js for h in la
 
 # 17. Chargement & parcours d'écrans V3.3
 flow_hooks = ["startBoot", "finishBoot", "launchFromFlow", "syncFlowUI", "flowDifficultyChosen", "pendingLaunch"]
+# 18. Zone de combat dégagée V3.4
+check("Zone de combat dégagée V3.4 présente", "billboardAlpha" in all_js and "floaterSpread" in all_js and "spotlightX" in all_js and "f.ry-212" not in js["render"] and "ga-jump" in css and "11.5vh" in css, "tactile compact aux coins + écran géant discret en combat + floaters espacés")
+
 check("Chargement & parcours d'écrans V3.3 présents", all(h in all_js for h in flow_hooks) and "bootLoader" in html and "menuArena" in html and "btnSelectNext" in html and "flowSteps" in html and "#bootLoader" in css and "screenIn" in css, "boot rapide + étapes Personnages/Arène/Difficulté + transitions")
 
 # 14. Aucun secret serveur dans le client livré au navigateur

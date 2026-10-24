@@ -3,6 +3,22 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.4.0] — 24 octobre 2026 — « Zone de combat dégagée » (retour direct du propriétaire)
+### La scène appartient aux personnages — Kenzo + Manager
+- 📱 **Tactile compact aux coins** : les boutons ne s'étalent plus sur le stage. Grille resserrée en bas à gauche (déplacements) et en bas à droite (attaques), taille ramenée à ~46–52 px en paysage (bornée par la hauteur d'écran), fond semi-transparent flouté et libellés masqués en paysage court — on voit le décor et les jambes des combattants à travers.
+- 🏷️ **Plaques de nom retirées** au-dessus des combattants pendant les combats : le HUD affiche déjà les noms, la zone de jeu ne montre plus que les personnages.
+- 📺 **Écran géant des arènes réduit** (344×82 au lieu de 470×116) et **effacé à 30 % pendant le combat** (55 % en fin de round, plein visible dans les menus où il fait partie du décor).
+- 💬 **Textes flottants espacés** : dégâts, « CONTRE ! » et noms de techniques proches se décalent verticalement au lieu de se chevaucher illisiblement.
+
+### Graphisme & lisibilité — Kenzo
+- 💡 **Halo de scène** : une lumière douce au sol suit le centre de l'action entre les deux combattants (passe POST, qualités moyenne/haute) — les personnages ressortent mieux du décor sans aucun élément ajouté à l'écran.
+- Le rendu conserve Humanité++ (V3.1), le paysage prioritaire (V3.2) et le parcours d'écrans (V3.3).
+
+### Garanties — Manager + Sarah
+- 🎯 **Présentation uniquement** : le tactile garde exactement les mêmes boutons et la même logique multi-touch (seul le CSS change), aucun impact sur la physique, le déterminisme, les replays ou l'Online.
+- 🧪 Suite portée à **241 assertions source / 270 vérifications affichées** : tactile compact vérifié dans le CSS livré, plaque de nom absente du rendu, écran géant mesuré à 100 % au menu et ≤ 35 % en combat, halo actif et décalage des textes flottants mesuré. Contrôle visuel par capture réelle de combat.
+- 🛡️ Gate QA enrichie d'un contrôle permanent « Zone de combat dégagée V3.4 ».
+
 ## [3.3.0] — 24 octobre 2026 — « Flux d'écrans & Chargement » (retour direct du propriétaire)
 ### Un vrai parcours d'écrans — Manager + Nadia
 - ⏳ **Écran de chargement** à l'ouverture : logo animé, barre de progression avec pourcentage, étapes affichées (« Préparation des combattants… », « Ouverture des arènes… ») et astuces de combat — environ **1,2 seconde**, skippable au clic ou au clavier, avec fondu de sortie et filet de sécurité anti-blocage.
