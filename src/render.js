@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V6.0 — RÉALITÉ 3D (WebGL) + GRAPHISMES AAA II 2D, M1 SIGNATURE & ROSTER 41
+   Godson FURY ARENA V6.1 — MAQUETTES VIVANTES 3D + GRAPHISMES AAA II 2D, M1 SIGNATURE & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -9,7 +9,7 @@ const glowCache=new Map();
 const impactSpriteCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D V6.0 (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:""};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D V6.1 — Maquettes Vivantes (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:""};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -126,6 +126,30 @@ function glowSprite(color){
   const gr=g.createRadialGradient(64,64,2,64,64,64); gr.addColorStop(0,"#ffffff"); gr.addColorStop(.22,color); gr.addColorStop(1,"rgba(0,0,0,0)");
   g.fillStyle=gr; g.fillRect(0,0,128,128); glowCache.set(color,c); return c;
 }
+/* V6.1 — l'interface est fabriquée dans les matériaux de l'arène active :
+   ses accents, sa profondeur et sa lumière changent avec le décor au lieu
+   d'être une couche web générique posée par-dessus l'image. */
+const STAGE_DECOR_THEMES={
+  stadium:{accent:"#ffc400",glow:"#00a2ff",deep:"#172537",panel:"#101b2a",rail:"#ff7a00"},
+  tokyo:{accent:"#ff2e88",glow:"#00e5ff",deep:"#130d31",panel:"#0d1029",rail:"#7c3aed"},
+  temple:{accent:"#ffd54f",glow:"#4fc3f7",deep:"#3a2418",panel:"#241812",rail:"#d84315"},
+  Libreville:{accent:"#ff8a65",glow:"#26c6da",deep:"#17384d",panel:"#102a38",rail:"#ffb74d"}
+};
+function syncStageDecor(){
+  const wrap=typeof document!=="undefined"?document.getElementById("gameWrap"):null;
+  const theme=STAGE_DECOR_THEMES[currentArena.id]||STAGE_DECOR_THEMES.stadium;
+  if(wrap&&wrap.style){
+    wrap.dataset.arena=currentArena.id; wrap.dataset.mood=currentArenaMood;
+    wrap.style.setProperty("--stage-accent",theme.accent);
+    wrap.style.setProperty("--stage-glow",theme.glow);
+    wrap.style.setProperty("--stage-deep",theme.deep);
+    wrap.style.setProperty("--stage-panel",theme.panel);
+    wrap.style.setProperty("--stage-rail",theme.rail);
+  }
+  if(typeof document!=="undefined"&&document.body){ document.body.dataset.arena=currentArena.id; document.body.dataset.mood=currentArenaMood; }
+  renderStats.stageDecor=currentArena.id+":"+currentArenaMood;
+  return theme;
+}
 function rebuildArenaCache(){
   arenaCache={};
   const mk=(stops,y1)=>{ const g=ctx.createLinearGradient(0,0,0,y1||H); stops.forEach(s=>g.addColorStop(s[0],s[1])); return g; };
@@ -137,6 +161,7 @@ function rebuildArenaCache(){
   renderStats.arenaMood=currentArenaMood;
   vignetteGrad=ctx.createRadialGradient(W/2,H/2,H*.38,W/2,H/2,H*.86);
   vignetteGrad.addColorStop(0,"rgba(0,0,0,0)"); vignetteGrad.addColorStop(1,"rgba(0,0,0,"+(mood.vignette||.42)+")");
+  syncStageDecor();
 }
 function setArenaById(id,moodPreference){
   const a=ARENAS.find(x=>x.id===id)||ARENAS[0],resolvedMood=resolveArenaMood(a.id,moodPreference||selArenaMood||"auto");
@@ -1346,11 +1371,8 @@ function loop(ts){
   if(typeof syncImmersiveCombat==="function")syncImmersiveCombat();
   if(typeof updateSelectPortraits==="function")updateSelectPortraits();
   if(typeof updateVSPortraits==="function")updateVSPortraits();
-  if(onlineLive){ hitStopT=0; slowmoT=0; }
   if(state==="pause"||(replayPlayback.active&&replayPlayback.paused)){ prepareInterpolation(1); updateCamera(0); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
-  if(hitStopT>0&&!onlineLive){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
   let scale=renderStats.speedScale;
-  if(slowmoT>0&&!onlineLive){ slowmoT-=dt/16.667; scale*=.34; }
   acc+=dt*scale;
   const step=1000/60; let n=0;
   const maxSteps=replayPlayback.active?Math.max(3,Math.ceil(replayPlayback.speed)+1):3;

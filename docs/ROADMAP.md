@@ -123,13 +123,22 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V6.1 — « Maquettes Vivantes & 2v2 deux téléphones » *(LIVRÉ le 24/10/2026 — 426 assertions source / 661 vérifications, suite verte)*
+
+- **Corrections du propriétaire traitées comme critères de release** : suppression totale du gel/ralenti à l’impact, personnages formalisés d’après les maquettes et interface intégrée au décor plutôt que superposée.
+- **41 fiches `BOARD_MODEL3D`** : muscles, proportions, silhouettes, tenues/armures, tissus, coiffures/casques, équipements et armes ; bug de casse des IDs corrigé pour que chaque fiche soit réellement utilisée. WebGL optimisé par caches, batches persistants et buffers réutilisés.
+- **Interface-décor** : thèmes des 4 arènes synchronisés vers `--stage-*`, HUD en tableau suspendu, panneaux-consoles, pods tactiles et disposition relue en captures Chromium.
+- **2v2 Relais sur deux téléphones** : principal + réserviste par joueur, relève du perdant et victoire à deux éliminations ; WebRTC/lockstep local par codes `GF61`, sans compte/Supabase/classement. Bluetooth réservé au partage éventuel des codes, jamais promis comme transport navigateur du combat.
+- **Preuves Sarah** : contrôle QA n°32, zéro mécanisme de gel dans le runtime, relève et replay 2v2 simulés, deux contextes Chromium connectés et plus de 220 frames synchronisées sans désync. Voir `docs/SPRINT_V61_MAQUETTES_2TELEPHONES.md`.
+- 🔜 **Tournoi & Saisons** (brackets locaux et récompenses de saison), puis validation Online public entre deux réseaux distincts et test terrain du mode local sur deux téléphones physiques.
+
 ## ✅ V6.0 — « Réalité 3D » *(LIVRÉ le 24/10/2026 — 398 assertions source / 633 vérifications, suite verte)*
 
 - **Pivot du propriétaire après V5.3** : vraie 3D temps réel plutôt que le tournoi initialement envisagé ; moteur WebGL maison sans dépendance, canvas `#gl3d` sous l’overlay 2D et HUD/joystick inchangés.
 - **41 combattants humanoïdes articulés** : volumes, visages, cheveux, tenues, capes/armures/accessoires, course/saut/garde/coups/M1/chutes pilotés par les profils humains existants.
 - **4 arènes volumiques** : Stade en gradins, Néon Tokyo, Temple Céleste et Plage de Libreville, avec caméra perspective, lumières d’ambiance, ombres de contact, projectiles et impacts 3D.
 - **Sécurité Sarah** : réglage Auto/Toujours/2D, diagnostic et repli AAA II sans WebGL ; captures Chromium/WebGL réelles des 4 arènes ; hash déterministe inchangé. Voir `docs/SPRINT_V60_REALITE_3D.md`.
-- 🔜 **V6.1 Matière & Performance 3D** (détails personnages, mesures mobiles, ombres enrichies), puis **Tournoi & Saisons**. Online public toujours conditionné à un duel WebRTC réel entre deux réseaux distincts.
+- ↪️ La V6.1 ci-dessus a ensuite été réorientée par les corrections du propriétaire vers les Maquettes Vivantes, le zéro gel, l’interface-décor et le 2v2 deux téléphones. Prochain cap : **Tournoi & Saisons** ; Online public toujours conditionné à un duel WebRTC réel entre deux réseaux distincts.
 
 ## ✅ V5.3 — « Graphismes AAA II » *(LIVRÉ le 24/10/2026 — 384 assertions source / 619 vérifications, suite verte)*
 

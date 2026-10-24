@@ -3,6 +3,62 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [6.1.0] — 2026-10-24 — « Maquettes Vivantes & 2v2 deux téléphones »
+
+Sprint correctif et multijoueur local issu des retours directs du propriétaire
+après la V6.0 : plus aucun gel à l’impact, personnages formalisés d’après les
+maquettes, interface fabriquée dans le décor et vrai **2v2 chacun sur son
+téléphone**.
+
+### Corrigé — Zéro gel d’impact
+- Suppression complète des anciens gels de touche et du ralenti de K.O. dans
+  le runtime ; la simulation avance dès la frame qui suit un coup confirmé.
+- Lisibilité conservée par recul, animation corporelle, sons, étincelles,
+  sprites d’impact et textes de dégâts. Smoke et QA verrouillent la régression.
+
+### Ajouté — Maquettes Vivantes 3D (Marco + Kenzo)
+- `BOARD_MODEL3D` décrit désormais explicitement les **41 combattants** :
+  masse musculaire, poitrine/épaules/taille/hanches/cou, famille de corps,
+  tenue ou armure, manches, cape, pans de tissu et peintures de guerre.
+- Cheveux, barbes, oreilles, capuches, masques, couronnes, chapeaux, casques,
+  dômes et têtes robot ; équipements de dos/ceinture et armes portées
+  (épées, katana, dagues, haches, lances, bâtons, fusils et dispositifs).
+- Muscles et membres renflés, plaques, tissus et accessoires sont générés en
+  géométrie 3D ; résolution des IDs à casse mixte (`Zara`, `Lira`, `Kairos`,
+  `Zara-Nova`) corrigée et testée pour qu’aucune fiche ne retombe en silence
+  sur le modèle générique.
+- Optimisations WebGL : caches couleur/nuance, batches et particules
+  persistants, buffers dynamiques réutilisés ; captures à 4 draw calls.
+
+### Ajouté — Interface construite dans le décor (Lena + Nadia)
+- Quatre thèmes d’arène synchronisent accents, halos, panneaux et rails de
+  toute l’interface via `--stage-*` : HUD en tableau suspendu, menus en
+  consoles d’arène et tactile en pods latéraux, centre de combat dégagé.
+- Menu principal ancré/compacté, minuteur protégé des découpes, carte locale
+  regroupée (principal, format, réserviste, étapes, codes, lancement),
+  favicon intégré et disposition relue en captures navigateur.
+
+### Ajouté — 2v2 Relais sur deux téléphones (Nadia + Manager)
+- Chaque joueur choisit **deux combattants distincts** sur son téléphone.
+  Le perdant d’un segment est relayé par son réserviste ; première équipe à
+  **deux éliminations** victorieuse. Équipes déterministes incluses aux
+  replays et au hash de synchronisation.
+- Liaison locale WebRTC/lockstep sur même Wi-Fi ou point d’accès, sans
+  compte, sans Supabase et sans classement : invitation et réponse `GF61`
+  compressées/base64url à copier ou partager, puis lancement confirmé par
+  handshake ordonné `start → start-ready` afin qu’aucune entrée initiale ne
+  soit perdue avant l’initialisation du lockstep.
+- Le Bluetooth navigateur n’est pas présenté comme transport de combat :
+  le partage système peut seulement transmettre les codes ; le duel passe
+  par le réseau local.
+
+### Garanti
+- **426 assertions / 661 vérifications** vertes, contrôle QA n°32, captures
+  WebGL et preuve Chromium en deux contextes (canal ouvert, plus de 220
+  frames lockstep, aucune désynchronisation).
+- Bundle **565 Ko** (578 724 octets, nouveau budget V6.1 ≤ 640 Ko).
+  Détail : `docs/SPRINT_V61_MAQUETTES_2TELEPHONES.md`.
+
 ## [6.0.0] — 2026-10-24 — « Réalité 3D »
 
 Pivot majeur demandé par le propriétaire après la V5.3 : les combats passent en

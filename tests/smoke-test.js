@@ -454,7 +454,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'génération V3 affichée et exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -546,7 +546,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 41, '41 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -585,7 +585,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -603,7 +603,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -630,7 +630,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -645,13 +645,14 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version V3.5+ affichée et exposée au moteur');
-  assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
+  assert(/^[3456]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version V3.5+ affichée et exposée au moteur');
+  assert(ev('Object.values(ATTACKS).every(a=>!("hitstop" in a))') === true, 'zéro gel d’impact : aucune attaque ne déclare de pause ou de ralentissement à la touche');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
-  ev('keys.clear(); p1.reset(); p2.reset(); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; hitStopT=0; slowmoT=0;');
+  ev('keys.clear(); p1.reset(); p2.reset(); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1;');
   press('KeyF', 2); step(5);
-  assert(ev('p1.hitConfirmed') === true && ev('hitStopT') <= 16 && ev('slowmoT') === 0, 'coup de poing réel : aucun ralentissement perceptible (gel ≤ 16 ms, pas de slow-mo)');
+  const noFreezeFrame = ev('simFrame'), noFreezeStun = ev('p2.hitStun'); step(1);
+  assert(ev('p1.hitConfirmed') === true && ev('simFrame') === noFreezeFrame + 1 && (noFreezeStun === 0 || ev('p2.hitStun') === noFreezeStun - 1), 'coup de poing réel : la simulation avance dès la frame suivante, sans gel ni slow-mo');
   assert(ev('typeof syncImmersiveCombat') === 'function' && !!window.document.getElementById('btnPauseFloat'), 'combat immersif paysage + pause flottante disponibles');
   let immersiveOk = true;
   try { ev('syncImmersiveCombat()'); } catch (e) { immersiveOk = false; }
@@ -678,7 +679,7 @@ try {
       close() { this.readyState = 'closed'; if (this.onclose) this.onclose(); }
     }
     class FakePeerConnection {
-      constructor() { this.connectionState = 'connected'; this.localDescription = null; this.remoteDescription = null; }
+      constructor() { this.connectionState = 'connected'; this.iceGatheringState = 'complete'; this.localDescription = null; this.remoteDescription = null; }
       createDataChannel() { return new FakeDataChannel(); }
       async createOffer() { return { type: 'offer', sdp: 'fake-offer' }; }
       async createAnswer() { return { type: 'answer', sdp: 'fake-answer' }; }
@@ -763,6 +764,43 @@ try {
     ev(`onlineSession.config={matchKey:"ASYNCV3-123456",hostId:"${asyncUserId}",guestId:"${asyncOtherId}",hostChar:0,guestChar:1,arena:"stadium",arenaMood:"crepuscule"};`);
     await ev('submitOnlineMatchResult(p1)');
     assert(fetchCalls.some(c => c.url.includes('/functions/v1/submit-match-result') && c.body.match_key === 'ASYNCV3-123456' && c.body.verification_hash) && window.document.getElementById('onlineStatus').textContent.includes('attente'), 'résultat classé : claim envoyé à l’Edge Function, en attente du co-signataire');
+
+    console.log('\n— V6.1 : duel local 2 téléphones (signalisation manuelle simulée) —');
+    const setLocalSelection61 = (main, reserve) => {
+      const mainEl = window.document.getElementById('localFighterMain');
+      mainEl.value = String(main); mainEl.dispatchEvent(new window.Event('change', { bubbles: true }));
+      const reserveEl = window.document.getElementById('onlineFighterReserve');
+      reserveEl.value = String(reserve); reserveEl.dispatchEvent(new window.Event('change', { bubbles: true }));
+      window.document.getElementById('localMatchFormat').value = 'team2v2';
+    };
+    click('btnModePhones'); await waitMs(5);
+    assert(!window.document.getElementById('menuOnline').classList.contains('hidden') && window.document.getElementById('localPhoneStatus').textContent.includes('2 téléphones'), 'entrée 2 téléphones : panneau local ouvert sans compte ni classement');
+    setLocalSelection61(6, 12);
+    assert(ev('localSelectedTeam().join("-")') === '6-12' && ev('localSelectedFormat()') === 'team2v2', 'équipe locale hôte : KAEL + remplaçant VORAK, format 2v2 Relais');
+    const inviteCode61 = await ev('createLocalPhoneInvite()');
+    assert(/^GF61\.[GR]\./.test(inviteCode61) && ev('onlineState.localManual') === true && ev('onlineState.localConfig.hostTeam.join("-")') === '6-12' && ev('onlineState.room.localOnly') === true, 'invitation GF61 créée en WebRTC local, sans salon Supabase');
+    const invitePayload61 = await ev('decodeLocalSignal(document.getElementById("localSignalOut").value)');
+    assert(invitePayload61.kind === 'invite' && invitePayload61.desc.sdp === 'fake-offer' && invitePayload61.config.format === 'team2v2' && invitePayload61.config.hostTeam.join('-') === '6-12', 'code d’invitation relisible : SDP locale + équipe hôte + format 2v2');
+    let invalidLocalCode61 = false;
+    try { await ev('decodeLocalSignal("GF61.X.nope")'); } catch (e) { invalidLocalCode61 = true; }
+    assert(invalidLocalCode61, 'code local invalide rejeté proprement avant toute connexion');
+    setLocalSelection61(7, 8);
+    await ev('encodeLocalSignal({kind:"answer",version:GAME_VERSION,matchKey:onlineState.localConfig.matchKey,desc:{type:"answer",sdp:"fake-local-answer"},guest:localGuestPayload()}).then(code=>{document.getElementById("localSignalIn").value=code; return code;})');
+    await ev('finalizeLocalPhoneAnswer()');
+    assert(ev('onlineState.localConfig.guestTeam.join("-")') === '7-8' && ev('onlineState.peer.remoteDescription.sdp') === 'fake-local-answer' && ev('onlineState.room.guest_id') === 'local-guest', 'réponse invitée connectée : Sora + AEL-7 fusionnés dans la config du match');
+    ev('if(onlineState.channel&&onlineState.channel.onopen)onlineState.channel.onopen(); syncOnlineUI();');
+    await ev('startOnlineDuel()');
+    assert(ev('!!onlineState.pendingStartConfig') === true && ev('mode') !== 'online', 'démarrage WebRTC ordonné : l’hôte attend la confirmation start-ready avant d’initialiser le lockstep');
+    ev('onlineState.channel.onmessage({data:JSON.stringify({t:"start-ready",matchKey:onlineState.pendingStartConfig.matchKey})})'); await waitMs(50);
+    assert(ev('mode') === 'online' && ev('teamMatch.active') === true && ev('p1.char.id') === 'kael' && ev('p2.char.id') === 'sora' && ev('onlineSession.config.localOnly') === true, 'match local lancé par le même lockstep : KAEL contre Sora, réservistes prêts');
+    await ev('leaveOnlineRoom(false)'); ev('clearTeamMatch(); goMenu();');
+    setLocalSelection61(6, 12);
+    await ev('encodeLocalSignal({kind:"invite",version:GAME_VERSION,desc:{type:"offer",sdp:"fake-local-offer"},config:buildLocalHostConfig()}).then(code=>{document.getElementById("localSignalIn").value=code; return code;})');
+    setLocalSelection61(7, 8);
+    const answerCode61 = await ev('acceptLocalPhoneInvite()');
+    const answerPayload61 = await ev('decodeLocalSignal(document.getElementById("localSignalOut").value)');
+    assert(/^GF61\.[GR]\./.test(answerCode61) && answerPayload61.kind === 'answer' && answerPayload61.guest.guestTeam.join('-') === '7-8' && ev('onlineState.isHost') === false && ev('onlineState.localConfig.hostTeam.join("-")') === '6-12', 'téléphone invité : réponse GF61 créée avec son équipe et la config hôte');
+    await ev('leaveOnlineRoom(false)'); ev('clearTeamMatch(); goMenu();');
     await ev('onlineSignOut()');
     assert(ev('onlineState.session') === null && window.localStorage.getItem(ev('GO_GAME_SESSION_KEY')) === null, 'déconnexion GO GAME : session locale effacée');
   })();
@@ -774,7 +812,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6,9).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 41, 'identifiants uniques pour les 41 combattants');
@@ -802,7 +840,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||window.document.querySelector('h1').textContent.includes('V6.0')), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|[456]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V6\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -984,7 +1022,7 @@ function finishTestRun() {
   const m1Failures=[];
   for(let i=0;i<41;i++){
     const len=ev(`m1SignatureFor(CHARACTERS[${i}]).steps.length`);
-    ev(`keys.clear(); resetFighterStats(); applyCharacterTo(p1,${i}); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.x=620; p2.x=705; p1.y=p2.y=GROUND; p1.vx=p2.vx=0; p1.vy=p2.vy=0; p1.facing=1; p2.facing=-1; p2.health=p2.maxHealth; projectiles=[]; floaters=[]; hitStopT=0; slowmoT=0;`);
+    ev(`keys.clear(); resetFighterStats(); applyCharacterTo(p1,${i}); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.x=620; p2.x=705; p1.y=p2.y=GROUND; p1.vx=p2.vx=0; p1.vy=p2.vy=0; p1.facing=1; p2.facing=-1; p2.health=p2.maxHealth; projectiles=[]; floaters=[];`);
     for(let t=0;t<36;t++){
       if(ev('p1.stats.m1Finishers')>=1)break;
       press('KeyF',1); step(2);
@@ -1001,11 +1039,11 @@ function finishTestRun() {
   assert(ev('rosterSearch="sentence des ombres"; rosterMatches(CHARACTERS[31])')===true&&ev('rosterMatches(CHARACTERS[0])')===false,'recherche roster : on peut aussi trouver un combattant par le nom de son M1');
   ev('rosterSearch=""; goMenu()');
   const eng51=fs.readFileSync(path.join(root,'src/engine.js'),'utf8'),ui51=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),html51=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&html51.includes('Godson FURY ARENA V6.0'),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
+  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&/Godson FURY ARENA V6\.\d+/.test(html51),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
 
   /* ===== V5.2 « Écran Adaptatif & Joystick Pro » : décision d'équipe Lena/Nadia/Kenzo/Marco/Sarah ===== */
   console.log('\n— V5.2 : joystick gauche, actions à droite & formats d’écran —');
-  assert(/^(5\.[23]|6\.0)\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
+  assert(/^(5\.[23]|6\.\d+)\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
   assert(!!window.document.getElementById('joyBase')&&!!window.document.getElementById('joyKnob'),'joystick tactile présent en bas à gauche avec bouton mobile');
   assert(!window.document.querySelector('.tBtn[data-t="left"]')&&!window.document.querySelector('.tBtn[data-t="right"]')&&!window.document.querySelector('.tBtn[data-t="jump"]'),'anciens boutons directionnels supprimés : le joystick remplace gauche/droite/saut');
   assert([...window.document.querySelectorAll('.actionGroup .tBtn')].map(b=>b.dataset.t).join(',')==='special,dash,block,kick,punch','cluster droit ergonomique : Spécial, Dash, Garde, Pied et grand POING•M1');
@@ -1036,7 +1074,7 @@ function finishTestRun() {
 
   /* ===== V5.3 « Graphismes AAA II » : ombres portées, impacts sprites, tenues des planches ===== */
   console.log('\n— V5.3 : Graphismes AAA II (Kenzo + Marco, render-only) —');
-  assert(ev('GAME_VERSION')==='6.0.0'&&ev('renderStats.artDirection').includes('Graphismes AAA II'),'direction artistique : Réalité 3D V6.0 avec repli Graphismes AAA II');
+  assert(/^6\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('renderStats.artDirection').includes('Graphismes AAA II'),'direction artistique génération 6 : Réalité 3D avec repli Graphismes AAA II');
   assert(ev('Object.keys(BOARD_OUTFIT_MOTIFS).length')===41&&ev('CHARACTERS.every(c=>!!BOARD_OUTFIT_MOTIFS[String(c.id).toLowerCase()])')===true,'tenues des planches : motif explicite pour chacun des 41 combattants');
   assert(ev('BOARD_OUTFIT_MOTIFS["godson-prime"]')==='couronne'&&ev('BOARD_OUTFIT_MOTIFS["zara"]')==='vague'&&ev('BOARD_OUTFIT_MOTIFS["kael"]')==='lame'&&ev('BOARD_OUTFIT_MOTIFS["lyra-azur"]')==='aile','motifs fidèles aux identités : couronne royale, vague de Libreville, lame d’acier, aile d’Azur');
   ev('qualityLevel=2; renderStats.boardOutfits=0;');
@@ -1061,7 +1099,7 @@ function finishTestRun() {
   ev('for(let k=0;k<32;k++)updateEffects();');
   assert(ev('impactBursts.length')===0,'sprites d’impact : durée courte et nettoyage automatique');
   ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
-  ev('keys.clear(); clearTouchInputs(); applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.x=600; p2.x=690; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; impactBursts=[]; projectiles=[]; state="fight"; introT=0; hitStopT=0;');
+  ev('keys.clear(); clearTouchInputs(); applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.x=600; p2.x=690; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; impactBursts=[]; projectiles=[]; state="fight"; introT=0;');
   let sawM1Burst=false;
   for(let t=0;t<42&&!sawM1Burst;t++){
     if(t%3===0)ev('keys.add("KeyF")');
@@ -1075,7 +1113,7 @@ function finishTestRun() {
   assert(render53.includes('BOARD_OUTFIT_MOTIFS')&&render53.includes('function drawBoardMotif')&&render53.includes('function arenaShadowVector')&&render53.includes('function impactSprite')&&render53.includes('function drawImpactBursts')&&engine53.includes('function impactBurst')&&engine53.includes('"m1final"')&&engine53.includes('"parry"'),'hooks sources V5.3 : motifs 41, ombres directionnelles et impacts typés');
   /* ===== V6.0 « Réalité 3D » : WebGL maison, poses humanoïdes, arènes 3D, repli 2D ===== */
   console.log('\n— V6.0 : Réalité 3D (Kenzo + Marco + Nadia, moteur WebGL maison) —');
-  assert(ev('GAME_VERSION')==='6.0.0'&&window.document.title.includes('V6.0')&&window.document.querySelector('h1').textContent.includes('V6.0'),'édition officielle V6.0 « Réalité 3D » affichée');
+  assert(/^6\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&/V6\.\d+/.test(window.document.title)&&/V6\.\d+/.test(window.document.querySelector('h1').textContent),'génération officielle V6 « Réalité 3D » affichée');
   assert(ev('SETTINGS.renderer3d')==='auto'&&!!window.document.getElementById('setRenderer3d')&&!!window.document.getElementById('gl3d')&&ev('typeof draw3DScene')==='function'&&ev('typeof buildFighterPose3D')==='function','3D Réalité activée par défaut en automatique, canvas WebGL et réglage présents');
   assert(ev('(() => { const b=newBatch3D(); addBox3D(b,[0,1,0],[1,2,1],[0,.4,0],parseColor3("#ff8000")); const c=parseColor3("#ff8000"); return b.count===24&&b.idx.length===36&&c[0]===1&&Math.abs(c[1]-128/255)<.002; })()')===true,'moteur 3D : géométrie indexée et couleurs converties sans bibliothèque externe');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=560; p2.rx=760; p1.ry=p2.ry=GROUND; state="fight"; computeCamera3D();');
@@ -1103,6 +1141,45 @@ function finishTestRun() {
   const render60=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),css60=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),html60=fs.readFileSync(path.join(root,'index.html'),'utf8'),ui60=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
   assert(render60.includes('function buildFighterPose3D')&&render60.includes('function buildArenaBatch3D')&&render60.includes('function computeCamera3D')&&render60.includes('webgl2')&&css60.includes('body.render3d-on #gl3d')&&html60.includes('id="setRenderer3d"')&&ui60.includes('function applyRenderer3DSetting'),'hooks sources V6.0 : WebGL, caméra, arènes, CSS et réglage synchronisés');
   ev('setArenaById("stadium","auto"); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
+
+  /* ===== V6.1 « Maquettes Vivantes & 2v2 deux téléphones » ===== */
+  console.log('\n— V6.1 : zéro gel, personnages des maquettes, interface-décor et 2v2 Relais —');
+  assert(ev('GAME_VERSION')==='6.1.0'&&window.document.title.includes('V6.1')&&window.document.querySelector('h1').textContent.includes('V6.1')&&ev('renderStats.artDirection').includes('Maquettes Vivantes'),'édition officielle V6.1 « Maquettes Vivantes & 2v2 deux téléphones » affichée');
+  const runtime61=['src/engine.js','src/render.js','src/render3d.js','src/ui.js','index.html'].map(f=>fs.readFileSync(path.join(root,f),'utf8')).join('\n');
+  assert(!/(hitstop|hitStopT|slowmoT)/.test(runtime61),'runtime V6.1 verrouillé : aucun mécanisme de gel ou de ralenti d’impact ne subsiste');
+  assert(ev('Object.keys(BOARD_MODEL3D).length')===41&&ev('CHARACTERS.every(c=>!!BOARD_MODEL3D[c.id]&&boardModel3D({char:c})===BOARD_MODEL3D[c.id])')===true,'maquettes 3D : fiche morphologique explicite réellement résolue pour chacun des 41 combattants, casse des IDs comprise');
+  assert(ev('(() => { const models=Object.values(BOARD_MODEL3D),sig=new Set(models.map(m=>[m.frame,m.top,m.head,m.hair,m.weapon,m.gear,m.muscle,m.chest,m.waist,m.shoulders].join("/"))); return sig.size>=38&&models.some(m=>m.muscle>=1.3)&&models.some(m=>m.muscle<=.5)&&models.some(m=>m.frame==="robot")&&models.some(m=>m.frame==="powerArmor")&&models.some(m=>m.frame==="feminine")&&models.some(m=>m.frame==="colossus"); })()')===true,'silhouettes des maquettes : muscles, épaules, taille, hanches et familles de corps réellement différenciés');
+  assert(ev('BOARD_MODEL3D.kael.weapon==="sword"&&BOARD_MODEL3D.kael.top==="plate"&&BOARD_MODEL3D.sora.head==="wizard"&&BOARD_MODEL3D.sora.weapon==="staff"&&BOARD_MODEL3D.sora.skirt>=.95&&BOARD_MODEL3D.ael.frame==="robot"&&BOARD_MODEL3D.ael.weapon==="rifle"&&BOARD_MODEL3D.vorak.muscle>=1.3&&BOARD_MODEL3D.vorak.fur===1&&BOARD_MODEL3D.brutus.head==="helmet"&&BOARD_MODEL3D.brutus.frame==="powerArmor"&&BOARD_MODEL3D.lyra.back==="none"')===true,'identités des planches respectées : armure/épée de KAEL, robe/chapeau/bâton de Sora, robot d’AEL-7, colosse de Vorak, armure lourde de Brutus');
+  const board61=ev('(() => { const seen=new Set(); let vertices=0; CHARACTERS.forEach((c,i)=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); vertices+=o.count+t.count; seen.add(renderStats.boardModel3d); }); return seen.size+":"+vertices+":"+renderStats.boardModels3d; })()');
+  assert(board61.startsWith('41:')&&board61.endsWith(':41')&&parseInt(board61.split(':')[1],10)>120000,'les 41 modèles des maquettes génèrent leur géométrie 3D complète ('+board61+')');
+  const stageDecors61=ev('(() => ARENAS.map(a=>{ setArenaById(a.id,"nuit"); const w=document.getElementById("gameWrap"); return [w.dataset.arena,w.dataset.mood,w.style.getPropertyValue("--stage-accent"),w.style.getPropertyValue("--stage-panel"),renderStats.stageDecor].join("/"); }).join("|"))()');
+  assert(stageDecors61.split('|').length===4&&stageDecors61.split('|').every(v=>v.includes('/nuit/#')&&v.includes(':nuit')),'interface construite dans le décor : les 4 arènes pilotent accents, panneaux et ambiance du HUD');
+  const css61=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),html61=fs.readFileSync(path.join(root,'index.html'),'utf8'),ui61=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),engine61=fs.readFileSync(path.join(root,'src/engine.js'),'utf8');
+  assert(css61.includes('V6.1 — INTERFACE CONSTRUITE DANS LE DÉCOR')&&['--stage-accent','--stage-glow','--stage-deep','--stage-panel','--stage-rail'].every(v=>css61.includes(v))&&css61.includes('.fighterHud::before')&&css61.includes('.touchGroup.actionGroup'),'présentation V6.1 : scoreboard, panneaux-consoles et pods tactiles partagent les matériaux de l’arène');
+  assert(html61.includes('rel="icon" href="data:image/svg+xml')&&html61.includes('id="btnModePhones"')&&html61.includes('id="localPhoneCard"')&&html61.includes('navigateurs ne savent pas ouvrir un canal de jeu Bluetooth direct'),'coque V6.1 : favicon intégré, entrée 2 téléphones et limite Bluetooth expliquée sans fausse promesse');
+
+  ev('mode="2p"; configureTeamMatch({format:"team2v2",hostTeam:[6,12],guestTeam:[7,8],hostChar:6,guestChar:7}); applyCharacterTo(p1,6); applyCharacterTo(p2,7); p1.roundWins=0; p2.roundWins=0; round=1; beginMatch();');
+  assert(ev('teamMatch.active')===true&&ev('roundsToWin()')===2&&ev('p1.char.id')==='kael'&&ev('p2.char.id')==='sora'&&window.document.getElementById('roundLabel').textContent.includes('2V2'),'2v2 Relais lancé : KAEL contre Sora, victoire à deux éliminations');
+  assert(ev('JSON.stringify(replayRecorder.meta.context.team)')==='{"p1":[6,12],"p2":[7,8]}','replay 2v2 : les deux équipes complètes sont enregistrées pour une relecture déterministe');
+  step(145); ev('p2.health=0; endRound(p1,true,"ko");');
+  assert(ev('state')==='roundEnd'&&ev('p1.roundWins')===1&&ev('p2.char.id')==='sora','premier segment : Sora est éliminée, score d’équipe 1–0');
+  ev('roundEndT=1;'); step(1);
+  assert(ev('state')==='intro'&&ev('round')===2&&ev('p1.char.id')==='kael'&&ev('p2.char.id')==='ael'&&ev('teamMatch.p2.index')===1&&ev('p2.health')===ev('p2.maxHealth'),'relève automatique : AEL-7 remplace Sora à pleine vie, KAEL reste en piste');
+  step(145); ev('p2.health=0; endRound(p1,true,"ko"); roundEndT=1;'); step(1);
+  assert(ev('state')==='matchEnd'&&ev('p1.roundWins')===2&&ev('lastWinner')===ev('p1')&&ev('lastReplayData.context.team.p2.join("-")')==='7-8','fin du 2v2 : les deux combattants adverses éliminés, victoire d’équipe et replay finalisé');
+  ev('clearTeamMatch(); goMenu(); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset();');
+
+  click('btnModePhones');
+  const localMain61=window.document.getElementById('localFighterMain'); localMain61.value='6'; localMain61.dispatchEvent(new window.Event('change',{bubbles:true}));
+  window.document.getElementById('onlineFighterReserve').value='12'; window.document.getElementById('localMatchFormat').value='team2v2';
+  assert(!window.document.getElementById('menuOnline').classList.contains('hidden')&&window.document.getElementById('onlineFighter').value==='6'&&ev('localSelectedTeam().join("-")')==='6-12','disposition locale : combattant principal, réserviste et format sont ensemble dans la carte 2 téléphones');
+  const localCfg61=ev('(() => { const c=buildLocalHostConfig(),m=mergeLocalGuestConfig(c,{guestName:"Invitée Locale",guestChar:7,guestTeam:[7,7],guestCountry:"ga",guestInitial:"il",guestSkin:{primary:"#123456",accent:"#abcdef"}}); return [c.format,c.hostTeam.join("-"),m.guestTeam.join("-"),m.localOnly,m.guestName,m.guestCountry].join("|"); })()');
+  assert(localCfg61==='team2v2|6-12|7-8|true|Invitée Locale|GA','config deux téléphones : équipes distinctes, identité invitée assainie et match explicitement non classé');
+  assert(ev('(() => { configureTeamMatch({format:"duel",hostTeam:[6,12],guestTeam:[7,8]}); const duelRespected=!teamMatch.active&&teamMatch.format==="duel"; configureTeamMatch({format:"team2v2",hostTeam:[6,12],guestTeam:[7,8]}); const teamRespected=teamMatch.active; clearTeamMatch(); return duelRespected&&teamRespected; })()')===true,'format explicite prioritaire : le Duel 1v1 reste un duel même si une config transporte des réservistes');
+  assert(ui61.includes('"GF61."')&&ui61.includes('CompressionStream')&&ui61.includes('DecompressionStream')&&ui61.includes('{iceServers:[]}')&&ui61.includes('function waitForIceGathering')&&ui61.includes('async function createLocalPhoneInvite')&&ui61.includes('async function acceptLocalPhoneInvite')&&ui61.includes('async function finalizeLocalPhoneAnswer')&&ui61.includes('navigator.share')&&ui61.includes('start-ready')&&ui61.includes('pendingStartConfig'),'hooks sources V6.1 : codes GF61 compressés, ICE local sans STUN/Supabase, invitation/réponse/finalisation et partage système');
+  assert(engine61.includes('function configureTeamMatch')&&engine61.includes('function prepareTeamRelayNext')&&engine61.includes('function sanitizeTeamChars')&&engine61.includes('teamMatch.p1.index')&&engine61.includes('team:(typeof teamMatchForReplay'),'hooks moteur V6.1 : relève déterministe, équipes assainies, hash et contexte replay synchronisés');
+  ev('goMenu()');
+
 
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }

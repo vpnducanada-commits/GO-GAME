@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V6.0 — RÉALITÉ 3D, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V6.1 — MAQUETTES VIVANTES, 2V2 RELAIS & RÉALITÉ 3D
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="6.0.0";
+const GAME_VERSION="6.1.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -14,7 +14,8 @@ let ctx=canvas.getContext("2d",{alpha:true}); // alpha : en mode 3D, ce canvas d
 const $=id=>document.getElementById(id);
 const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
 const lerp=(a,b,t)=>a+(b-a)*t;
-function shade(hex,amt){ const n=parseInt(hex.slice(1),16); let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt; r=clamp(r,0,255);g=clamp(g,0,255);b=clamp(b,0,255); return "#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0"); }
+const _shadeCache=new Map();
+function shade(hex,amt){ const key=hex+":"+amt,cached=_shadeCache.get(key); if(cached)return cached; const n=parseInt(hex.slice(1),16); let r=(n>>16)+amt,g=((n>>8)&255)+amt,b=(n&255)+amt; r=clamp(r,0,255);g=clamp(g,0,255);b=clamp(b,0,255); const out="#"+((r<<16)|(g<<8)|b).toString(16).padStart(6,"0"); if(_shadeCache.size>512)_shadeCache.clear(); _shadeCache.set(key,out); return out; }
 
 /* ---------------- PROFIL & SAUVEGARDE LOCALE ---------------- */
 const SAVE_KEY="gideonGodsonArenaV2Pro";
@@ -145,7 +146,7 @@ function encodeReplayInput(inp){ let bits=0; REPLAY_INPUT_KEYS.forEach((k,i)=>{ 
 function decodeReplayInput(bits,target){ REPLAY_INPUT_KEYS.forEach((k,i)=>target[k]=!!(bits&(1<<i))); return target; }
 function replayStateHash(){
   const q=v=>Math.round((v||0)*1000)/1000;
-  const parts=[state,round,timerSec,p1.charIndex,p2.charIndex,
+  const parts=[state,round,timerSec,p1.charIndex,p2.charIndex,(typeof teamMatch!=="undefined"&&teamMatch.active?(teamMatch.p1.index+","+teamMatch.p2.index):""),
     q(p1.x),q(p1.y),q(p1.vx),q(p1.vy),q(p1.health),q(p1.energy),p1.roundWins,p1.attackType||"",p1.attackT,p1.hitStun,p1.downT,p1.stats.damage,p1.stats.hits,p1.stats.maxCombo,
     q(p2.x),q(p2.y),q(p2.vx),q(p2.vy),q(p2.health),q(p2.energy),p2.roundWins,p2.attackType||"",p2.attackT,p2.hitStun,p2.downT,p2.stats.damage,p2.stats.hits,p2.stats.maxCombo,
     projectiles.length,projectiles.map(pr=>q(pr.x)+","+q(pr.y)+","+pr.kind).join(";")];
@@ -250,7 +251,7 @@ function captureReplayMeta(seed){
   return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,arenaMood:currentArenaMood,arenaMoodPreference:selArenaMood,
     char1:p1.charIndex,char2:p2.charIndex,names:{p1:p1.name,p2:p2.name},
     settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},
-    context:{storyStep:story.step,arcadeStage:arcade.stage,arcadeTotal:arcadeTotal(),arcadeCircuit:arcade.circuit||"stade",survivalWave:survival.wave,survivalScore:survival.score},
+    context:{storyStep:story.step,arcadeStage:arcade.stage,arcadeTotal:arcadeTotal(),arcadeCircuit:arcade.circuit||"stade",survivalWave:survival.wave,survivalScore:survival.score,team:(typeof teamMatchForReplay==="function"?teamMatchForReplay():null)},
     start:{p1:snap(p1),p2:snap(p2)}};
 }
 function startReplayRecording(seed){
@@ -493,16 +494,16 @@ let currentArenaMood=resolveArenaMood(currentArena.id,selArenaMood);
 
 /* ---------------- DONNÉES : ATTAQUES (frame data pro) ---------------- */
 const ATTACKS={
-  punch:   {dur:16,start:4, end:9, dmg:6, range:104,knock:4.2,hitstun:11,blockstun:6, hitstop:14, energy:6, label:"Poing"},
-  kick:    {dur:24,start:7, end:15,dmg:9, range:116,knock:7.5,hitstun:14,blockstun:8, hitstop:24, energy:8, label:"Pied",hard:true},
-  uppercut:{dur:28,start:8, end:16,dmg:11,range:97, knock:2.5,hitstun:18,blockstun:9, hitstop:34, energy:9, label:"Uppercut",hard:true,launcher:11.5},
-  sweep:   {dur:27,start:8, end:16,dmg:8, range:118,knock:6,  hitstun:14,blockstun:8, hitstop:26, energy:8, label:"Balayage",hard:true,knockdown:true,low:true},
-  airPunch:{dur:15,start:3, end:9, dmg:6, range:99, knock:4,  hitstun:11,blockstun:6, hitstop:14, energy:6, label:"Poing aérien",air:true},
-  airKick: {dur:21,start:6, end:14,dmg:9, range:112,knock:6.5,hitstun:14,blockstun:8, hitstop:24, energy:8, label:"Pied aérien",hard:true,air:true},
-  special: {dur:27,start:8, end:9, dmg:14,range:0,  knock:7,  hitstun:15,blockstun:9, hitstop:32, energy:0, label:"Spécial"},
-  exspecial:{dur:24,start:7, end:9, dmg:17,range:0,  knock:8,  hitstun:16,blockstun:10,hitstop:38, energy:0, label:"EX Spécial",hard:true},
-  super:   {dur:32,start:9, end:10,dmg:23,range:0,  knock:11, hitstun:19,blockstun:11,hitstop:48,energy:0, label:"SUPER",hard:true,knockdown:true},
-  throw:   {dur:25,start:5, end:8, dmg:12,range:82, knock:10, hitstun:20,blockstun:0, hitstop:38, energy:10,label:"Projection",hard:true,knockdown:true,throw:true}
+  punch:   {dur:16,start:4, end:9, dmg:6, range:104,knock:4.2,hitstun:11,blockstun:6, energy:6, label:"Poing"},
+  kick:    {dur:24,start:7, end:15,dmg:9, range:116,knock:7.5,hitstun:14,blockstun:8, energy:8, label:"Pied",hard:true},
+  uppercut:{dur:28,start:8, end:16,dmg:11,range:97, knock:2.5,hitstun:18,blockstun:9, energy:9, label:"Uppercut",hard:true,launcher:11.5},
+  sweep:   {dur:27,start:8, end:16,dmg:8, range:118,knock:6,  hitstun:14,blockstun:8, energy:8, label:"Balayage",hard:true,knockdown:true,low:true},
+  airPunch:{dur:15,start:3, end:9, dmg:6, range:99, knock:4,  hitstun:11,blockstun:6, energy:6, label:"Poing aérien",air:true},
+  airKick: {dur:21,start:6, end:14,dmg:9, range:112,knock:6.5,hitstun:14,blockstun:8, energy:8, label:"Pied aérien",hard:true,air:true},
+  special: {dur:27,start:8, end:9, dmg:14,range:0,  knock:7,  hitstun:15,blockstun:9, energy:0, label:"Spécial"},
+  exspecial:{dur:24,start:7, end:9, dmg:17,range:0,  knock:8,  hitstun:16,blockstun:10,energy:0, label:"EX Spécial",hard:true},
+  super:   {dur:32,start:9, end:10,dmg:23,range:0,  knock:11, hitstun:19,blockstun:11,energy:0, label:"SUPER",hard:true,knockdown:true},
+  throw:   {dur:25,start:5, end:8, dmg:12,range:82, knock:10, hitstun:20,blockstun:0, energy:10,label:"Projection",hard:true,knockdown:true,throw:true}
 };
 const CANCELS={ punch:["punch","kick","uppercut","sweep","special","exspecial"], kick:["special","exspecial"], uppercut:["special","exspecial"], sweep:[], airPunch:["airKick"], airKick:[], special:[], exspecial:[], super:[], throw:[] };
 /* ---------------- M1 SIGNATURE V5.1 : UNE CHAÎNE PAR COMBATTANT ----------------
@@ -687,12 +688,57 @@ let arcade={stage:1,seq:[],lastWin:false,total:5,circuit:"stade",circuitName:"Ci
 function arcadeTotal(){ return Math.max(1,arcade.total||(arcade.seq&&arcade.seq.length)||5); }
 let story={step:1,total:STORY_CAMPAIGN.fights.length,lastWin:false};
 let survival={wave:1,score:0,lastWaveScore:0,lastWin:false,next:null,carryHealth:null,carryEnergy:0,recorded:false,runCounted:false};
-function roundsToWin(){ return mode==="survival"?1:SETTINGS.roundsWin; }
+/* V6.1 — 2v2 RELAIS : chaque joueur engage DEUX combattants. Le perdant
+   d'une manche est éliminé et son partenaire entre immédiatement ; la
+   première équipe à éliminer les deux adversaires gagne. Le format reste
+   déterministe et compatible lockstep/replay : les deux téléphones
+   appliquent la même relève à partir des mêmes équipes négociées. */
+let teamMatch={active:false,format:"duel",p1:{chars:[],index:0},p2:{chars:[],index:0}};
+function sanitizeTeamChars(list,fallback){
+  const out=[];
+  const push=v=>{ const idx=clamp(parseInt(v,10)||0,0,CHARACTERS.length-1); if(!out.includes(idx))out.push(idx); };
+  if(Array.isArray(list))list.forEach(push);
+  if(!out.length)push(fallback||0);
+  let extra=(out[0]+1)%CHARACTERS.length;
+  while(out.length<2){ push(extra); extra=(extra+1)%CHARACTERS.length; }
+  return out.slice(0,2);
+}
+function clearTeamMatch(){ teamMatch={active:false,format:"duel",p1:{chars:[],index:0},p2:{chars:[],index:0}}; return teamMatch; }
+function configureTeamMatch(source){
+  if(!source){ return clearTeamMatch(); }
+  const p1List=source.hostTeam||source.p1Team||(source.teams&&source.teams.p1)||(source.team&&source.team.p1)||source.p1;
+  const p2List=source.guestTeam||source.p2Team||(source.teams&&source.teams.p2)||(source.team&&source.team.p2)||source.p2;
+  const explicitFormat=source.format||source.mode;
+  const wantsTeam=explicitFormat?explicitFormat==="team2v2":(source.team2v2===true||(Array.isArray(p1List)&&Array.isArray(p2List)));
+  if(!wantsTeam)return clearTeamMatch();
+  teamMatch={active:true,format:"team2v2",
+    p1:{chars:sanitizeTeamChars(p1List,source.hostChar||0),index:0},
+    p2:{chars:sanitizeTeamChars(p2List,source.guestChar==null?1:source.guestChar),index:0}};
+  return teamMatch;
+}
+function teamMatchForReplay(){ return teamMatch.active?{p1:[...teamMatch.p1.chars],p2:[...teamMatch.p2.chars]}:null; }
+function teamScoreLabel(){ return teamMatch.active?("ÉQUIPES "+p1.roundWins+"–"+p2.roundWins+" • Remplaçants : "+(CHARACTERS[teamMatch.p1.chars[1]]||{}).name+" / "+(CHARACTERS[teamMatch.p2.chars[1]]||{}).name):""; }
+function prepareTeamRelayNext(winner){
+  if(!teamMatch.active||!winner)return false;
+  const loser=winner===p1?p2:p1,side=loser===p1?"p1":"p2",team=teamMatch[side];
+  if(!team||team.index>=team.chars.length-1)return false;
+  team.index++;
+  applyCharacterTo(loser,team.chars[team.index]);
+  if(mode==="online"&&typeof applyOnlineIdentity==="function"&&typeof onlineSession!=="undefined"&&onlineSession&&onlineSession.config){
+    const cfg=onlineSession.config;
+    applyOnlineIdentity(loser,side==="p1"?cfg.hostInitial:cfg.guestInitial,side==="p1"?cfg.hostSkin:cfg.guestSkin);
+  }
+  buildDisplayNames();
+  const nameEl=$(side==="p1"?"nameP1":"nameP2");
+  if(nameEl)nameEl.innerHTML=(side==="p1"?"🟦 ":(mode==="online"?"🌐 ":"🟥 "))+escapeHTML(loser.displayName);
+  return true;
+}
+function roundsToWin(){ return teamMatch.active?2:mode==="survival"?1:SETTINGS.roundsWin; }
 function fighterMatchScore(f,op){ return Math.max(0,Math.round(f.stats.damage+f.stats.maxComboDamage*4+(f.health/f.maxHealth)*120+f.roundWins*90-op.stats.damage*.35)); }
 let dummyMode="immobile";
 let round=1,timerSec=99,timerFrames=0,matchElapsed=0,simFrame=0,timeGlobal=0;
 let introT=0,roundEndT=0,announcedFight=false,announceT=0,lastWinner=null,lastFinishType="";
-let shake=0,slowmoT=0,hitStopT=0,crowdExcite=0,cinematic=0;
+let shake=0,crowdExcite=0,cinematic=0;
 let particles=[],projectiles=[],floaters=[],rings=[],ghosts=[],impactBursts=[];
 const playerHabits={jumps:0,blocks:0,dashes:0};
 function isCombat(){ return state==="fight"||state==="training"; }
@@ -968,7 +1014,6 @@ function startM1Attack(f){
   atk.blockstun=(atk.blockstun||6)+(step.final?2:1);
   atk.knock=Math.max(1.2,(atk.knock||4)+step.knockAdd);
   atk.energy=Math.max(3,Math.round((atk.energy||6)*(step.final?1.05:.82)));
-  atk.hitstop=step.final?Math.min(28,Math.max(18,atk.hitstop||20)):Math.min(atk.hitstop||14,step.type==="punch"?13:18);
   atk.low=step.type==="sweep";
   if(!step.final){ atk.launcher=0; atk.knockdown=false; }
   else {
@@ -1052,7 +1097,7 @@ function spawnProjectile(f){
   const specs=abilitySpecs(f,isSuper,isEx);
   specs.forEach(sp=>{
     const atk={...baseAtk,dmg:sp.dmg};
-    if(specs.length>1){ atk.hitstun=Math.min(atk.hitstun,13); atk.hitstop=Math.min(atk.hitstop,30); if(sp.y!==specs[0].y)atk.knockdown=false; }
+    if(specs.length>1){ atk.hitstun=Math.min(atk.hitstun,13); if(sp.y!==specs[0].y)atk.knockdown=false; }
     projectiles.push({x:sp.x,y:sp.y,px:sp.x,py:sp.y,rx:sp.x,ry:sp.y,vx:sp.vx,vy:sp.vy||0,r:sp.r,owner:f,super:isSuper,ex:isEx||!!sp.ex,life:sp.life||175,atk,kind:sp.kind||"bolt",grav:sp.grav||0,pierce:!!sp.pierce,homing:sp.homing||0});
   });
   ring(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail); spark(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail,specs.length>2?22:13,3);
@@ -1084,7 +1129,7 @@ function applyDamage(att,def,atk,typeLabel){
     att.hitConfirmed=false; resetM1Chain(att); att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
     spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400"); impactBurst(def.x+def.facing*44,hitY,"parry","#ffc400",1.45,def.facing);
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
-    hitStopT=Math.max(hitStopT,38); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
+    shake=Math.max(shake,4.2); crowdExcite=110; SFX.parry();
     if(isLocalCareerFighter(def)){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
     return;
   }
@@ -1132,7 +1177,6 @@ function applyDamage(att,def,atk,typeLabel){
   floater(def.x,def.y-184*def.char.scale,(isRiposte?"Riposte ! -":isCounter?"CONTRE ! -":"-")+dmg,isRiposte?"#ffc400":isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter||isRiposte);
   const seqName=comboSequenceName(att); if(att.combo>=3&&seqName)floater(att.x,att.y-212*att.char.scale,seqName,"#ffc400");
   shake=Math.max(shake,(atk.hard?7:3.4)*((isCounter||isRiposte)?1.15:1)); crowdExcite=95;
-  hitStopT=Math.max(hitStopT,(atk.hitstop||20)*((isCounter||isRiposte)?1.2:1));
   if(isCounter||isRiposte)SFX.counter(); else SFX.hit(!!atk.hard);
   if(def.health<=0){
     if(state==="training"){ spark(def.x,hitY,"#ffffff",30,6); floater(def.x,def.y-220,"MANNEQUIN RÉINITIALISÉ","#69f0ae",true); def.health=def.maxHealth; def.comboVuln=false; att.combo=0; att.comboT=0; }
@@ -1321,8 +1365,8 @@ function resetRound(){
   projectiles=[]; floaters=[]; rings=[]; ghosts=[]; impactBursts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
   timerSec=SETTINGS.roundTime; timerFrames=0; state="intro"; introT=132; announcedFight=false; lastWinner=null; cinematic=70;
   if(typeof buildPips==="function")buildPips();
-  $("roundLabel").textContent=mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
-  announce(mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),mode==="arcade"?((arcade.circuitName||"Championnat Godson")+" — combat "+arcade.stage+" / "+arcadeTotal()):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
+  $("roundLabel").textContent=teamMatch.active?("2V2 • MANCHE "+round+" • "+p1.roundWins+"–"+p2.roundWins):mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
+  announce(teamMatch.active?("MANCHE "+round):mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),teamMatch.active?(p1.char.name+" VS "+p2.char.name+" • "+teamScoreLabel()):mode==="arcade"?((arcade.circuitName||"Championnat Godson")+" — combat "+arcade.stage+" / "+arcadeTotal()):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
   if(typeof resetCamera==="function")resetCamera(true);
   if(typeof snapHUD==="function")snapHUD();
 }
@@ -1364,7 +1408,7 @@ function endRound(winner,byKO,finishType){
   projectiles=[];
   if(winner){ winner.roundWins++; winner.victory=true; const loser=winner===p1?p2:p1;
     if(byKO){ loser.dead=true; loser.vy=-6.5; loser.kvx=winner.facing*7; } }
-  if(byKO){ announce("K.O. !",finishType==="super"?"FINISH PAR SUPER ATTAQUE !":"",true); SFX.ko(); slowmoT=38; shake=Math.max(shake,13); cinematic=110; }
+  if(byKO){ announce("K.O. !",finishType==="super"?"FINISH PAR SUPER ATTAQUE !":"",true); SFX.ko(); shake=Math.max(shake,11); cinematic=110; }
   else announce(winner?"TEMPS ÉCOULÉ":"ÉGALITÉ !",winner?winner.name+" remporte le round":"Aucun point marqué");
   crowdExcite=170; firework(240+Math.random()*800,150+Math.random()*90);
   if(typeof buildPips==="function")buildPips();
@@ -1464,11 +1508,11 @@ function updateGameLogic(){
   }
   else if(state==="roundEnd"){
     updateFighter(p1,INPUT_BLANK,p2); updateFighter(p2,INPUT_BLANK,p1); separate();
-    if(roundEndT===108&&lastWinner)announce(lastWinner.name.toUpperCase()+" GAGNE !","Round "+round+" terminé");
+    if(roundEndT===108&&lastWinner)announce(lastWinner.name.toUpperCase()+" GAGNE !",teamMatch.active?("Manche "+round+" terminée • Équipes "+p1.roundWins+"–"+p2.roundWins):"Round "+round+" terminé");
     if(roundEndT===70)firework(200+Math.random()*880,140+Math.random()*100);
     if(--roundEndT<=0){
       if(lastWinner&&lastWinner.roundWins>=roundsToWin())finishMatch(lastWinner);
-      else { if(lastWinner)round++; resetRound(); }
+      else { if(lastWinner){ prepareTeamRelayNext(lastWinner); round++; } resetRound(); }
     }
   }
   else if(state==="menu"||state==="vs"||state==="matchEnd"||state==="select"||state==="scene"){

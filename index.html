@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Godson FURY ARENA V6.0 | L’Arène des Légendes — signé Gédéon - Godson</title>
+<title>Godson FURY ARENA V6.1 | L’Arène des Légendes — signé Gédéon - Godson</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23ff7a00%27/%3E%3Ctext x=%2732%27 y=%2744%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2738%27 font-weight=%27900%27 fill=%27white%27%3EG%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body class="screen-adaptatif">
@@ -17,7 +18,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>Godson <span>FURY</span> ARENA <em>V6.0</em></h1>
+        <h1>Godson <span>FURY</span> ARENA <em>V6.1</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -98,10 +99,11 @@
       </section>
       <div class="hubSection">🎮 JOUER — CAMPAGNE &amp; DUELS</div>
       <button class="storyBanner" id="btnModeStory"><span class="sbIc">📖</span><span class="sbTx"><b>CAMPAGNE — SAGA Gideon - Godson</b><small id="storyProgressLabel">6 combats • Boss ultime GODSON PRIME 👑</small></span><span class="sbGo">JOUER ▶</span></button>
-      <button class="storyBanner onlineBanner" id="btnOnline"><span class="sbIc">🌐</span><span class="sbTx"><b>Godson FURY ONLINE</b><small id="onlineMenuStatus">Duels privés • Classement mondial • Cloud</small></span><span class="sbGo">OUVRIR ▶</span></button>
+      <button class="storyBanner onlineBanner" id="btnOnline"><span class="sbIc">🌐</span><span class="sbTx"><b>Godson FURY ONLINE</b><small id="onlineMenuStatus">2 téléphones en local • Duels privés • Classement mondial</small></span><span class="sbGo">OUVRIR ▶</span></button>
       <div class="modeCards">
         <button class="modeCard mc-bot" id="btnModeBot"><span class="ic">🤖</span><b>VERSUS BOT</b><small>Contre l’IA • 3 niveaux</small></button>
-        <button class="modeCard mc-2p" id="btnMode2P"><span class="ic">👥</span><b>2 JOUEURS</b><small>Duel local</small></button>
+        <button class="modeCard mc-2p" id="btnMode2P"><span class="ic">👥</span><b>2 JOUEURS</b><small>Même écran</small></button>
+        <button class="modeCard mc-phones" id="btnModePhones"><span class="ic">📱⚔️📱</span><b>2V2 — 2 TÉLÉPHONES</b><small>Point d’accès / Wi-Fi local • chacun son téléphone</small></button>
         <button class="modeCard mc-arc" id="btnModeArcade"><span class="ic">🏆</span><b>CHAMPIONNAT</b><small>Circuit Stade rapide • 3 circuits dans Carrière</small></button>
         <button class="modeCard mc-surv" id="btnModeSurvival"><span class="ic">🌊</span><b>SURVIE</b><small>Vagues infinies</small></button>
         <button class="modeCard mc-tr" id="btnModeTraining"><span class="ic">🥋</span><b>ENTRAÎNEMENT</b><small>M1 Signature sur mannequin</small></button>
@@ -258,6 +260,34 @@
               <button class="btn dark onlineBtn" id="btnOnlineLeaveRoom">Quitter</button>
             </div>
             <p class="onlineNetStats" id="onlineNetStats">Réseau : en attente.</p>
+          </section>
+
+          <section class="onlineCard localPhoneCard" id="localPhoneCard">
+            <h4>📱 2v2 sur 2 téléphones — point d’accès / Wi-Fi local</h4>
+            <p id="localPhoneStatus">Connectez les deux téléphones au même Wi-Fi ou au point d’accès de l’un d’eux, ouvrez Godson FURY sur chacun, puis échangez les deux codes ci-dessous. Aucun compte ni classement : le combat passe en direct d’un téléphone à l’autre.</p>
+            <div class="onlineForm localTeamForm">
+              <div><label>Ton combattant principal</label><select id="localFighterMain"></select></div>
+              <div><label>Format du match</label><select id="localMatchFormat"><option value="team2v2" selected>👥 2V2 Relais — 2 combattants par joueur</option><option value="duel">⚔️ Duel 1v1 — 1 combattant par joueur</option></select></div>
+              <div><label>Combattant de réserve (2v2)</label><select id="onlineFighterReserve"></select></div>
+            </div>
+            <div class="localSteps">
+              <span><b>1 · Hôte</b><br>Choisis tes combattants ci-dessus, crée l’invitation et envoie/partage le code.</span>
+              <span><b>2 · Invité</b><br>Colle l’invitation, crée la réponse et renvoie-la à l’hôte.</span>
+              <span><b>3 · Hôte</b><br>Colle la réponse, connecte les téléphones, puis lance le duel.</span>
+            </div>
+            <div class="onlineActions">
+              <button class="btn green onlineBtn" id="btnLocalCreateInvite">📨 1 · Créer l’invitation</button>
+              <button class="btn blue onlineBtn" id="btnLocalAcceptInvite">🤝 2 · Créer ma réponse</button>
+              <button class="btn gold onlineBtn" id="btnLocalFinalize">🔗 3 · Connecter la réponse</button>
+              <button class="btn orange onlineBtn" id="btnLocalStartDuel">🚀 Lancer le match</button>
+              <button class="btn dark onlineBtn" id="btnLocalCopyCode">📋 Copier mon code</button>
+              <button class="btn dark onlineBtn" id="btnLocalShareCode">↗️ Partager (Bluetooth/appareil proche…)</button>
+            </div>
+            <div class="localSignalGrid">
+              <div><label for="localSignalOut">Mon code à envoyer</label><textarea id="localSignalOut" readonly placeholder="Ton invitation ou ta réponse apparaîtra ici…"></textarea></div>
+              <div><label for="localSignalIn">Code reçu de l’autre téléphone</label><textarea id="localSignalIn" placeholder="Colle ici le code GF61… reçu de ton adversaire"></textarea></div>
+            </div>
+            <small>ℹ️ Les navigateurs ne savent pas ouvrir un canal de jeu Bluetooth direct entre deux téléphones. Godson FURY utilise donc le Wi-Fi/point d’accès pour le combat ; le bouton « Partager » peut passer par Bluetooth ou l’envoi à un appareil proche pour transmettre les codes.</small>
           </section>
 
           <section class="onlineCard">
@@ -442,7 +472,7 @@
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Godson FURY ARENA V6.0</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Godson FURY ARENA V6.1</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V6.0 — RÉALITÉ 3D, JOYSTICK PRO & M1 SIGNATURE
+   Godson FURY ARENA V6.1 — 2V2 DEUX TÉLÉPHONES, RÉALITÉ 3D & M1 SIGNATURE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -549,7 +549,7 @@ function showVS(keepPrepared){
   showOnly("menuVS");
   clearTimeout(vsTimeout); vsTimeout=setTimeout(()=>{ if(state==="vs")launchPreparedMatch(); },2450);
 }
-function launchPreparedMatch(){ clearTimeout(vsTimeout); showOnly(null); beginMatch(); }
+function launchPreparedMatch(){ clearTimeout(vsTimeout); if(typeof clearTeamMatch==="function")clearTeamMatch(); showOnly(null); beginMatch(); }
 function skipVS(){ if(state==="vs")launchPreparedMatch(); }
 
 /* ---------------- REPLAYS DÉTERMINISTES & REPLAY STUDIO V2.7–V2.8 ---------------- */
@@ -557,7 +557,7 @@ let lastReplayUiKey="";
 function replayModeLabel(d){
   if(!d)return "";
   const c=d.context||{};
-  return d.mode==="story"?"Histoire "+(c.storyStep||"?")+"/6":d.mode==="survival"?"Survie — vague "+(c.survivalWave||1):d.mode==="arcade"?"Championnat "+(c.arcadeStage||1)+"/"+(c.arcadeTotal||5):d.mode==="online"?"Duel en ligne Godson FURY":d.mode==="2p"?"2 Joueurs":"Bot "+((DIFFS[d.botDiff]||{}).label||d.botDiff||"");
+  return d.mode==="story"?"Histoire "+(c.storyStep||"?")+"/6":d.mode==="survival"?"Survie — vague "+(c.survivalWave||1):d.mode==="arcade"?"Championnat "+(c.arcadeStage||1)+"/"+(c.arcadeTotal||5):d.mode==="online"?(c.team?"2v2 Relais — 2 téléphones/en ligne":"Duel en ligne Godson FURY"):d.mode==="2p"?"2 Joueurs":"Bot "+((DIFFS[d.botDiff]||{}).label||d.botDiff||"");
 }
 function replaySummary(d){
   if(!d)return "Aucun replay enregistré";
@@ -652,6 +652,8 @@ function startReplayPlayback(data){
   survival.score=ctx.survivalScore||0; survival.carryHealth=null; survival.lastWin=false;
   if(data.settings){ SETTINGS.roundTime=data.settings.roundTime; SETTINGS.roundsWin=data.settings.roundsWin; }
   applyCharacterTo(p1,data.char1); applyCharacterTo(p2,data.char2);
+  if(ctx.team&&typeof configureTeamMatch==="function")configureTeamMatch({format:"team2v2",hostTeam:ctx.team.p1,guestTeam:ctx.team.p2,hostChar:data.char1,guestChar:data.char2});
+  else if(typeof clearTeamMatch==="function")clearTeamMatch();
   setArenaById(data.arena||"stadium",data.arenaMood||"auto");
   showOnly(null);
   beginMatch();
@@ -687,13 +689,14 @@ function bindReplayUI(){
 const GO_GAME_SUPABASE_URL="https://mcyousugmxgugfremmsq.supabase.co";
 const GO_GAME_SUPABASE_PUBLISHABLE_KEY="sb_publishable_F4-BiEBa5ZHkESEXD93qnA_OkCBQd9K";
 const GO_GAME_SESSION_KEY="gideonGodsonArenaOnlineSessionV1";
-let onlineState={session:null,profile:null,busy:false,leaderboard:[],publicReplays:[],room:null,isHost:false,peer:null,channel:null,pollTimer:0,signalBusy:false,processedSignals:new Set(),pendingIce:[],remoteDescriptionSet:false,rttMs:null,suggestedDelay:6,pingSeq:0,lastPingAt:0,started:false,closing:false};
+let onlineState={session:null,profile:null,busy:false,leaderboard:[],publicReplays:[],room:null,isHost:false,peer:null,channel:null,pollTimer:0,signalBusy:false,processedSignals:new Set(),pendingIce:[],remoteDescriptionSet:false,rttMs:null,suggestedDelay:6,pingSeq:0,lastPingAt:0,started:false,closing:false,localManual:false,localConfig:null,pendingStartConfig:null,pendingStartTimer:0};
 function onlineEl(id){ return $(id); }
 function onlineSetStatus(text){
   const el=onlineEl("onlineStatus"); if(el)el.textContent=text;
   const menu=onlineEl("onlineMenuStatus"); if(menu)menu.textContent=text.length>118?text.slice(0,115)+"…":text;
 }
-function onlineSetRoomStatus(text){ const el=onlineEl("onlineRoomStatus"); if(el)el.textContent=text; }
+function onlineSetRoomStatus(text){ const el=onlineEl("onlineRoomStatus"); if(el)el.textContent=text; if(onlineState.localManual){ const local=onlineEl("localPhoneStatus"); if(local)local.textContent=text; } }
+function localSetStatus(text){ const el=onlineEl("localPhoneStatus"); if(el)el.textContent=text; const room=onlineEl("onlineRoomStatus"); if(room)room.textContent=text; }
 function onlineSetCloudStatus(text){ const el=onlineEl("onlineCloudStatus"); if(el)el.textContent=text; }
 function onlineErrorText(err){
   if(!err)return "Erreur inconnue";
@@ -702,7 +705,7 @@ function onlineErrorText(err){
 }
 function onlineSetBusy(busy){
   onlineState.busy=!!busy;
-  ["btnOnlineSignUp","btnOnlineSignIn","btnOnlineSaveProfile","btnOnlineSignOut","btnOnlineCreateRoom","btnOnlineJoinRoom","btnOnlineStartDuel","btnOnlineRefreshLeaderboard","btnOnlineUploadSave","btnOnlineDownloadSave","btnOnlinePublishReplay","btnOnlineRefreshReplays"].forEach(id=>{ const b=onlineEl(id); if(b)b.disabled=!!busy; });
+  ["btnOnlineSignUp","btnOnlineSignIn","btnOnlineSaveProfile","btnOnlineSignOut","btnOnlineCreateRoom","btnOnlineJoinRoom","btnOnlineStartDuel","btnOnlineRefreshLeaderboard","btnOnlineUploadSave","btnOnlineDownloadSave","btnOnlinePublishReplay","btnOnlineRefreshReplays","btnLocalCreateInvite","btnLocalAcceptInvite","btnLocalFinalize","btnLocalStartDuel"].forEach(id=>{ const b=onlineEl(id); if(b)b.disabled=!!busy; });
 }
 async function onlineRun(task){
   if(onlineState.busy)return;
@@ -838,9 +841,9 @@ async function ensureOnlineProfile(){
   return onlineState.profile;
 }
 function populateOnlineFighters(){
-  ["onlineMainFighter","onlineFighter"].forEach(id=>{
+  ["onlineMainFighter","onlineFighter","onlineFighterReserve","localFighterMain"].forEach(id=>{
     const select=onlineEl(id); if(!select)return;
-    const current=select.value||String(id==="onlineMainFighter"?selCharP1:selCharP1);
+    const current=select.value||String(id==="onlineFighterReserve"?(selCharP2>=0?selCharP2:1):selCharP1);
     select.innerHTML=CHARACTERS.map((c,i)=>{
       const locked=isCharLocked(c);
       return "<option value='"+i+"'"+(locked?" disabled":"")+">"+escapeHTML(c.name)+(locked?" 🔒":"")+" — "+escapeHTML(c.title)+"</option>";
@@ -852,10 +855,13 @@ function syncOnlineUI(){
   const user=onlineState.session&&onlineState.session.user,profile=onlineState.profile;
   const summary=onlineEl("onlineAccountSummary");
   if(summary)summary.textContent=user?(profile?("✅ "+profile.display_name+" • "+(profile.country_code||"GA")+" • Main : "+(profile.main_fighter||"GÉDÉON")):("✅ Compte connecté ("+(user.email||"joueur Godson FURY")+"). Publie ton profil pour rejoindre le classement.")):"Aucun compte connecté. Le classement public reste lisible, le jeu local reste 100 % jouable hors ligne.";
+  const canStart=!!(onlineState.isHost&&onlineState.room&&onlineState.room.guest_id&&onlineState.channel&&onlineState.channel.readyState==="open"&&!onlineState.started);
   const start=onlineEl("btnOnlineStartDuel");
-  if(start)start.disabled=onlineState.busy||!(onlineState.isHost&&onlineState.room&&onlineState.room.guest_id&&onlineState.channel&&onlineState.channel.readyState==="open"&&!onlineState.started);
+  if(start)start.disabled=onlineState.busy||!canStart;
+  const localStart=onlineEl("btnLocalStartDuel");
+  if(localStart)localStart.disabled=onlineState.busy||!canStart;
   const net=onlineEl("onlineNetStats");
-  if(net)net.textContent="Réseau : "+(onlineState.channel&&onlineState.channel.readyState==="open"?"canal WebRTC ouvert":onlineState.room?"salon "+onlineState.room.code+" • "+onlineState.room.status:"en attente")+(onlineState.rttMs!=null?(" • ping ~"+Math.round(onlineState.rttMs)+" ms • délai d’entrée "+onlineState.suggestedDelay+" frames"):"")+" • Lockstep déterministe, pause désactivée pendant le duel.";
+  if(net)net.textContent="Réseau : "+(onlineState.channel&&onlineState.channel.readyState==="open"?(onlineState.localManual?"liaison locale 2 téléphones ouverte":"canal WebRTC ouvert"):onlineState.room?(onlineState.localManual?"point d’accès/Wi-Fi local • échange des codes":"salon "+onlineState.room.code+" • "+onlineState.room.status):"en attente")+(onlineState.rttMs!=null?(" • ping ~"+Math.round(onlineState.rttMs)+" ms • délai d’entrée "+onlineState.suggestedDelay+" frames"):"")+" • Lockstep déterministe, pause désactivée pendant le duel.";
 }
 async function refreshOnlineLeaderboard(){
   const rows=await onlineRequest("/rest/v1/leaderboard?select=*&limit=100",{auth:false});
@@ -979,8 +985,21 @@ function setupOnlineChannel(channel){
       onlineState.suggestedDelay=clamp(Math.ceil((onlineState.rttMs/2)/16.7)+3,4,12);
       syncOnlineUI();
     }
-    else if(msg.t==="start"&&!onlineState.isHost)launchOnlineMatch(msg.config||(onlineState.room&&onlineState.room.config));
+    else if(msg.t==="start"&&!onlineState.isHost){
+      const startConfig=msg.config||(onlineState.room&&onlineState.room.config);
+      if(launchOnlineMatch(startConfig))sendOnlineChannel({t:"start-ready",matchKey:startConfig&&startConfig.matchKey});
+    }
+    else if(msg.t==="start-ready"&&onlineState.isHost){
+      const pendingConfig=onlineState.pendingStartConfig;
+      if(pendingConfig&&(!msg.matchKey||msg.matchKey===pendingConfig.matchKey)){
+        onlineState.pendingStartConfig=null;
+        if(onlineState.pendingStartTimer){ clearTimeout(onlineState.pendingStartTimer); onlineState.pendingStartTimer=0; }
+        launchOnlineMatch(pendingConfig);
+      }
+    }
     else if(msg.t==="bye"){
+      onlineState.pendingStartConfig=null;
+      if(onlineState.pendingStartTimer){ clearTimeout(onlineState.pendingStartTimer); onlineState.pendingStartTimer=0; }
       if(onlineSession.active)handleOnlinePeerClosed("L’adversaire a quitté le duel.");
       else onlineSetRoomStatus("L’adversaire a quitté le salon.");
     }
@@ -988,15 +1007,17 @@ function setupOnlineChannel(channel){
   channel.onclose=()=>{ if(!onlineState.closing)handleOnlinePeerClosed("Connexion WebRTC fermée."); };
   channel.onerror=()=>{ if(!onlineState.closing)onlineSetRoomStatus("⚠️ Erreur du canal WebRTC — le salon reste ouvert quelques instants."); };
 }
-function createOnlinePeer(isHost){
+function createOnlinePeer(isHost,options){
   const PC=window.RTCPeerConnection||window.webkitRTCPeerConnection;
   if(!PC)throw new Error("WebRTC indisponible : utilise un navigateur moderne en HTTPS pour les duels");
   if(onlineState.peer){ try{onlineState.peer.close();}catch(e){} }
-  const pc=new PC({iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
+  const localManual=!!(options&&options.localManual);
+  const pc=new PC(localManual?{iceServers:[]}:{iceServers:[{urls:"stun:stun.l.google.com:19302"},{urls:"stun:stun1.l.google.com:19302"}]});
+  onlineState.localManual=localManual;
   onlineState.peer=pc; onlineState.pendingIce=[]; onlineState.remoteDescriptionSet=false; onlineState.channel=null;
-  pc.onicecandidate=event=>{ if(event.candidate)insertOnlineSignal("ice",event.candidate.toJSON?event.candidate.toJSON():event.candidate).catch(()=>{}); };
+  pc.onicecandidate=event=>{ if(event.candidate&&!localManual)insertOnlineSignal("ice",event.candidate.toJSON?event.candidate.toJSON():event.candidate).catch(()=>{}); };
   pc.onconnectionstatechange=()=>{
-    if(pc.connectionState==="failed"&&!onlineState.closing)onlineSetRoomStatus("⚠️ Connexion directe impossible entre les deux réseaux. Réessaie ou change de Wi-Fi/4G.");
+    if(pc.connectionState==="failed"&&!onlineState.closing)onlineSetRoomStatus(localManual?"⚠️ Liaison locale impossible : vérifiez que les deux téléphones sont sur le même Wi-Fi/point d’accès, puis recréez les codes.":"⚠️ Connexion directe impossible entre les deux réseaux. Réessaie ou change de Wi-Fi/4G.");
     if(pc.connectionState==="disconnected"&&onlineSession.active&&!onlineState.closing)onlineSetRoomStatus("⚠️ Connexion instable — le lockstep attend les inputs pour éviter toute désynchronisation.");
   };
   if(isHost)setupOnlineChannel(pc.createDataChannel("gogame-lockstep",{ordered:true}));
@@ -1067,7 +1088,8 @@ async function createOnlineRoom(){
   if(code.length<4)code=makeOnlineRoomCode();
   const seed=makeReplaySeed();
   const arenaId=onlineEl("onlineArena").value||"stadium",moodPref=onlineEl("onlineMood").value||"auto";
-  const config={version:GAME_VERSION,seed,matchKey:code+"-"+seed.toString(16)+"-"+Date.now().toString(36),hostId:user.id,hostName:profile.display_name,hostChar:onlineSelectedFighter(),hostCountry:profile.country_code||"GA",hostInitial:PROFILE.initials.p1||"G",hostSkin:onlineSkinPayload(),arena:arenaId,arenaMood:resolveArenaMood(arenaId,moodPref),arenaMoodPreference:moodPref,settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},inputDelay:6};
+  const hostChar=onlineSelectedFighter();
+  const config={version:GAME_VERSION,seed,matchKey:code+"-"+seed.toString(16)+"-"+Date.now().toString(36),format:"duel",hostId:user.id,hostName:profile.display_name,hostChar,hostCountry:profile.country_code||"GA",hostInitial:PROFILE.initials.p1||"G",hostSkin:onlineSkinPayload(),arena:arenaId,arenaMood:resolveArenaMood(arenaId,moodPref),arenaMoodPreference:moodPref,settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},inputDelay:6};
   const rows=await onlineRequest("/rest/v1/online_rooms",{method:"POST",headers:{Prefer:"return=representation"},body:{code,host_id:user.id,status:"open",config}}).catch(err=>{
     if(err&&err.status===409)throw new Error("Ce code de salon est déjà utilisé — laisse le champ vide pour en générer un");
     throw err;
@@ -1096,14 +1118,32 @@ async function joinOnlineRoom(){
 }
 async function startOnlineDuel(){
   if(!onlineState.isHost)throw new Error("Seul l’hôte lance le duel");
+  if(onlineState.pendingStartConfig)throw new Error("Lancement déjà envoyé : en attente de la confirmation de l’autre téléphone");
   if(!onlineState.room||!onlineState.room.guest_id)throw new Error("En attente de ton adversaire dans le salon");
   if(!onlineState.channel||onlineState.channel.readyState!=="open")throw new Error("Le canal WebRTC n’est pas encore ouvert");
   const config={...(onlineState.room.config||{}),inputDelay:onlineState.suggestedDelay||6};
-  const rows=await onlineRequest("/rest/v1/online_rooms?code=eq."+encodeURIComponent(onlineState.room.code),{method:"PATCH",headers:{Prefer:"return=representation"},body:{status:"playing",config}});
-  onlineState.room=Array.isArray(rows)&&rows.length?rows[0]:{...onlineState.room,status:"playing",config};
-  sendOnlineChannel({t:"start",config});
-  onlineSetRoomStatus("🚀 Duel lancé ! Synchronisation lockstep…");
-  setTimeout(()=>launchOnlineMatch(config),320);
+  if(config.localOnly||onlineState.localManual){
+    config.localOnly=true; onlineState.localConfig=config;
+    onlineState.room={...onlineState.room,status:"playing",config};
+  }else{
+    const rows=await onlineRequest("/rest/v1/online_rooms?code=eq."+encodeURIComponent(onlineState.room.code),{method:"PATCH",headers:{Prefer:"return=representation"},body:{status:"playing",config}});
+    onlineState.room=Array.isArray(rows)&&rows.length?rows[0]:{...onlineState.room,status:"playing",config};
+  }
+  onlineState.pendingStartConfig=config;
+  if(!sendOnlineChannel({t:"start",config})){
+    onlineState.pendingStartConfig=null;
+    throw new Error("Impossible d’envoyer le lancement : le canal WebRTC vient de se fermer");
+  }
+  onlineSetRoomStatus("🚀 Duel envoyé ! Confirmation de l’autre appareil, puis synchronisation lockstep…");
+  if(onlineState.pendingStartTimer)clearTimeout(onlineState.pendingStartTimer);
+  onlineState.pendingStartTimer=setTimeout(()=>{
+    onlineState.pendingStartTimer=0;
+    if(onlineState.pendingStartConfig===config&&!onlineState.started){
+      onlineState.pendingStartConfig=null;
+      onlineSetRoomStatus("⚠️ L’autre appareil n’a pas confirmé le lancement. Vérifiez qu’il est toujours connecté, puis relancez le duel.");
+      syncOnlineUI();
+    }
+  },8000);
 }
 function launchOnlineMatch(config){
   if(!config||onlineState.started)return false;
@@ -1114,26 +1154,30 @@ function launchOnlineMatch(config){
     sendOnlineChannel({t:"bye"});
     return false;
   }
-  onlineState.started=true; stopOnlinePolling();
+  onlineState.started=true; onlineState.pendingStartConfig=null;
+  if(onlineState.pendingStartTimer){ clearTimeout(onlineState.pendingStartTimer); onlineState.pendingStartTimer=0; }
+  stopOnlinePolling();
   mode="online"; pendingMode="online";
   resetOnlineSession(config,onlineState.isHost?1:2);
   if(config.settings){
     SETTINGS.roundTime=[0,60,99,120].includes(+config.settings.roundTime)?+config.settings.roundTime:99;
     SETTINGS.roundsWin=clamp(parseInt(config.settings.roundsWin,10)||2,1,3);
   }
-  applyCharacterTo(p1,clamp(config.hostChar||0,0,CHARACTERS.length-1));
-  applyCharacterTo(p2,clamp(config.guestChar==null?1:config.guestChar,0,CHARACTERS.length-1));
+  const teamCfg=(typeof configureTeamMatch==="function"?configureTeamMatch(config):null);
+  applyCharacterTo(p1,clamp(teamCfg&&teamCfg.active?teamCfg.p1.chars[0]:(config.hostChar||0),0,CHARACTERS.length-1));
+  applyCharacterTo(p2,clamp(teamCfg&&teamCfg.active?teamCfg.p2.chars[0]:(config.guestChar==null?1:config.guestChar),0,CHARACTERS.length-1));
   applyOnlineIdentity(p1,config.hostInitial,config.hostSkin);
   applyOnlineIdentity(p2,config.guestInitial,config.guestSkin);
   setArenaById(config.arena||"stadium",config.arenaMood||"auto");
   buildDisplayNames(); p1.reset(); p2.reset(); placeMenuFighters();
   showOnly(null); beginMatch();
-  $("roundLabel").textContent="🌐 DUEL EN LIGNE • "+String(config.hostName||"J1").toUpperCase()+" VS "+String(config.guestName||"J2").toUpperCase();
-  showToast("🌐 Duel Godson FURY synchronisé — que le meilleur gagne !");
+  $("roundLabel").textContent=(config.localOnly?"📱 2 TÉLÉPHONES":"🌐 DUEL EN LIGNE")+(config.format==="team2v2"?" • 2V2":"");
+  showToast(config.localOnly?"📱 Duel local synchronisé sur vos deux téléphones !":"🌐 Duel Godson FURY synchronisé — que le meilleur gagne !");
   return true;
 }
 async function submitOnlineMatchResult(winner){
   const config=onlineSession&&onlineSession.config;
+  if(config&&config.localOnly){ onlineSetStatus("📱 Duel local sur deux téléphones terminé — résultat amical, non classé."); return; }
   if(!config||!onlineState.session)return;
   try{
     await ensureOnlineSession();
@@ -1171,12 +1215,187 @@ async function leaveOnlineRoom(updateRemote){
   if(onlineState.channel){ try{onlineState.channel.close();}catch(e){} }
   if(onlineState.peer){ try{onlineState.peer.close();}catch(e){} }
   onlineState.channel=null; onlineState.peer=null; onlineTransportSend=null; onlineState.started=false;
-  onlineState.room=null; onlineState.isHost=false; onlineState.processedSignals.clear(); onlineState.pendingIce=[];
-  if(updateRemote&&room&&onlineState.session){
+  onlineState.room=null; onlineState.isHost=false; onlineState.processedSignals.clear(); onlineState.pendingIce=[]; onlineState.localManual=false; onlineState.localConfig=null; onlineState.pendingStartConfig=null;
+  if(onlineState.pendingStartTimer){ clearTimeout(onlineState.pendingStartTimer); onlineState.pendingStartTimer=0; }
+  if(updateRemote&&room&&!room.localOnly&&!(room.config&&room.config.localOnly)&&onlineState.session){
     await onlineRequest("/rest/v1/online_rooms?code=eq."+encodeURIComponent(room.code),{method:"PATCH",headers:{Prefer:"return=minimal"},body:{status:"closed"},timeout:6000}).catch(()=>{});
   }
   onlineState.closing=false; syncOnlineUI();
 }
+/* ---------------- V6.1 : DUEL LOCAL SUR DEUX TÉLÉPHONES ----------------
+   Même Wi-Fi ou point d'accès d'un des deux téléphones : la signalisation
+   WebRTC (SDP + candidats du réseau local) est échangée par deux codes
+   copiés/partagés par les joueurs, sans compte, sans Supabase et sans
+   serveur. Une fois le DataChannel ouvert, on réutilise exactement le
+   lockstep déterministe des duels en ligne. Le Bluetooth du navigateur ne
+   peut pas servir de canal pair-à-pair : le partage système peut en
+   revanche transmettre les codes d'invitation/réponse. */
+function localSelectedFormat(){
+  const el=onlineEl("localMatchFormat");
+  return el&&el.value==="duel"?"duel":"team2v2";
+}
+function localSelectedReserve(){
+  const el=onlineEl("onlineFighterReserve");
+  return clamp(parseInt(el&&el.value!=null?el.value:String(selCharP2>=0?selCharP2:1),10)||0,0,CHARACTERS.length-1);
+}
+function localSelectedTeam(){
+  const localMain=onlineEl("localFighterMain");
+  const main=localMain&&localMain.value!==""?clamp(parseInt(localMain.value,10)||0,0,CHARACTERS.length-1):onlineSelectedFighter(),reserve=localSelectedReserve();
+  return typeof sanitizeTeamChars==="function"?sanitizeTeamChars([main,reserve],main):[main,reserve===main?(main+1)%CHARACTERS.length:reserve];
+}
+function localPlayerName(){
+  const typed=onlineEl("onlineDisplayName")?String(onlineEl("onlineDisplayName").value||"").trim():"";
+  return String((onlineState.profile&&onlineState.profile.display_name)||typed||PROFILE.names.p1||"Joueur Godson").replace(/\s+/g," ").slice(0,24)||"Joueur Godson";
+}
+function localGuestPayload(){
+  const team=localSelectedTeam(),countryEl=onlineEl("onlineCountry");
+  return {guestName:localPlayerName(),guestChar:team[0],guestTeam:team,guestCountry:String(countryEl&&countryEl.value||"GA").toUpperCase().replace(/[^A-Z]/g,"").slice(0,2)||"GA",guestInitial:PROFILE.initials.p1||"J",guestSkin:onlineSkinPayload()};
+}
+function mergeLocalGuestConfig(base,guest){
+  guest=guest||{};
+  const team=typeof sanitizeTeamChars==="function"?sanitizeTeamChars(guest.guestTeam,guest.guestChar==null?1:guest.guestChar):[clamp(guest.guestChar||1,0,CHARACTERS.length-1),1];
+  return {...(base||{}),localOnly:true,guestId:"local-guest",
+    guestName:String(guest.guestName||"Joueur 2").replace(/\s+/g," ").slice(0,24)||"Joueur 2",
+    guestChar:team[0],guestTeam:team,
+    guestCountry:String(guest.guestCountry||"GA").toUpperCase().replace(/[^A-Z]/g,"").slice(0,2)||"GA",
+    guestInitial:String(guest.guestInitial||"J").toUpperCase().replace(/[^A-Z0-9]/g,"").slice(0,2)||"J",
+    guestSkin:guest.guestSkin&&typeof guest.guestSkin==="object"?{primary:String(guest.guestSkin.primary||""),accent:String(guest.guestSkin.accent||"")}:{}};
+}
+function buildLocalHostConfig(){
+  const seed=makeReplaySeed(),format=localSelectedFormat(),team=localSelectedTeam();
+  const arenaId=onlineEl("onlineArena")?onlineEl("onlineArena").value||"stadium":"stadium";
+  const moodPref=onlineEl("onlineMood")?onlineEl("onlineMood").value||"auto":"auto";
+  const countryEl=onlineEl("onlineCountry");
+  return {version:GAME_VERSION,seed,matchKey:"local-"+seed.toString(16)+"-"+Date.now().toString(36),localOnly:true,format,
+    hostId:"local-host",guestId:"local-guest",hostName:localPlayerName(),hostChar:team[0],hostTeam:team,
+    hostCountry:String(countryEl&&countryEl.value||"GA").toUpperCase().replace(/[^A-Z]/g,"").slice(0,2)||"GA",
+    hostInitial:PROFILE.initials.p1||"G",hostSkin:onlineSkinPayload(),
+    arena:arenaId,arenaMood:resolveArenaMood(arenaId,moodPref),arenaMoodPreference:moodPref,
+    settings:{roundTime:SETTINGS.roundTime,roundsWin:format==="team2v2"?2:SETTINGS.roundsWin},inputDelay:4};
+}
+function waitForIceGathering(pc,timeoutMs){
+  if(!pc||pc.iceGatheringState==="complete")return Promise.resolve(true);
+  return new Promise(resolve=>{
+    let done=false;
+    const finish=ok=>{ if(done)return; done=true; pc.removeEventListener&&pc.removeEventListener("icegatheringstatechange",onChange); resolve(ok); };
+    const onChange=()=>{ if(pc.iceGatheringState==="complete")finish(true); };
+    if(pc.addEventListener)pc.addEventListener("icegatheringstatechange",onChange);
+    setTimeout(()=>finish(false),timeoutMs||3500);
+  });
+}
+async function encodeLocalSignal(payload){
+  const raw=new TextEncoder().encode(JSON.stringify(payload));
+  let bytes=raw,mode="R";
+  try{
+    if(typeof CompressionStream!=="undefined"&&typeof Blob!=="undefined"&&Blob.prototype&&typeof Blob.prototype.stream==="function"&&typeof Response!=="undefined"){
+      const packed=await new Response(new Blob([raw]).stream().pipeThrough(new CompressionStream("gzip"))).arrayBuffer();
+      if(packed&&packed.byteLength) { bytes=new Uint8Array(packed); mode="G"; }
+    }
+  }catch(e){ bytes=raw; mode="R"; }
+  let binary="";
+  for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode.apply(null,Array.from(bytes.subarray(i,i+8192)));
+  return "GF61."+mode+"."+btoa(binary).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/g,"");
+}
+async function decodeLocalSignal(text){
+  const clean=String(text||"").trim().replace(/\s+/g,"");
+  const match=clean.match(/^GF61\.([GR])\.([A-Za-z0-9_-]+)$/);
+  if(!match)throw new Error("Code invalide : colle le code GF61 complet reçu de l’autre téléphone");
+  let b64=match[2].replace(/-/g,"+").replace(/_/g,"/"); while(b64.length%4)b64+="=";
+  const binary=atob(b64),bytes=new Uint8Array(binary.length);
+  for(let i=0;i<binary.length;i++)bytes[i]=binary.charCodeAt(i);
+  let raw=bytes;
+  if(match[1]==="G"){
+    if(typeof DecompressionStream==="undefined"||typeof Blob==="undefined"||!Blob.prototype||typeof Blob.prototype.stream!=="function"||typeof Response==="undefined")throw new Error("Ce navigateur ne sait pas décompresser le code : demande à l’hôte de recréer l’invitation dans Chrome/Edge récent");
+    raw=new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new DecompressionStream("gzip"))).arrayBuffer());
+  }
+  const decoded=JSON.parse(new TextDecoder().decode(raw));
+  if(!decoded||typeof decoded!=="object")throw new Error("Code illisible ou incomplet");
+  return decoded;
+}
+async function resetLocalPeerState(){
+  await leaveOnlineRoom(false).catch(()=>{});
+  onlineState.closing=false; onlineState.started=false; onlineState.localManual=true;
+}
+async function createLocalPhoneInvite(){
+  await resetLocalPeerState();
+  const config=buildLocalHostConfig();
+  onlineState.isHost=true; onlineState.localConfig=config;
+  onlineState.room={code:"2PHONES",status:"local",guest_id:null,config,localOnly:true};
+  const pc=createOnlinePeer(true,{localManual:true});
+  const offer=await pc.createOffer(); await pc.setLocalDescription(offer);
+  localSetStatus("📡 Préparation de l’invitation locale… collecte des adresses du Wi-Fi/point d’accès.");
+  await waitForIceGathering(pc,3800);
+  if(!pc.localDescription)throw new Error("Invitation WebRTC impossible à créer sur ce navigateur");
+  const code=await encodeLocalSignal({kind:"invite",version:GAME_VERSION,desc:{type:pc.localDescription.type,sdp:pc.localDescription.sdp},config});
+  onlineEl("localSignalOut").value=code; onlineEl("localSignalIn").value="";
+  localSetStatus("📨 Invitation prête ("+code.length+" caractères). Envoie-la à l’autre téléphone, puis attends sa réponse. Format : "+(config.format==="team2v2"?"2V2 Relais":"Duel 1v1")+".");
+  showToast("📱 Invitation locale créée — envoie le code à ton adversaire");
+  syncOnlineUI();
+  return code;
+}
+async function acceptLocalPhoneInvite(){
+  const payload=await decodeLocalSignal(onlineEl("localSignalIn").value);
+  if(payload.kind!=="invite"||!payload.desc||!payload.config)throw new Error("Ce code n’est pas une invitation d’hôte valide");
+  if(payload.config.version!==GAME_VERSION)throw new Error("Versions différentes : hôte V"+String(payload.config.version||"?")+", ton jeu V"+GAME_VERSION);
+  await resetLocalPeerState();
+  const guest=localGuestPayload(),config=mergeLocalGuestConfig(payload.config,guest);
+  onlineState.isHost=false; onlineState.localConfig=config;
+  onlineState.room={code:"2PHONES",status:"local",guest_id:"local-guest",config,localOnly:true};
+  const pc=createOnlinePeer(false,{localManual:true});
+  await pc.setRemoteDescription(payload.desc); onlineState.remoteDescriptionSet=true;
+  const answer=await pc.createAnswer(); await pc.setLocalDescription(answer);
+  localSetStatus("🤝 Invitation reçue. Préparation de la réponse locale…");
+  await waitForIceGathering(pc,3800);
+  if(!pc.localDescription)throw new Error("Réponse WebRTC impossible à créer sur ce navigateur");
+  const code=await encodeLocalSignal({kind:"answer",version:GAME_VERSION,matchKey:config.matchKey,desc:{type:pc.localDescription.type,sdp:pc.localDescription.sdp},guest});
+  onlineEl("localSignalOut").value=code;
+  localSetStatus("✅ Réponse prête ("+code.length+" caractères). Renvoie-la à l’hôte ; le duel démarrera dès qu’il la connectera.");
+  showToast("📱 Réponse locale créée — renvoie le code à l’hôte");
+  syncOnlineUI();
+  return code;
+}
+async function finalizeLocalPhoneAnswer(){
+  const payload=await decodeLocalSignal(onlineEl("localSignalIn").value);
+  if(payload.kind!=="answer"||!payload.desc||!payload.guest)throw new Error("Ce code n’est pas une réponse d’invité valide");
+  if(!onlineState.isHost||!onlineState.peer||!onlineState.localConfig)throw new Error("Crée d’abord ton invitation d’hôte sur ce téléphone");
+  if(payload.matchKey&&onlineState.localConfig.matchKey&&payload.matchKey!==onlineState.localConfig.matchKey)throw new Error("Cette réponse correspond à une autre invitation : recréez les deux codes");
+  const config=mergeLocalGuestConfig(onlineState.localConfig,payload.guest);
+  onlineState.localConfig=config;
+  onlineState.room={...(onlineState.room||{}),code:"2PHONES",status:"local",guest_id:"local-guest",config,localOnly:true};
+  await onlineState.peer.setRemoteDescription(payload.desc); onlineState.remoteDescriptionSet=true;
+  localSetStatus("🔗 Réponse connectée. Ouverture du canal entre les deux téléphones… puis bouton « Lancer le duel ».");
+  showToast("📱 Réponse acceptée — connexion des téléphones…");
+  syncOnlineUI();
+  return config;
+}
+async function copyLocalPhoneCode(){
+  const out=onlineEl("localSignalOut"),code=out?String(out.value||"").trim():"";
+  if(!code){ showToast("📱 Crée d’abord une invitation ou une réponse"); return false; }
+  try{ if(navigator.clipboard&&navigator.clipboard.writeText)await navigator.clipboard.writeText(code); else { out.select(); document.execCommand&&document.execCommand("copy"); } }
+  catch(e){ out.select(); throw new Error("Copie automatique refusée : le code est sélectionné, copie-le manuellement"); }
+  showToast("📋 Code local copié — envoie-le à l’autre téléphone");
+  return true;
+}
+async function shareLocalPhoneCode(){
+  const out=onlineEl("localSignalOut"),code=out?String(out.value||"").trim():"";
+  if(!code){ showToast("📱 Crée d’abord une invitation ou une réponse"); return false; }
+  if(navigator.share){
+    try{ await navigator.share({title:"Godson FURY — duel local",text:code}); showToast("↗️ Code partagé"); return true; }
+    catch(e){ if(e&&e.name==="AbortError")return false; }
+  }
+  return copyLocalPhoneCode();
+}
+async function openLocalPhones(){
+  audio(); populateOnlineFighters();
+  if(!onlineEl("onlineDisplayName").value)onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion Godson FURY").slice(0,24);
+  if(selArenaId!=="random")onlineEl("onlineArena").value=selArenaId;
+  onlineEl("onlineMood").value=selArenaMood;
+  showOnly("menuOnline"); syncOnlineUI();
+  const card=onlineEl("localPhoneCard");
+  if(card&&card.scrollIntoView)setTimeout(()=>card.scrollIntoView({behavior:"smooth",block:"start"}),60);
+  localSetStatus("📱 Mode 2 téléphones : même Wi-Fi ou point d’accès, format "+(localSelectedFormat()==="team2v2"?"2V2 Relais":"Duel 1v1")+". L’hôte crée l’invitation, l’invité répond, puis l’hôte connecte et lance.");
+}
+
 async function openOnline(){
   audio(); populateOnlineFighters();
   if(!onlineEl("onlineDisplayName").value)onlineEl("onlineDisplayName").value=(PROFILE.names.p1||"Champion Godson FURY").slice(0,24);
@@ -1209,6 +1428,16 @@ function bindOnlineUI(){
   onlineEl("btnOnlineJoinRoom").onclick=()=>onlineRun(joinOnlineRoom);
   onlineEl("btnOnlineStartDuel").onclick=()=>onlineRun(startOnlineDuel);
   onlineEl("btnOnlineLeaveRoom").onclick=()=>onlineRun(async()=>{ await leaveOnlineRoom(true); onlineSetRoomStatus("Salon quitté. Crée un nouveau code ou rejoins celui d’un adversaire."); });
+  const phonesBtn=$("btnModePhones"); if(phonesBtn)phonesBtn.onclick=openLocalPhones;
+  onlineEl("btnLocalCreateInvite").onclick=()=>onlineRun(createLocalPhoneInvite);
+  onlineEl("btnLocalAcceptInvite").onclick=()=>onlineRun(acceptLocalPhoneInvite);
+  onlineEl("btnLocalFinalize").onclick=()=>onlineRun(finalizeLocalPhoneAnswer);
+  onlineEl("btnLocalStartDuel").onclick=()=>onlineRun(startOnlineDuel);
+  onlineEl("btnLocalCopyCode").onclick=()=>onlineRun(copyLocalPhoneCode);
+  onlineEl("btnLocalShareCode").onclick=()=>onlineRun(shareLocalPhoneCode);
+  onlineEl("onlineFighter").addEventListener("change",()=>{ const localMain=onlineEl("localFighterMain"); if(localMain)localMain.value=onlineEl("onlineFighter").value; const reserve=onlineEl("onlineFighterReserve"); if(reserve&&reserve.value===onlineEl("onlineFighter").value)reserve.value=String((onlineSelectedFighter()+1)%CHARACTERS.length); });
+  onlineEl("localFighterMain").addEventListener("change",e=>{ onlineEl("onlineFighter").value=e.target.value; onlineEl("onlineMainFighter").value=e.target.value; const reserve=onlineEl("onlineFighterReserve"); if(reserve&&reserve.value===e.target.value)reserve.value=String((parseInt(e.target.value,10)+1)%CHARACTERS.length); });
+  onlineEl("onlineFighterReserve").addEventListener("change",e=>{ if(e.target.value===onlineEl("onlineFighter").value){ e.target.value=String((onlineSelectedFighter()+1)%CHARACTERS.length); showToast("👥 2V2 : choisis un remplaçant différent de ton combattant principal"); } });
   onlineEl("btnOnlineRefreshLeaderboard").onclick=()=>onlineRun(refreshOnlineLeaderboard);
   onlineEl("btnOnlineUploadSave").onclick=()=>onlineRun(uploadOnlineSave);
   onlineEl("btnOnlineDownloadSave").onclick=()=>onlineRun(downloadOnlineSave);
