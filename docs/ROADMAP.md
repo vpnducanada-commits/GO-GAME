@@ -121,7 +121,11 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 ## ✅ V4.0 — « Arcade plein écran & anatomie HD » *(LIVRÉ le 24/10/2026 — 287 assertions source / 331 vérifications, suite verte)*
 - 🖥️ Nouvelle direction du propriétaire (« quitter le mini-jeu ») : coque **100 % viewport**, scène 16:9 maximale, barre système intégrée à la scène et masquée en combat, aucun pied de page ni panneau extérieur.
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
-- 🔜 Trajectoire V4 : V4.1 peinture & tenues avancées par personnage ; V4.2 compétition locale/tournoi ; V4.3 approfondissement Online public (matchmaking/spectateurs selon validation réseau réelle).
+- 🔜 Trajectoire V4 : V4.1 livrée ci-dessous ; V4.2 compétition locale/tournoi ; V4.3 approfondissement Online public (matchmaking/spectateurs selon validation réseau réelle).
+
+## ✅ V4.1 — « Peinture & Présentation » *(LIVRÉ le 24/10/2026 — 297 assertions source / 341 vérifications, suite verte)*
+- 🆚 Écran VS **plein corps animé et face à face**, cadres aux couleurs des combattants ; intro de round avec **bandeaux nominatifs** glissants façon grande licence.
+- 🎨 Matières par style : métal brossé + rivets, cœur d’énergie pulsant, étincelles arcaniques, écume, bandages, éclair signature et reflet de chevelure — strictement visuel.
 
 Le socle connecté est livré et documenté dans `docs/V3_GO_GAME_FONDATIONS.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/SPRINT_V3_GO_GAME_ONLINE.md`. Les suites possibles sont le matchmaking public, un TURN dédié, la revanche synchronisée, les spectateurs et la relecture serveur des replays de tournoi. Le Sprint 09 local reste le prochain cap de contenu hors ligne.
 

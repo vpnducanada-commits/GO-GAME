@@ -773,7 +773,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|4\.0)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|4\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 9, 'identifiants uniques pour les 9 combattants');
@@ -801,7 +801,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|4\.0)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|4\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -829,7 +829,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.0 : Arcade plein écran & anatomie HD —');
-  assert(ev('GAME_VERSION') === '4.0.0' && window.document.querySelector('h1').textContent.includes('V4.0 PRO'), 'version V4.0.0 exposée');
+  assert(/^4\.[01]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Arcade plein écran (4.0+) exposée');
   assert(!!window.document.querySelector('#gameWrap > header.sig'), 'barre système intégrée DANS la scène (aucun panneau extérieur)');
   const cssV4 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(cssV4.includes('#app{position:fixed;inset:0') && cssV4.includes('width:min(100dvw,calc(100dvh * 16 / 9))') && cssV4.includes('height:min(100dvh,calc(100dvw * 9 / 16))') && cssV4.includes('footer{display:none!important}'), 'coque plein écran : scène 16:9 maximale manipulable, aucun pied de page');
@@ -843,9 +843,31 @@ function finishTestRun() {
   assert(ev('cam.zoom') >= 1.3, 'caméra de jeu de combat : zoom rapproché ' + ev('cam.zoom'));
   ev('renderStats.outfitDetails=0;');
   for (let i = 0; i < 9; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); drawFighter(p1);`); }
-  assert(ev('renderStats.outfitDetails') >= 9 && ev('renderStats.artDirection') === 'HD Arcade V4', 'tenues signatures HD dessinées pour les 9 combattants');
+  assert(ev('renderStats.outfitDetails') >= 9 && ev('renderStats.artDirection').startsWith('HD Arcade V4'), 'tenues signatures HD dessinées pour les 9 combattants');
   const renderSrcV4 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
   assert(renderSrcV4.includes('const hipY=lerp(-86,-63,cb)') && renderSrcV4.includes('solveJoint(hipX-4,hipY,bFoot.x,bFoot.y-7,46,45,-1)') && renderSrcV4.includes('clamp(1180/(dist+420),.88,1.34)') && renderSrcV4.includes('ch.scale*1.08'), 'squelette allongé, IK adulte et présence visuelle renforcée verrouillés');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
+
+
+  console.log('\n— V4.1 : Peinture, matières & présentation (VS plein corps, intro cinéma) —');
+  assert(ev('GAME_VERSION') === '4.1.0' && window.document.querySelector('h1').textContent.includes('V4.1 PRO'), 'version V4.1.0 exposée');
+  ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight');
+  assert(ev('state') === 'vs' && !!window.document.getElementById('vsPortrait1') && !!window.document.getElementById('vsPortrait2'), 'écran VS : portraits plein corps des deux combattants');
+  assert(window.document.querySelector('#vsAvatar1 canvas') && window.document.getElementById('vsAvatar1').style.borderColor, 'cadre VS aux couleurs du combattant');
+  ev('renderStats.portraits=0; updateVSPortraits(); updateVSPortraits();');
+  assert(ev('renderStats.portraits') >= 4 && ev('vsRigs[0].f.facing') === 1 && ev('vsRigs[1].f.facing') === -1, 'portraits VS animés et face à face (' + ev('renderStats.portraits') + ' dessins)');
+  assert(window.document.getElementById('vsName1').textContent === ev('p1.name'), 'VS synchronisé avec les combattants du match');
+  ev('skipVS()');
+  assert(ev('state') === 'intro' && ev('introT') > 90, 'intro de round en cours après le VS');
+  ev('for(let k=0;k<30;k++)updateGameLogic(); renderStats.introBanners=0; render();');
+  assert(ev('renderStats.introBanners') >= 1, 'bandeaux nominatifs cinématographiques pendant l’intro');
+  ev('renderStats.materialDetails=0;');
+  for (let i = 0; i < 9; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); drawFighter(p1);`); }
+  assert(ev('renderStats.materialDetails') >= 9, 'peinture & matières V4.1 appliquées aux 9 combattants');
+  const renderSrcV41 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
+  assert(renderSrcV41.includes('Peinture & matières V4.1') && renderSrcV41.includes('Intro cinématographique V4.1') && renderSrcV41.includes('updateVSPortraits()'), 'hooks V4.1 présents dans le rendu et la boucle');
+  const cssV41 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
+  assert(cssV41.includes('ÉCRAN VS PLEIN CORPS') && cssV41.includes('aspect-ratio:300/340'), 'cadre VS plein corps stylé');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n================ RÉSULTAT ================');

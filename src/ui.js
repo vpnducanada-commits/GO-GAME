@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.0 PRO — ARCADE PLEIN ÉCRAN & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.1 PRO — ARCADE PLEIN ÉCRAN, VS PLEIN CORPS & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -113,6 +113,7 @@ function drawFighterPortrait(pctx,f,w,h,cx,groundY,k,sk){
     f.x=f.rx=0; f.ry=0; f.y=GROUND; f.vy=0; f.vx=0; f.kvx=0; f.grounded=true;
     f.energy=0; f.hitFlash=0; f.attack=null; f.attackT=0; f.hitStun=0; f.downT=0; f.dead=false; f.blocking=false; f.crouching=false; f.dashT=0; f.victory=false;
     f.blinkT=((portraitTick+(f.charIndex||0)*47)%260)<7?-1:90;
+    f.facing=f.side===2?-1:1; if(f.motion)f.motion.face=f.facing; // les portraits se font face (P1 → droite, P2 → gauche)
     f.anim=(f.anim||0)+1;
     pctx.save(); pctx.translate(cx,groundY); pctx.scale(k,k); drawFighter(f); pctx.restore();
     renderStats.portraits=(renderStats.portraits||0)+1;
@@ -141,6 +142,31 @@ function updatePreviewBoxes(previewP2Index){
   fill(1,selCharP1,false);
   fill(2,previewP2Index,selCharP2<0&&pendingMode!=="arcade"&&pendingMode!=="story"&&pendingMode!=="survival");
 }
+/* Portraits plein corps de l'écran VS (V4.1) : les deux combattants du match,
+   animés par le même moteur que les cartes de sélection. */
+let vsRigs=null;
+function ensureVSRigs(){
+  if(vsRigs)return;
+  vsRigs=[1,2].map(side=>{
+    const cv=$("vsPortrait"+side); if(!cv)return null;
+    const f=new Fighter(0,side); applyCharacterTo(f,side===1?selCharP1:1); f.reset();
+    return {ctx:cv.getContext("2d"),f,sk:f.skin,charIndex:-1};
+  }).filter(Boolean);
+}
+function syncVSPortraitsToFighters(){
+  ensureVSRigs(); if(!vsRigs)return;
+  [[vsRigs[0],p1],[vsRigs[1],p2]].forEach(pair=>{
+    const rig=pair[0],src=pair[1]; if(!rig||!src)return;
+    if(rig.charIndex!==src.charIndex){ applyCharacterTo(rig.f,src.charIndex); rig.f.reset(); rig.charIndex=src.charIndex; }
+    rig.f.skin={...src.skin}; rig.f.letter=src.letter; rig.sk=rig.f.skin;
+  });
+}
+function updateVSPortraits(){
+  const menu=$("menuVS"); if(!menu||menu.classList.contains("hidden"))return;
+  if(!vsRigs)syncVSPortraitsToFighters();
+  if(vsRigs)for(const rig of vsRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,326,1.38,rig.sk);
+}
+
 function updateSelectPortraits(){
   const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden"))return;
   portraitTick++;
@@ -301,8 +327,9 @@ function prepareMatch(keepPrepared){
 function showVS(keepPrepared){
   audio(); prepareMatch(!!keepPrepared); SFX.confirm();
   $("hud").style.display="none"; $("trainingBar").style.display="none";
-  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.textContent=f.letter; a.style.background="linear-gradient(135deg,"+f.skin.primary+","+f.skin.accent+")"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title+" • "+(f.char.superName||""); };
+  const setSide=(avatar,name,char,f)=>{ const a=$(avatar); a.style.borderColor=f.skin.accent; a.style.boxShadow="0 0 34px "+f.skin.primary+",0 22px 50px rgba(0,0,0,.55)"; $(name).textContent=f.name; $(char).textContent=f.char.name+" — "+f.char.title+" • "+(f.char.superName||""); };
   setSide("vsAvatar1","vsName1","vsChar1",p1); setSide("vsAvatar2","vsName2","vsChar2",p2);
+  syncVSPortraitsToFighters();
   $("vsArena").textContent="🏟️ "+currentArena.name+" • "+arenaMoodLabel(currentArenaMood)+(mode==="arcade"?" • Étage "+arcade.stage+"/5":mode==="story"?" • Histoire "+story.step+"/"+story.total:mode==="survival"?" • 🌊 Vague "+survival.wave:"");
   showOnly("menuVS");
   clearTimeout(vsTimeout); vsTimeout=setTimeout(()=>{ if(state==="vs")launchPreparedMatch(); },2450);

@@ -3,6 +3,23 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [4.1.0] — 24 octobre 2026 — « Peinture & Présentation » (trajectoire V4, chantier 1)
+### Écran VS plein corps — Lena
+- 🆚 Fini les médaillons avec une lettre : les deux combattants du match s’affichent **en pied, animés par le moteur**, dans des cadres aux couleurs de leur personnage — et **face à face** (orientation vérifiée par capture et verrouillée par test).
+- 🎬 **Intro de round cinématographique** : bandeaux nominatifs façon grande licence qui glissent depuis les bords (nom du joueur, personnage et titre), puis s’effacent avant « COMBATTEZ ! ».
+
+### Peinture & matières — Marco + Kenzo
+- 🛡️ **Métal brossé** pour Kael/Titan/Prime : reflet diagonal animé et rivets de plastron.
+- 🔷 **Énergie synthétique** pour AEL-7 : cœur lumineux pulsant et coutures cyan.
+- ✨ **Étincelles arcaniques** pour Sora/Nova, bulles d’écume pour Zara, bandages croisés pour Kira, éclair signature pour le héros.
+- 💈 Reflet de matière sur chaque chevelure/casque.
+
+### Garanties — Nadia + Sarah
+- 🎯 Présentation et rendu uniquement : gameplay, hitboxes, déterminisme, replays et Online inchangés.
+- 🧪 **297 assertions source / 341 vérifications affichées**, gate QA contrôle permanent n°23, captures relues (VS Kael/Sora face à face, intro sur Libreville). Bundle 348 Ko (budget 352 Ko — marge surveillée).
+
+---
+
 ## [4.0.0] — 24 octobre 2026 — « Arcade plein écran & anatomie HD » (nouvelle direction du propriétaire)
 ### Quitter le mini-jeu : coque de vrai jeu — Manager + Lena
 - 🖥️ **100 % de l’écran appartient au jeu** : l’application occupe tout le viewport et la scène 16:9 prend la plus grande surface manipulable possible. Fini la page avec cadre réduit, pied de page et zones mortes.

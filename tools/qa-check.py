@@ -142,6 +142,10 @@ header_in_stage = html.find('id="gameWrap"') < html.find('<header class="sig">')
 shell_ok = header_in_stage and all(x in css for x in ('#app{position:fixed;inset:0','width:min(100dvw,calc(100dvh * 16 / 9))','height:min(100dvh,calc(100dvw * 9 / 16))','footer{display:none!important}','body.combatImmersif header.sig{display:none!important}')) and 'classList.toggle("combatImmersif",!!on)' in js["ui"] and all(x in js["render"] for x in ('headR:15.3','const hipY=lerp(-86,-63,cb)','clamp(1180/(dist+420),.88,1.34)','outfitDetails','HD Arcade V4'))
 check("Arcade plein écran & anatomie HD V4.0 présents", shell_ok, "viewport 100 % jeu + barre système intégrée/masquée en combat + proportions adultes + caméra 1,34×")
 
+# 23. Peinture & présentation V4.1 (VS plein corps, intro cinéma, matières)
+vs_ok = all(x in html for x in ('vsPortrait1','vsPortrait2')) and all(x in js["ui"] for x in ('ensureVSRigs','syncVSPortraitsToFighters','updateVSPortraits','f.facing=f.side===2?-1:1')) and all(x in js["render"] for x in ('updateVSPortraits()','Peinture & matières V4.1','Intro cinématographique V4.1','materialDetails')) and 'ÉCRAN VS PLEIN CORPS' in css
+check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à face + bandeaux d'intro + matières par style")
+
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
 secret_hits = [p for p in ("sb_secret_", "service_role", "SUPABASE_SERVICE_ROLE_KEY") if p in client_blob]

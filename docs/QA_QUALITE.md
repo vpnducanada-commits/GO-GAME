@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 352 Ko (budget conservé en V4.0 malgré la coque plein écran et l’anatomie HD ; 342 Ko réels), sans asset externe.
+- ✅ Bundle officiel ≤ 352 Ko (budget conservé en V4.1 ; 348 Ko réels — marge de 4 Ko placée sous surveillance Sarah), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 
