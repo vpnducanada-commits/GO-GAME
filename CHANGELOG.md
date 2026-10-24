@@ -3,6 +3,33 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [4.3.0] — 2026-10-24 — « Roster complet des planches »
+
+Correction demandée par le propriétaire : la V3.6 n'avait traduit que 3 des 35 personnages
+de ses planches. **Les 32 manquants sont désormais jouables — roster porté à 41 combattants.**
+
+### Ajouté
+- **Planche 1 complétée** : Lira l'Exploratrice, Zed le Traqueur, Nyx l'Ingénieure,
+  Vorak le Berserker (KAEL, Sora et AEL-7 déjà présents).
+- **Planche 2 « Univers original » intégrale (16)** : Aerin, Korben, Lyra la Prêtresse
+  solaire, Drakesh, Selene, Taiko, Vex, Elara, Brax, Kazu, Sera, Vorga, Nox, Raven, Zep, Astrid.
+- **Planche 3 intégrale (12)** : Sélénia, Drakar, Nyx l'Assassine, Kairos, Zara ingénieure
+  de la Colonie Nova, Brutus, Aria, Krak l'orc des marais, Luna, Velen, Lyra la
+  Dragonnière, Orion.
+- Chaque personnage : **palette et morphologie dédiées** (41 profils humains — du colosse
+  Krak à 126 PV à l'assassine Nyx ultra-rapide, peau verte de l'orc, peau bleutée de
+  Drakesh, robots Luna/Zep/Brutus…), statistique propre, **spécial/EX/super fonctionnels**
+  par famille d'archétype (flèches, lames, ondes sismiques, orbes chercheuses, plasma,
+  vagues royales…) et signature VFX assortie.
+- **Arcade et Survie** puisent dans tout le roster ; les colosses peuvent surgir en boss.
+- **Sélection adaptée aux 41 cartes** : grille dense et élargie, lisible au pouce en paysage.
+- Homonymes des planches conservés et documentés (Nyx ×2, Lyra ×2, Zara ×2) avec titres
+  différenciants — inventaire exact dans `docs/CONCEPTS_PERSONNAGES.md` (rewritten).
+
+### Inchangé / garanti
+- Indices 0–8 intacts : Histoire, sauvegardes, replays et Online inchangés ; déterminisme
+  préservé. 317 assertions / 553 vérifications vertes, gate QA 25 contrôles, bundle 374 Ko.
+
 ## [4.2.0] — 2026-10-24 — « Graphismes AAA »
 
 Recentrage décidé par le propriétaire : toute l'équipe se focalise d'abord sur le visuel,

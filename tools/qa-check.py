@@ -130,7 +130,7 @@ check("Chargement & parcours d'écrans V3.3 présents", all(h in all_js for h in
 check("Prise en main paysage & impacts fluides V3.5 présents", "syncImmersiveCombat" in all_js and "btnPauseFloat" in html and "combatImmersif" in css and "touch-action:none" in css and "hitstop:14" in js["engine"] and "hitstop:105" not in js["engine"], "combat immersif 100dvh + pause flottante + gel d'impact micro (14-48 ms)")
 
 # 20. Nouveaux Champions V3.6 (planches du propriétaire traduites en combattants jouables)
-champions_ok = all(x in js["engine"] for x in ('id:"kael"','id:"sora"','id:"ael"','case "kael":','case "sora":','case "ael":')) and all(x in js["render"] for x in ('kael:{label','magicienne','synthetique','kael:"lames"','ael:"circuits"')) and "6,7,8" in js["ui"] and (ROOT/"docs/CONCEPTS_PERSONNAGES.md").exists() and len(list((ROOT/"assets/concepts").glob("planche-personnages-*.jpg")))>=3
+champions_ok = all(x in js["engine"] for x in ('id:"kael"','id:"sora"','id:"ael"','case "kael":','case "sora":','case "ael":')) and all(x in js["render"] for x in ('kael:{label','magicienne','synthetique','kael:"lames"','ael:"circuits"')) and 'CHARACTERS.map((c,i)=>i).filter(i=>i!==4)' in js["ui"] and (ROOT/"docs/CONCEPTS_PERSONNAGES.md").exists() and len(list((ROOT/"assets/concepts").glob("planche-personnages-*.jpg")))>=3
 check("Nouveaux Champions V3.6 présents", champions_ok, "KAEL / Sora / AEL-7 jouables (moteur + morphologies + VFX) + planches archivées")
 
 # 21. Sélection & Corps pleins V3.7 (aperçus animés, bordures à effets, membres visibles)
@@ -148,8 +148,14 @@ check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à 
 
 # 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
 #     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
-aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and 'GAME_VERSION="4.2.0"' in js["engine"] and 'V4.2 PRO' in html
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html)
 check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
+
+# 25. Roster complet des planches V4.3 : les 35 designs des 3 planches du propriétaire
+#     jouables (41 combattants avec les 6 historiques), morphologies dédiées.
+board_ids = ("Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion")
+roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and 'GAME_VERSION="4.3.0"' in js["engine"] and 'V4.3 PRO' in html and 'ROSTER PLANCHES COMPLET' in css
+check("Roster complet des planches V4.3 présent", roster_ok, "35 personnages des planches + 41 morphologies + grille de sélection dense")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

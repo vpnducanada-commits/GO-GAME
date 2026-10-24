@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 384 Ko (budget relevé en V4.2 sur décision du propriétaire — mandat graphismes AAA ; 352 Ko réels), sans asset externe.
+- ✅ Bundle officiel ≤ 384 Ko (budget relevé en V4.2 sur décision du propriétaire — mandat graphismes AAA ; 374 Ko réels en V4.3 avec 41 combattants), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 

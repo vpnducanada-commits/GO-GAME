@@ -1,32 +1,62 @@
-# Concepts personnages — planches du propriétaire (24 octobre 2026)
+# Concepts personnages — les 3 planches du propriétaire (24 octobre 2026)
 
-Le propriétaire du jeu a déposé 3 planches de personnages (environ 33 designs). Versions web optimisées
-archivées dans `assets/concepts/` :
+Le propriétaire a déposé **3 planches de personnages nommés : 35 designs au total**.
+Versions archivées dans `assets/concepts/`. Depuis la **V4.3 « Roster complet des
+planches »**, **les 35 personnages sont jouables** dans GO GAME, traduits dans le style
+procédural animé du jeu (même squelette Humanité++, mêmes expressions, 60 fps, aucun
+sprite collé) : palettes et silhouettes relevées sur les planches, morphologie dédiée
+pour chacun, familles de coups spéciaux/EX/supers et signatures VFX par archétype.
 
-- `planche-personnages-1.jpg` — Guerrier, Magicienne, Robot, Muscle, Fille, Ninja, Garçon, Pirate,
-  Chapeau, Karatéka, Femme, Héros.
-- `planche-personnages-2.jpg` — Guerrier, Magicienne, Robot, Muscle, Fille, Ninja, Garçon, Pirate,
-  Chapeau, Karatéka, Femme, Elfe.
-- `planche-personnages-3.jpg` — Guerrier, Magicienne, Robot, Muscle, Fille, Ninja, Garçon, Pirate,
-  Chapeau, Karatéka, Elfe, Femme.
+## Planche 1 — « Modèles de jeu » (7)
 
-## Décision d'équipe (manager + Nadia, Kenzo, Sarah)
+| # | Planche | Dans le jeu (id) | Traduction |
+|---|---|---|---|
+| 1 | Lira, l'Exploratrice | `Lira` (V4.3) | kaki d'exploratrice, queue, lame perçante |
+| 2 | Kael, le Guerrier | `kael` (V3.6) | armure d'acier, cape rouge, lames |
+| 3 | Sora, la Magicienne | `sora` (V3.6) | chapeau pointu violet, cheveux argentés, orbes |
+| 4 | Zed, le Traqueur | `zed` (V4.3) | capuche sombre, pluie de flèches |
+| 5 | Nyx, l'Ingénieure | `nyx` (V4.3) | cheveux bleus électriques, tirs tech cyan |
+| 6 | Vorak, le Berserker | `vorak` (V4.3) | colosse tatoué, crête, onde sismique |
+| 7 | Ael, le Synthétique | `ael` → AEL-7 (V3.6) | robot blanc/cyan, visière lumineuse |
 
-La V3.6 « Nouveaux Champions » traduit 3 designs de la première ligne en **combattants jouables dans le
-style procédural animé du jeu** (même moteur d'animation Humanité++, mêmes expressions, aucun sprite) :
+## Planche 2 — « Univers original » (16, tous ajoutés en V4.3)
 
-| Concept | Champion du jeu | Traduction visuelle |
-| --- | --- | --- |
-| Guerrier (épée, armure, cape rouge) | **KAEL**, le Guerrier d'Acier | cape rouge, épaulettes cuirassées, silhouette large, lames perçantes |
-| Magicienne (chapeau pointu, violet) | **Sora**, la Magicienne des Arcanes | chapeau pointu à gemme, cheveux longs argentés, cape violette, orbes chercheuses |
-| Robot (blanc/cyan) | **AEL-7**, l'Unité Synthétique | casque lisse blanc, visière cyan lumineuse, épaulettes blanches, tirs plasma |
+Aerin (Éclaireuse des Terres Vertes, `aerin`) • Korben (Ingénieur spatial, `korben`) •
+Lyra (Prêtresse solaire, `lyra`) • Drakesh (Chasseur de primes, `drakesh`, peau bleutée) •
+Selene (Pirate de l'espace, `selene`, cheveux roses) • Taiko (Moine de l'ombre, `taiko`) •
+Vex (Cyborg berserker, `vex`) • Elara (Chasseuse de rêves, `elara`, éthérée argentée) •
+Brax (Titan des montagnes, `brax`, barbe et fourrures) • Kazu (Samouraï du vent, `kazu`) •
+Sera (Hacker nomade, `sera`, queue turquoise) • Vorga (Guerrière déchue, `vorga`,
+bandages du désert) • Nox (Esprit des forêts, `nox`, teint sylvestre) •
+Raven (Tireuse d'élite, `raven`) • Zep (Explorateur des abysses, `zep`, scaphandre cyan) •
+Astrid (Noblesse déchue, `astrid`, couronne et cape dorée).
 
-**Pourquoi pas les images directement ?** Les planches sont de la 3D stylisée : les coller dans l'écran de
-sélection créerait un contraste violent avec les combattants animés du jeu. Les dessins vivent donc comme
-**référence officielle** et les champions partagent le squelette, les expressions et les 60 fps du jeu.
+## Planche 3 — « Modèles de jeu, recto/verso » (12, tous ajoutés en V4.3)
 
-## Réserve pour les prochains sprints
+Sélénia (Rôdeuse de la Forêt sacrée, `selenia`) • Drakar (Guerrier nordique du Givre,
+`drakar`) • Nyx (Assassine de l'Ordre des Ombres, `nyx-ombre`) • Kairos (Mage des
+Tempêtes, `Kairos`) • Zara (Ingénieure de la Colonie Nova, `zara-nova`, tenue jaune) •
+Brutus (Tank de la Légion de Fer, `brutus`, blindé rouge) • Aria (Prêtresse de la Lumière
+Céleste, `aria`) • Krak (Brute de la Tribu des Marais, `krak`, orc à peau verte) •
+Luna (Robot exploratrice Unité 7, `luna`) • Velen (Tueur du Syndicat, `velen`) •
+Lyra (Dragonnière des Ciels d'Azur, `lyra-azur`, armure azur) • Orion (Scientifique de
+l'Alliance Galactique, `orion`, blouse blanche).
 
-Candidats naturels pour une V3.7+ « Deuxième vague » : Muscle (lutteur vert), Ninja (rapide, déjà proche de
-Kira — à différencier), Pirate (sabre + pistolet), Karatéka (gi blanc), Elfe (arc ?), Chapeau (dandy).
-Chacun nécessite : identité de gameplay distincte (pas un recolor), entrées moteur/rendu, tests d'équilibrage.
+## Homonymes présents sur les planches (fidélité conservée)
+
+Les planches nomment deux fois **Nyx** (Ingénieure planche 1 / Assassine planche 3) et
+deux fois **Lyra** (Prêtresse solaire planche 2 / Dragonnière planche 3) ; la **Zara**
+ingénieure de la planche 3 partage le prénom de Zara, la Vague de Libreville (héroïne
+historique du jeu). Décision du studio : **noms d'affichage fidèles aux planches**,
+identifiants techniques distincts (`nyx`/`nyx-ombre`, `lyra`/`lyra-azur`,
+`Zara`/`zara-nova`) et titres différenciants sur les cartes de sélection.
+
+## Roster total
+
+**41 combattants** : 35 des planches + les 6 historiques (Gédéon, Kira, Titan, Nova,
+Godson Prime — secret déblocable — et Zara de Libreville). Arcade et Survie puisent dans
+tout le roster ; les colosses (Krak, Brax, Brutus…) peuvent surgir en boss de Survie.
+Preuve automatisée : section V4.3 du smoke test (spécial, super, EX et rendu vérifiés
+pour chacun des 32 nouveaux) et contrôle QA permanent n°25.
+
+*Signé Gideon - Godson — © 2026.*

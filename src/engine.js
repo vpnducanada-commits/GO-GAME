@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.2 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V4.3 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="4.2.0";
+const GAME_VERSION="4.3.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game");
 let ctx=canvas.getContext("2d",{alpha:false}); // « let » : les portraits de sélection V3.7 échangent temporairement le contexte
@@ -330,7 +330,71 @@ const CHARACTERS=[
  {id:"sora",name:"SORA",title:"La Magicienne des Arcanes",letter:"S",style:"magicienne",specName:"🔮 Orbe Arcanique",superName:"☄️ Comète Pourpre",victoryLine:"Les étoiles avaient déjà écrit ta défaite, je n'ai fait que la lire.",hp:94,speed:1.02,power:1.02,atkSpeed:1,energyGain:1.4,scale:.99,bulk:.88,reach:1,gravity:.74,jump:16.4,knockRes:1.05,dashCD:24,
   skin:{primary:"#5e35b1",dark:"#2a1454",accent:"#b388ff",pants:"#1d1038",skin:"#e8b98d",hair:"#e8e6f5",glove:"#ffd54f",trail:"#b388ff"}},
  {id:"ael",name:"AEL-7",title:"L'Unité Synthétique",letter:"A",style:"synthetique",specName:"🔷 Tir Plasma",superName:"🛰️ Canon Orbital",victoryLine:"Probabilité de ta victoire recalculée : 0,00 %.",hp:104,speed:1.18,power:.98,atkSpeed:1.12,energyGain:1.1,scale:1.02,bulk:.95,reach:1.04,gravity:.79,jump:16.8,knockRes:.95,dashCD:21,
-  skin:{primary:"#eceff1",dark:"#90a4ae",accent:"#18ffff",pants:"#263238",skin:"#cfd8dc",hair:"#eceff1",glove:"#102027",trail:"#18ffff"}}
+  skin:{primary:"#eceff1",dark:"#90a4ae",accent:"#18ffff",pants:"#263238",skin:"#cfd8dc",hair:"#eceff1",glove:"#102027",trail:"#18ffff"}},
+ {id:"Lira",name:"Lira",title:"L'Exploratrice",letter:"L",style:"kunoichi",specName:"🧭 Lame de Route",superName:"🗺️ Grande Traversée",victoryLine:"J'ai traversé des déserts entiers ; ton arène n'était qu'une étape.",hp:100,speed:1.08,power:1,atkSpeed:1.06,energyGain:1.08,scale:0.99,bulk:0.93,reach:1.03,gravity:0.78,jump:16.3,knockRes:1,dashCD:24,
+  skin:{primary:"#6b7c4f",dark:"#39432a",accent:"#d7ccc8",pants:"#4a4a38",skin:"#c68642",hair:"#2b1c10",glove:"#5d4037",trail:"#aed581"}},
+ {id:"zed",name:"Zed",title:"Le Traqueur",letter:"Z",style:"hero",specName:"🏹 Pluie de Flèches",superName:"🎯 Traque Fatale",victoryLine:"Un bon traqueur ne court jamais : sa proie vient à lui.",hp:96,speed:1.16,power:0.97,atkSpeed:1.1,energyGain:1.06,scale:1,bulk:0.92,reach:1.06,gravity:0.77,jump:16.6,knockRes:1.04,dashCD:22,
+  skin:{primary:"#4e5a4e",dark:"#232a24",accent:"#a1887f",pants:"#2e332c",skin:"#a06a35",hair:"#1c1c1c",glove:"#37474f",trail:"#9ccc65"}},
+ {id:"nyx",name:"Nyx",title:"L'Ingénieure",letter:"N",style:"hero",specName:"🔷 Impulsion Tech",superName:"🛠️ Surcharge Système",victoryLine:"Diagnostic terminé : ta défaite était un défaut de conception.",hp:97,speed:1.13,power:0.96,atkSpeed:1.12,energyGain:1.2,scale:0.98,bulk:0.9,reach:1.01,gravity:0.78,jump:16.5,knockRes:1.03,dashCD:22,
+  skin:{primary:"#263238",dark:"#10181d",accent:"#29b6f6",pants:"#1b242b",skin:"#e0ac82",hair:"#1e88e5",glove:"#29b6f6",trail:"#4fc3f7"}},
+ {id:"vorak",name:"VORAK",title:"Le Berserker",letter:"V",style:"titan",specName:"🪓 Fracas Sauvage",superName:"🌋 Rage du Berserker",victoryLine:"Vorak ÉCRASE. Vorak ne discute pas.",hp:122,speed:0.8,power:1.3,atkSpeed:0.86,energyGain:0.88,scale:1.14,bulk:1.38,reach:1.09,gravity:0.91,jump:14.4,knockRes:0.7,dashCD:37,
+  skin:{primary:"#6d4c41",dark:"#3e2723",accent:"#c62828",pants:"#4e342e",skin:"#9e8f83",hair:"#212121",glove:"#4e342e",trail:"#ef5350"}},
+ {id:"aerin",name:"AERIN",title:"Éclaireuse des Terres Vertes",letter:"A",style:"nova",specName:"🍃 Flèches des Cimes",superName:"🌲 Colère des Terres Vertes",victoryLine:"Les Terres Vertes protègent celles qui les écoutent.",hp:93,speed:1.2,power:0.9,atkSpeed:1.14,energyGain:1.12,scale:0.97,bulk:0.86,reach:1.04,gravity:0.75,jump:17,knockRes:1.1,dashCD:21,
+  skin:{primary:"#2e7d32",dark:"#1b3a1f",accent:"#a5d6a7",pants:"#2c4630",skin:"#e8b98d",hair:"#3a2410",glove:"#4e6b3a",trail:"#81c784"}},
+ {id:"korben",name:"KORBEN",title:"Ingénieur Spatial",letter:"K",style:"hero",specName:"🔧 Décharge Orbitale",superName:"🚀 Protocole Korben",victoryLine:"J'ai réparé des stations en plein vide. Toi, c'était facile.",hp:106,speed:1,power:1.06,atkSpeed:1,energyGain:1.15,scale:1.03,bulk:1.04,reach:1.03,gravity:0.81,jump:15.9,knockRes:0.95,dashCD:26,
+  skin:{primary:"#f57c00",dark:"#37474f",accent:"#4fc3f7",pants:"#455a64",skin:"#d9a066",hair:"#14100c",glove:"#263238",trail:"#ffb74d"}},
+ {id:"lyra",name:"Lyra",title:"Prêtresse Solaire",letter:"L",style:"nova",specName:"☀️ Rayon Solaire",superName:"🌞 Aurore Sacrée",victoryLine:"Le soleil ne demande pas la permission de briller.",hp:97,speed:1.03,power:1,atkSpeed:1.02,energyGain:1.5,scale:1,bulk:0.91,reach:1.02,gravity:0.76,jump:16.3,knockRes:1.02,dashCD:25,
+  skin:{primary:"#f5efe0",dark:"#c9a227",accent:"#ffd54f",pants:"#e8dcc0",skin:"#7a4a21",hair:"#f5f0e6",glove:"#ffd54f",trail:"#ffe082"}},
+ {id:"drakesh",name:"Drakesh",title:"Chasseur de Primes",letter:"D",style:"guerrier",specName:"🎯 Tir du Chasseur",superName:"💀 Prime Réclamée",victoryLine:"Ta tête valait cher. Le combat, lui, ne valait rien.",hp:108,speed:1.05,power:1.1,atkSpeed:1.06,energyGain:1.05,scale:1.05,bulk:1.06,reach:1.08,gravity:0.82,jump:15.8,knockRes:0.92,dashCD:25,
+  skin:{primary:"#37474f",dark:"#14181c",accent:"#ff5722",pants:"#1c2226",skin:"#7f9db9",hair:"#10151c",glove:"#263238",trail:"#ff7043"}},
+ {id:"selene",name:"SELENE",title:"Pirate de l'Espace",letter:"S",style:"kunoichi",specName:"🏴‍☠️ Sabre Stellaire",superName:"☠️ Abordage Spatial",victoryLine:"Ton trésor, ton honneur, ton arène : tout est à moi maintenant.",hp:95,speed:1.19,power:0.95,atkSpeed:1.14,energyGain:1.08,scale:0.98,bulk:0.89,reach:1.02,gravity:0.76,jump:16.8,knockRes:1.07,dashCD:21,
+  skin:{primary:"#ad1457",dark:"#1a0e16",accent:"#f48fb1",pants:"#200f1c",skin:"#e8b98d",hair:"#ec407a",glove:"#212121",trail:"#f06292"}},
+ {id:"taiko",name:"Taiko",title:"Moine de l'Ombre",letter:"T",style:"kunoichi",specName:"🌑 Lame d'Ombre",superName:"🕯️ Méditation Fatale",victoryLine:"L'ombre ne frappe pas fort. Elle frappe juste.",hp:100,speed:1.14,power:1.02,atkSpeed:1.1,energyGain:1.1,scale:1,bulk:0.94,reach:1.05,gravity:0.78,jump:16.5,knockRes:1,dashCD:23,
+  skin:{primary:"#263238",dark:"#0d1114",accent:"#90a4ae",pants:"#161c20",skin:"#c68642",hair:"#0a0a0c",glove:"#37474f",trail:"#b0bec5"}},
+ {id:"vex",name:"Vex",title:"Cyborg Berserker",letter:"V",style:"titan",specName:"🤖 Poing Hydraulique",superName:"⚙️ Furie Cyborg",victoryLine:"Chair contre acier : tu connais déjà la fin.",hp:118,speed:0.86,power:1.24,atkSpeed:0.92,energyGain:0.95,scale:1.11,bulk:1.3,reach:1.07,gravity:0.88,jump:15,knockRes:0.76,dashCD:33,
+  skin:{primary:"#546e7a",dark:"#263238",accent:"#ff1744",pants:"#20262b",skin:"#c9b8a6",hair:"#37474f",glove:"#455a64",trail:"#ff5252"}},
+ {id:"elara",name:"ELARA",title:"Chasseuse de Rêves",letter:"E",style:"nova",specName:"💭 Orbe Onirique",superName:"🌙 Chasse de Rêves",victoryLine:"Je t'ai battu dans tes rêves bien avant ce combat.",hp:93,speed:1.08,power:0.95,atkSpeed:1.03,energyGain:1.42,scale:0.98,bulk:0.87,reach:1,gravity:0.73,jump:16.6,knockRes:1.06,dashCD:24,
+  skin:{primary:"#b39ddb",dark:"#4a3670",accent:"#e1f5fe",pants:"#5e4b8b",skin:"#f0d9c8",hair:"#dfe6f5",glove:"#9575cd",trail:"#b3e5fc"}},
+ {id:"brax",name:"Brax",title:"Titan des Montagnes",letter:"B",style:"titan",specName:"🏔️ Éboulement",superName:"⛰️ Réveil du Titan",victoryLine:"Les montagnes ne reculent devant personne.",hp:124,speed:0.79,power:1.32,atkSpeed:0.85,energyGain:0.87,scale:1.16,bulk:1.4,reach:1.1,gravity:0.92,jump:14.2,knockRes:0.68,dashCD:38,
+  skin:{primary:"#6d4c41",dark:"#3e2723",accent:"#d7ccc8",pants:"#4e342e",skin:"#d9a066",hair:"#4a2f1c",glove:"#5d4037",trail:"#bcaaa4"}},
+ {id:"kazu",name:"Kazu",title:"Samouraï du Vent",letter:"K",style:"guerrier",specName:"🍂 Lame du Vent",superName:"🌪️ Voie du Samouraï",victoryLine:"Mon sabre suit le vent ; toi, tu suivais ta peur.",hp:101,speed:1.15,power:1.04,atkSpeed:1.13,energyGain:1.06,scale:1.01,bulk:0.95,reach:1.09,gravity:0.77,jump:16.7,knockRes:1,dashCD:22,
+  skin:{primary:"#90a4ae",dark:"#37474f",accent:"#00b0ff",pants:"#455a64",skin:"#e0ac82",hair:"#14100c",glove:"#607d8b",trail:"#80d8ff"}},
+ {id:"sera",name:"Sera",title:"Hacker Nomade",letter:"S",style:"kunoichi",specName:"💻 Intrusion Éclair",superName:"📡 Piratage Total",victoryLine:"Accès refusé à ta victoire. Je viens de la supprimer.",hp:94,speed:1.18,power:0.92,atkSpeed:1.16,energyGain:1.22,scale:0.97,bulk:0.87,reach:1,gravity:0.76,jump:16.8,knockRes:1.08,dashCD:21,
+  skin:{primary:"#6a1b9a",dark:"#1a0f2e",accent:"#1de9b6",pants:"#1c1c26",skin:"#e8b98d",hair:"#00bfa5",glove:"#00bfa5",trail:"#64ffda"}},
+ {id:"vorga",name:"VORGA",title:"Guerrière Déchue",letter:"V",style:"kunoichi",specName:"🏜️ Sables Anciens",superName:"⚰️ Malédiction Déchue",victoryLine:"Le désert garde ses morts… et ses vaincus.",hp:105,speed:1.02,power:1.08,atkSpeed:1,energyGain:1.05,scale:1.02,bulk:1,reach:1.07,gravity:0.8,jump:15.9,knockRes:0.94,dashCD:27,
+  skin:{primary:"#d7ccc8",dark:"#8d6e63",accent:"#ffb300",pants:"#a1887f",skin:"#d9c9a8",hair:"#e8e0cc",glove:"#8d6e63",trail:"#ffca28"}},
+ {id:"nox",name:"Nox",title:"Esprit des Forêts",letter:"N",style:"nova",specName:"🌿 Étreinte Sylvestre",superName:"🍄 Réveil de la Forêt",victoryLine:"La forêt reprend toujours ce qui lui appartient.",hp:95,speed:1.07,power:0.97,atkSpeed:1.02,energyGain:1.38,scale:0.99,bulk:0.89,reach:1.02,gravity:0.74,jump:16.4,knockRes:1.04,dashCD:24,
+  skin:{primary:"#33691e",dark:"#12240c",accent:"#ffd54f",pants:"#1e3315",skin:"#b9c49a",hair:"#24401a",glove:"#558b2f",trail:"#aeea00"}},
+ {id:"raven",name:"Raven",title:"Tireuse d'Élite",letter:"R",style:"hero",specName:"🎯 Tir de Précision",superName:"🔭 Visée Parfaite",victoryLine:"Une balle, une cible, aucune hésitation.",hp:96,speed:1.12,power:1,atkSpeed:1.08,energyGain:1.14,scale:0.99,bulk:0.91,reach:1.08,gravity:0.78,jump:16.3,knockRes:1.02,dashCD:23,
+  skin:{primary:"#4527a0",dark:"#160b2e",accent:"#b388ff",pants:"#1c1430",skin:"#e0ac82",hair:"#241040",glove:"#7c4dff",trail:"#b388ff"}},
+ {id:"zep",name:"Zep",title:"Explorateur des Abysses",letter:"Z",style:"synthetique",specName:"🌊 Torpille Abyssale",superName:"🐙 Pression des Abysses",victoryLine:"Là d'où je viens, même la lumière apprend à craindre.",hp:107,speed:1,power:1.05,atkSpeed:1,energyGain:1.12,scale:1.04,bulk:1.05,reach:1.04,gravity:0.85,jump:15.3,knockRes:0.93,dashCD:27,
+  skin:{primary:"#006064",dark:"#02262b",accent:"#18ffff",pants:"#06333a",skin:"#90a4ae",hair:"#004d5a",glove:"#00838f",trail:"#18ffff"}},
+ {id:"astrid",name:"ASTRID",title:"Noblesse Déchue",letter:"A",style:"prime",specName:"👑 Lames Royales Déchues",superName:"🏰 Trône Reconquis",victoryLine:"On m'a tout pris, sauf l'habitude de gagner.",hp:104,speed:1.06,power:1.08,atkSpeed:1.06,energyGain:1.2,scale:1.02,bulk:0.98,reach:1.05,gravity:0.79,jump:16.1,knockRes:0.96,dashCD:24,
+  skin:{primary:"#6a1220",dark:"#1a0508",accent:"#ffc400",pants:"#20060a",skin:"#f0d9c8",hair:"#5a2a16",glove:"#263238",trail:"#ff5252"}},
+ {id:"selenia",name:"SÉLÉNIA",title:"Rôdeuse de la Forêt Sacrée",letter:"S",style:"nova",specName:"🏹 Flèche Sacrée",superName:"🌳 Bénédiction de la Forêt",victoryLine:"La forêt sacrée m'a vue grandir ; elle t'a vu tomber.",hp:94,speed:1.19,power:0.92,atkSpeed:1.13,energyGain:1.1,scale:0.97,bulk:0.87,reach:1.04,gravity:0.75,jump:16.9,knockRes:1.09,dashCD:21,
+  skin:{primary:"#558b2f",dark:"#264015",accent:"#c5e1a5",pants:"#31451f",skin:"#e8b98d",hair:"#3a2410",glove:"#6d4c41",trail:"#9ccc65"}},
+ {id:"drakar",name:"Drakar",title:"Guerrier Nordique du Givre",letter:"D",style:"titan",specName:"❄️ Hache du Givre",superName:"🧊 Hiver du Clan",victoryLine:"Le Givre ne plie pas. Le Givre brise.",hp:116,speed:0.88,power:1.2,atkSpeed:0.93,energyGain:0.94,scale:1.1,bulk:1.26,reach:1.08,gravity:0.87,jump:15.1,knockRes:0.8,dashCD:32,
+  skin:{primary:"#78909c",dark:"#37474f",accent:"#b3e5fc",pants:"#455a64",skin:"#d9a066",hair:"#6d4c41",glove:"#546e7a",trail:"#81d4fa"}},
+ {id:"nyx-ombre",name:"Nyx",title:"Assassine de l'Ordre des Ombres",letter:"N",style:"kunoichi",specName:"🗡️ Dagues de l'Ordre",superName:"🌑 Sentence des Ombres",victoryLine:"L'Ordre des Ombres ne laisse jamais de témoins.",hp:92,speed:1.23,power:0.9,atkSpeed:1.19,energyGain:1.08,scale:0.96,bulk:0.85,reach:1,gravity:0.75,jump:17.1,knockRes:1.12,dashCD:20,
+  skin:{primary:"#311b4d",dark:"#12081f",accent:"#b388ff",pants:"#1a1026",skin:"#e0c8b8",hair:"#140a20",glove:"#4527a0",trail:"#b388ff"}},
+ {id:"Kairos",name:"Kairos",title:"Mage des Tempêtes",letter:"K",style:"hero",specName:"⛈️ Foudre des Tempêtes",superName:"🌩️ Jugement du Ciel",victoryLine:"Je suis le calme juste avant l'orage… et l'orage lui-même.",hp:98,speed:1.05,power:1.03,atkSpeed:1.03,energyGain:1.44,scale:1.01,bulk:0.94,reach:1.03,gravity:0.77,jump:16.2,knockRes:1.01,dashCD:25,
+  skin:{primary:"#1565c0",dark:"#0a2a5e",accent:"#82b1ff",pants:"#10243e",skin:"#d9a066",hair:"#101418",glove:"#1976d2",trail:"#82b1ff"}},
+ {id:"Zara-nova",name:"Zara",title:"Ingénieure de la Colonie Nova",letter:"Z",style:"hero",specName:"🔩 Tir d'Ingénieure",superName:"🛰️ Colonie Nova",victoryLine:"Sur Nova, on répare tout. Même les défaites des autres.",hp:99,speed:1.1,power:0.99,atkSpeed:1.08,energyGain:1.18,scale:0.99,bulk:0.92,reach:1.02,gravity:0.78,jump:16.4,knockRes:1,dashCD:23,
+  skin:{primary:"#f9a825",dark:"#7a5200",accent:"#4fc3f7",pants:"#37474f",skin:"#e0ac82",hair:"#3a2410",glove:"#fbc02d",trail:"#ffd54f"}},
+ {id:"brutus",name:"BRUTUS",title:"Tank de la Légion de Fer",letter:"B",style:"synthetique",specName:"🛡️ Charge de la Légion",superName:"💥 Marteau de Fer",victoryLine:"La Légion de Fer avance. Elle ne négocie pas.",hp:123,speed:0.81,power:1.29,atkSpeed:0.87,energyGain:0.9,scale:1.15,bulk:1.39,reach:1.09,gravity:0.91,jump:14.3,knockRes:0.69,dashCD:37,
+  skin:{primary:"#b71c1c",dark:"#2b0d0d",accent:"#ff8a65",pants:"#26181c",skin:"#8a8f94",hair:"#37474f",glove:"#263238",trail:"#ff7043"}},
+ {id:"aria",name:"Aria",title:"Prêtresse de la Lumière Céleste",letter:"A",style:"nova",specName:"✨ Lumière Céleste",superName:"🌟 Chœur des Cieux",victoryLine:"Que la lumière guide tes pas… hors de mon arène.",hp:96,speed:1.04,power:0.98,atkSpeed:1.02,energyGain:1.48,scale:1,bulk:0.9,reach:1.01,gravity:0.75,jump:16.3,knockRes:1.03,dashCD:25,
+  skin:{primary:"#eef0f4",dark:"#b0a58c",accent:"#ffd54f",pants:"#d8d2c0",skin:"#f0d9c8",hair:"#eae6da",glove:"#ffd54f",trail:"#fff9c4"}},
+ {id:"krak",name:"Krak",title:"Brute de la Tribu des Marais",letter:"K",style:"titan",specName:"🐊 Fureur des Marais",superName:"🌋 Krak Écrase",victoryLine:"Krak pas content. Krak ÉCRASE. Toi par terre.",hp:126,speed:0.78,power:1.34,atkSpeed:0.84,energyGain:0.86,scale:1.17,bulk:1.42,reach:1.11,gravity:0.93,jump:14,knockRes:0.66,dashCD:39,
+  skin:{primary:"#5d4037",dark:"#2e1d16",accent:"#ffb300",pants:"#3e2723",skin:"#6d9c3f",hair:"#1c2410",glove:"#4e342e",trail:"#9ccc65"}},
+ {id:"luna",name:"Luna",title:"Robot Exploratrice Unité 7",letter:"L",style:"synthetique",specName:"🤖 Tir d'Exploration",superName:"🌕 Protocole Luna",victoryLine:"Exploration terminée : ce territoire est conquis.",hp:102,speed:1.17,power:0.97,atkSpeed:1.11,energyGain:1.12,scale:1,bulk:0.92,reach:1.03,gravity:0.78,jump:16.7,knockRes:0.97,dashCD:22,
+  skin:{primary:"#eceff1",dark:"#78909c",accent:"#40c4ff",pants:"#263238",skin:"#dfe7eb",hair:"#eceff1",glove:"#102027",trail:"#40c4ff"}},
+ {id:"velen",name:"Velen",title:"Tueur du Syndicat",letter:"V",style:"kunoichi",specName:"🎭 Frappe du Syndicat",superName:"📜 Contrat Rempli",victoryLine:"Ce n'était pas personnel. Juste un contrat.",hp:97,speed:1.18,power:1,atkSpeed:1.12,energyGain:1.06,scale:1,bulk:0.93,reach:1.04,gravity:0.77,jump:16.6,knockRes:1.03,dashCD:22,
+  skin:{primary:"#8e1414",dark:"#14060a",accent:"#ff5252",pants:"#1a0c10",skin:"#b97f4e",hair:"#160809",glove:"#263238",trail:"#ff5252"}},
+ {id:"lyra-azur",name:"Lyra",title:"Dragonnière des Ciels d'Azur",letter:"L",style:"guerrier",specName:"🐉 Souffle d'Azur",superName:"🐲 Chevauchée des Ciels",victoryLine:"Les ciels d'Azur ont une nouvelle légende.",hp:103,speed:1.08,power:1.06,atkSpeed:1.05,energyGain:1.16,scale:1.02,bulk:0.97,reach:1.07,gravity:0.79,jump:16.2,knockRes:0.97,dashCD:24,
+  skin:{primary:"#42a5f5",dark:"#1c3f6e",accent:"#e3f2fd",pants:"#2c4a73",skin:"#e8b98d",hair:"#3a2410",glove:"#90a4ae",trail:"#82b1ff"}},
+ {id:"orion",name:"ORION",title:"Scientifique de l'Alliance Galactique",letter:"O",style:"hero",specName:"🔬 Rayon Expérimental",superName:"🧪 Théorie Vérifiée",victoryLine:"Hypothèse : ma victoire. Résultat : confirmé.",hp:98,speed:1.06,power:0.97,atkSpeed:1.04,energyGain:1.3,scale:1,bulk:0.93,reach:1.02,gravity:0.79,jump:16,knockRes:1.02,dashCD:25,
+  skin:{primary:"#eceff1",dark:"#90a4ae",accent:"#00b0ff",pants:"#37474f",skin:"#d9a066",hair:"#14100c",glove:"#00b0ff",trail:"#80d8ff"}}
 ];
 function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:clamp(Math.round(c.power*62),5,100),VIE:clamp(Math.round(c.hp*.78),5,100),ÉNER:clamp(Math.round(c.energyGain*55),5,100)}; }
 
@@ -765,49 +829,49 @@ function abilitySpecs(f,isSuper,isEx){
   const S=(o)=>Object.assign({x:f.x+dir*52,y:baseY,vx:dir*8.7,vy:0,r:18,dmg:isSuper?23:(isEx?17:14),kind:"bolt",grav:0,life:175,pierce:false,homing:0,ex:!!isEx},o||{});
   let specs;
   switch(f.char.id){
-    case "kira":
+    case "kira": case "zed": case "aerin": case "selenia": case "nyx-ombre": case "velen":
       specs=isSuper
         ?[-2,-1,0,1,2].map(i=>S({y:baseY+i*17,vx:dir*11.2,vy:i*.72,r:13,dmg:7,kind:"blade"}))
         :isEx?[-1.5,-.5,.5,1.5].map(i=>S({y:baseY+i*14,vx:dir*11.6,vy:i*.48,r:13,dmg:6,kind:"blade"}))
         :[-1,0,1].map(i=>S({y:baseY+i*16,vx:dir*10.6,vy:i*.42,r:12.5,dmg:6,kind:"blade"}));
       break;
-    case "titan":
+    case "titan": case "vorak": case "vex": case "brax": case "drakar": case "brutus": case "krak":
       specs=isSuper
         ?[S({y:GROUND-20,vx:dir*7.9,r:38,dmg:24,kind:"ground",life:190})]
         :isEx?[S({y:GROUND-19,vx:dir*7.7,r:31,dmg:17,kind:"ground",life:190}),S({x:f.x+dir*20,y:GROUND-18,vx:dir*7.7,r:23,dmg:8,kind:"ground",life:190})]
         :[S({y:GROUND-18,vx:dir*7.1,r:26,dmg:15,kind:"ground",life:185})];
       break;
-    case "nova":
+    case "nova": case "lyra": case "aria":
       specs=isSuper
         ?[-125,-42,42,125].map((off,i)=>S({x:clamp(op.x+off,45,W-45),y:74+i*22,vx:-off/52,vy:5.2,r:17,dmg:9,kind:"meteor",grav:.16,life:150}))
         :isEx?[S({vx:dir*9.2,r:24,dmg:16,kind:"orb",homing:.26,life:200}),S({y:baseY-28,vx:dir*8.4,vy:-.5,r:14,dmg:7,kind:"orb",homing:.2,life:180})]
         :[S({vx:dir*8.1,r:21,dmg:14,kind:"orb",homing:.16,life:190})];
       break;
-    case "godson-prime":
+    case "godson-prime": case "astrid": case "lyra-azur":
       specs=isSuper
         ?[-32,0,32].map(off=>S({y:baseY+off,vx:dir*10.4,r:off===0?24:19,dmg:off===0?13:10,kind:"royal"}))
         :isEx?[-24,0,24].map(off=>S({y:baseY+off,vx:dir*10.7,r:off===0?20:16,dmg:off===0?11:8,kind:"royal",pierce:off===0}))
         :[-18,18].map(off=>S({y:baseY+off,vx:dir*9.6,r:16,dmg:9,kind:"royal"}));
       break;
-    case "Zara":
+    case "Zara": case "vorga":
       specs=isSuper
         ?[S({y:GROUND-28,vx:dir*8.4,r:40,dmg:25,kind:"wave",life:190})]
         :isEx?[-1,0,1].map(i=>S({y:baseY+i*13,vx:dir*11.7,vy:i*.6,r:15,dmg:8,kind:"blade",pierce:i===0}))
         :[-1,1].map(i=>S({y:baseY+i*13,vx:dir*10.8,vy:i*.62,r:14,dmg:8,kind:"blade"}));
       break;
-    case "kael":
+    case "kael": case "Lira": case "selene": case "taiko": case "kazu":
       specs=isSuper
         ?[-26,0,26].map(off=>S({y:baseY+off,vx:dir*11.2,r:off===0?22:17,dmg:off===0?12:9,kind:"blade"}))
         :isEx?[-16,16].map(off=>S({y:baseY+off,vx:dir*12,r:16,dmg:9,kind:"blade",pierce:true}))
         :[S({vx:dir*11.8,r:16,dmg:13,kind:"blade",pierce:true})];
       break;
-    case "sora":
+    case "sora": case "elara": case "nox":
       specs=isSuper
         ?[-70,0,70].map((off,i)=>S({x:clamp(op.x+off,45,W-45),y:70+i*24,vx:-off/60,vy:5.4,r:18,dmg:10,kind:"meteor",grav:.15,life:150}))
         :isEx?[-26,0,26].map(off=>S({y:baseY+off,vx:dir*8.2,r:15,dmg:8,kind:"orb",homing:.15,life:190}))
         :[S({vx:dir*7.4,r:20,dmg:13,kind:"orb",homing:.22,life:200})];
       break;
-    case "ael":
+    case "ael": case "nyx": case "korben": case "drakesh": case "sera": case "raven": case "zep": case "Zara-nova": case "luna":
       specs=isSuper
         ?[S({vx:dir*9.8,r:32,dmg:24,kind:"judgment",pierce:true,life:190})]
         :isEx?[-24,-8,8,24].map(off=>S({y:baseY+off,vx:dir*12.6,r:12,dmg:6,kind:"bolt",pierce:true}))

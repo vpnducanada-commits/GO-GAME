@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.2 PRO — ARCADE PLEIN ÉCRAN, GRAPHISMES AAA & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.3 PRO — ARCADE PLEIN ÉCRAN, ROSTER PLANCHES COMPLET & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -237,7 +237,7 @@ function stageOpponent(){ if(!arcade.seq.length)setupArcadeRun(); return arcade.
 function generateSurvivalWave(){
   const wave=survival.wave,bossWave=wave%5===0;
   const pattern=wave>6?"difficile":(["facile","moyen","moyen","difficile","difficile"][(wave-1)%5]);
-  const normalPool=[0,1,2,3,5,6,7,8],bossPool=[4,4,2,5,6];
+  const normalPool=CHARACTERS.map((c,i)=>i).filter(i=>i!==4),bossPool=[4,4,2,5,6,36,21,34];
   const char=bossWave?bossPool[(Math.random()*bossPool.length)|0]:normalPool[(Math.random()*normalPool.length)|0];
   survival.next={char,diff:pattern,arena:ARENAS[(Math.random()*ARENAS.length)|0].id,boss:bossWave};
   return survival.next;
@@ -302,7 +302,7 @@ function syncFlowUI(){
 function launchFromFlow(){ if(pendingMode==="story")showStoryScene("intro"); else showVS(false); }
 function setupArcadeRun(){
   arcade.stage=1;
-  const order=[0,1,2,3,5,6,7,8].sort(()=>Math.random()-.5).slice(0,4),diffs=["facile","facile","moyen","difficile"];
+  const order=CHARACTERS.map((c,i)=>i).filter(i=>i!==4).sort(()=>Math.random()-.5).slice(0,4),diffs=["facile","facile","moyen","difficile"];
   arcade.seq=order.map((char,i)=>({char,diff:i===1&&(Math.random()<.5)?"moyen":diffs[i]}));
   arcade.seq.push({char:Math.random()<.35?4:(Math.random()<.5?2:3),diff:"difficile"}); // boss secret possible : GODSON PRIME
 }

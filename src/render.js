@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.2 PRO — GRAPHISMES AAA : PEINTURE, LUMIÈRE & PROFONDEUR
+   GÉDÉON - Godson ARENA V4.3 PRO — GRAPHISMES AAA & ROSTER COMPLET DES PLANCHES (41 COMBATTANTS)
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -464,7 +464,39 @@ const HUMAN_PROFILES={
   zara:{label:"vague athlétique",headR:14.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:1.02,hair:"tresses marines",beard:0,brow:.6},
   kael:{label:"guerrier cuirassé",headR:15.5,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.16,hair:"court guerrier",beard:.3,brow:.8},
   sora:{label:"magicienne gracieuse",headR:14.7,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.96,hair:"long argenté",beard:0,brow:.55},
-  ael:{label:"androïde athlétique",headR:14.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:1.04,hair:"casque synthétique",beard:0,brow:.3}
+  ael:{label:"androïde athlétique",headR:14.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:1.04,hair:"casque synthétique",beard:0,brow:.3},
+  "Lira":{label:"exploratrice athlétique",headR:14.8,jaw:0.55,neck:8,shoulder:19.2,hip:17,limb:1,hair:"queue d'exploratrice",beard:0,brow:0.6},
+  "zed":{label:"traqueur sec",headR:15,jaw:0.7,neck:8.8,shoulder:20.5,hip:16.5,limb:1.02,hair:"capuche de traqueur",beard:0.15,brow:0.8},
+  "nyx":{label:"ingénieure vive",headR:14.7,jaw:0.52,neck:7.8,shoulder:18.8,hip:16.6,limb:0.97,hair:"court bleu électrique",beard:0,brow:0.58},
+  "vorak":{label:"berserker massif",headR:15.8,jaw:0.95,neck:12.4,shoulder:28.4,hip:20.4,limb:1.3,hair:"crête de guerre",beard:0.4,brow:0.95},
+  "aerin":{label:"elfe éclaireuse",headR:14.6,jaw:0.48,neck:7.4,shoulder:18.2,hip:16.2,limb:0.95,hair:"long elfique",beard:0,brow:0.55},
+  "korben":{label:"ingénieur spatial costaud",headR:15.2,jaw:0.72,neck:9.6,shoulder:22.4,hip:17.8,limb:1.06,hair:"court spatial",beard:0.25,brow:0.7},
+  "lyra":{label:"prêtresse solaire",headR:14.9,jaw:0.54,neck:8.1,shoulder:19.4,hip:17.2,limb:1,hair:"coiffe solaire",beard:0,brow:0.5},
+  "drakesh":{label:"chasseur alien",headR:15.4,jaw:0.8,neck:10,shoulder:23.6,hip:17.6,limb:1.1,hair:"rasé alien",beard:0,brow:0.85},
+  "selene":{label:"pirate spatiale",headR:14.7,jaw:0.52,neck:7.8,shoulder:18.9,hip:16.8,limb:0.98,hair:"queue rose pirate",beard:0,brow:0.66},
+  "taiko":{label:"moine de l'ombre",headR:15.1,jaw:0.66,neck:8.9,shoulder:20.8,hip:16.4,limb:1.03,hair:"capuche de moine",beard:0.1,brow:0.78},
+  "vex":{label:"cyborg berserker",headR:15.6,jaw:0.9,neck:11.8,shoulder:27,hip:19.6,limb:1.24,hair:"implants rasés",beard:0,brow:0.9},
+  "elara":{label:"chasseuse éthérée",headR:14.6,jaw:0.47,neck:7.3,shoulder:18,hip:16,limb:0.94,hair:"long argenté onirique",beard:0,brow:0.5},
+  "brax":{label:"titan des montagnes",headR:15.9,jaw:0.96,neck:12.6,shoulder:28.8,hip:20.6,limb:1.32,hair:"barbe de montagne",beard:0.9,brow:0.88},
+  "kazu":{label:"samouraï élancé",headR:15,jaw:0.64,neck:8.7,shoulder:20.6,hip:16.2,limb:1.04,hair:"chignon samouraï",beard:0,brow:0.72},
+  "sera":{label:"hacker nomade",headR:14.7,jaw:0.52,neck:7.7,shoulder:18.6,hip:16.5,limb:0.97,hair:"queue turquoise hacker",beard:0,brow:0.6},
+  "vorga":{label:"guerrière bandagée",headR:14.9,jaw:0.56,neck:8.2,shoulder:19.6,hip:17,limb:1.01,hair:"bandages du désert",beard:0,brow:0.62},
+  "nox":{label:"esprit sylvestre",headR:14.8,jaw:0.5,neck:7.6,shoulder:18.4,hip:16.4,limb:0.96,hair:"couronne de ramures",beard:0,brow:0.52},
+  "raven":{label:"tireuse d'élite",headR:14.8,jaw:0.53,neck:7.9,shoulder:19,hip:16.6,limb:0.99,hair:"court violet tactique",beard:0,brow:0.7},
+  "zep":{label:"scaphandrier des abysses",headR:15.2,jaw:0.6,neck:9.4,shoulder:22,hip:17.4,limb:1.07,hair:"casque des abysses",beard:0,brow:0.4},
+  "astrid":{label:"reine déchue",headR:14.9,jaw:0.55,neck:8.1,shoulder:19.8,hip:17.2,limb:1.01,hair:"couronne déchue",beard:0,brow:0.68},
+  "selenia":{label:"rôdeuse elfique",headR:14.6,jaw:0.48,neck:7.4,shoulder:18.3,hip:16.3,limb:0.96,hair:"long de rôdeuse",beard:0,brow:0.56},
+  "drakar":{label:"nordique du givre",headR:15.6,jaw:0.88,neck:11.4,shoulder:26.4,hip:19.4,limb:1.22,hair:"barbe nordique",beard:0.85,brow:0.86},
+  "nyx-ombre":{label:"assassine voilée",headR:14.7,jaw:0.5,neck:7.6,shoulder:18.5,hip:16.4,limb:0.97,hair:"capuche d'assassine",beard:0,brow:0.74},
+  "Kairos":{label:"mage des tempêtes",headR:15.1,jaw:0.66,neck:8.8,shoulder:20.9,hip:16.6,limb:1.03,hair:"court de mage",beard:0.12,brow:0.7},
+  "Zara-nova":{label:"ingénieure de colonie",headR:14.8,jaw:0.54,neck:7.9,shoulder:19,hip:16.9,limb:0.99,hair:"court d'ingénieure",beard:0,brow:0.6},
+  "brutus":{label:"tank blindé",headR:15.8,jaw:0.92,neck:12.2,shoulder:28.2,hip:20.2,limb:1.28,hair:"casque de légion",beard:0,brow:0.5},
+  "aria":{label:"prêtresse céleste",headR:14.8,jaw:0.5,neck:7.7,shoulder:18.7,hip:16.7,limb:0.98,hair:"long céleste",beard:0,brow:0.48},
+  "krak":{label:"orc des marais",headR:16,jaw:0.98,neck:12.8,shoulder:29,hip:20.8,limb:1.34,hair:"crête de marais",beard:0.2,brow:0.95},
+  "luna":{label:"androïde exploratrice",headR:14.8,jaw:0.52,neck:8.2,shoulder:19.6,hip:15.6,limb:1,hair:"casque exploratrice",beard:0,brow:0.3},
+  "velen":{label:"tueur du syndicat",headR:15.1,jaw:0.7,neck:9,shoulder:21,hip:16.6,limb:1.04,hair:"capuche de tueur",beard:0.15,brow:0.82},
+  "lyra-azur":{label:"dragonnière azur",headR:14.9,jaw:0.55,neck:8.1,shoulder:19.8,hip:17,limb:1.02,hair:"queue de dragonnière",beard:0,brow:0.64},
+  "orion":{label:"scientifique",headR:15.1,jaw:0.62,neck:8.6,shoulder:20.2,hip:16.8,limb:1,hair:"court scientifique",beard:0.08,brow:0.55}
 };
 const HUMAN_PROFILE_LOOKUP={}; Object.keys(HUMAN_PROFILES).forEach(k=>{ HUMAN_PROFILE_LOOKUP[k.toLowerCase()]=HUMAN_PROFILES[k]; });
 function humanProfile(f){ const key=String((f&&f.char&&f.char.id)||"gideon").toLowerCase(); return HUMAN_PROFILE_LOOKUP[key]||HUMAN_PROFILES.gideon; }
@@ -855,7 +887,7 @@ function drawFighter(f){
   if(f.counterWindowT>0&&isCombat()){ ctx.save(); ctx.font="1000 12px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle="rgba(90,50,0,.82)"; rr(f.rx-43,f.ry-236*ch.scale,86,20,10); ctx.fill(); ctx.fillStyle="#ffc400"; ctx.fillText("⚡ RIPOSTE !",f.rx,f.ry-222*ch.scale); ctx.restore(); }
   /* V3.4 : plus de plaque de nom au-dessus des combattants — le HUD affiche déjà les noms ; la zone de combat reste dégagée. */
 }
-const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume",kael:"lames",sora:"runes",ael:"circuits"};
+const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume",kael:"lames",sora:"runes",ael:"circuits","Lira":"lames","zed":"traînées","nyx":"circuits","vorak":"éclats sismiques","aerin":"traînées","korben":"circuits","lyra":"orbites","drakesh":"circuits","selene":"lames","taiko":"lames","vex":"éclats sismiques","elara":"runes","brax":"éclats sismiques","kazu":"lames","sera":"circuits","vorga":"écume","nox":"runes","raven":"circuits","zep":"circuits","astrid":"couronne royale","selenia":"traînées","drakar":"éclats sismiques","nyx-ombre":"traînées","Kairos":"foudre","Zara-nova":"circuits","brutus":"éclats sismiques","aria":"orbites","krak":"éclats sismiques","luna":"circuits","velen":"traînées","lyra-azur":"couronne royale","orion":"foudre"};
 function signatureVfxStyle(owner){ return SIGNATURE_VFX[(owner&&owner.char&&owner.char.id)||""]||"énergie"; }
 function drawSignatureVfx(pr){
   const owner=pr.owner||{},style=signatureVfxStyle(owner),trail=(owner.skin&&owner.skin.trail)||"#ffc400";

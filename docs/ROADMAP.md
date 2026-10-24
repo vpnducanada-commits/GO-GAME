@@ -121,7 +121,12 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 ## ✅ V4.0 — « Arcade plein écran & anatomie HD » *(LIVRÉ le 24/10/2026 — 287 assertions source / 331 vérifications, suite verte)*
 - 🖥️ Nouvelle direction du propriétaire (« quitter le mini-jeu ») : coque **100 % viewport**, scène 16:9 maximale, barre système intégrée à la scène et masquée en combat, aucun pied de page ni panneau extérieur.
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
-- 🔜 Trajectoire V4 : V4.1 et V4.2 livrées ci-dessous. Sur décision du propriétaire (24/10/2026), la priorité passe d'abord au visuel AAA — références Tekken, Street Fighter, KOF, Marvel vs Capcom, Mortal Kombat : V4.3 Graphismes AAA II (volumes peints torse/vêtements, ombres directionnelles, impacts en sprites) ; puis V4.4 compétition locale/tournoi ; V4.5 approfondissement Online public (selon validation réseau réelle).
+- 🔜 Trajectoire V4 : V4.1, V4.2 et V4.3 livrées ci-dessous. Priorités du propriétaire : d'abord le visuel AAA (V4.2 livrée), puis l'intégration de TOUS les personnages des planches (V4.3 livrée). Next : V4.4 Graphismes AAA II (volumes peints torse/vêtements, ombres directionnelles, impacts en sprites) ; puis V4.5 compétition locale/tournoi ; V4.6 approfondissement Online public (selon validation réseau réelle).
+
+## ✅ V4.3 — « Roster complet des planches » *(LIVRÉ le 24/10/2026 — 317 assertions source / 553 vérifications, suite verte)*
+
+- **Les 35 personnages des 3 planches du propriétaire sont jouables** (+32 d'un coup, roster 41) : stats, morphologies, palettes, spécial/EX/super et signatures VFX par archétype ; inventaire fidèle dans `docs/CONCEPTS_PERSONNAGES.md`.
+- Arcade/Survie alimentés par tout le roster (boss colosses inclus), grille de sélection dense 41 cartes, indices historiques intacts (Histoire/replays/Online préservés).
 
 ## ✅ V4.2 — « Graphismes AAA » *(LIVRÉ le 24/10/2026 — 306 assertions source / 354 vérifications, suite verte)*
 
