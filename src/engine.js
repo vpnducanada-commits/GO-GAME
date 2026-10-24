@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.0 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V3.1 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="3.0.0";
+const GAME_VERSION="3.1.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);

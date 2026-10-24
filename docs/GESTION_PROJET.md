@@ -25,19 +25,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 GO GAME Online & Combat Pro.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 GO GAME Online & Combat Pro • V3.1 Humanité++ (personnages plus humains, 100 % visuel).
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V3.0 (actuel) |
+| Indicateur | Cible | V3.1 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 194 assertions source / 218 vérifications affichées ✅ + gate QA statique |
+| Tests automatisés | 100 % verts | 211 assertions source / 240 vérifications affichées ✅ + gate QA statique + contrôle visuel par captures |
 | Taille version 1-fichier | ≤ 320 Ko avec client Online | 293 Ko ✅ |
 | Dépendances externes | 0 pour jouer en local ; Supabase/WebRTC uniquement en Online opt-in | Conforme ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
 | Modes / Personnages / Arènes | en croissance | 6 locaux + Duel Online (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Track V3 « GO GAME Online & Combat Pro » livrée (V3.0). Voir `docs/SPRINT_V3_GO_GAME_ONLINE.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/ROADMAP.md`. Le jeu local reste autonome hors ligne ; les duels privés, le cloud et le classement co-vérifié sont branchés sur Supabase + WebRTC. Le Sprint 09 « Compétition locale » reste le prochain cap de contenu local.
+V3.1 « Humanité++ » livrée : refonte visuelle complète des personnages (proportions adultes, visages expressifs, regard vivant, IK), strictement render-only. Track V3 « GO GAME Online & Combat Pro » livrée (V3.0). Voir `docs/SPRINT_V3_GO_GAME_ONLINE.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/ROADMAP.md`. Le jeu local reste autonome hors ligne ; les duels privés, le cloud et le classement co-vérifié sont branchés sur Supabase + WebRTC. Le Sprint 09 « Compétition locale » reste le prochain cap de contenu local.
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

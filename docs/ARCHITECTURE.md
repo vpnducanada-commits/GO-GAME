@@ -10,7 +10,9 @@
 index.html
 ├── src/style.css      → présentation, menus, HUD, responsive
 ├── src/engine.js      → simulation, combat, IA, audio, profil, états du jeu
-├── src/render.js      → pipeline graphique, caméra, HUD canvas/DOM, boucle
+├── src/render.js      → pipeline graphique, caméra, HUD canvas/DOM, boucle ; anatomie
+│                        procédurale Humanité++ (V3.1) : HUMAN_PROFILES, IK deux segments,
+│                        visage expressif — strictement render-only, lit la simulation sans l'écrire
 └── src/ui.js          → menus, sélection, réglages, personnalisation, fins de match
 
 tools/build-single.py  → fusionne tout en un HTML autonome livrable

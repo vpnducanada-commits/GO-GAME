@@ -453,7 +453,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(ev('GAME_VERSION') === '3.0.0' && window.document.querySelector('h1').textContent.includes('V3.0 PRO'), 'version V3.0.0 affichée et exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -543,6 +543,45 @@ try {
   assert(window.document.getElementById('btnRematch').classList.contains('hidden') && window.document.getElementById('btnEndSelect').classList.contains('hidden'), 'fin en ligne : pas de revanche locale non synchronisée proposée');
   ev('goMenu();');
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
+
+  console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
+  assert(ev('GAME_VERSION') === '3.1.0' && window.document.querySelector('h1').textContent.includes('V3.1 PRO'), 'version V3.1.0 affichée et exposée au moteur');
+  assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
+  assert(ev('Object.keys(HUMAN_PROFILES).length') === 6, '6 morphologies humaines déclarées');
+  const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
+  for (let i = 0; i < 6; i++) {
+    const prof = ev(`(()=>{const p=humanProfile({char:CHARACTERS[${i}]}); return p.label+'|'+p.headR+'|'+p.shoulder+'|'+p.hip+'|'+p.limb+'|'+p.hair;})()`);
+    humanSignatures.add(prof);
+    const shoulder = Number(prof.split('|')[2]); minShoulder = Math.min(minShoulder, shoulder); maxShoulder = Math.max(maxShoulder, shoulder);
+  }
+  assert(humanSignatures.size === 6 && maxShoulder - minShoulder >= 9, 'silhouettes distinctes : épaules de ' + minShoulder + ' à ' + maxShoulder);
+  assert(ev('(()=>{const rs=Object.values(HUMAN_PROFILES).map(p=>p.headR); return Math.max(...rs)<=18&&Math.min(...rs)>=16;})()') === true, 'proportions adultes : tête réduite (16 à 18 px) pour les 6 combattants');
+  assert(ev('(()=>{const j=solveJoint(0,0,60,20,42,41,-1); return Math.abs(Math.hypot(j.x,j.y)-42)<1.5&&Math.abs(Math.hypot(60-j.x,20-j.y)-41)<1.5;})()') === true, 'IK deux segments : longueurs des membres respectées');
+  assert(ev('(()=>{const j=solveJoint(0,0,400,0,42,41,1); return Number.isFinite(j.x)&&Number.isFinite(j.y);})()') === true, 'IK : cible hors de portée clampée sans NaN');
+  ev('p1.reset(); p2.reset(); p1.x=p1.rx=500; p2.x=p2.rx=900; p1.y=p1.ry=p2.y=p2.ry=GROUND; p1.facing=1; p2.facing=-1; p1.health=p1.maxHealth;');
+  ev('for(let k=0;k<60;k++)fighterMotion(p1);');
+  assert(ev('renderStats.gazeX') > 0.5 && ev('renderStats.humanMotionSamples') > 0, 'regard : les yeux suivent l’adversaire placé devant');
+  ev('p2.x=p2.rx=120; for(let k=0;k<60;k++)fighterMotion(p1);');
+  assert(ev('renderStats.gazeX') < -0.5, 'regard : les yeux suivent l’adversaire passé derrière');
+  ev('p1.reset(); p1.vx=6; p1.facing=1; for(let k=0;k<40;k++)fighterMotion(p1); p1.vx=0;');
+  assert(Math.abs(ev('renderStats.hairSway')) > 1.5, 'inertie : cheveux et vêtements réagissent à la vitesse');
+  ev('p1.health=Math.round(p1.maxHealth*.12); for(let k=0;k<60;k++)fighterMotion(p1);');
+  assert(ev('renderStats.fatigue') > 0.6, 'fatigue : vie basse = respiration et épaules marquées');
+  ev('p1.reset(); p1.health=p1.maxHealth; if(p1.motion)p1.motion.fatigue=0; p1.hitStun=0; p1.attack=null; p1.blocking=false; drawFighter(p1);');
+  assert(ev('renderStats.lastFacialExpression') === 'focus', 'visage : expression concentrée au repos');
+  ev('p1.hitStun=12; drawFighter(p1); p1.hitStun=0;');
+  assert(ev('renderStats.lastFacialExpression') === 'douleur', 'visage : expression de douleur sur impact');
+  ev('p1.blocking=true; drawFighter(p1); p1.blocking=false;');
+  assert(ev('renderStats.lastFacialExpression') === 'garde', 'visage : expression de garde');
+  for (let i = 0; i < 6; i++) {
+    ev(`applyCharacterTo(p1,${i}); p1.reset(); if(p1.motion)p1.motion.fatigue=0; drawFighter(p1);`);
+    assert(ev('renderStats.lastHumanProfile') === ev('CHARACTERS[' + i + '].id'), 'rendu humain complet sans erreur : ' + ev('CHARACTERS[' + i + '].name'));
+  }
+  assert(ev('renderStats.humanProfiles') === 6, 'métriques Humanité++ exposées (6 profils actifs)');
+  const logicalBeforeHuman = ev('p1.x+","+p1.y+","+p1.health+","+p1.vx');
+  ev('drawFighter(p1); drawFighter(p2);');
+  assert(ev('p1.x+","+p1.y+","+p1.health+","+p1.vx') === logicalBeforeHuman, 'Humanité++ 100 % visuel : physique, hitboxes et déterminisme inchangés');
+  ev('p1.reset(); p2.reset(); goMenu();');
 
   /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
      applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */

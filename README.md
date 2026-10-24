@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V3.0 PRO « GO GAME Online & Combat Pro »
+# 🎮 GÉDÉON - Godson ARENA — V3.1 PRO « Humanité++ & GO GAME Online »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V3.0-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; GO GAME Online demande une connexion. |
+| ⭐ **`Gedeon-GODSON-Arena-V3.1-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; GO GAME Online demande une connexion. |
 | 🌐 **[Jouer en ligne (GitHub Pages HTTPS)](https://vpnducanada-commits.github.io/GO-GAME/)** | Version publique recommandée pour créer un compte et disputer des duels WebRTC. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
@@ -93,14 +93,14 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V3.0 « GO GAME Online & Combat Pro »** : duels privés WebRTC lockstep, classement mondial co-vérifié, profils/sauvegardes/replays cloud, projections, EX uniques et Godson Cancel. Arena Moods V2.8, le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés — et tout le jeu local reste jouable hors ligne.
+**V3.1 « Humanité++ »** : personnages aux proportions adultes, visages expressifs, regard vivant, membres articulés en IK et fatigue visible — refonte 100 % visuelle, sans toucher aux hitboxes, aux replays ni au netcode. **V3.0 « GO GAME Online & Combat Pro »** : duels privés WebRTC lockstep, classement mondial co-vérifié, profils/sauvegardes/replays cloud, projections, EX uniques et Godson Cancel. Arena Moods V2.8, le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés — et tout le jeu local reste jouable hors ligne.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V3.0-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V3.1-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
-├── tests/smoke-test.js   → 194 assertions source / 218 vérifications affichées ✅
+├── tests/smoke-test.js   → 211 assertions source / 240 vérifications affichées ✅
 ├── supabase/ migrations • Edge Function • configuration publique
 └── tools/ build-single.py • qa-check.py • supabase-smoke.mjs
 ```

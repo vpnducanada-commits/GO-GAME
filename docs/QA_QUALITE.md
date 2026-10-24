@@ -11,6 +11,7 @@
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
 | Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry/EX/projections/cancels, rendus, sauvegardes, déterminisme, replays, Arena Moods, tactile et client Online contre API simulée |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
+| Visuel | captures hors-navigateur (canvas natif) | lineup des personnages et frame de combat relus par Kenzo avant release graphique (introduit en V3.1) |
 | Release | Git + tag | arbre propre, commit et version traçables |
 
 ## Seuils de release non négociables

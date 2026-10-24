@@ -110,6 +110,10 @@ online_hooks = ["onlineRequest", "onlineSignUp", "saveOnlineProfile", "refreshOn
 combat_hooks = ['"throw"', '"exspecial"', "godsonCancelReady", "abilitySpecs", "renderMoveList"]
 check("GO GAME Online + combat V3 présents", all(h in all_js for h in online_hooks + combat_hooks) and "menuOnline" in html and "btnOnline" in html and "moveList" in html, "Supabase REST + WebRTC + lockstep + Projection/EX/Godson Cancel")
 
+# 15. Humanité++ V3.1 : anatomie procédurale (visuel uniquement)
+human_hooks = ["HUMAN_PROFILES", "humanProfile", "drawHumanHead", "drawHumanArm", "drawHumanLeg", "solveJoint", "taperedSegment", "drawFist", "drawShoe", "lastFacialExpression", "humanMotionSamples"]
+check("Humanité++ V3.1 présente", all(h in all_js for h in human_hooks), "6 morphologies + visage expressif + IK + regard/fatigue (render-only)")
+
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
 secret_hits = [p for p in ("sb_secret_", "service_role", "SUPABASE_SERVICE_ROLE_KEY") if p in client_blob]

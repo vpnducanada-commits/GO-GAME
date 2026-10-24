@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.0 PRO — INTERFACE, MENUS & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.1 PRO — INTERFACE, MENUS & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

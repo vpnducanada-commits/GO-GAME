@@ -3,6 +3,19 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.1.0] — 24 octobre 2026 — « Humanité++ » (demande prioritaire du propriétaire)
+### Personnages plus humains — Kenzo + Nadia + Manager
+- 🧍 **Proportions adultes stylisées** : tête réduite (rayon 16,5 à 17,8 px), cou et trapèzes dessinés, épaules/hanches/mâchoires propres à chaque combattant. Six morphologies déclarées dans `HUMAN_PROFILES` : athlète équilibré (Gideon), sprinteuse agile (Kira), colosse puissant (Titan), stratège élancée (Nova), champion royal (GODSON Prime) et vague athlétique (Zara).
+- 🙂 **Visage de trois-quarts complet** : front, pommette, nez et narine, oreille, œil en amande avec iris mobile et clignement, sourcil tendu, bouche expressive (focus, effort, garde, douleur, fatigue, victoire, KO), barbe légère selon le personnage et goutte de sueur en fin de vie.
+- 👀 **Regard vivant** : les yeux suivent l'adversaire, la tête accuse un léger retard sur le buste, les cheveux et les vêtements répondent à l'inertie, bassin et épaules contre-tournent pendant la marche, et la **fatigue** devient visible (respiration ample, épaules tombantes) quand la vie baisse.
+- 🦵 **Membres volumiques articulés** : segments effilés ombrés plutôt que bâtons, genoux/coudes résolus par cinématique inverse à deux segments, poings gantés orientés et chaussures articulées au pas. Le buste gagne cage thoracique, taille, bassin, ceinture articulée et plis de tissu animés ; reflets et traînées de dash utilisent la même silhouette.
+- 🔤 Lettres d'emblème et de bandeau contre-miroitées : elles restent lisibles quand le combattant regarde à gauche.
+
+### Garanties techniques — Manager + Sarah
+- 🎯 **100 % visuel (render-only)** : aucune hitbox, aucune constante de physique, aucun input et aucun octet du protocole n'ont changé. Les replays déterministes, le Replay Studio et le lockstep GO GAME Online restent valides à l'identique.
+- 🧪 Suite portée à **211 assertions source / 240 vérifications affichées** : 6 morphologies distinctes, proportions adultes bornées, IK aux longueurs exactes et cible hors de portée clampée, regard qui suit l'adversaire des deux côtés, inertie cheveux/vêtements, fatigue > 60 % à vie basse, expressions faciales et invariance physique pendant le rendu. Contrôle visuel réel par captures hors-navigateur (lineup des 6 combattants + combat à Libreville).
+- 🛡️ Gate QA enrichie d'un contrôle permanent Humanité++ (hooks anatomiques présents dans le client livré).
+
 ## [3.0.0] — 24 octobre 2026 — « GO GAME Online & Combat Pro » (Track V3)
 ### GO GAME Online — Manager + Kenzo + Nadia
 - 🌐 **Panneau GO GAME complet** : inscription/connexion Supabase Auth par email, session persistée et rafraîchie, pseudo public unique, pays et combattant principal. Le jeu local reste intégralement disponible hors ligne et sans compte.

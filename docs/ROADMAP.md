@@ -75,6 +75,13 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🥋 **Combat Pro** : Projection anti-garde, 6 EX uniques, Godson Cancel, backdash défensif et IA enrichie
 - 📈 **Performance** : métriques CPU logique/rendu, FX adaptatifs et verrouillage réseau à 60 Hz/100 %
 
+## ✅ V3.1 — « Humanité++ » *(LIVRÉ le 24/10/2026 — 211 assertions source, suite verte)*
+- 🧍 **Proportions adultes stylisées** et 6 morphologies distinctes (`HUMAN_PROFILES`), cou/trapèzes/épaules/hanches/mâchoires par combattant
+- 🙂 **Visages de trois-quarts expressifs** : iris mobile, clignement, sourcil, bouche (focus/effort/garde/douleur/fatigue/victoire/KO), chevelures signatures inertielles
+- 🦵 **Membres volumiques en IK deux segments**, poings et chaussures orientés, buste avec taille/bassin/plis animés, regard qui suit l'adversaire et fatigue visible
+- 🎯 **Render-only garanti** : hitboxes, physique, déterminisme, replays et lockstep Online inchangés ; contrôle visuel par captures réelles (lineup + combat)
+- 📋 Board du chantier : `docs/SPRINT_V31_HUMANITE.md`
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
