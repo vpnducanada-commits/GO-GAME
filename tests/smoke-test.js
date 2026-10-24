@@ -545,7 +545,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(ev('GAME_VERSION') === '3.1.0' && window.document.querySelector('h1').textContent.includes('V3.1 PRO'), 'version V3.1.0 affichée et exposée au moteur');
+  assert(/^3\.[12]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 6, '6 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -582,6 +582,24 @@ try {
   ev('drawFighter(p1); drawFighter(p2);');
   assert(ev('p1.x+","+p1.y+","+p1.health+","+p1.vx') === logicalBeforeHuman, 'Humanité++ 100 % visuel : physique, hitboxes et déterminisme inchangés');
   ev('p1.reset(); p2.reset(); goMenu();');
+
+  console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
+  assert(ev('GAME_VERSION') === '3.2.0' && window.document.querySelector('h1').textContent.includes('V3.2 PRO'), 'version V3.2.0 affichée et exposée au moteur');
+  assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
+  assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
+  let landscapeCallOk = true;
+  try { ev('requestImmersiveLandscape()'); } catch (e) { landscapeCallOk = false; }
+  assert(landscapeCallOk, 'plein écran paysage : aucun crash si l’API est absente');
+  window.document.getElementById('btnPortraitAnyway').click();
+  assert(window.document.body.classList.contains('allowPortrait'), 'choix portrait respecté (classe allowPortrait)');
+  window.document.body.classList.remove('allowPortrait');
+  assert(window.document.querySelector('.helpBar') === null, 'barre d’aide sous le jeu supprimée (anti-saturation)');
+  assert(window.document.querySelector('footer').textContent.trim().length < 130, 'pied de page condensé en une ligne signature');
+  const cssV32 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
+  assert(cssV32.includes('orientation:portrait') && cssV32.includes('orientation:landscape') && cssV32.includes('#rotateHint') && cssV32.includes(':fullscreen'), 'CSS paysage : invite portrait, mode cinéma et plein écran');
+  assert(!!window.document.getElementById('moveList') && !!window.document.querySelector('.moveDetails summary'), 'techniques repliées sous un résumé dépliable à la sélection');
+  ev('goMenu()');
+  assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
      applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.1 PRO — RENDU HAUT GRAPHISME & HUMANITÉ++
+   GÉDÉON - Godson ARENA V3.2 PRO — RENDU HAUT GRAPHISME & HUMANITÉ++
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */

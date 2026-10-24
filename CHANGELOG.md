@@ -3,6 +3,23 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.2.0] — 24 octobre 2026 — « Paysage & Interface Épurée » (retour direct du propriétaire)
+### Le jeu se joue en paysage — Manager + Kenzo
+- 🌄 **Scène paysage d'abord** : la zone de jeu tient désormais toujours dans la hauteur visible de l'écran (largeur bornée par `100dvh` en 16:9), sans défilement parasite pendant les combats.
+- 📱 **« Tourne ton appareil »** : sur téléphone en portrait, un écran dédié propose le **plein écran paysage** (avec tentative de verrouillage d'orientation) ou, au choix du joueur, de continuer en portrait. Si l'appareil repasse en portrait pendant un combat local, le jeu se met en pause automatiquement pour protéger la partie (jamais en ligne ni en replay).
+- 🎬 **Mode cinéma** : en paysage sur écran court (téléphones), l'en-tête se compacte et le pied de page disparaît pour laisser toute la place à l'arène ; en plein écran, la scène occupe 100 % de l'écran sans coins arrondis.
+- ⛶ Le bouton d'en-tête devient **« Paysage »** et déclenche le même plein écran immersif.
+
+### Interface épurée — Nadia + Kenzo
+- ✂️ **Supprimés** : les 4 cartes d'aide sous la scène (doublon de « Comment jouer »), le pied de page géant (remplacé par une ligne signature), les notes de bas de panneau (Hall of Fame, Replays, Défis), les signatures répétées sur les écrans VS/Histoire/Pause, le badge « VERSION 2.8 » périmé et les libellés redondants (ARÈNE/AMBIANCE, énergie détaillée du HUD).
+- 🧹 **Condensés** : menu principal (bannières et cartes en quelques mots), panneau GO GAME Online (titres courts, statuts d'une ligne), écran d'aide resserré, ligne de carrière du menu et progression Histoire en format compact, toasts les plus longs raccourcis.
+- 🥋 Les **techniques du combattant** à la sélection sont repliées sous un résumé dépliable : disponibles en un toucher, invisibles le reste du temps.
+
+### Garanties — Manager + Sarah
+- 🎯 Refonte **présentation uniquement** : gameplay, physique, déterminisme, replays et protocole Online inchangés (la pause portrait réutilise la pause existante et reste interdite en ligne). Tous les identifiants DOM utilisés par le jeu sont conservés.
+- 🧪 Suite portée à **221 assertions source / 250 vérifications affichées** : écran de rotation et ses choix, logique paysage sans crash hors navigateur, suppression de la barre d'aide, footer borné, règles CSS portrait/paysage/plein écran et menu toujours complet.
+- 🛡️ Gate QA enrichie d'un contrôle permanent « Paysage & interface épurée V3.2 ».
+
 ## [3.1.0] — 24 octobre 2026 — « Humanité++ » (demande prioritaire du propriétaire)
 ### Personnages plus humains — Kenzo + Nadia + Manager
 - 🧍 **Proportions adultes stylisées** : tête réduite (rayon 16,5 à 17,8 px), cou et trapèzes dessinés, épaules/hanches/mâchoires propres à chaque combattant. Six morphologies déclarées dans `HUMAN_PROFILES` : athlète équilibré (Gideon), sprinteuse agile (Kira), colosse puissant (Titan), stratège élancée (Nova), champion royal (GODSON Prime) et vague athlétique (Zara).

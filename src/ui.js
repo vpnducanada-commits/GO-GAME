@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.1 PRO — INTERFACE, MENUS & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.2 PRO — INTERFACE ÉPURÉE, PAYSAGE & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -67,9 +67,9 @@ function syncProfileUI(){
   const s=PROFILE.stats,storyInfo=PROFILE.story||{},top=(PROFILE.leaderboard&&PROFILE.leaderboard[0])?PROFILE.leaderboard[0].score:0;
   $("profileStats").textContent=profileRank()+" • 🏆 "+s.wins+"V • "+s.losses+"D • Combo "+s.bestCombo+" • Défis "+completedChallenges()+"/6"+(top?" • Record "+top:"");
   const chapter=(storyInfo.progressStep||1)>3?"Chapitre 2":"Chapitre 1";
-  $("menuStats").textContent="Carrière : "+s.matches+" match(s), "+s.wins+" victoire(s), combo max "+s.bestCombo+" hits ("+s.bestComboDamage+" dégâts), Histoire "+(storyInfo.chapter2Completed?"saga terminée x"+(storyInfo.clears||0):chapter+" — combat "+(storyInfo.progressStep||1)+"/6")+", Survie : vague "+(s.bestSurvivalWave||0)+", GODSON PRIME "+(PROFILE.unlocks&&PROFILE.unlocks.prime?"👑 débloqué":"🔒 secret")+", tenue de Libreville "+(PROFILE.unlocks&&PROFILE.unlocks.librevilleSkin?"🌴 débloquée":"🔒 à gagner")+".";
+  $("menuStats").textContent="🏆 "+s.matches+" match(s) • "+s.wins+" V • Combo max "+s.bestCombo+" • Histoire "+(storyInfo.chapter2Completed?"terminée":(storyInfo.progressStep||1)+"/6")+" • Survie vague "+(s.bestSurvivalWave||0);
   const lbl=$("storyProgressLabel");
-  if(lbl)lbl.textContent=storyInfo.chapter2Completed?"✅ Saga terminée x"+(storyInfo.clears||0)+" — Rejouer les Chapitres 1 & 2 • Prime + tenue de Libreville débloqués 🌴":storyInfo.chapter1Completed?"🌴 Chapitre 2 en cours — Reprendre au combat "+(storyInfo.progressStep||4)+"/6 • Zara, Nova déchaînée, GODSON PRIME":(storyInfo.progressStep&&storyInfo.progressStep>1?"▶ Reprendre au combat "+storyInfo.progressStep+"/6 • Chapitre 1 puis Chapitre 2 à Libreville":"6 combats scénarisés • 2 chapitres • GODSON PRIME + tenue de Libreville à débloquer");
+  if(lbl)lbl.textContent=storyInfo.chapter2Completed?"✅ Saga terminée — Rejouer":storyInfo.chapter1Completed?"🌴 Chapitre 2 — Combat "+(storyInfo.progressStep||4)+"/6":(storyInfo.progressStep&&storyInfo.progressStep>1?"▶ Reprendre — Combat "+storyInfo.progressStep+"/6":"6 combats • GODSON PRIME à débloquer");
 }
 function effectiveSkin(char,side){
   const sk={...char.skin},custom=side===1?PROFILE.customColors.p1:PROFILE.customColors.p2;
@@ -247,7 +247,7 @@ function syncReplayUI(){
   const count=Array.isArray(replayLibrary)?replayLibrary.length:0,has=count>0&&!!(lastReplayData&&lastReplayData.duration>0),main=$("btnLastReplay"),end=$("btnWatchReplay"),info=$("replayInfo");
   if(main)main.disabled=!has;
   if(end)end.disabled=!has;
-  if(info)info.textContent=has?("🎬 Bibliothèque Replay Studio : "+count+" replay"+(count>1?"s":"")+" conservé"+(count>1?"s":"")+" • Dernier : "+replaySummary(lastReplayData)+"."):"🎬 Termine un match pour créer ton premier replay et l’ajouter à la bibliothèque.";
+  if(info)info.textContent=has?("🎬 "+count+" replay"+(count>1?"s":"")+" • Dernier : "+replaySummary(lastReplayData)+"."):"🎬 Termine un match pour créer ton premier replay.";
   const libraryMenu=$("menuReplays"); if(libraryMenu&&!libraryMenu.classList.contains("hidden"))renderReplayLibrary();
   updateReplayBar(true);
 }
@@ -927,8 +927,41 @@ function goMenu(){
   syncProfileUI(); showOnly("menuMain"); syncReplayUI();
   if(AC)startMusic();
 }
+/* V3.2 — Paysage prioritaire : plein écran immersif et verrouillage
+   d'orientation en best effort, plus pause de Protection si l'appareil
+   repasse en portrait pendant un combat local. */
+async function requestImmersiveLandscape(){
+  const el=$("gameWrap");
+  try{
+    if(el&&el.requestFullscreen){
+      const r=el.requestFullscreen({navigationUI:"hide"});
+      if(r&&r.catch)r.catch(()=>{ try{el.requestFullscreen();}catch(e){} });
+    }
+  }catch(e){ try{ if(el&&el.requestFullscreen)el.requestFullscreen(); }catch(e2){} }
+  try{
+    if(window.screen&&screen.orientation&&screen.orientation.lock){
+      const p=screen.orientation.lock("landscape");
+      if(p&&p.catch)p.catch(()=>{});
+    }
+  }catch(e){}
+}
+let portraitQuery=null;
+function handlePortraitChange(){
+  if(!portraitQuery)return;
+  const portrait=!!portraitQuery.matches;
+  document.body.classList.toggle("portraitSmall",portrait);
+  if(portrait&&!document.body.classList.contains("allowPortrait")&&state==="fight"&&mode!=="online"&&!(typeof replayPlayback!=="undefined"&&replayPlayback.active))togglePause();
+}
+function initPortraitGuard(){
+  try{
+    portraitQuery=window.matchMedia("(orientation: portrait) and (max-width: 860px)");
+    if(portraitQuery.addEventListener)portraitQuery.addEventListener("change",handlePortraitChange);
+    else if(portraitQuery.addListener)portraitQuery.addListener(handlePortraitChange);
+    handlePortraitChange();
+  }catch(e){}
+}
 function togglePause(){
-  if(mode==="online"&&onlineSession.active){ showToast("🌐 Pause désactivée pendant un duel en ligne pour garder les deux joueurs synchronisés."); return; }
+  if(mode==="online"&&onlineSession.active){ showToast("🌐 Pause désactivée en duel en ligne."); return; }
   if(replayPlayback.active){ toggleReplayPause(); return; }
   if(replayPlayback.ended)return;
   if(state==="fight"||state==="intro"||state==="roundEnd"||state==="training"){ prevState=state; state="pause"; showOnly("menuPause"); }
@@ -1055,7 +1088,7 @@ function populateSettings(){
   $("fpsChip").classList.toggle("hidden",!SETTINGS.showFps);
 }
 function openSettings(){
-  if(replayPlayback.active||replayPlayback.ended){ showToast("🎬 Réglages indisponibles pendant un replay — quitte la lecture d’abord."); return; }
+  if(replayPlayback.active||replayPlayback.ended){ showToast("🎬 Quitte le replay pour ouvrir les réglages."); return; }
   audio();
   if(state==="fight"||state==="intro"||state==="roundEnd"||state==="training"){ prevState=state; state="pause"; settingsReturn="menuPause"; }
   else settingsReturn=state==="pause"?"menuPause":"menuMain";
@@ -1138,7 +1171,10 @@ function bindUI(){
     if(m==="survival"&&survival.lastWin&&state==="matchEnd"){ recordSurvivalRun(); goMenu(); showToast("🏅 Run de Survie enregistrée au Hall of Fame : "+survival.score+" points"); return; }
     if(m==="arcade")setupArcadeRun(); if(m==="story")setupStoryRun(); if(m==="survival")setupSurvivalRun(); enterSelect(m); };
   $("btnQuit1").onclick=goMenu; $("btnQuit2").onclick=goMenu; $("btnPauseTop").onclick=togglePause;
-  $("btnFull").onclick=()=>{ const el=$("gameWrap"); if(document.fullscreenElement)document.exitFullscreen(); else if(el.requestFullscreen)el.requestFullscreen(); };
+  $("btnFull").onclick=()=>{ if(document.fullscreenElement)document.exitFullscreen(); else requestImmersiveLandscape(); };
+  const _bLand=$("btnLandscape"); if(_bLand)_bLand.onclick=requestImmersiveLandscape;
+  const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); };
+  initPortraitGuard();
   $("btnTouch").onclick=function(){ touchEnabled=!touchEnabled; this.textContent=touchEnabled?"📱 Tactile : ON":"📱 Tactile"; $("touchUI").style.display=(touchEnabled&&(isCombat()||state==="intro"))?"flex":"none"; };
   // Entraînement
   document.querySelectorAll("#trainingBar [data-dummy]").forEach(b=>b.onclick=()=>{ dummyMode=b.dataset.dummy; document.querySelectorAll("#trainingBar [data-dummy]").forEach(x=>x.classList.toggle("on",x===b)); floater(640,240,"Mannequin : "+b.textContent,"#69f0ae"); });

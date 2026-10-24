@@ -82,6 +82,12 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🎯 **Render-only garanti** : hitboxes, physique, déterminisme, replays et lockstep Online inchangés ; contrôle visuel par captures réelles (lineup + combat)
 - 📋 Board du chantier : `docs/SPRINT_V31_HUMANITE.md`
 
+## ✅ V3.2 — « Paysage & Interface Épurée » *(LIVRÉ le 24/10/2026 — 221 assertions source, suite verte)*
+- 🌄 **Paysage prioritaire** : scène 16:9 qui tient dans `100dvh`, écran « Tourne ton appareil » en portrait mobile, plein écran + verrouillage d'orientation best effort, pause protectrice en combat local
+- 🎬 **Mode cinéma** en paysage court : en-tête compact, pied de page masqué, menus resserrés
+- ✂️ **Interface épurée** : barre d'aide sous la scène supprimée, footer d'une ligne, notes et signatures redondantes retirées, techniques repliées, statuts Online et carrière condensés
+- 🎯 Présentation uniquement : gameplay, déterminisme, replays et Online inchangés ; board : `docs/SPRINT_V32_PAYSAGE.md`
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
