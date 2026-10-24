@@ -1,10 +1,10 @@
-<!-- GÉDÉON - Godson ARENA V4.3 PRO — version autonome 1 fichier — signé Gideon - Godson © 2026 -->
+<!-- GÉDÉON - Godson ARENA V4.4 PRO — version autonome 1 fichier — signé Gideon - Godson © 2026 -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GÉDÉON - Godson ARENA V4.3 PRO | Combat 1v1 — signé Gideon - Godson</title>
+<title>GÉDÉON - Godson ARENA V4.4 PRO | Combat 1v1 — signé Gideon - Godson</title>
 <style>
 /* ===== GÉDÉON - Godson ARENA V4.0 PRO — arcade plein écran, sélection Pro & corps HD, signé Gideon - Godson ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -419,6 +419,21 @@ body.combatImmersif #btnPauseFloat{display:grid}
   .charCard small{display:none}
 }
 
+/* ================= V4.4 — NAVIGATION PRO (recherche, filtres, actions fixes) =================
+   Lena : trouver un combattant parmi 41 devient immédiat (recherche + familles),
+   les grilles défilent dans leur panneau et les boutons d'étape restent toujours
+   sous le pouce — fini le défilement sans fin de l'écran de sélection. */
+.rosterTools{display:flex;flex-wrap:wrap;gap:7px;align-items:center;justify-content:center;width:min(99%,1180px)}
+#rosterSearch{flex:1 1 200px;max-width:330px;padding:10px 15px;border-radius:999px;border:2px solid rgba(255,255,255,.28);background:rgba(3,6,18,.68);color:#fff;font-weight:800;font-size:14px;outline:none}
+#rosterSearch:focus{border-color:var(--or,#ffc400)}
+.filterChip{border:2px solid rgba(255,255,255,.24);background:rgba(255,255,255,.07);color:#fff;border-radius:999px;padding:8px 13px;font-weight:1000;font-size:12px;cursor:pointer;transition:.13s}
+.filterChip:hover{border-color:rgba(255,255,255,.65);transform:translateY(-1px)}
+.filterChip.on{border-color:var(--or,#ffc400);background:rgba(255,196,0,.18);box-shadow:0 0 0 2px rgba(255,196,0,.4)}
+#rosterCount{font-weight:1000;font-size:12px;letter-spacing:1px;opacity:.92}
+.roster{max-height:min(54dvh,540px);overflow-y:auto;padding:2px 5px 2px 2px;scrollbar-width:thin}
+.stickyActions{position:sticky;bottom:6px;z-index:6;background:rgba(4,7,20,.85);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.18);border-radius:16px;padding:8px;box-shadow:0 14px 34px rgba(0,0,0,.5)}
+@media(orientation:landscape) and (max-height:580px){.roster{max-height:42dvh}#rosterSearch{padding:7px 12px}.filterChip{padding:6px 10px}}
+
 </style>
 </head>
 <body>
@@ -431,7 +446,7 @@ body.combatImmersif #btnPauseFloat{display:grid}
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V4.3 PRO</em></h1>
+        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V4.4 PRO</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -539,6 +554,16 @@ body.combatImmersif #btnPauseFloat{display:grid}
     <div class="overlay hidden" id="menuSelect">
       <div class="flowSteps"><span class="fs on">1 · Personnages</span><span class="fsSep">›</span><span class="fs">2 · Arène</span><span class="fsSep">›</span><span class="fs">3 · <span class="flowLast">Combat</span></span></div>
       <div class="gameTitle" style="animation:none"><div class="small" id="selectKicker">PRÉPARATION DU COMBAT</div><h2 style="font-size:clamp(26px,4.4vw,46px)" id="selectTitle">Choisis ton combattant</h2></div>
+      <div class="rosterTools">
+        <input id="rosterSearch" type="search" placeholder="🔎 Rechercher un combattant…" aria-label="Rechercher un combattant">
+        <button type="button" class="filterChip on" data-f="tous">Tous</button>
+        <button type="button" class="filterChip" data-f="rapide">⚡ Rapides</button>
+        <button type="button" class="filterChip" data-f="colosse">🛡️ Colosses</button>
+        <button type="button" class="filterChip" data-f="energie">🔮 Énergie</button>
+        <button type="button" class="filterChip" data-f="tech">🤖 Tech</button>
+        <button type="button" class="filterChip" data-f="lames">⚔️ Lames</button>
+        <span id="rosterCount">41 / 41 combattants</span>
+      </div>
       <div class="selectGrid">
         <div class="rosterPanel"><h4 id="rosterTitleP1">🟦 JOUEUR 1</h4>
           <div class="previewBox" id="previewBoxP1"><canvas id="previewP1" width="300" height="340" aria-label="Aperçu du combattant du Joueur 1"></canvas><div class="previewMeta"><b id="previewNameP1">—</b><small id="previewTitleP1"></small><span id="previewStatsP1"></span></div></div>
@@ -547,7 +572,7 @@ body.combatImmersif #btnPauseFloat{display:grid}
           <div class="previewBox" id="previewBoxP2"><canvas id="previewP2" width="300" height="340" aria-label="Aperçu du combattant adverse"></canvas><div class="previewMeta"><b id="previewNameP2">—</b><small id="previewTitleP2"></small><span id="previewStatsP2"></span></div></div>
           <div class="roster" id="rosterP2"></div></div>
       </div>
-      <div class="btnRow">
+      <div class="btnRow stickyActions">
         <button class="btn dark" id="btnSelectBack">⬅ Menu</button>
         <button class="btn orange" id="btnSelectNext" style="min-width:260px">🏟️ Choisir l’arène ▶</button>
       </div>
@@ -562,7 +587,7 @@ body.combatImmersif #btnPauseFloat{display:grid}
       <div class="arenaRow" id="arenaRow"></div>
       <div style="font-weight:1000;letter-spacing:3px;font-size:11px;opacity:.9">🌤️ AMBIANCE</div>
       <div class="arenaMoodRow" id="arenaMoodRow" aria-label="Choix de l’ambiance de l’arène"></div>
-      <div class="btnRow">
+      <div class="btnRow stickyActions">
         <button class="btn dark" id="btnArenaBack">⬅ Personnages</button>
         <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
       </div>
@@ -816,18 +841,18 @@ body.combatImmersif #btnPauseFloat{display:grid}
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Gédéon - Godson ARENA V4.3 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Gédéon - Godson ARENA V4.4 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script>
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.3 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V4.4 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="4.3.0";
+const GAME_VERSION="4.4.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game");
 let ctx=canvas.getContext("2d",{alpha:false}); // « let » : les portraits de sélection V3.7 échangent temporairement le contexte
@@ -2140,7 +2165,7 @@ buildDisplayNames(); placeMenuFighters();
 <script>
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.3 PRO — GRAPHISMES AAA & ROSTER COMPLET DES PLANCHES (41 COMBATTANTS)
+   GÉDÉON - Godson ARENA V4.4 PRO — GRAPHISMES AAA, TENUES PEINTES & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -2148,7 +2173,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -2958,6 +2983,18 @@ function drawFighter(f){
   }else{
     ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.58,shY+18); ctx.lineTo(shX+shoulderHalf*.58,shY+18); ctx.moveTo(shX-shoulderHalf*.5,shY+31); ctx.lineTo(shX+shoulderHalf*.5,shY+31); ctx.stroke();
   }
+  // Tenues de combat peintes V4.4 (Marco) : ouverture du vêtement, col et plis du tissu.
+  ctx.save(); ctx.lineCap="round";
+  ctx.globalAlpha=.5; ctx.strokeStyle=shade(sk.primary,-52); ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(shoulderFront.x-5,shoulderFront.y+8); ctx.quadraticCurveTo(waistX+hipHalf*.68,waistY,hipFront.x-3,hipFront.y-2); ctx.stroke();
+  ctx.globalAlpha=.85; ctx.strokeStyle=sk.accent; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(shX-human.neck*1.15,shY+12); ctx.quadraticCurveTo(shX+3,shY+17,shX+human.neck*1.2,shY+12); ctx.stroke();
+  ctx.globalAlpha=.16; ctx.strokeStyle="#000000"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.25,shY+22); ctx.quadraticCurveTo(waistX-3,waistY-4,hipX-hipHalf*.3,hipY-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(shX+shoulderHalf*.18,shY+26); ctx.quadraticCurveTo(waistX+5,waistY,hipX+hipHalf*.28,hipY-3); ctx.stroke();
+  ctx.globalAlpha=.2; ctx.strokeStyle="#ffffff";
+  ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.45,shY+16); ctx.quadraticCurveTo(waistX-hipHalf*.4,waistY,hipBack.x+4,hipBack.y-2); ctx.stroke();
+  ctx.restore(); renderStats.torsoPaint=(renderStats.torsoPaint||0)+1;
   renderStats.outfitDetails=(renderStats.outfitDetails||0)+1; ctx.restore();
   // Peinture & matières V4.1 (Marco) : métal brossé, énergie, étincelles, tissus.
   ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";
@@ -3283,7 +3320,7 @@ rebuildArenaCache();
 <script>
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.3 PRO — ARCADE PLEIN ÉCRAN, ROSTER PLANCHES COMPLET & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.4 PRO — NAVIGATION PRO, ARCADE PLEIN ÉCRAN & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -3371,6 +3408,7 @@ function isCharLocked(c){ return !!(c.unlockKey&&!(PROFILE.unlocks&&PROFILE.unlo
    dans chaque carte de sélection et en grand dans les aperçus. Le contexte principal
    est échangé le temps du dessin (ctx est un « let »), toujours restauré. */
 let portraitCards=[],portraitTick=0,previewRigs=null;
+let rosterFilter="tous",rosterSearch="";
 const portraitFighterCache={};
 function portraitFighterFor(index,side){
   const key=side+":"+index;
@@ -3459,20 +3497,54 @@ function updateSelectPortraits(){
 /* Navigation clavier dans la grille de sélection (flèches : gauche/droite/haut/bas). */
 document.addEventListener("keydown",e=>{
   const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden")||state!=="select")return;
-  const step=e.code==="ArrowRight"?1:e.code==="ArrowLeft"?-1:e.code==="ArrowDown"?3:e.code==="ArrowUp"?-3:0;
+  let cols=3; try{ cols=Math.max(1,getComputedStyle(menu.querySelector("#rosterP1")).gridTemplateColumns.split(" ").length); }catch(_){ }
+  const step=e.code==="ArrowRight"?1:e.code==="ArrowLeft"?-1:e.code==="ArrowDown"?cols:e.code==="ArrowUp"?-cols:0;
   if(!step)return; e.preventDefault();
   let n=selCharP1;
-  for(let k=0;k<CHARACTERS.length;k++){ n=(n+step+CHARACTERS.length)%CHARACTERS.length; if(!isCharLocked(CHARACTERS[n]))break; }
-  if(n!==selCharP1){ selCharP1=n; saveSelection(); refreshSelect(); }
+  for(let k=0;k<CHARACTERS.length;k++){ n=(n+step+CHARACTERS.length)%CHARACTERS.length; if(!isCharLocked(CHARACTERS[n])&&rosterMatches(CHARACTERS[n]))break; }
+  if(n!==selCharP1){ selCharP1=n; saveSelection(); refreshSelect(); const selCard=document.querySelector("#rosterP1 .charCard.sel"); if(selCard&&typeof selCard.scrollIntoView==="function")selCard.scrollIntoView({block:"nearest"}); }
 });
 
+/* Navigation Pro V4.4 (Lena) : recherche + filtres par famille sur les 41 cartes. */
+function rosterMatches(c){
+  if(!c)return false;
+  if(rosterSearch&&!(c.name+" "+c.title).toLowerCase().includes(rosterSearch))return false;
+  switch(rosterFilter){
+    case "rapide": return c.speed>=1.12;
+    case "colosse": return c.hp>=112;
+    case "energie": return c.energyGain>=1.3;
+    case "tech": return c.style==="synthetique"||["nyx","korben","sera","raven","zara-nova","orion","drakesh"].includes(c.id);
+    case "lames": return c.style==="guerrier"||c.style==="kunoichi";
+    default: return true;
+  }
+}
+function applyRosterFilter(){
+  let visible=0;
+  document.querySelectorAll("#rosterP1 .charCard,#rosterP2 .charCard").forEach(card=>{
+    if(card.dataset.idx===undefined){card.style.display="";return;}
+    const show=rosterMatches(CHARACTERS[+card.dataset.idx]);
+    card.style.display=show?"":"none";
+    if(show&&card.parentElement&&card.parentElement.id==="rosterP1")visible++;
+  });
+  const el=$("rosterCount"); if(el)el.textContent=visible+" / "+CHARACTERS.length+" combattants";
+  renderStats.rosterVisible=visible;
+}
+function bindRosterTools(){
+  const input=$("rosterSearch"); if(!input||input.dataset.bound)return; input.dataset.bound="1";
+  input.addEventListener("input",()=>{ rosterSearch=input.value.trim().toLowerCase(); applyRosterFilter(); });
+  document.querySelectorAll(".filterChip").forEach(chip=>chip.addEventListener("click",()=>{
+    rosterFilter=chip.dataset.f||"tous";
+    document.querySelectorAll(".filterChip").forEach(c=>c.classList.toggle("on",c===chip));
+    applyRosterFilter();
+  }));
+}
 function buildRosters(){
   portraitCards=[];
   const build=(container,side,selected,allowRandom)=>{
     container.innerHTML="";
     CHARACTERS.forEach((c,i)=>{
       const sk=effectiveSkin(c,side),btn=document.createElement("button"),locked=isCharLocked(c);
-      btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button";
+      btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button"; btn.dataset.idx=i;
       btn.style.setProperty("--cc",locked?"#546e7a":sk.primary); btn.style.setProperty("--ca",locked?"#ffc400":sk.accent);
       btn.innerHTML=locked
         ?"<span class='portraitWrap'><span class='portraitFallback'>🔒</span></span><b>??? SECRET</b><small>Personnage légendaire</small><small>"+escapeHTML(c.lockedHint||"À débloquer")+"</small>"
@@ -3497,6 +3569,7 @@ function buildRosters(){
   $("rosterP2").style.pointerEvents=autoP2?"none":"auto";
   $("arenaRow").style.opacity=(pendingMode==="story"||pendingMode==="survival")?.5:1;
   $("arenaRow").style.pointerEvents=(pendingMode==="story"||pendingMode==="survival")?"none":"auto";
+  bindRosterTools(); applyRosterFilter();
 }
 function buildArenaCards(){
   const row=$("arenaRow"); row.innerHTML="";

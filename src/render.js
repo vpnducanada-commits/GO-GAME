@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.3 PRO — GRAPHISMES AAA & ROSTER COMPLET DES PLANCHES (41 COMBATTANTS)
+   GÉDÉON - Godson ARENA V4.4 PRO — GRAPHISMES AAA, TENUES PEINTES & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,7 +8,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Graphismes AAA V4.2",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -818,6 +818,18 @@ function drawFighter(f){
   }else{
     ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.58,shY+18); ctx.lineTo(shX+shoulderHalf*.58,shY+18); ctx.moveTo(shX-shoulderHalf*.5,shY+31); ctx.lineTo(shX+shoulderHalf*.5,shY+31); ctx.stroke();
   }
+  // Tenues de combat peintes V4.4 (Marco) : ouverture du vêtement, col et plis du tissu.
+  ctx.save(); ctx.lineCap="round";
+  ctx.globalAlpha=.5; ctx.strokeStyle=shade(sk.primary,-52); ctx.lineWidth=3;
+  ctx.beginPath(); ctx.moveTo(shoulderFront.x-5,shoulderFront.y+8); ctx.quadraticCurveTo(waistX+hipHalf*.68,waistY,hipFront.x-3,hipFront.y-2); ctx.stroke();
+  ctx.globalAlpha=.85; ctx.strokeStyle=sk.accent; ctx.lineWidth=2.6;
+  ctx.beginPath(); ctx.moveTo(shX-human.neck*1.15,shY+12); ctx.quadraticCurveTo(shX+3,shY+17,shX+human.neck*1.2,shY+12); ctx.stroke();
+  ctx.globalAlpha=.16; ctx.strokeStyle="#000000"; ctx.lineWidth=2;
+  ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.25,shY+22); ctx.quadraticCurveTo(waistX-3,waistY-4,hipX-hipHalf*.3,hipY-4); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(shX+shoulderHalf*.18,shY+26); ctx.quadraticCurveTo(waistX+5,waistY,hipX+hipHalf*.28,hipY-3); ctx.stroke();
+  ctx.globalAlpha=.2; ctx.strokeStyle="#ffffff";
+  ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.45,shY+16); ctx.quadraticCurveTo(waistX-hipHalf*.4,waistY,hipBack.x+4,hipBack.y-2); ctx.stroke();
+  ctx.restore(); renderStats.torsoPaint=(renderStats.torsoPaint||0)+1;
   renderStats.outfitDetails=(renderStats.outfitDetails||0)+1; ctx.restore();
   // Peinture & matières V4.1 (Marco) : métal brossé, énergie, étincelles, tissus.
   ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";

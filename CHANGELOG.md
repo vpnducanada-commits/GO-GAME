@@ -3,6 +3,32 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [4.4.0] — 2026-10-24 — « Navigation Pro & Tenues de combat »
+
+Retour du propriétaire : la navigation et l'affichage n'étaient pas encore au niveau,
+et les personnages devaient continuer à quitter le statut de mini-jeu.
+
+### Ajouté — Navigation & affichage (Lena)
+- **Recherche instantanée** de combattant (nom + titre) dans l'écran de sélection.
+- **Filtres par famille** : Tous, ⚡ Rapides, 🛡️ Colosses, 🔮 Énergie, 🤖 Tech, ⚔️ Lames,
+  avec compteur en direct (« 8 / 41 combattants »).
+- **Barres d'action fixes** : « Choisir l'arène » et « Lancer le combat » restent collées
+  en bas de l'écran, toujours atteignables au pouce.
+- **Grilles à défilement interne** : les listes défilent dans leur panneau, les aperçus
+  grands formats et les titres restent en place.
+- **Clavier par colonnes réelles** : les flèches haut/bas suivent la vraie grille,
+  ne visitent que les cartes filtrées et font défiler la carte sélectionnée à l'écran.
+
+### Ajouté — Personnages (Marco/Kenzo)
+- **Tenues de combat peintes** sur les 41 combattants : ouverture du vêtement sur le
+  devant, col aux couleurs d'accent, plis du tissu ombrés et reflet dorsal — le torse
+  n'est plus un simple aplat dégradé.
+
+### Inchangé / garanti
+- Gameplay, hitboxes, déterminisme, replays, Histoire et Online intacts (présentation
+  et navigation uniquement). 327 assertions / 561 vérifications vertes, gate QA 26
+  contrôles, bundle 379 Ko (budget 384 Ko tenu).
+
 ## [4.3.0] — 2026-10-24 — « Roster complet des planches »
 
 Correction demandée par le propriétaire : la V3.6 n'avait traduit que 3 des 35 personnages

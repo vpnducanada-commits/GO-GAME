@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GÉDÉON - Godson ARENA V4.3 PRO | Combat 1v1 — signé Gideon - Godson</title>
+<title>GÉDÉON - Godson ARENA V4.4 PRO | Combat 1v1 — signé Gideon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
@@ -16,7 +16,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V4.3 PRO</em></h1>
+        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V4.4 PRO</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -124,6 +124,16 @@
     <div class="overlay hidden" id="menuSelect">
       <div class="flowSteps"><span class="fs on">1 · Personnages</span><span class="fsSep">›</span><span class="fs">2 · Arène</span><span class="fsSep">›</span><span class="fs">3 · <span class="flowLast">Combat</span></span></div>
       <div class="gameTitle" style="animation:none"><div class="small" id="selectKicker">PRÉPARATION DU COMBAT</div><h2 style="font-size:clamp(26px,4.4vw,46px)" id="selectTitle">Choisis ton combattant</h2></div>
+      <div class="rosterTools">
+        <input id="rosterSearch" type="search" placeholder="🔎 Rechercher un combattant…" aria-label="Rechercher un combattant">
+        <button type="button" class="filterChip on" data-f="tous">Tous</button>
+        <button type="button" class="filterChip" data-f="rapide">⚡ Rapides</button>
+        <button type="button" class="filterChip" data-f="colosse">🛡️ Colosses</button>
+        <button type="button" class="filterChip" data-f="energie">🔮 Énergie</button>
+        <button type="button" class="filterChip" data-f="tech">🤖 Tech</button>
+        <button type="button" class="filterChip" data-f="lames">⚔️ Lames</button>
+        <span id="rosterCount">41 / 41 combattants</span>
+      </div>
       <div class="selectGrid">
         <div class="rosterPanel"><h4 id="rosterTitleP1">🟦 JOUEUR 1</h4>
           <div class="previewBox" id="previewBoxP1"><canvas id="previewP1" width="300" height="340" aria-label="Aperçu du combattant du Joueur 1"></canvas><div class="previewMeta"><b id="previewNameP1">—</b><small id="previewTitleP1"></small><span id="previewStatsP1"></span></div></div>
@@ -132,7 +142,7 @@
           <div class="previewBox" id="previewBoxP2"><canvas id="previewP2" width="300" height="340" aria-label="Aperçu du combattant adverse"></canvas><div class="previewMeta"><b id="previewNameP2">—</b><small id="previewTitleP2"></small><span id="previewStatsP2"></span></div></div>
           <div class="roster" id="rosterP2"></div></div>
       </div>
-      <div class="btnRow">
+      <div class="btnRow stickyActions">
         <button class="btn dark" id="btnSelectBack">⬅ Menu</button>
         <button class="btn orange" id="btnSelectNext" style="min-width:260px">🏟️ Choisir l’arène ▶</button>
       </div>
@@ -147,7 +157,7 @@
       <div class="arenaRow" id="arenaRow"></div>
       <div style="font-weight:1000;letter-spacing:3px;font-size:11px;opacity:.9">🌤️ AMBIANCE</div>
       <div class="arenaMoodRow" id="arenaMoodRow" aria-label="Choix de l’ambiance de l’arène"></div>
-      <div class="btnRow">
+      <div class="btnRow stickyActions">
         <button class="btn dark" id="btnArenaBack">⬅ Personnages</button>
         <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
       </div>
@@ -401,7 +411,7 @@
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Gédéon - Godson ARENA V4.3 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Gédéon - Godson ARENA V4.4 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>

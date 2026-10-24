@@ -872,7 +872,7 @@ function finishTestRun() {
 
 
   /* ===== V4.2 « Graphismes AAA » : peinture, lumière d'arène, profondeur ===== */
-  assert(/^4\.[23]\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
+  assert(/^4\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
   assert(ev('renderStats.artDirection')==='Graphismes AAA V4.2','direction artistique AAA V4.2');
   ev('qualityLevel=2');
   window.document.querySelector('#btnMode2P').click(); window.document.querySelector('#btnLaunchFight').click();
@@ -888,7 +888,7 @@ function finishTestRun() {
 
   /* ===== V4.3 « Roster complet des planches » : les 35 designs du propriétaire jouables ===== */
   console.log('\n— V4.3 : Roster complet des planches (41 combattants) —');
-  assert(ev('GAME_VERSION')==='4.3.0','version 4.3.0');
+  assert(/^4\.[34]\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
   assert(ev('CHARACTERS.length')===41,'roster complet : 41 combattants jouables');
   const boardIds=["Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion"];
   assert(ev('(()=>{const ids='+JSON.stringify(boardIds)+'; return ids.every(id=>CHARACTERS.some(c=>c.id===id));})()')===true,'les 35 personnages des 3 planches du propriétaire sont dans le roster');
@@ -909,6 +909,29 @@ function finishTestRun() {
   const eng43=fs.readFileSync(path.join(root,'src/engine.js'),'utf8');
   assert(boardIds.every(id=>eng43.includes('id:"'+id+'"')),'hooks sources : les 35 identifiants des planches présents dans le moteur');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
+
+  /* ===== V4.4 « Navigation Pro & tenues de combat peintes » ===== */
+  console.log('\n— V4.4 : Navigation Pro & tenues de combat peintes —');
+  assert(ev('GAME_VERSION')==='4.4.0','version 4.4.0');
+  ev('goMenu()'); click('btnMode2P');
+  assert(!!window.document.getElementById('rosterSearch')&&window.document.querySelectorAll('.filterChip').length>=6,'recherche + filtres par famille présents dans la sélection');
+  assert(window.document.querySelectorAll('.stickyActions').length>=2,'barres d’action fixes : Personnages et Arène toujours atteignables');
+  ev('rosterFilter="tous"; rosterSearch="krak"; applyRosterFilter()');
+  assert(ev('renderStats.rosterVisible')===1,'recherche « krak » : exactement 1 combattant visible');
+  ev('rosterSearch=""; rosterFilter="colosse"; applyRosterFilter()');
+  assert(ev('renderStats.rosterVisible')>=5&&ev('renderStats.rosterVisible')<41,'filtre Colosses : '+ev('renderStats.rosterVisible')+' combattants');
+  ev('rosterFilter="energie"; applyRosterFilter()');
+  assert(ev('renderStats.rosterVisible')>=3,'filtre Énergie : '+ev('renderStats.rosterVisible')+' combattants');
+  ev('rosterFilter="tous"; applyRosterFilter()');
+  assert(ev('renderStats.rosterVisible')===41,'filtre Tous : les 41 combattants visibles');
+  assert(window.document.getElementById('rosterCount').textContent.includes('41'),'compteur de roster à jour : '+window.document.getElementById('rosterCount').textContent);
+  const ui44=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
+  assert(ui44.includes('function applyRosterFilter()')&&ui44.includes('function rosterMatches(')&&ui44.includes('gridTemplateColumns'),'hooks navigation : filtres + clavier par colonnes réelles');
+  click('btnLaunchFight'); ev('skipVS(); state="fight"; introT=0;');
+  for(let i=0;i<20;i++)ev('updateGameLogic()');
+  ev('renderStats.torsoPaint=0; render()');
+  assert(ev('renderStats.torsoPaint')>=2,'tenues de combat peintes (ouverture, col, plis) sur les deux combattants');
+  ev('goMenu()');
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
   console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');

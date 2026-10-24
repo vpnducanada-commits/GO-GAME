@@ -148,14 +148,19 @@ check("Peinture & présentation V4.1 présents", vs_ok, "VS plein corps face à 
 
 # 24. Graphismes AAA V4.2 : peinture cylindrique, rim light d'arène, visage peint,
 #     rayons/poussières d'ambiance et avant-plans de profondeur par arène.
-aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html)
+aaa_ok = all(x in js["render"] for x in ('createLinearGradient(mx-nx*hw','renderStats.cylinderShading=true','renderStats.rimLight=rimColor','renderStats.facePaint','function drawAmbientLife()','renderStats.ambientMotes=n','function drawForegroundDepth()','renderStats.foregroundDepth=id','drawForegroundDepth();','artDirection:"Graphismes AAA V4.2"')) and ('V4.2 PRO' in html or 'V4.3 PRO' in html or 'V4.4 PRO' in html)
 check("Graphismes AAA V4.2 présents", aaa_ok, "peinture cylindrique + lumière d'arène + ambiance + avant-plans de profondeur")
 
 # 25. Roster complet des planches V4.3 : les 35 designs des 3 planches du propriétaire
 #     jouables (41 combattants avec les 6 historiques), morphologies dédiées.
 board_ids = ("Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion")
-roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and 'GAME_VERSION="4.3.0"' in js["engine"] and 'V4.3 PRO' in html and 'ROSTER PLANCHES COMPLET' in css
+roster_ok = all(('id:"%s"' % i) in js["engine"] for i in board_ids) and js["render"].count("headR:") >= 41 and ('GAME_VERSION="4.3.0"' in js["engine"] or 'GAME_VERSION="4.4.0"' in js["engine"]) and 'PRO' in html and 'ROSTER PLANCHES COMPLET' in css
 check("Roster complet des planches V4.3 présent", roster_ok, "35 personnages des planches + 41 morphologies + grille de sélection dense")
+
+# 26. Navigation Pro & tenues de combat peintes V4.4 : recherche/filtres roster,
+#     barres d'action fixes, grilles à défilement interne, vêtements peints.
+nav_ok = all(x in html for x in ('id="rosterSearch"','filterChip','id="rosterCount"','stickyActions')) and all(x in js["ui"] for x in ('function applyRosterFilter()','function rosterMatches(','function bindRosterTools()','gridTemplateColumns','renderStats.rosterVisible')) and all(x in css for x in ('.rosterTools','.stickyActions','.filterChip.on')) and all(x in js["render"] for x in ('Tenues de combat peintes V4.4','renderStats.torsoPaint')) and 'GAME_VERSION="4.4.0"' in js["engine"] and 'V4.4 PRO' in html
+check("Navigation Pro & tenues peintes V4.4 présents", nav_ok, "recherche + filtres par famille + actions fixes + ouverture/col/plis peints")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

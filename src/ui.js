@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V4.3 PRO — ARCADE PLEIN ÉCRAN, ROSTER PLANCHES COMPLET & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.4 PRO — NAVIGATION PRO, ARCADE PLEIN ÉCRAN & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -88,6 +88,7 @@ function isCharLocked(c){ return !!(c.unlockKey&&!(PROFILE.unlocks&&PROFILE.unlo
    dans chaque carte de sélection et en grand dans les aperçus. Le contexte principal
    est échangé le temps du dessin (ctx est un « let »), toujours restauré. */
 let portraitCards=[],portraitTick=0,previewRigs=null;
+let rosterFilter="tous",rosterSearch="";
 const portraitFighterCache={};
 function portraitFighterFor(index,side){
   const key=side+":"+index;
@@ -176,20 +177,54 @@ function updateSelectPortraits(){
 /* Navigation clavier dans la grille de sélection (flèches : gauche/droite/haut/bas). */
 document.addEventListener("keydown",e=>{
   const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden")||state!=="select")return;
-  const step=e.code==="ArrowRight"?1:e.code==="ArrowLeft"?-1:e.code==="ArrowDown"?3:e.code==="ArrowUp"?-3:0;
+  let cols=3; try{ cols=Math.max(1,getComputedStyle(menu.querySelector("#rosterP1")).gridTemplateColumns.split(" ").length); }catch(_){ }
+  const step=e.code==="ArrowRight"?1:e.code==="ArrowLeft"?-1:e.code==="ArrowDown"?cols:e.code==="ArrowUp"?-cols:0;
   if(!step)return; e.preventDefault();
   let n=selCharP1;
-  for(let k=0;k<CHARACTERS.length;k++){ n=(n+step+CHARACTERS.length)%CHARACTERS.length; if(!isCharLocked(CHARACTERS[n]))break; }
-  if(n!==selCharP1){ selCharP1=n; saveSelection(); refreshSelect(); }
+  for(let k=0;k<CHARACTERS.length;k++){ n=(n+step+CHARACTERS.length)%CHARACTERS.length; if(!isCharLocked(CHARACTERS[n])&&rosterMatches(CHARACTERS[n]))break; }
+  if(n!==selCharP1){ selCharP1=n; saveSelection(); refreshSelect(); const selCard=document.querySelector("#rosterP1 .charCard.sel"); if(selCard&&typeof selCard.scrollIntoView==="function")selCard.scrollIntoView({block:"nearest"}); }
 });
 
+/* Navigation Pro V4.4 (Lena) : recherche + filtres par famille sur les 41 cartes. */
+function rosterMatches(c){
+  if(!c)return false;
+  if(rosterSearch&&!(c.name+" "+c.title).toLowerCase().includes(rosterSearch))return false;
+  switch(rosterFilter){
+    case "rapide": return c.speed>=1.12;
+    case "colosse": return c.hp>=112;
+    case "energie": return c.energyGain>=1.3;
+    case "tech": return c.style==="synthetique"||["nyx","korben","sera","raven","zara-nova","orion","drakesh"].includes(c.id);
+    case "lames": return c.style==="guerrier"||c.style==="kunoichi";
+    default: return true;
+  }
+}
+function applyRosterFilter(){
+  let visible=0;
+  document.querySelectorAll("#rosterP1 .charCard,#rosterP2 .charCard").forEach(card=>{
+    if(card.dataset.idx===undefined){card.style.display="";return;}
+    const show=rosterMatches(CHARACTERS[+card.dataset.idx]);
+    card.style.display=show?"":"none";
+    if(show&&card.parentElement&&card.parentElement.id==="rosterP1")visible++;
+  });
+  const el=$("rosterCount"); if(el)el.textContent=visible+" / "+CHARACTERS.length+" combattants";
+  renderStats.rosterVisible=visible;
+}
+function bindRosterTools(){
+  const input=$("rosterSearch"); if(!input||input.dataset.bound)return; input.dataset.bound="1";
+  input.addEventListener("input",()=>{ rosterSearch=input.value.trim().toLowerCase(); applyRosterFilter(); });
+  document.querySelectorAll(".filterChip").forEach(chip=>chip.addEventListener("click",()=>{
+    rosterFilter=chip.dataset.f||"tous";
+    document.querySelectorAll(".filterChip").forEach(c=>c.classList.toggle("on",c===chip));
+    applyRosterFilter();
+  }));
+}
 function buildRosters(){
   portraitCards=[];
   const build=(container,side,selected,allowRandom)=>{
     container.innerHTML="";
     CHARACTERS.forEach((c,i)=>{
       const sk=effectiveSkin(c,side),btn=document.createElement("button"),locked=isCharLocked(c);
-      btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button";
+      btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button"; btn.dataset.idx=i;
       btn.style.setProperty("--cc",locked?"#546e7a":sk.primary); btn.style.setProperty("--ca",locked?"#ffc400":sk.accent);
       btn.innerHTML=locked
         ?"<span class='portraitWrap'><span class='portraitFallback'>🔒</span></span><b>??? SECRET</b><small>Personnage légendaire</small><small>"+escapeHTML(c.lockedHint||"À débloquer")+"</small>"
@@ -214,6 +249,7 @@ function buildRosters(){
   $("rosterP2").style.pointerEvents=autoP2?"none":"auto";
   $("arenaRow").style.opacity=(pendingMode==="story"||pendingMode==="survival")?.5:1;
   $("arenaRow").style.pointerEvents=(pendingMode==="story"||pendingMode==="survival")?"none":"auto";
+  bindRosterTools(); applyRosterFilter();
 }
 function buildArenaCards(){
   const row=$("arenaRow"); row.innerHTML="";

@@ -121,7 +121,12 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 ## ✅ V4.0 — « Arcade plein écran & anatomie HD » *(LIVRÉ le 24/10/2026 — 287 assertions source / 331 vérifications, suite verte)*
 - 🖥️ Nouvelle direction du propriétaire (« quitter le mini-jeu ») : coque **100 % viewport**, scène 16:9 maximale, barre système intégrée à la scène et masquée en combat, aucun pied de page ni panneau extérieur.
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
-- 🔜 Trajectoire V4 : V4.1, V4.2 et V4.3 livrées ci-dessous. Priorités du propriétaire : d'abord le visuel AAA (V4.2 livrée), puis l'intégration de TOUS les personnages des planches (V4.3 livrée). Next : V4.4 Graphismes AAA II (volumes peints torse/vêtements, ombres directionnelles, impacts en sprites) ; puis V4.5 compétition locale/tournoi ; V4.6 approfondissement Online public (selon validation réseau réelle).
+- 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Next : V4.5 Graphismes AAA II (ombres portées directionnelles, impacts en sprites, tenues fidèles aux planches : capuches, robes, fourrures) ; puis V4.6 compétition locale/tournoi ; V4.7 approfondissement Online public (selon validation réseau réelle).
+
+## ✅ V4.4 — « Navigation Pro & Tenues de combat » *(LIVRÉ le 24/10/2026 — 327 assertions source / 561 vérifications, suite verte)*
+
+- **Navigation de sélection professionnelle** : recherche instantanée, filtres par famille avec compteur, barres d'action fixes, grilles à défilement interne, clavier par colonnes réelles.
+- **Tenues de combat peintes** : ouverture, col et plis du tissu sur les 41 combattants.
 
 ## ✅ V4.3 — « Roster complet des planches » *(LIVRÉ le 24/10/2026 — 317 assertions source / 553 vérifications, suite verte)*
 
