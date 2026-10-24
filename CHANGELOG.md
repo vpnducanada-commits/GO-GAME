@@ -3,6 +3,55 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.1.0] — 2026-10-24 — « Tournoi & Saisons »
+
+Sprint de compétition locale qui suit la roadmap après l’Anatomie AAA : le
+Championnat reste la tournée linéaire de la Carrière, tandis qu’un nouveau
+mode **Tournoi** ajoute de vrais tableaux à élimination directe et une
+progression de saison durable.
+
+### Ajouté — Brackets locaux 4 / 8 / 16 (Nadia + Manager)
+- **Coupe Express** (4 participants), **Coupe Godson** (8) et **Coupe des
+  Légendes** (16), avec difficultés et arènes progressives par tour.
+- Entrants CPU uniques, cote de combattant transparente et ordre classique
+  des têtes de série ; GODSON PRIME est garanti dans la Coupe des Légendes
+  lorsque le joueur ne l’a pas choisi.
+- Les matchs du joueur utilisent la simulation normale. Les autres affiches
+  sont résolues par un hash déterministe propre à la graine du bracket et
+  une probabilité fondée sur l’écart de cote, sans toucher au hasard des
+  replays ni au lockstep.
+- En cas d’élimination, le reste du tableau est simulé jusqu’au champion
+  CPU ; le classement du joueur reste enregistré et consultable.
+
+### Ajouté — Saison 1 « Aurore de Libreville » (Nadia + Lena)
+- Les points de saison sont attribués **une seule fois, à la fin du
+  tournoi**, selon le classement, plus 10 points par victoire du joueur.
+  Abandonner un bracket ne donne aucun point.
+- Cinq paliers à 100, 250, 500, 900 et 1 400 points offrent XP, Godson et
+  trois titres équipables ; statistiques, historique et dernier bracket
+  sont persistés localement.
+- Quatre nouvelles quêtes de carrière couvrent le premier tournoi, le
+  premier titre, 500 points de saison et la triple couronne des trois coupes.
+- Une future saison archivera l’ancienne avant réinitialisation ; la Saison 1
+  n’expire pas automatiquement en V7.1.
+
+### Ajouté — Interface de tournoi (Lena)
+- Carte **Tournoi & Saisons** au menu principal, écran dédié avec formats,
+  progression de saison, bracket horizontal par tour, actions et historique.
+- Section Carrière, objectif prioritaire du hub lorsqu’un bracket est actif
+  et retour direct au tableau après chaque match, sans revanche parasite.
+- Le combattant peut changer avant le premier match, puis reste verrouillé ;
+  adversaire, difficulté et arène du tour sont imposés par le bracket.
+
+### Garanti
+- **453 assertions source / 689 vérifications affichées** vertes et contrôle
+  QA n°34 ; migration des anciens profils, reprise d’un bracket actif et
+  protection anti-double-gain testées de bout en bout.
+- Simulation déterministe, hitboxes, dégâts, M1, replays, Online 1v1,
+  2v2 Relais local et repli 2D préservés.
+- Bundle **655 Ko** (671 709 octets, budget V7 ≤ 704 Ko).
+  Détail : `docs/SPRINT_V71_TOURNOI_SAISONS.md`.
+
 ## [7.0.0] — 2026-10-24 — « Anatomie AAA »
 
 Sprint visuel majeur demandé après la V6.1 : dépasser l’aspect « poupée » et

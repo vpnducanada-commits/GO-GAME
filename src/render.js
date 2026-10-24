@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.0 — ANATOMIE AAA 3D + GRAPHISMES AAA II 2D, M1 SIGNATURE & ROSTER 41
+   Godson FURY ARENA V7.1 — ANATOMIE AAA 3D + GRAPHISMES AAA II 2D, M1 SIGNATURE & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -9,7 +9,7 @@ const glowCache=new Map();
 const impactSpriteCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D V7.0 — Anatomie AAA (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:""};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D V7.1 — Anatomie AAA & Tournoi (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:""};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -286,7 +286,7 @@ function drawBillboard(title,sub){
   ctx.font="1000 12.5px 'Segoe UI',Arial"; ctx.fillStyle="#ffe082"; ctx.fillText("★ Arena Championship ★",640,69);
   ctx.font="800 10px 'Segoe UI',Arial"; ctx.fillStyle="rgba(255,255,255,.85)"; ctx.fillText(sub,640,87); ctx.restore();
 }
-function modeLabel(){ return state==="menu"||state==="select"?"CHOISIS TON MODE DE JEU":(mode==="story"?"MODE HISTOIRE • COMBAT "+story.step+"/"+story.total:mode==="survival"?"MODE SURVIE • VAGUE "+survival.wave:mode==="arcade"?((arcade.circuitName||"CHAMPIONNAT Godson").toUpperCase()+" • COMBAT "+arcade.stage+"/"+arcadeTotal()):mode==="training"?"MODE ENTRAÎNEMENT":mode==="bot"?"MODE BOT • "+DIFFS[botDiff].label.toUpperCase():"MODE 2 JOUEURS"); }
+function modeLabel(){ return state==="menu"||state==="select"?"CHOISIS TON MODE DE JEU":(mode==="story"?"MODE HISTOIRE • COMBAT "+story.step+"/"+story.total:mode==="survival"?"MODE SURVIE • VAGUE "+survival.wave:mode==="arcade"?((arcade.circuitName||"CHAMPIONNAT Godson").toUpperCase()+" • COMBAT "+arcade.stage+"/"+arcadeTotal()):mode==="tournament"?("TOURNOI Godson • "+(((typeof tournamentCurrentMatch==="function"&&tournamentCurrentMatch())||{}).roundName||"BRACKET").toUpperCase()):mode==="training"?"MODE ENTRAÎNEMENT":mode==="bot"?"MODE BOT • "+DIFFS[botDiff].label.toUpperCase():"MODE 2 JOUEURS"); }
 function drawStadium(){
   ctx.fillStyle=arenaCache.sky; ctx.fillRect(-220,-60,1720,H+120);
   ctx.save(); ctx.globalAlpha=.95; ctx.drawImage(glowSprite("#ff9800"),640-235,215-235,470,470); ctx.restore();

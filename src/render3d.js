@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.0 — ANATOMIE AAA & RÉALITÉ 3D (WebGL maison, zéro dépendance)
+   Godson FURY ARENA V7.1 — ANATOMIE AAA & RÉALITÉ 3D (WebGL maison, zéro dépendance)
    Personnages humanoïdes articulés, arènes en profondeur, caméra combat.
    La simulation reste celle du moteur déterministe : ce module ne fait
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.

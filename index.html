@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>Godson FURY ARENA V7.0 | L’Arène des Légendes — signé Gédéon - Godson</title>
+<title>Godson FURY ARENA V7.1 | L’Arène des Légendes — signé Gédéon - Godson</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%23ff7a00%27/%3E%3Ctext x=%2732%27 y=%2744%27 text-anchor=%27middle%27 font-family=%27Arial%27 font-size=%2738%27 font-weight=%27900%27 fill=%27white%27%3EG%3C/text%3E%3C/svg%3E">
 <link rel="stylesheet" href="src/style.css">
 </head>
@@ -18,7 +18,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>Godson <span>FURY</span> ARENA <em>V7.0</em></h1>
+        <h1>Godson <span>FURY</span> ARENA <em>V7.1</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -88,14 +88,14 @@
         <h2>GÉDÉON<br>GODSON</h2>
         <div class="arena">A R E N A</div>
       </div>
-      <div class="signed">✍️ Créé &amp; signé par <span>Gédéon - Godson</span> © 2026 • L’ARÈNE DES LÉGENDES • M1 SIGNATURE</div>
+      <div class="signed">✍️ Créé &amp; signé par <span>Gédéon - Godson</span> © 2026 • L’ARÈNE DES LÉGENDES • M1 SIGNATURE • TOURNOI &amp; SAISONS</div>
       <section class="careerHub" aria-label="Progression de carrière">
         <div class="careerHubTop">
           <div class="careerHubId"><span id="hubCareerRank">🎓 Débutant</span><b id="hubCareerLevel">NIVEAU 1</b><small id="hubCareerTitle">Ta légende commence ici</small></div>
           <div class="careerHubWallet"><b id="hubCareerCoins">🪙 0 Godson</b><small id="hubCareerXp">0 / 100 XP — prochain niveau</small></div>
         </div>
         <div class="xpBar"><i id="hubXpFill"></i></div>
-        <div class="careerHubBottom"><p id="hubNextObjective">🎯 Prochain objectif : termine ton premier match.</p><button type="button" class="btn gold" id="btnCareer">🏆 Carrière &amp; Championnat</button></div>
+        <div class="careerHubBottom"><p id="hubNextObjective">🎯 Prochain objectif : termine ton premier match.</p><button type="button" class="btn gold" id="btnCareer">🏆 Carrière, Tournoi &amp; Championnat</button></div>
       </section>
       <div class="hubSection">🎮 JOUER — CAMPAGNE &amp; DUELS</div>
       <button class="storyBanner" id="btnModeStory"><span class="sbIc">📖</span><span class="sbTx"><b>CAMPAGNE — SAGA Gideon - Godson</b><small id="storyProgressLabel">6 combats • Boss ultime GODSON PRIME 👑</small></span><span class="sbGo">JOUER ▶</span></button>
@@ -107,6 +107,7 @@
         <button class="modeCard mc-arc" id="btnModeArcade"><span class="ic">🏆</span><b>CHAMPIONNAT</b><small>Circuit Stade rapide • 3 circuits dans Carrière</small></button>
         <button class="modeCard mc-surv" id="btnModeSurvival"><span class="ic">🌊</span><b>SURVIE</b><small>Vagues infinies</small></button>
         <button class="modeCard mc-tr" id="btnModeTraining"><span class="ic">🥋</span><b>ENTRAÎNEMENT</b><small>M1 Signature sur mannequin</small></button>
+        <button class="modeCard mc-tournament" id="btnModeTournament"><span class="ic">🌅</span><b>TOURNOI &amp; SAISONS</b><small>Brackets 4 / 8 / 16 • Saison 1 — Aurore de Libreville • points, paliers et titres</small></button>
       </div>
       <div class="hubSection">🏆 PROGRESSION, COLLECTION &amp; OPTIONS</div>
       <div class="btnRow">
@@ -319,16 +320,41 @@
     <!-- CARRIÈRE & CHAMPIONNAT V5 -->
     <div class="overlay hidden" id="menuCareer">
       <div class="panel careerPanel">
-        <h3>🏆 Carrière Godson — Édition Jeu Complet</h3>
+        <h3>🏆 Carrière Godson — Tournoi &amp; Saisons</h3>
         <div id="careerSummary"></div>
         <div class="careerGrid">
           <section class="careerSection"><h4>🏟️ Championnat Godson</h4><div id="circuitList" class="circuitList"></div></section>
           <section class="careerSection"><h4>🎯 Quêtes de carrière</h4><div id="questList" class="questList"></div></section>
           <section class="careerSection"><h4>🎁 Récompenses &amp; titres</h4><div id="careerShop" class="questList"></div></section>
           <section class="careerSection"><h4>🗺️ Parcours du jeu</h4><div id="careerJourney"></div></section>
+          <section class="careerSection tournamentCareerSection"><h4>🌅 Tournoi &amp; Saisons</h4><div id="careerTournament"></div></section>
         </div>
       </div>
       <button class="btn dark" id="btnCareerBack">⬅ Retour au hub</button>
+    </div>
+
+    <!-- TOURNOI LOCAL & SAISONS V7.1 -->
+    <div class="overlay hidden" id="menuTournament">
+      <h3>🏆 TOURNOI &amp; SAISONS</h3>
+      <p class="flowStep" id="tournamentSub">Saison 1 — Aurore de Libreville • Brackets locaux 4, 8 et 16</p>
+      <div class="tournamentPanel">
+        <div class="tournamentStatus" id="tournamentStatus">Choisis une coupe pour générer le tableau.</div>
+        <div id="tournamentSummary"></div>
+        <h4 class="tournamentSectionTitle">🎟️ Choisis ta coupe</h4>
+        <div class="tournamentFormats" id="tournamentFormats"></div>
+        <h4 class="tournamentSectionTitle">🏟️ Tableau du tournoi</h4>
+        <div id="tournamentBracket"></div>
+        <div class="btnRow tournamentActions">
+          <button class="btn green" id="btnTournamentPlay">⚔️ Jouer le match</button>
+          <button class="btn blue" id="btnTournamentChangeChar">🔀 Choisir / changer de combattant<small>Possible avant le premier match</small></button>
+          <button class="btn dark" id="btnTournamentCareer">🏆 Carrière</button>
+          <button class="btn red" id="btnTournamentAbandon">🏳️ Abandonner le bracket<small>Aucun point de saison</small></button>
+        </div>
+        <h4 class="tournamentSectionTitle">🗂️ Historique de saison</h4>
+        <div id="tournamentHistory"></div>
+        <p class="miniNote">Les affiches CPU sont simulées selon la cote des combattants et la graine du bracket. Si tu es éliminé, le tableau se termine pour révéler le champion CPU. Les points de saison sont attribués une seule fois, à la fin du tournoi.</p>
+      </div>
+      <div class="btnRow"><button class="btn dark" id="btnTournamentBack">⬅ Menu principal</button></div>
     </div>
 
     <!-- DÉFIS & CARRIÈRE -->
@@ -472,7 +498,7 @@
     <button id="btnPauseFloat" aria-label="Pause" title="Pause">⏸</button>
   </div>
 
-  <footer>✍️ <strong>Godson FURY ARENA V7.0</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Godson FURY ARENA V7.1</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>

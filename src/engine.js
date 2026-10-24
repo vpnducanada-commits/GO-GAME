@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.0 — ANATOMIE AAA, MAQUETTES VIVANTES, 2V2 RELAIS & RÉALITÉ 3D
+   Godson FURY ARENA V7.1 — TOURNOI & SAISONS, ANATOMIE AAA, 2V2 RELAIS & RÉALITÉ 3D
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.0.0";
+const GAME_VERSION="7.1.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -32,7 +32,7 @@ function defaultProfile(){ return {
   stats:{wins:0,losses:0,matches:0,bestCombo:0,bestComboDamage:0,arcadeClears:0,bestSurvivalWave:0,survivalRuns:0,bestParriesMatch:0,totalParries:0},
   unlocks:{prime:false,librevilleSkin:false},
   story:{progressStep:1,completed:false,clears:0,chapter1Completed:false,chapter2Completed:false,chapter2Clears:0},
-  career:{xp:0,Godson:0,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""},
+  career:{xp:0,Godson:0,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:"",season:{id:"saison-1-aurore",points:0,claimed:{},tournaments:0,matchWins:0,titles:{express:0,godson:0,legendes:0},bestPlacementRank:0,bestPlacement:"",history:[],archive:[],lastTournament:null},activeTournament:null},
   leaderboard:[],
   ach:{}
 };}
@@ -40,7 +40,8 @@ function normalizeProfileData(p){
   const d=defaultProfile(),src=p&&typeof p==="object"?p:{};
   const normalized={...d,...src,settings:{...d.settings,...(src.settings||{})},names:{...d.names,...(src.names||{})},initials:{...d.initials,...(src.initials||{})},customColors:{...d.customColors,...(src.customColors||{})},selection:{...d.selection,...(src.selection||{})},stats:{...d.stats,...(src.stats||{})},unlocks:{...d.unlocks,...(src.unlocks||{})},story:{...d.story,...(src.story||{})},leaderboard:Array.isArray(src.leaderboard)?src.leaderboard:[],ach:src.ach||{}};
   const rawCareer=(src.career&&typeof src.career==="object")?src.career:{};
-  normalized.career={...d.career,...rawCareer,circuits:{...d.career.circuits,...(rawCareer.circuits||{})},questsClaimed:{...(rawCareer.questsClaimed||{})},fighterWins:{...(rawCareer.fighterWins||{})},titles:Array.isArray(rawCareer.titles)?rawCareer.titles.slice(0,24):[]};
+  const rawSeason=(rawCareer.season&&typeof rawCareer.season==="object")?rawCareer.season:{};
+  normalized.career={...d.career,...rawCareer,circuits:{...d.career.circuits,...(rawCareer.circuits||{})},questsClaimed:{...(rawCareer.questsClaimed||{})},fighterWins:{...(rawCareer.fighterWins||{})},titles:Array.isArray(rawCareer.titles)?rawCareer.titles.slice(0,32):[],season:{...d.career.season,...rawSeason,claimed:{...(rawSeason.claimed||{})},titles:{...d.career.season.titles,...(rawSeason.titles||{})},history:Array.isArray(rawSeason.history)?rawSeason.history.slice(0,12):[],archive:Array.isArray(rawSeason.archive)?rawSeason.archive.slice(0,12):[],lastTournament:(rawSeason.lastTournament&&typeof rawSeason.lastTournament==="object")?rawSeason.lastTournament:null},activeTournament:(rawCareer.activeTournament&&typeof rawCareer.activeTournament==="object")?rawCareer.activeTournament:null};
   if(!src.career){
     // Migration V5 : les anciens champions conservent leur passé sous forme d'XP et de Godson.
     normalized.career.xp=(normalized.stats.wins||0)*45+(normalized.stats.matches||0)*12+(normalized.stats.arcadeClears||0)*250+(normalized.stats.bestSurvivalWave||0)*20+(normalized.story.chapter1Completed?250:0)+(normalized.story.chapter2Completed?350:0);
@@ -55,17 +56,28 @@ function normalizeProfileData(p){
 let PROFILE=defaultProfile();
 try{ const raw=store.get(); if(raw)PROFILE=normalizeProfileData(JSON.parse(raw)); }catch(e){}
 let SETTINGS=PROFILE.settings;
-function saveProfile(){ SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
+function saveProfile(){ if(typeof syncTournamentToProfile==="function")syncTournamentToProfile(); SETTINGS=PROFILE.settings; store.set(JSON.stringify(PROFILE)); if(typeof syncProfileUI==="function")syncProfileUI(); }
 function exportProfileData(){ return JSON.parse(JSON.stringify(PROFILE)); }
 /* ---------------- CARRIÈRE V5 : XP, NIVEAUX, MONNAIE & TITRES ----------------
    La carrière relie tous les modes : chaque match terminé fait progresser le
    joueur, les championnats et la campagne offrent les plus grosses primes. */
 let lastCareerReward=null;
+let tournament=null,tournamentPendingFormat="godson";
 function careerData(){
   if(!PROFILE.career||typeof PROFILE.career!=="object")PROFILE.career=defaultProfile().career;
   const c=PROFILE.career;
   c.xp=Math.max(0,Math.floor(+c.xp||0)); c.Godson=Math.max(0,Math.floor(+c.Godson||0));
   if(!c.circuits||typeof c.circuits!=="object")c.circuits={stade:0,monde:0,legendes:0};
+  if(!c.season||typeof c.season!=="object")c.season=defaultProfile().career.season;
+  const season=c.season;
+  season.points=Math.max(0,Math.floor(+season.points||0)); season.tournaments=Math.max(0,Math.floor(+season.tournaments||0)); season.matchWins=Math.max(0,Math.floor(+season.matchWins||0));
+  season.bestPlacementRank=Math.max(0,Math.floor(+season.bestPlacementRank||0)); if(typeof season.bestPlacement!=="string")season.bestPlacement="";
+  if(!season.claimed||typeof season.claimed!=="object")season.claimed={};
+  if(!season.titles||typeof season.titles!=="object")season.titles={express:0,godson:0,legendes:0};
+  ["express","godson","legendes"].forEach(k=>{ season.titles[k]=Math.max(0,Math.floor(+season.titles[k]||0)); });
+  if(!Array.isArray(season.history))season.history=[]; if(!Array.isArray(season.archive))season.archive=[];
+  if(season.lastTournament&&typeof season.lastTournament!=="object")season.lastTournament=null;
+  if(c.activeTournament&&typeof c.activeTournament!=="object")c.activeTournament=null;
   if(!c.questsClaimed||typeof c.questsClaimed!=="object")c.questsClaimed={};
   if(!c.fighterWins||typeof c.fighterWins!=="object")c.fighterWins={};
   if(!Array.isArray(c.titles))c.titles=[];
@@ -101,6 +113,16 @@ function awardCareerForMatch(winner){
     c.bestStage=Math.max(c.bestStage||0,arcade.stage);
     if(localWin&&arcade.stage>=arcadeTotal()){ xp+=circuit.xp||250; coins+=circuit.coins||150; reason="🏆 "+circuit.name+" remporté"; }
   }
+  else if(mode==="tournament"){
+    const fmt=(typeof tournamentFormat==="function"&&tournament)?tournamentFormat(tournament.formatId):null,last=(tournament&&tournament.lastResult)||{};
+    const roundIndex=Math.max(0,last.roundIndex==null?(tournament?tournament.currentRound||0:0):last.roundIndex);
+    xp=34+roundIndex*8; coins=20+roundIndex*5; reason=(fmt?fmt.name:"Tournoi Godson")+" — "+(last.roundName||"match de bracket");
+    if(last.complete&&fmt){
+      if(last.placementRank===1){ xp+=fmt.xp||300; coins+=fmt.coins||180; reason="👑 "+fmt.name+" remporté — +"+(last.seasonPoints||0)+" pts de saison"; }
+      else if(last.placementRank===2){ xp+=Math.round((fmt.xp||300)*.45); coins+=Math.round((fmt.coins||180)*.45); }
+      else if(last.placementRank===3){ xp+=Math.round((fmt.xp||300)*.25); coins+=Math.round((fmt.coins||180)*.25); }
+    }
+  }
   if(localWin){ xp+=mode==="survival"?18:42; coins+=mode==="survival"?8:24; }
   if(subject&&subject.stats){
     if((subject.stats.maxCombo||0)>=6)xp+=15;
@@ -110,8 +132,66 @@ function awardCareerForMatch(winner){
   }
   return awardCareer(xp,coins,reason);
 }
+
+/* ---------------- SAISON LOCALE V7.1 : POINTS, PALIERS & RÉCOMPENSES ----------------
+   La Saison 1 — Aurore de Libreville transforme les résultats de tournoi en
+   progression durable. Aucun classement réseau n'est promis : les points
+   sont locaux, les récompenses sont purement cosmétiques/progression et
+   les anciennes saisons seront archivées avant tout redémarrage. */
+const CURRENT_SEASON={id:"saison-1-aurore",name:"Saison 1 — Aurore de Libreville",short:"Saison 1",icon:"🌅"};
+const SEASON_TIERS=[
+  {id:"aube",points:100,name:"Aube",icon:"🌤️",xp:100,coins:75,desc:"Premiers pas dans la saison."},
+  {id:"maree",points:250,name:"Marée",icon:"🌊",xp:175,coins:125,title:"Champion de la Marée",desc:"Titre de saison : Champion de la Marée."},
+  {id:"soleil",points:500,name:"Soleil de Libreville",icon:"☀️",xp:275,coins:200,desc:"Le soleil de Libreville brille sur ton bracket."},
+  {id:"couronne",points:900,name:"Couronne Aurore",icon:"👑",xp:450,coins:350,title:"Champion de l’Aurore",desc:"Titre de saison : Champion de l’Aurore."},
+  {id:"mythe",points:1400,name:"Mythe de Saison",icon:"🌌",xp:800,coins:600,title:"Mythe de l’Aurore",desc:"Titre ultime : Mythe de l’Aurore."}
+];
+function seasonData(){
+  const c=careerData(); let s=c.season;
+  if(!s||typeof s!=="object"){ c.season=defaultProfile().career.season; s=c.season; }
+  if(s.id!==CURRENT_SEASON.id){
+    const archive=Array.isArray(s.archive)?s.archive.slice(0,12):[];
+    if(s.id&&(s.points||s.tournaments)&&!archive.some(a=>a&&a.id===s.id))archive.unshift({id:s.id,points:s.points||0,tournaments:s.tournaments||0,matchWins:s.matchWins||0,titles:{...(s.titles||{})},bestPlacement:s.bestPlacement||"",bestPlacementRank:s.bestPlacementRank||0});
+    c.season={id:CURRENT_SEASON.id,points:0,claimed:{},tournaments:0,matchWins:0,titles:{express:0,godson:0,legendes:0},bestPlacementRank:0,bestPlacement:"",history:[],archive,lastTournament:null};
+    s=c.season;
+  }
+  return s;
+}
+function seasonTierForPoints(points){
+  let found=null; SEASON_TIERS.forEach(t=>{ if((points||0)>=t.points)found=t; }); return found;
+}
+function seasonProgress(){
+  const s=seasonData(),points=s.points||0,current=seasonTierForPoints(points),next=SEASON_TIERS.find(t=>points<t.points)||null;
+  const floor=current?current.points:0,span=next?Math.max(1,next.points-floor):1,into=points-floor;
+  return {season:CURRENT_SEASON,data:s,points,currentTier:current,nextTier:next,into,needed:span,pct:next?clamp(Math.round(into/span*100),0,100):100,tournaments:s.tournaments||0,matchWins:s.matchWins||0,bestPlacement:s.bestPlacement||"",bestPlacementRank:s.bestPlacementRank||0};
+}
+function awardSeasonPoints(points){
+  const s=seasonData(),gain=Math.max(0,Math.round(points||0)); s.points=(s.points||0)+gain; return gain;
+}
+function seasonRewardState(def){
+  const s=seasonData(),c=careerData();
+  return {eligible:(s.points||0)>=(def?def.points:Infinity),claimed:!!(def&&s.claimed[def.id]),owned:!!(def&&def.title&&c.titles.includes(def.title)),equipped:!!(def&&def.title&&c.title===def.title)};
+}
+function claimSeasonReward(id){
+  const def=SEASON_TIERS.find(t=>t.id===id); if(!def)return false;
+  const s=seasonData(),st=seasonRewardState(def); if(st.claimed||!st.eligible)return false;
+  s.claimed[def.id]=true;
+  const c=careerData();
+  if(def.title&&!c.titles.includes(def.title))c.titles.push(def.title);
+  if(def.title)c.title=def.title;
+  awardCareer(def.xp||0,def.coins||0,"Saison — palier "+def.name);
+  saveProfile();
+  return true;
+}
+function toggleSeasonTitle(id){
+  const def=SEASON_TIERS.find(t=>t.id===id); if(!def||!def.title)return false;
+  const c=careerData(),st=seasonRewardState(def); if(!st.claimed||!st.owned)return false;
+  c.title=st.equipped?"":def.title; saveProfile(); return true;
+}
+
 function applyProfileData(data){
   PROFILE=normalizeProfileData(data); SETTINGS=PROFILE.settings;
+  if(typeof syncTournamentFromProfile==="function")syncTournamentFromProfile();
   selCharP1=PROFILE.selection.charP1||0;
   selCharP2=PROFILE.selection.charP2==null?1:PROFILE.selection.charP2;
   selArenaId=PROFILE.selection.arena||"stadium";
@@ -251,7 +331,7 @@ function captureReplayMeta(seed){
   return {v:REPLAY_VERSION,gameVersion:GAME_VERSION,seed:seed>>>0,createdAt:Date.now(),mode,botDiff,arena:currentArena.id,arenaMood:currentArenaMood,arenaMoodPreference:selArenaMood,
     char1:p1.charIndex,char2:p2.charIndex,names:{p1:p1.name,p2:p2.name},
     settings:{roundTime:SETTINGS.roundTime,roundsWin:SETTINGS.roundsWin},
-    context:{storyStep:story.step,arcadeStage:arcade.stage,arcadeTotal:arcadeTotal(),arcadeCircuit:arcade.circuit||"stade",survivalWave:survival.wave,survivalScore:survival.score,team:(typeof teamMatchForReplay==="function"?teamMatchForReplay():null)},
+    context:{storyStep:story.step,arcadeStage:arcade.stage,arcadeTotal:arcadeTotal(),arcadeCircuit:arcade.circuit||"stade",survivalWave:survival.wave,survivalScore:survival.score,tournament:(typeof tournamentForReplay==="function"?tournamentForReplay():null),team:(typeof teamMatchForReplay==="function"?teamMatchForReplay():null)},
     start:{p1:snap(p1),p2:snap(p2)}};
 }
 function startReplayRecording(seed){
@@ -676,6 +756,7 @@ function buildDisplayNames(){
   else if(mode==="story")p2.name=currentStoryFight().foeName;
   else if(mode==="survival")p2.name=(survival.next&&survival.next.boss?"👑 BOSS — Vague ":"🌊 Vague ")+survival.wave;
   else if(mode==="arcade")p2.name="BOT "+arcade.stage+"/"+arcadeTotal();
+  else if(mode==="tournament")p2.name="🏆 "+(((typeof tournamentCurrentMatch==="function"&&tournamentCurrentMatch())||{}).roundName||"Tournoi");
   else p2.name="BOT "+DIFFS[botDiff].label.toUpperCase();
   p1.displayName=p1.name+" • "+p1.char.name;
   p2.displayName=p2.name+" • "+p2.char.name;
@@ -688,6 +769,225 @@ let arcade={stage:1,seq:[],lastWin:false,total:5,circuit:"stade",circuitName:"Ci
 function arcadeTotal(){ return Math.max(1,arcade.total||(arcade.seq&&arcade.seq.length)||5); }
 let story={step:1,total:STORY_CAMPAIGN.fights.length,lastWin:false};
 let survival={wave:1,score:0,lastWaveScore:0,lastWin:false,next:null,carryHealth:null,carryEnergy:0,recorded:false,runCounted:false};
+/* ---------------- TOURNOI LOCAL V7.1 : BRACKETS 4 / 8 / 16 ----------------
+   Nadia : le Championnat reste une tournée linéaire ; le Tournoi est un vrai
+   tableau à élimination directe. Le joueur dispute ses matchs en simulation
+   normale, les autres affiches sont résolues par une formule déterministe
+   fondée sur la graine du bracket et la cote des combattants. L'état est
+   sauvegardé dans la carrière : quitter le jeu ne perd jamais un bracket. */
+const TOURNAMENT_FORMATS={
+  express:{id:"express",name:"Coupe Express",icon:"⚡",size:4,xp:220,coins:140,diffs:["facile","difficile"],arenas:["stadium","Libreville"],placementPoints:{1:160,2:90,3:40},desc:"4 combattants, 2 victoires pour soulever la coupe."},
+  godson:{id:"godson",name:"Coupe Godson",icon:"🏆",size:8,xp:420,coins:260,diffs:["moyen","difficile","difficile"],arenas:["stadium","tokyo","temple"],placementPoints:{1:260,2:150,3:80,5:35},desc:"Le bracket signature : quarts, demis et grande finale."},
+  legendes:{id:"legendes",name:"Coupe des Légendes",icon:"👑",size:16,xp:750,coins:480,diffs:["moyen","difficile","difficile","difficile"],arenas:["temple","tokyo","stadium","Libreville"],placementPoints:{1:420,2:240,3:130,5:70,9:30},desc:"16 entrants et quatre tours vers la couronne. GODSON PRIME veille."}
+};
+function tournamentFormat(id){ return TOURNAMENT_FORMATS[id]||TOURNAMENT_FORMATS.godson; }
+function tournamentHash01(seed,salt){
+  let h=((seed>>>0)^Math.imul(((salt|0)+0x9e3779b9),0x85ebca6b))>>>0;
+  h=Math.imul(h^(h>>>13),0xc2b2ae35); h^=h>>>16; return (h>>>0)/4294967296;
+}
+function tournamentRating(charIndex){
+  const c=CHARACTERS[clamp(charIndex,0,CHARACTERS.length-1)]||CHARACTERS[0];
+  const rating=(c.hp||100)*.3+(c.power||1)*25+(c.speed||1)*15+(c.atkSpeed||1)*12+(c.energyGain||1)*10+(c.reach||1)*5;
+  return Math.round(rating*10)/10;
+}
+function tournamentSeedOrder(size){
+  let order=[1];
+  while(order.length<size){ const total=order.length*2+1,next=[]; order.forEach(seed=>{ next.push(seed,total-seed); }); order=next; }
+  return order.slice(0,size);
+}
+function tournamentRoundName(remaining){
+  return remaining>=16?"Huitièmes de finale":remaining===8?"Quarts de finale":remaining===4?"Demi-finales":remaining===2?"Finale":"Tournoi";
+}
+function defaultTournamentState(){
+  return {active:false,started:false,status:"idle",formatId:"godson",formatName:TOURNAMENT_FORMATS.godson.name,size:8,seed:0,playerChar:0,playerEntrant:-1,entrants:[],rounds:[],currentRound:0,currentMatch:-1,playerWins:0,champion:null,placement:"",placementRank:0,seasonPoints:0,seasonRecorded:false,lastResult:null,createdAt:0,updatedAt:0,completedAt:0};
+}
+function tournamentClone(value){ try{ return JSON.parse(JSON.stringify(value)); }catch(e){ return null; } }
+function normalizeTournamentState(raw){
+  if(!raw||typeof raw!=="object")return null;
+  const fmt=TOURNAMENT_FORMATS[raw.formatId]; if(!fmt||!Array.isArray(raw.entrants)||raw.entrants.length!==fmt.size||!Array.isArray(raw.rounds)||!raw.rounds.length)return null;
+  const t=tournamentClone(raw); if(!t)return null;
+  t.formatName=fmt.name; t.size=fmt.size; t.seed=(+t.seed||0)>>>0; t.playerChar=clamp(Math.floor(+t.playerChar||0),0,CHARACTERS.length-1);
+  t.currentRound=clamp(Math.floor(+t.currentRound||0),0,Math.max(0,t.rounds.length-1)); t.playerWins=Math.max(0,Math.floor(+t.playerWins||0));
+  t.playerEntrant=t.entrants.findIndex(e=>e&&e.player); if(t.playerEntrant<0)return null;
+  for(const e of t.entrants){ if(!e||!CHARACTERS[clamp(Math.floor(+e.char||0),0,CHARACTERS.length-1)])return null; e.char=clamp(Math.floor(+e.char||0),0,CHARACTERS.length-1); e.seed=Math.max(1,Math.floor(+e.seed||1)); e.rating=+e.rating||tournamentRating(e.char); e.player=!!e.player; }
+  t.active=t.status==="preview"||t.status==="active"; t.started=!!t.started;
+  return t;
+}
+function syncTournamentToProfile(){
+  const c=careerData();
+  if(tournament&&(tournament.status==="preview"||tournament.status==="active"))c.activeTournament=tournamentClone(tournament);
+  else c.activeTournament=null;
+  if(tournament&&tournament.status==="complete"&&tournament.seasonRecorded)seasonData().lastTournament=tournamentClone(tournament);
+  return c.activeTournament;
+}
+function syncTournamentFromProfile(){
+  const c=careerData(),s=seasonData();
+  tournament=normalizeTournamentState(c.activeTournament)||normalizeTournamentState(s.lastTournament)||defaultTournamentState();
+  tournamentPendingFormat=tournament.formatId||tournamentPendingFormat||"godson";
+  return tournament;
+}
+function persistTournamentState(){ syncTournamentToProfile(); saveProfile(); return tournament; }
+function tournamentEntrant(entry){ return typeof entry==="number"?(tournament&&tournament.entrants?tournament.entrants[entry]:null):entry; }
+function tournamentEntrantLabel(entry){
+  const e=tournamentEntrant(entry); if(!e)return "À déterminer";
+  const c=CHARACTERS[e.char]||{}; return (e.player?"🟦 ":"")+(c.name||"Combattant")+" • Tête de série "+(e.seed||"—");
+}
+function setupTournamentRun(formatId,playerChar,seed){
+  if(tournament&&tournament.started&&tournament.status==="active")return tournament;
+  const fmt=tournamentFormat(formatId||tournamentPendingFormat||"godson"),chosen=clamp(playerChar==null?selCharP1:Math.floor(+playerChar||0),0,CHARACTERS.length-1),actualSeed=(seed==null?makeReplaySeed():(+seed>>>0));
+  let candidates=CHARACTERS.map((c,i)=>i).filter(i=>i!==chosen);
+  candidates.sort((a,b)=>tournamentHash01(actualSeed,a*97+13)-tournamentHash01(actualSeed,b*97+13)||a-b);
+  let selected=candidates.slice(0,fmt.size-1);
+  const ensureElite=pool=>{ const elite=pool.find(i=>i!==chosen&&!selected.includes(i)); if(elite!=null&&!selected.some(i=>pool.includes(i)))selected[selected.length-1]=elite; };
+  if(fmt.id==="legendes")ensureElite([4]);
+  if(fmt.id==="godson")ensureElite([4,36,34,21]);
+  const ranked=[chosen,...selected].map(char=>({char,player:char===chosen,rating:tournamentRating(char)})).sort((a,b)=>b.rating-a.rating||a.char-b.char);
+  ranked.forEach((e,i)=>{ e.seed=i+1; });
+  const bySeed=new Map(ranked.map(e=>[e.seed,e])),entrants=tournamentSeedOrder(fmt.size).map(seedNo=>bySeed.get(seedNo));
+  const rounds=[],roundCount=Math.round(Math.log2(fmt.size));
+  for(let r=0;r<roundCount;r++){
+    const remaining=fmt.size>>r,matches=[];
+    for(let m=0;m<remaining/2;m++)matches.push({id:"R"+r+"M"+m,roundName:tournamentRoundName(remaining),a:r===0?m*2:null,b:r===0?m*2+1:null,winner:null,loser:null,score:[0,0],simulated:false,resultRecorded:false});
+    rounds.push({name:tournamentRoundName(remaining),matches});
+  }
+  tournament={active:true,started:false,status:"preview",formatId:fmt.id,formatName:fmt.name,size:fmt.size,seed:actualSeed,playerChar:chosen,playerEntrant:entrants.findIndex(e=>e.player),entrants,rounds,currentRound:0,currentMatch:-1,playerWins:0,champion:null,placement:"",placementRank:0,seasonPoints:0,seasonRecorded:false,lastResult:null,createdAt:Date.now(),updatedAt:Date.now(),completedAt:0};
+  tournamentPendingFormat=fmt.id;
+  simulateTournamentRound(0,false);
+  tournament.updatedAt=Date.now(); persistTournamentState();
+  return tournament;
+}
+function ensureTournamentForSelection(){
+  if(!tournament)syncTournamentFromProfile();
+  if(tournament&&tournament.started&&tournament.status==="active"){ selCharP1=tournament.playerChar; return tournament; }
+  if(!tournament||tournament.status==="idle"||tournament.status==="complete"||tournament.status==="abandoned"||tournament.formatId!==tournamentPendingFormat||tournament.playerChar!==selCharP1){
+    const keepSeed=tournament&&tournament.status==="preview"?tournament.seed:null;
+    return setupTournamentRun(tournamentPendingFormat,selCharP1,keepSeed);
+  }
+  return tournament;
+}
+function tournamentCurrentMatch(){
+  if(!tournament||!tournament.rounds||tournament.status==="idle"||tournament.status==="abandoned")return null;
+  const round=tournament.rounds[tournament.currentRound]; if(!round)return null;
+  const index=round.matches.findIndex(m=>m&&m.winner==null&&(m.a===tournament.playerEntrant||m.b===tournament.playerEntrant));
+  if(index<0)return null;
+  tournament.currentMatch=index;
+  return {...round.matches[index],roundIndex:tournament.currentRound,matchIndex:index,roundName:round.name};
+}
+function simulateTournamentMatch(roundIndex,matchIndex){
+  if(!tournament||!tournament.rounds[roundIndex])return false;
+  const match=tournament.rounds[roundIndex].matches[matchIndex]; if(!match||match.winner!=null||match.a==null||match.b==null)return false;
+  const a=tournament.entrants[match.a],b=tournament.entrants[match.b]; if(!a||!b)return false;
+  const pA=1/(1+Math.pow(10,-((a.rating||0)-(b.rating||0))/18)),roll=tournamentHash01(tournament.seed,1009+roundIndex*131+matchIndex*17+match.a*7+match.b*3);
+  const aWins=roll<pA,target=clamp(Math.floor(+SETTINGS.roundsWin||2),1,3),loserRoll=tournamentHash01(tournament.seed,7919+roundIndex*197+matchIndex*29+match.a*11+match.b*5);
+  const loserScore=target===1?0:(loserRoll<.42?target-1:loserRoll<.72&&target>2?1:0);
+  match.winner=aWins?match.a:match.b; match.loser=aWins?match.b:match.a;
+  match.score=aWins?[target,loserScore]:[loserScore,target]; match.simulated=true; match.resultRecorded=true;
+  return true;
+}
+function simulateTournamentRound(roundIndex,includePlayer){
+  if(!tournament||!tournament.rounds[roundIndex])return false;
+  let changed=false;
+  tournament.rounds[roundIndex].matches.forEach((match,i)=>{ if(includePlayer||!(match.a===tournament.playerEntrant||match.b===tournament.playerEntrant))changed=simulateTournamentMatch(roundIndex,i)||changed; });
+  return changed;
+}
+function advanceTournamentRoundIfReady(roundIndex){
+  if(!tournament||roundIndex>=tournament.rounds.length-1)return false;
+  const round=tournament.rounds[roundIndex],next=tournament.rounds[roundIndex+1];
+  if(!round||!next||round.matches.some(m=>m.winner==null))return false;
+  next.matches.forEach((match,i)=>{ match.a=round.matches[i*2].winner; match.b=round.matches[i*2+1].winner; });
+  if(tournament.currentRound===roundIndex)tournament.currentRound=roundIndex+1;
+  return true;
+}
+function tournamentChampionEntrant(){
+  if(!tournament||!tournament.rounds.length)return null;
+  const final=tournament.rounds[tournament.rounds.length-1].matches[0];
+  return final&&final.winner!=null?final.winner:null;
+}
+function simulateTournamentToEnd(){
+  if(!tournament)return false;
+  for(let guard=0;guard<12;guard++){
+    if(tournamentChampionEntrant()!=null)break;
+    const r=tournament.currentRound;
+    simulateTournamentRound(r,false);
+    if(r>=tournament.rounds.length-1)break;
+    if(!advanceTournamentRoundIfReady(r))break;
+  }
+  const champ=tournamentChampionEntrant(); if(champ!=null)tournament.champion=champ;
+  return champ!=null;
+}
+function tournamentPlacementForLoss(roundIndex){
+  const remaining=((tournament&&tournament.size)||8)>>Math.max(0,roundIndex||0);
+  if(remaining<=2)return {rank:2,label:"Finaliste"};
+  if(remaining===4)return {rank:3,label:"Demi-finaliste"};
+  if(remaining===8)return {rank:5,label:"Quart de finaliste"};
+  return {rank:9,label:"Huitième de finaliste"};
+}
+function recordTournamentCompletion(){
+  if(!tournament||tournament.seasonRecorded)return tournament?tournament.seasonPoints||0:0;
+  const fmt=tournamentFormat(tournament.formatId),s=seasonData();
+  const base=(fmt.placementPoints&&fmt.placementPoints[tournament.placementRank])||0,points=base+(tournament.playerWins||0)*10;
+  tournament.seasonPoints=points; tournament.seasonRecorded=true; tournament.status="complete"; tournament.active=false; tournament.completedAt=Date.now(); tournament.updatedAt=tournament.completedAt;
+  awardSeasonPoints(points);
+  s.tournaments=(s.tournaments||0)+1; s.matchWins=(s.matchWins||0)+(tournament.playerWins||0);
+  if(tournament.placementRank===1)s.titles[fmt.id]=(s.titles[fmt.id]||0)+1;
+  if(!s.bestPlacementRank||tournament.placementRank<s.bestPlacementRank){ s.bestPlacementRank=tournament.placementRank; s.bestPlacement=tournament.placement; }
+  const champ=tournament.entrants[tournament.champion];
+  s.history.unshift({date:tournament.completedAt,formatId:fmt.id,formatName:fmt.name,playerChar:tournament.playerChar,championChar:champ?champ.char:null,placement:tournament.placement,placementRank:tournament.placementRank,wins:tournament.playerWins||0,points});
+  s.history=s.history.slice(0,12);
+  s.lastTournament=tournamentClone(tournament);
+  careerData().activeTournament=null;
+  if(typeof unlock==="function"){
+    unlock("tournament-first","Premier tournoi terminé");
+    if(tournament.placementRank===1)unlock("tournament-"+fmt.id,"Champion — "+fmt.name);
+  }
+  return points;
+}
+function completeTournamentPlayerMatch(winner){
+  if(!tournament||replayPlayback.active||(winner!==p1&&winner!==p2))return false;
+  if(tournament.status!=="active"&&tournament.status!=="preview")return false;
+  const current=tournamentCurrentMatch(); if(!current)return false;
+  const match=tournament.rounds[current.roundIndex].matches[current.matchIndex]; if(!match||match.winner!=null)return false;
+  const playerWon=winner===p1,opponentEntrant=match.a===tournament.playerEntrant?match.b:match.a,target=clamp(Math.floor(+SETTINGS.roundsWin||2),1,3);
+  const playerScore=Math.max(playerWon?target:0,p1.roundWins||0),oppScore=Math.max(playerWon?0:target,p2.roundWins||0);
+  match.winner=playerWon?tournament.playerEntrant:opponentEntrant; match.loser=playerWon?opponentEntrant:tournament.playerEntrant;
+  match.score=match.a===tournament.playerEntrant?[playerScore,oppScore]:[oppScore,playerScore]; match.simulated=false; match.resultRecorded=true;
+  if(playerWon)tournament.playerWins=(tournament.playerWins||0)+1;
+  const isFinal=current.roundIndex>=tournament.rounds.length-1;
+  simulateTournamentRound(current.roundIndex,false);
+  if(playerWon&&isFinal){
+    tournament.champion=tournament.playerEntrant; tournament.placementRank=1; tournament.placement="Champion";
+  }else if(playerWon){
+    advanceTournamentRoundIfReady(current.roundIndex);
+    simulateTournamentRound(tournament.currentRound,false);
+  }else{
+    const placement=tournamentPlacementForLoss(current.roundIndex); tournament.placementRank=placement.rank; tournament.placement=placement.label;
+    simulateTournamentToEnd();
+  }
+  const complete=playerWon?isFinal:tournamentChampionEntrant()!=null;
+  let points=0; if(complete)points=recordTournamentCompletion();
+  tournament.lastResult={roundIndex:current.roundIndex,matchIndex:current.matchIndex,roundName:current.roundName,win:playerWon,complete:!!complete,champion:tournament.champion,placement:tournament.placement,placementRank:tournament.placementRank,seasonPoints:points,opponent:opponentEntrant};
+  if(complete&&seasonData().lastTournament)seasonData().lastTournament.lastResult=tournamentClone(tournament.lastResult);
+  tournament.updatedAt=Date.now(); persistTournamentState();
+  return true;
+}
+function tournamentCurrentOpponent(){
+  const current=tournamentCurrentMatch(); if(!current)return null;
+  const fmt=tournamentFormat(tournament.formatId),oppIndex=current.a===tournament.playerEntrant?current.b:current.a,opp=tournament.entrants[oppIndex];
+  if(!opp)return null;
+  return {char:opp.char,entrant:oppIndex,diff:fmt.diffs[current.roundIndex]||"difficile",arena:fmt.arenas[current.roundIndex%fmt.arenas.length]||currentArena.id,roundName:current.roundName,roundIndex:current.roundIndex,matchIndex:current.matchIndex,seed:opp.seed,rating:opp.rating};
+}
+function tournamentForReplay(){
+  if(!tournament||!(tournament.status==="active"||tournament.status==="preview"))return null;
+  const current=tournamentCurrentMatch();
+  return {formatId:tournament.formatId,seed:tournament.seed,roundIndex:current?current.roundIndex:tournament.currentRound,roundName:current?current.roundName:"",matchIndex:current?current.matchIndex:-1,playerChar:tournament.playerChar};
+}
+function abandonTournament(){
+  if(!tournament||!(tournament.status==="preview"||tournament.status==="active"))return false;
+  tournament.status="abandoned"; tournament.active=false; tournament.updatedAt=Date.now(); careerData().activeTournament=null; persistTournamentState();
+  return true;
+}
+syncTournamentFromProfile();
+
 /* V6.1 — 2v2 RELAIS : chaque joueur engage DEUX combattants. Le perdant
    d'une manche est éliminé et son partenaire entre immédiatement ; la
    première équipe à éliminer les deux adversaires gagne. Le format reste
@@ -1267,7 +1567,7 @@ function updateFighter(f,inp,op){
   if(vxSign)f.lastVXSign=vxSign;
   if(move!==0&&move===f.holdDir)f.holdT++; else {f.holdDir=move;f.holdT=0;}
   const runMul=f.grounded?1+Math.min(.3,f.holdT/160):1;
-  const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
+  const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="tournament"||mode==="story"||mode==="survival"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
   let target=move*4.7*f.char.speed*botMul*runMul*(f.grounded?1:.8);
   if(f.dashT>0)target=f.dashDir*12.4*f.char.speed;
   // Inertie humaine : accélération un peu plus progressive que le freinage, sans perdre la réactivité arcade.
@@ -1365,8 +1665,8 @@ function resetRound(){
   projectiles=[]; floaters=[]; rings=[]; ghosts=[]; impactBursts=[]; bot.queue=[]; bot.press={}; bot.lastFollowId=-1; bot.move=0; bot.blockT=0;
   timerSec=SETTINGS.roundTime; timerFrames=0; state="intro"; introT=132; announcedFight=false; lastWinner=null; cinematic=70;
   if(typeof buildPips==="function")buildPips();
-  $("roundLabel").textContent=teamMatch.active?("2V2 • MANCHE "+round+" • "+p1.roundWins+"–"+p2.roundWins):mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
-  announce(teamMatch.active?("MANCHE "+round):mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),teamMatch.active?(p1.char.name+" VS "+p2.char.name+" • "+teamScoreLabel()):mode==="arcade"?((arcade.circuitName||"Championnat Godson")+" — combat "+arcade.stage+" / "+arcadeTotal()):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
+  $("roundLabel").textContent=teamMatch.active?("2V2 • MANCHE "+round+" • "+p1.roundWins+"–"+p2.roundWins):mode==="arcade"?("CHAMPIONNAT "+arcade.stage+"/"+arcadeTotal()+" • ROUND "+round):mode==="tournament"?((((typeof tournamentCurrentMatch==="function"&&tournamentCurrentMatch())||{}).roundName||"TOURNOI").toUpperCase()+" • ROUND "+round):mode==="story"?("HISTOIRE "+story.step+"/"+story.total+" • ROUND "+round):mode==="survival"?("SURVIE • VAGUE "+survival.wave):("ROUND "+round);
+  announce(teamMatch.active?("MANCHE "+round):mode==="survival"?("VAGUE "+survival.wave):("ROUND "+round),teamMatch.active?(p1.char.name+" VS "+p2.char.name+" • "+teamScoreLabel()):mode==="arcade"?((arcade.circuitName||"Championnat Godson")+" — combat "+arcade.stage+" / "+arcadeTotal()):mode==="tournament"?((tournament?tournament.formatName:"Tournoi Godson")+" — "+(((typeof tournamentCurrentMatch==="function"&&tournamentCurrentMatch())||{}).roundName||"Bracket")):mode==="story"?currentStoryFight().chapter:mode==="survival"?("Score : "+survival.score+" • Un seul round !"):"Prêt… ?"); SFX.beep();
   if(typeof resetCamera==="function")resetCamera(true);
   if(typeof snapHUD==="function")snapHUD();
 }
@@ -1417,9 +1717,9 @@ function finishMatch(winner){
   if(replayPlayback.active){ finishReplayPlayback(winner); return; }
   finalizeReplayRecording(winner);
   state="matchEnd"; hideAnnounce(); stopMusic(); SFX.win(); confetti(); cinematic=0;
-  if(mode==="bot"||mode==="arcade"||mode==="story"||mode==="survival"){
+  if(mode==="bot"||mode==="arcade"||mode==="tournament"||mode==="story"||mode==="survival"){
     PROFILE.stats.matches++;
-    if(winner===p1){ PROFILE.stats.wins++; unlock("firstwin","Première victoire"); if(PROFILE.stats.wins>=10)unlock("wins10","Défi Habitué de l’Arène — 10 victoires"); if(botDiff==="difficile"&&mode==="bot")unlock("hardwin","Vaincre le bot Difficile"); }
+    if(winner===p1){ PROFILE.stats.wins++; unlock("firstwin","Première victoire"); if(PROFILE.stats.wins>=10)unlock("wins10","Défi Habitué de l’Arène — 10 victoires"); if(botDiff==="difficile"&&(mode==="bot"||mode==="tournament"))unlock("hardwin","Vaincre le bot Difficile"); }
     else PROFILE.stats.losses++;
     PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,p1.stats.parries||0);
   } else if(mode==="online"){
@@ -1469,6 +1769,7 @@ function finishMatch(winner){
     }
     survival.score+=survival.lastWaveScore;
   }
+  if(mode==="tournament"&&typeof completeTournamentPlayerMatch==="function")completeTournamentPlayerMatch(winner);
   awardCareerForMatch(winner);
   saveProfile();
   if(typeof showEndScreen==="function")showEndScreen(winner);

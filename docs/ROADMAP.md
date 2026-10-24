@@ -105,9 +105,9 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🥊 **Gel d'impact divisé par ~3** (14–48 ms au lieu de 42–105 ms, contre ×1,2, parry 38 ms) : plus aucun ralentissement perceptible sur les coups normaux ; ralenti conservé uniquement sur le K.O.
 - 🎯 Boucle d'affichage uniquement : déterminisme, replays et Online intacts ; board : `docs/SPRINT_V35_PRISE_EN_MAIN.md`
 
-## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
-- **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
-- **Manager** : historique de tournoi et récompenses cosmétiques locales
+## ✅ SPRINT 09 — « Compétition locale » *(livré en deux étapes : Championnat V5.0, puis Tournoi V7.1)*
+- **Nadia** : tournoi local en tableau 4/8/16 et simulation CPU fondée sur les données des combattants
+- **Manager** : historique, points de saison, paliers et titres locaux persistants
 
 ## 🌐 Après la V3.0 *(pistes, non engagées)*
 ## ✅ V3.6 — « Nouveaux Champions » *(LIVRÉ le 24/10/2026 — 263 assertions source / 307 vérifications, suite verte)*
@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.1 — « Tournoi & Saisons » *(LIVRÉ le 24/10/2026 — 453 assertions source / 689 vérifications, suite verte)*
+
+- **Arbitrage d’équipe** : le Championnat Godson reste une tournée linéaire ; le nouveau mode `tournament` est un vrai tableau à élimination directe, local et contrôlé par le bot.
+- **Trois coupes persistantes** : Express 4, Godson 8 et Légendes 16, avec entrants uniques, têtes de série classiques, difficultés/arènes par tour et combattant joueur verrouillé après le premier match.
+- **Simulation CPU déterministe** : cote fondée sur PV, puissance, vitesse, énergie, vitesse d’attaque et portée ; hash propre à la graine du bracket, sans utiliser le hasard des replays. Après une élimination, le tableau se termine et révèle le champion CPU.
+- **Saison 1 — Aurore de Libreville** : points de classement + 10 par victoire, crédités une seule fois à la fin ; cinq paliers XP/Godson et titres, statistiques, historique, dernier bracket et archivage préparé pour les saisons suivantes.
+- **Intégration complète** : carte du menu principal, écran Bracket/Saison, section Carrière, objectif du hub, quatre quêtes, contexte replay et retour de fin de match vers le tableau. Voir `docs/SPRINT_V71_TOURNOI_SAISONS.md`.
+- 🔜 Validation Online publique entre deux réseaux distincts et test terrain sur téléphones physiques ; aucun tournoi réseau ni classement de saison serveur n’est promis en V7.1.
+
 ## ✅ V7.0 — « Anatomie AAA » *(LIVRÉ le 24/10/2026 — 434 assertions source / 669 vérifications, suite verte)*
 
 - **Retour direct du propriétaire après V6.1** : les personnages devaient dépasser l’aspect « simples poupées » et viser la présentation des grandes licences 3D de combat, avec le budget nécessaire pour les graphismes et les FPS.
@@ -130,7 +139,7 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - **Matières et lumière** : atlas de huit matières, rugosité/métal/peau par sommet, bump par dérivées (WebGL1 ou GLSL ES 3.00 en WebGL2), éclairage PBR simplifié, ACES et shadow-map PCF cadencée.
 - **Performance** : écrivain de sommets brut, caches trigonométriques, sphères scalaires, LOD adaptatif et indices 32 bits ; gain CPU de génération mesuré d’environ 34 % à 48 % dans Chromium headless.
 - **Preuves Sarah** : contrôle QA n°33, hash déterministe inchangé et cinq captures avec atlas/ombres/bump actifs. Limite assumée : géométrie procédurale stylisée, pas encore de meshes auteur ni de mesure FPS sur téléphone physique. Voir `docs/SPRINT_V70_ANATOMIE_AAA.md`.
-- 🔜 **Tournoi & Saisons** (brackets locaux et récompenses), puis validation Online public entre deux réseaux distincts et test terrain deux téléphones physiques.
+- ↪️ **Tournoi & Saisons livré en V7.1 ci-dessus** ; prochaines validations : Online public entre deux réseaux distincts et test terrain sur téléphones physiques.
 
 ## ✅ V6.1 — « Maquettes Vivantes & 2v2 deux téléphones » *(LIVRÉ le 24/10/2026 — 426 assertions source / 661 vérifications, suite verte)*
 
