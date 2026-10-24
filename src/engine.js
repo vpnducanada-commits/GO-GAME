@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V6.1 — MAQUETTES VIVANTES, 2V2 RELAIS & RÉALITÉ 3D
+   Godson FURY ARENA V7.0 — ANATOMIE AAA, MAQUETTES VIVANTES, 2V2 RELAIS & RÉALITÉ 3D
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="6.1.0";
+const GAME_VERSION="7.0.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;

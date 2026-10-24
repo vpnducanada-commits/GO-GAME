@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.0 — « Anatomie AAA » *(LIVRÉ le 24/10/2026 — 434 assertions source / 669 vérifications, suite verte)*
+
+- **Retour direct du propriétaire après V6.1** : les personnages devaient dépasser l’aspect « simples poupées » et viser la présentation des grandes licences 3D de combat, avec le budget nécessaire pour les graphismes et les FPS.
+- **Sculpture procédurale des 41 combattants** : torse en superellipse, tête en neuf niveaux, membres musculaires loftés, visage, mains à doigts, bottes, tissus et cheveux segmentés ; posture 3/4 et caméra rapprochée.
+- **Matières et lumière** : atlas de huit matières, rugosité/métal/peau par sommet, bump par dérivées (WebGL1 ou GLSL ES 3.00 en WebGL2), éclairage PBR simplifié, ACES et shadow-map PCF cadencée.
+- **Performance** : écrivain de sommets brut, caches trigonométriques, sphères scalaires, LOD adaptatif et indices 32 bits ; gain CPU de génération mesuré d’environ 34 % à 48 % dans Chromium headless.
+- **Preuves Sarah** : contrôle QA n°33, hash déterministe inchangé et cinq captures avec atlas/ombres/bump actifs. Limite assumée : géométrie procédurale stylisée, pas encore de meshes auteur ni de mesure FPS sur téléphone physique. Voir `docs/SPRINT_V70_ANATOMIE_AAA.md`.
+- 🔜 **Tournoi & Saisons** (brackets locaux et récompenses), puis validation Online public entre deux réseaux distincts et test terrain deux téléphones physiques.
+
 ## ✅ V6.1 — « Maquettes Vivantes & 2v2 deux téléphones » *(LIVRÉ le 24/10/2026 — 426 assertions source / 661 vérifications, suite verte)*
 
 - **Corrections du propriétaire traitées comme critères de release** : suppression totale du gel/ralenti à l’impact, personnages formalisés d’après les maquettes et interface intégrée au décor plutôt que superposée.

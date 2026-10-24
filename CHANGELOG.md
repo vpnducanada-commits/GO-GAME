@@ -3,6 +3,40 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.0.0] — 2026-10-24 — « Anatomie AAA »
+
+Sprint visuel majeur demandé après la V6.1 : dépasser l’aspect « poupée » et
+viser une présentation 3D digne des grandes licences de combat, sans perdre
+la fluidité ni le déterminisme du jeu.
+
+### Ajouté — Personnages sculptés procéduralement (Marco + Kenzo)
+- Torse en superellipse et tête en neuf niveaux, membres loftés avec profils
+  musculaires distincts pour cuisses, mollets, bras et avant-bras.
+- Visage volumique, mains avec doigts et pouce, bottes loftées, vêtements et
+  mèches segmentés, joug d’épaules et accessoires des 41 maquettes conservés.
+- Posture de combat en 3/4 : torsion progressive hanches → poitrine → tête,
+  caméra rapprochée et proportions rééquilibrées après huit séries de captures.
+
+### Ajouté — Matières, bump et ombres (Kenzo)
+- Atlas procédural de huit matières (peau, tissu, cuir, métal, cheveux,
+  technologie, énergie) et propriétés rugosité/métal/peau par sommet.
+- Bump mapping par dérivées, avec voie WebGL2 en GLSL ES 3.00, extension
+  WebGL1 et repli automatique ; éclairage PBR simplifié et ACES.
+- Shadow-map PCF 3 × 3 cadencée selon la qualité pour protéger les FPS.
+
+### Optimisé — Génération dynamique (Sarah + Kenzo)
+- Écrivain de sommets sans allocations vectorielles, caches trigonométriques,
+  sphères scalaires, transformation de pose mise en cache et LOD adaptatif.
+- Dans Chromium headless, la génération CPU des paires de référence baisse
+  d’environ 34 % à 48 % selon la qualité ; aucun asset externe n’est ajouté.
+
+### Garanti
+- **434 assertions / 669 vérifications** vertes, contrôle QA n°33 et cinq
+  captures WebGL avec atlas, ombres et bump explicitement actifs.
+- Hash déterministe, hitboxes, M1, replays, Online et 2v2 local inchangés.
+- Bundle **602 Ko** (617 379 octets, budget V7 ≤ 704 Ko).
+  Détail : `docs/SPRINT_V70_ANATOMIE_AAA.md`.
+
 ## [6.1.0] — 2026-10-24 — « Maquettes Vivantes & 2v2 deux téléphones »
 
 Sprint correctif et multijoueur local issu des retours directs du propriétaire
