@@ -644,7 +644,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^3\.[56]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version V3.5+ affichée et exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -773,7 +773,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(ev('GAME_VERSION') === '3.6.0' && window.document.querySelector('h1').textContent.includes('V3.6 PRO'), 'version V3.6.0 exposée');
+  assert(/^3\.[67]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 9, 'identifiants uniques pour les 9 combattants');
@@ -797,6 +797,34 @@ function finishTestRun() {
   const uiSrcV36 = fs.readFileSync(path.join(root, 'src/ui.js'), 'utf8');
   assert(uiSrcV36.includes('normalPool=[0,1,2,3,5,6,7,8]') && uiSrcV36.includes('order=[0,1,2,3,5,6,7,8]'), 'Arcade et Survie peuvent présenter les nouveaux champions');
   assert(['planche-personnages-1.jpg', 'planche-personnages-2.jpg', 'planche-personnages-3.jpg'].every(f => fs.existsSync(path.join(root, 'assets/concepts', f))) && fs.existsSync(path.join(root, 'docs/CONCEPTS_PERSONNAGES.md')), 'planches du propriétaire archivées en art conceptuel officiel');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
+
+
+  console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
+  assert(ev('GAME_VERSION') === '3.7.0' && window.document.querySelector('h1').textContent.includes('V3.7 PRO'), 'version V3.7.0 exposée');
+  ev('goMenu()'); click('btnMode2P');
+  assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
+  assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
+  assert(window.document.querySelectorAll('#rosterP1 canvas.portraitCanvas').length >= 8, 'chaque carte affiche le portrait animé de son combattant');
+  const firstCard = window.document.querySelectorAll('#rosterP1 .charCard')[0];
+  assert(firstCard.style.getPropertyValue('--cc') === ev('effectiveSkin(CHARACTERS[0],1).primary') && firstCard.style.getPropertyValue('--ca'), 'bordure de carte aux couleurs du personnage (primaire + accent)');
+  assert(window.document.getElementById('previewBoxP1').style.getPropertyValue('--cc'), 'aperçu encadré aux couleurs du combattant choisi');
+  window.document.querySelectorAll('#rosterP1 .charCard')[7].click();
+  assert(window.document.getElementById('previewNameP1').textContent === 'SORA' && window.document.getElementById('previewStatsP1').innerHTML.includes('stat'), 'aperçu synchronisé : nom + statistiques du personnage choisi');
+  ev('renderStats.portraits=0; updateSelectPortraits(); updateSelectPortraits();');
+  for (let k = 0; k < 6; k++) ev('updateSelectPortraits()');
+  assert(ev('renderStats.portraits') > 0, 'portraits réellement dessinés par le moteur (' + ev('renderStats.portraits') + ' dessins)');
+  assert(ev('selCharP1') === 7, 'sélection clavier : point de départ SORA');
+  window.document.dispatchEvent(new window.KeyboardEvent('keydown', { code: 'ArrowRight', bubbles: true }));
+  assert(ev('selCharP1') === 8 && window.document.getElementById('previewNameP1').textContent === 'AEL-7', 'navigation clavier : flèche droite -> personnage suivant + aperçu mis à jour');
+  const renderSrcV37 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
+  assert(renderSrcV37.includes('const legW=20.2*human.limb') && renderSrcV37.includes('const armW=16.4*human.limb') && renderSrcV37.includes('updateSelectPortraits()'), 'corps pleins : jambes et bras volumineux + portraits branchés sur la boucle');
+  const cssV37 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
+  assert(cssV37.includes('@keyframes cardPulse') && cssV37.includes('@keyframes cardShine') && cssV37.includes('.previewBox') && cssV37.includes('border:3px solid var(--cc'), 'effets de bordure : halo pulsant, reflet balayant, cadre d’aperçu');
+  const engineSrcV37 = fs.readFileSync(path.join(root, 'src/engine.js'), 'utf8');
+  assert(engineSrcV37.includes('let ctx=canvas.getContext'), 'contexte échangeable pour les portraits (toujours restauré)');
+  for (let i = 0; i < 9; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); drawFighter(p1);`); }
+  assert(true, 'les 9 combattants aux corps pleins se rendent sans erreur');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n================ RÉSULTAT ================');

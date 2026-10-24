@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.6 PRO — RENDU HAUT GRAPHISME, NOUVEAUX CHAMPIONS & HUMANITÉ++
+   GÉDÉON - Godson ARENA V3.7 PRO — RENDU HAUT GRAPHISME, CORPS PLEINS & HUMANITÉ++
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -445,15 +445,15 @@ function limb(x1,y1,x2,y2,x3,y3,w,c,endC,endR){
    Les proportions restent stylisées arcade, mais la tête redevient celle
    d'un adulte et chaque combattant reçoit sa morphologie propre. */
 const HUMAN_PROFILES={
-  gideon:{label:"athlète équilibré",headR:17.4,jaw:.68,neck:9,shoulder:22,hip:17,limb:1,hair:"court texturé",beard:.2,brow:.72},
-  kira:{label:"sprinteuse agile",headR:16.5,jaw:.48,neck:7.4,shoulder:18.4,hip:16.2,limb:.86,hair:"queue haute",beard:0,brow:.62},
+  gideon:{label:"athlète équilibré",headR:17.4,jaw:.68,neck:9,shoulder:22,hip:17,limb:1.06,hair:"court texturé",beard:.2,brow:.72},
+  kira:{label:"sprinteuse agile",headR:16.5,jaw:.48,neck:7.4,shoulder:18.4,hip:16.2,limb:.95,hair:"queue haute",beard:0,brow:.62},
   titan:{label:"colosse puissant",headR:17.8,jaw:.94,neck:12.2,shoulder:28,hip:20,limb:1.28,hair:"rasé",beard:.52,brow:.92},
-  nova:{label:"stratège élancée",headR:16.8,jaw:.52,neck:8,shoulder:19.6,hip:16.8,limb:.92,hair:"long ondulé",beard:0,brow:.58},
-  "godson-prime":{label:"champion royal",headR:17.5,jaw:.72,neck:10,shoulder:23.4,hip:18,limb:1.05,hair:"court royal",beard:.16,brow:.76},
-  zara:{label:"vague athlétique",headR:16.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:.94,hair:"tresses marines",beard:0,brow:.6},
-  kael:{label:"guerrier cuirassé",headR:17.6,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.1,hair:"court guerrier",beard:.3,brow:.8},
-  sora:{label:"magicienne gracieuse",headR:16.6,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.88,hair:"long argenté",beard:0,brow:.55},
-  ael:{label:"androïde athlétique",headR:16.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:.97,hair:"casque synthétique",beard:0,brow:.3}
+  nova:{label:"stratège élancée",headR:16.8,jaw:.52,neck:8,shoulder:19.6,hip:16.8,limb:1,hair:"long ondulé",beard:0,brow:.58},
+  "godson-prime":{label:"champion royal",headR:17.5,jaw:.72,neck:10,shoulder:23.4,hip:18,limb:1.12,hair:"court royal",beard:.16,brow:.76},
+  zara:{label:"vague athlétique",headR:16.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:1.02,hair:"tresses marines",beard:0,brow:.6},
+  kael:{label:"guerrier cuirassé",headR:17.6,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.16,hair:"court guerrier",beard:.3,brow:.8},
+  sora:{label:"magicienne gracieuse",headR:16.6,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.96,hair:"long argenté",beard:0,brow:.55},
+  ael:{label:"androïde athlétique",headR:16.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:1.04,hair:"casque synthétique",beard:0,brow:.3}
 };
 const HUMAN_PROFILE_LOOKUP={}; Object.keys(HUMAN_PROFILES).forEach(k=>{ HUMAN_PROFILE_LOOKUP[k.toLowerCase()]=HUMAN_PROFILES[k]; });
 function humanProfile(f){ const key=String((f&&f.char&&f.char.id)||"gideon").toLowerCase(); return HUMAN_PROFILE_LOOKUP[key]||HUMAN_PROFILES.gideon; }
@@ -486,11 +486,11 @@ function drawFist(x,y,r,angle,color){
 function drawHumanArm(x1,y1,x2,y2,x3,y3,width,sleeve,skin,glove,front){
   const solved=solveJoint(x1,y1,x3,y3,34,33,1),ex=lerp(x2,solved.x,.48),ey=lerp(y2,solved.y,.48);
   const wrist={x:lerp(ex,x3,.8),y:lerp(ey,y3,.8)},angle=Math.atan2(y3-wrist.y,x3-wrist.x);
-  taperedSegment(x1,y1,ex,ey,width,width*.72,sleeve,front);
-  taperedSegment(ex,ey,wrist.x,wrist.y,width*.68,width*.46,skin,front);
-  taperedSegment(lerp(ex,wrist.x,.72),lerp(ey,wrist.y,.72),wrist.x,wrist.y,width*.54,width*.5,glove,false);
-  ctx.fillStyle=front?skin:shade(skin,-24); ctx.beginPath(); ctx.arc(ex,ey,width*.34,0,7); ctx.fill();
-  drawFist(x3,y3,width*.88,angle,glove);
+  taperedSegment(x1,y1,ex,ey,width,width*.8,sleeve,front);
+  taperedSegment(ex,ey,wrist.x,wrist.y,width*.74,width*.56,skin,front);
+  taperedSegment(lerp(ex,wrist.x,.72),lerp(ey,wrist.y,.72),wrist.x,wrist.y,width*.62,width*.58,glove,false);
+  ctx.fillStyle=front?skin:shade(skin,-24); ctx.beginPath(); ctx.arc(ex,ey,width*.38,0,7); ctx.fill();
+  drawFist(x3,y3,width*.95,angle,glove);
 }
 function drawShoe(x,y,angle,size,accent,front){
   ctx.save(); ctx.translate(x,y); ctx.rotate(angle||0); ctx.scale(size||1,size||1);
@@ -502,10 +502,11 @@ function drawShoe(x,y,angle,size,accent,front){
 }
 function drawHumanLeg(x1,y1,x2,y2,x3,y3,width,pants,accent,front,shoeAngle){
   const ankle={x:x3,y:y3-7};
-  taperedSegment(x1,y1,x2,y2,width,width*.74,pants,front);
-  taperedSegment(x2,y2,ankle.x,ankle.y,width*.68,width*.4,pants,front);
-  ctx.fillStyle=front?"rgba(255,255,255,.18)":"rgba(0,0,0,.18)"; ctx.beginPath(); ctx.arc(x2,y2,width*.3,0,7); ctx.fill();
-  drawShoe(x3+4,y3-1,shoeAngle||0,front?1:.94,accent,front);
+  taperedSegment(x1,y1,x2,y2,width,width*.8,pants,front);
+  taperedSegment(x2,y2,ankle.x,ankle.y,width*.74,width*.52,shade(pants,-16),front);
+  taperedSegment(lerp(x2,ankle.x,.78),lerp(y2,ankle.y,.78),ankle.x,ankle.y,width*.56,width*.54,pants,false);
+  ctx.fillStyle=front?"rgba(255,255,255,.18)":"rgba(0,0,0,.18)"; ctx.beginPath(); ctx.arc(x2,y2,width*.34,0,7); ctx.fill();
+  drawShoe(x3+4,y3-1,shoeAngle||0,front?1.14:1.06,accent,front);
 }
 
 function drawGhosts(){
@@ -655,7 +656,7 @@ function drawFighter(f){
   if(f.dead){ const k=easeOutCubic(Math.min(1,f.koT/25)); ctx.rotate(-f.facing*1.42*k); }
   else if(down){ const k=easeOutCubic(Math.min(1,(42-f.downT)/10)); ctx.rotate(-f.facing*1.38*k); }
   else ctx.rotate((motion.lean+motion.air*clamp(f.vy*.0016,-.025,.035)-motion.hurt*.055+motion.dash*.09)*(f.facing||1));
-  let sx=ch.scale,sy=ch.scale;
+  let sx=ch.scale*1.04,sy=ch.scale*1.04;
   sy*=1+motion.squash*.045+motion.air*clamp(-f.vy*.0018,-.015,.045); sx*=1-motion.squash*.035;
   const visualFace=Math.abs(motion.face)<.22?(motion.face<0?-.22:.22):motion.face;
   ctx.scale(visualFace*sx,sy);
@@ -688,17 +689,17 @@ function drawFighter(f){
     bKnee=solveJoint(hipX-4,hipY,bFoot.x,bFoot.y-7,42,41,-1);
     if(f.attackType!=="kick"&&f.attackType!=="airKick"&&f.attackType!=="sweep")fKnee=solveJoint(hipX+5,hipY,fFoot.x,fFoot.y-7,42,41,-1);
   }
-  const legW=15.2*human.limb;
+  const legW=20.2*human.limb;
   const backShoeAngle=clamp(-bFoot.y*.018,0,.34),frontShoeAngle=f.attackType==="kick"||f.attackType==="airKick"?-.1:clamp(-fFoot.y*.018,0,.34);
   drawHumanLeg(hipX-4,hipY,bKnee.x,bKnee.y,bFoot.x,bFoot.y,legW,shade(sk.pants,-22),sk.accent,false,backShoeAngle);
-  drawHumanLeg(hipX+5,hipY,fKnee.x,fKnee.y,fFoot.x,fFoot.y,legW+1,sk.pants,sk.accent,true,frontShoeAngle);
+  drawHumanLeg(hipX+5,hipY,fKnee.x,fKnee.y,fFoot.x,fFoot.y,legW+1.6,sk.pants,sk.accent,true,frontShoeAngle);
   // Bras arrière : balancier opposé à la foulée + transition douce vers la garde
   const armSwing=Math.sin(f.walkPhase||0)*9*motion.run*(Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1),guardMix=motion.guard;
   const backHand={x:lerp(shX-8+armSwing,shX+24,guardMix),y:lerp(-82+bob+cb*6-Math.abs(armSwing)*.16,shY+13,guardMix)};
-  drawHumanArm(shX-6,shY+5,lerp(shX-21+armSwing*.45,shX+18,guardMix),lerp(-98+bob+cb*8,shY+27,guardMix),backHand.x,backHand.y,12.2*human.limb,sk.dark,shade(sk.skin,-24),sk.glove,false);
+  drawHumanArm(shX-6,shY+5,lerp(shX-21+armSwing*.45,shX+18,guardMix),lerp(-98+bob+cb*8,shY+27,guardMix),backHand.x,backHand.y,15.6*human.limb,sk.dark,shade(sk.skin,-24),sk.glove,false);
   // Buste humain : cou, trapèzes, cage thoracique, taille et bassin ne forment
   // plus un rectangle. Épaules et hanches contre-tournent comme dans la marche.
-  const shoulderHalf=human.shoulder*(0.82+ch.bulk*.18)*(1+Math.sin(motion.breath)*.012),hipHalf=human.hip*(0.84+ch.bulk*.16);
+  const shoulderHalf=human.shoulder*(0.9+ch.bulk*.2)*(1+Math.sin(motion.breath)*.012),hipHalf=human.hip*(0.92+ch.bulk*.18);
   const waistX=lerp(hipX,shX,.48)+(motion.clothSway||0)*.12,waistY=lerp(hipY,shY,.48);
   const shoulderBack={x:shX-shoulderHalf,y:shY+5-(motion.shoulderRoll||0)},shoulderFront={x:shX+shoulderHalf,y:shY+5+(motion.shoulderRoll||0)};
   const hipBack={x:hipX-hipHalf,y:hipY+3-(motion.pelvisRoll||0)},hipFront={x:hipX+hipHalf,y:hipY+3+(motion.pelvisRoll||0)};
@@ -724,8 +725,8 @@ function drawFighter(f){
   ctx.fillStyle="#111827"; ctx.beginPath(); ctx.moveTo(hipBack.x-2,hipBack.y-3); ctx.lineTo(hipFront.x+2,hipFront.y-3); ctx.lineTo(hipFront.x+1,hipFront.y+6); ctx.lineTo(hipBack.x-1,hipBack.y+6); ctx.closePath(); ctx.fill();
   ctx.fillStyle=sk.accent; ctx.fillRect(hipX-8,hipY-3+(motion.pelvisRoll||0)*.25,17,9); ctx.fillStyle="rgba(0,0,0,.35)"; ctx.fillRect(hipX-4,hipY-1+(motion.pelvisRoll||0)*.25,9,5);
   // Deltoïdes, clavicule, ombre latérale et plis qui suivent l'inertie du tissu.
-  ctx.fillStyle=sk.primary; ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+3,8.5*human.limb,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+3,9*human.limb,0,7); ctx.fill();
-  if(ch.style==="titan"||ch.style==="prime"||ch.style==="guerrier"||ch.style==="synthetique"){ ctx.fillStyle=ch.style==="prime"?"#ffc400":(ch.style==="synthetique"?sk.primary:(ch.style==="guerrier"?"#90a4ae":"#37474f")); ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+2,9.5,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+2,9.5,0,7); ctx.fill(); ctx.strokeStyle=ch.style==="prime"?"#fff3c4":"#90a4ae"; ctx.stroke(); }
+  ctx.fillStyle=sk.primary; ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+3,9.6*human.limb,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+3,10.2*human.limb,0,7); ctx.fill();
+  if(ch.style==="titan"||ch.style==="prime"||ch.style==="guerrier"||ch.style==="synthetique"){ ctx.fillStyle=ch.style==="prime"?"#ffc400":(ch.style==="synthetique"?sk.primary:(ch.style==="guerrier"?"#90a4ae":"#37474f")); ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+2,10.6,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+2,10.6,0,7); ctx.fill(); ctx.strokeStyle=ch.style==="prime"?"#fff3c4":"#90a4ae"; ctx.stroke(); }
   ctx.save(); ctx.globalAlpha=.18; ctx.fillStyle="#000"; ctx.beginPath(); ctx.ellipse(waistX-hipHalf*.48,waistY+4,hipHalf*.28,25,.08,0,7); ctx.fill(); ctx.restore();
   ctx.save(); ctx.strokeStyle="rgba(0,0,0,.24)"; ctx.lineWidth=1.5;
   [-.38,0,.36].forEach((o,i)=>{ ctx.beginPath(); ctx.moveTo(shX+shoulderHalf*o,shY+12); ctx.quadraticCurveTo(waistX+hipHalf*o+(motion.clothSway||0)*(.22+i*.08),waistY,hipX+hipHalf*o*.82,hipY-2); ctx.stroke(); });
@@ -737,7 +738,7 @@ function drawFighter(f){
   ctx.save(); ctx.translate(emblemX,emblemY+4); ctx.scale(Math.sign(visualFace)||1,1); ctx.fillText(f.letter,0,0); ctx.restore();
   drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down);
   // Bras avant selon pose
-  const armW=12.8*human.limb;
+  const armW=16.4*human.limb;
   if(f.victory&&(state==="roundEnd"||state==="matchEnd")&&!f.dead){
     drawHumanArm(shX+8,shY+4,shX+22,-142+bob,shX+27,-176+bob+Math.sin(renderTicker*.15)*4,armW,sk.primary,sk.skin,sk.glove,true);
   }else if(guardMix>.08&&f.attackT<=0){
@@ -957,6 +958,7 @@ function loop(ts){
   const onlineLive=mode==="online"&&onlineSession&&onlineSession.active&&!replayPlayback.active;
   renderStats.speedScale=onlineLive?1:(replayPlayback.active?replayPlayback.speed:SETTINGS.speed);
   if(typeof syncImmersiveCombat==="function")syncImmersiveCombat();
+  if(typeof updateSelectPortraits==="function")updateSelectPortraits();
   if(onlineLive){ hitStopT=0; slowmoT=0; }
   if(state==="pause"||(replayPlayback.active&&replayPlayback.paused)){ prepareInterpolation(1); updateCamera(0); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
   if(hitStopT>0&&!onlineLive){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }

@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 352 Ko (relevé à 352 en V3.6 pour les 3 Nouveaux Champions ; 327 Ko réels), sans asset externe.
+- ✅ Bundle officiel ≤ 352 Ko (budget conservé en V3.7 malgré les portraits animés et les corps pleins ; 336 Ko réels), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 

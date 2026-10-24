@@ -318,3 +318,34 @@ footer strong{color:#ffe082}
   body.combatImmersif #btnPauseFloat{display:grid}
   #hud{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
 }
+
+/* ================= V3.7 — SÉLECTION : APERÇUS ANIMÉS & BORDURES À EFFETS =================
+   Chaque carte porte les couleurs de son combattant (--cc primaire, --ca accent) :
+   bordure épaisse, halo lumineux, reflet balayant et pulsation quand elle est choisie. */
+.charCard{border:3px solid var(--cc,rgba(255,255,255,.25));background:linear-gradient(180deg,rgba(10,14,28,.88),rgba(5,8,16,.94));box-shadow:0 0 10px color-mix(in srgb,var(--cc,transparent) 42%,transparent),inset 0 0 16px rgba(0,0,0,.4);position:relative;overflow:hidden;padding:7px 6px 8px}
+.charCard::after{content:"";position:absolute;inset:0;background:linear-gradient(115deg,transparent 32%,rgba(255,255,255,.2) 48%,transparent 64%);transform:translateX(-130%);pointer-events:none}
+.charCard:hover{border-color:var(--ca,var(--cc));transform:translateY(-3px) scale(1.02)}
+.charCard:hover::after{transition:transform .55s ease;transform:translateX(130%)}
+.charCard.sel{border-color:var(--ca,#ffc400);background:linear-gradient(180deg,color-mix(in srgb,var(--cc,#ffc400) 26%,#0a0e1c),#050810);transform:scale(1.045);animation:cardPulse 1.15s ease-in-out infinite}
+.charCard.sel::after{animation:cardShine 1.7s linear infinite}
+@keyframes cardPulse{0%,100%{box-shadow:0 0 10px color-mix(in srgb,var(--ca,#ffc400) 45%,transparent),inset 0 0 14px rgba(0,0,0,.35)}50%{box-shadow:0 0 26px color-mix(in srgb,var(--ca,#ffc400) 88%,transparent),inset 0 0 14px rgba(0,0,0,.2)}}
+@keyframes cardShine{from{transform:translateX(-130%)}to{transform:translateX(130%)}}
+.portraitWrap{display:block;border-radius:10px;overflow:hidden;border:2px solid color-mix(in srgb,var(--cc,#fff) 65%,transparent);background:#070b16;margin-bottom:5px}
+.portraitCanvas{display:block;width:100%;height:auto;aspect-ratio:220/250}
+.portraitFallback{display:grid;place-items:center;aspect-ratio:220/250;font-size:44px}
+.charCard b{font-size:13.5px;letter-spacing:.4px}
+.charCard small{font-size:9.5px;margin:1px 0 0}
+.previewBox{display:flex;gap:10px;align-items:center;border:3px solid var(--cc,#ffc400);border-radius:16px;padding:8px 12px 8px 8px;margin-bottom:9px;background:linear-gradient(120deg,color-mix(in srgb,var(--cc,#ffc400) 18%,rgba(5,8,18,.85)),rgba(5,8,18,.9));box-shadow:0 0 18px color-mix(in srgb,var(--cc,#ffc400) 38%,transparent)}
+.previewBox canvas{width:104px;height:auto;aspect-ratio:300/340;border-radius:10px;background:#070b16;flex:none}
+.previewMeta{min-width:0;text-align:left}
+.previewMeta b{display:block;font-size:clamp(17px,2.4vw,24px);letter-spacing:1.2px;line-height:1.05}
+.previewMeta small{display:block;opacity:.85;font-size:11px;margin:2px 0 6px}
+.roster{grid-template-columns:repeat(auto-fit,minmax(92px,1fr))}
+@media(orientation:landscape) and (max-height:520px){
+  .previewBox{padding:5px 9px 5px 5px;margin-bottom:6px}
+  .previewBox canvas{width:66px}
+  .previewMeta b{font-size:15px}
+  .previewMeta small{font-size:9.5px;margin:1px 0 3px}
+  .roster{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px}
+  .charCard b{font-size:11px}.charCard small{display:none}
+}

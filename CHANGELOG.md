@@ -3,6 +3,25 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.7.0] — 24 octobre 2026 — « Sélection & Corps pleins » (retour direct du propriétaire)
+### Écran de sélection reconstruit — Manager + Kenzo
+- 🃏 **Cartes avec aperçu animé du vrai combattant** : fini le simple médaillon avec une lettre. Chaque personnage est dessiné en miniature par le moteur du jeu — tête, torse, bras, gants, jambes et chaussures visibles — avec respiration et clignements.
+- ✨ **Bordures personnalisées à effets** : chaque carte porte la couleur primaire et l’accent de son combattant, avec halo lumineux, reflet balayant au survol et **pulsation** quand le personnage est sélectionné.
+- 👀 **Grand aperçu par camp** : le personnage choisi s’affiche en grand au-dessus de chaque roster, avec nom, titre, SUPER et statistiques. Les statistiques quittent les petites cartes pour rendre la grille plus lisible.
+- 🧭 **Navigation améliorée** : sélection beaucoup plus visuelle au toucher, et navigation au clavier par flèches (gauche/droite/haut/bas) avec mise à jour immédiate de l’aperçu.
+
+### Corps pleins en combat — Kenzo + Nadia
+- 💪 **Membres visibles et volumineux** : cuisses, mollets articulés, revers de pantalon, bras et avant-bras épaissis, gants et chaussures plus présents, épaules et hanches élargies. Les silhouettes ne sont plus des « bâtonnets ».
+- 🎨 Le volume est adapté à chaque morphologie : Kira et Sora restent agiles, Titan et Kael deviennent nettement plus massifs. Présence visuelle globale renforcée de 4 %.
+- 🎯 Refonte **100 % visuelle** : physique, hitboxes, équilibrage, déterminisme, replays et Online inchangés.
+
+### Qualité — Sarah
+- 🧪 Suite portée à **277 assertions source / 321 vérifications affichées** : portraits réellement dessinés, bordures aux couleurs, aperçu synchronisé, navigation clavier et dimensions des membres verrouillées.
+- 📸 Captures natives relues avant release : grille des 9 cartes, grand aperçu de Sora et line-up de combat sur Libreville.
+- 🛡️ Gate QA : contrôle permanent n°21 « Sélection & Corps pleins V3.7 » ; bundle autonome 336 Ko, toujours sous le budget documenté de 352 Ko.
+
+---
+
 ## [3.6.0] — 24 octobre 2026 — « Nouveaux Champions » (planches déposées par le propriétaire)
 ### Vos personnages entrent dans l'arène — Manager + Kenzo + Nadia
 - 🎨 Le propriétaire a déposé **3 planches de personnages** (≈ 33 designs). Décision d'équipe : les traduire en **combattants jouables dans le style animé du jeu** (même squelette Humanité++, mêmes expressions, 60 fps) plutôt que coller des images 3D qui jureraient avec le combat. Les planches sont archivées en art conceptuel officiel (`assets/concepts/` + `docs/CONCEPTS_PERSONNAGES.md`).

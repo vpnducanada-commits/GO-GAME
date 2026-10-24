@@ -133,6 +133,10 @@ check("Prise en main paysage & impacts fluides V3.5 présents", "syncImmersiveCo
 champions_ok = all(x in js["engine"] for x in ('id:"kael"','id:"sora"','id:"ael"','case "kael":','case "sora":','case "ael":')) and all(x in js["render"] for x in ('kael:{label','magicienne','synthetique','kael:"lames"','ael:"circuits"')) and "6,7,8" in js["ui"] and (ROOT/"docs/CONCEPTS_PERSONNAGES.md").exists() and len(list((ROOT/"assets/concepts").glob("planche-personnages-*.jpg")))>=3
 check("Nouveaux Champions V3.6 présents", champions_ok, "KAEL / Sora / AEL-7 jouables (moteur + morphologies + VFX) + planches archivées")
 
+# 21. Sélection & Corps pleins V3.7 (aperçus animés, bordures à effets, membres visibles)
+selection_ok = all(x in html for x in ('previewBoxP1','previewP1','previewBoxP2','previewP2','previewNameP1')) and all(x in js["ui"] for x in ('updateSelectPortraits','drawFighterPortrait','portraitCanvas','setProperty("--cc"','previewNameP')) and all(x in css for x in ('@keyframes cardPulse','@keyframes cardShine','.previewBox','border:3px solid var(--cc')) and all(x in js["render"] for x in ('const legW=20.2*human.limb','const armW=16.4*human.limb','ch.scale*1.04')) and 'let ctx=canvas.getContext' in js["engine"]
+check("Sélection & Corps pleins V3.7 présents", selection_ok, "portraits animés du moteur + grands aperçus + bordures colorées pulsantes + membres volumineux")
+
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
 secret_hits = [p for p in ("sb_secret_", "service_role", "SUPABASE_SERVICE_ROLE_KEY") if p in client_blob]

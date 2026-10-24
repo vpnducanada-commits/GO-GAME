@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.6 PRO — NOUVEAUX CHAMPIONS & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.7 PRO — SÉLECTION & CORPS PLEINS, GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -84,24 +84,101 @@ function saveSelection(){ PROFILE.selection.charP1=selCharP1; PROFILE.selection.
 /* ---------------- SÉLECTION PERSONNAGES / ARÈNES ---------------- */
 function statRows(c){ const b=charStatBars(c); return Object.keys(b).map(k=>"<span class='stat'><span>"+k+"</span><i><b style='width:"+b[k]+"%'></b></i></span>").join(""); }
 function isCharLocked(c){ return !!(c.unlockKey&&!(PROFILE.unlocks&&PROFILE.unlocks[c.unlockKey])); }
+/* Portraits animés V3.7 : les vrais combattants du moteur, dessinés en miniature
+   dans chaque carte de sélection et en grand dans les aperçus. Le contexte principal
+   est échangé le temps du dessin (ctx est un « let »), toujours restauré. */
+let portraitCards=[],portraitTick=0,previewRigs=null;
+const portraitFighterCache={};
+function portraitFighterFor(index,side){
+  const key=side+":"+index;
+  if(!portraitFighterCache[key]){
+    const f=new Fighter(0,side); applyCharacterTo(f,index); f.reset();
+    f.id=index+1; f.anim=(index*37+side*13)%120; portraitFighterCache[key]=f;
+  }
+  return portraitFighterCache[key];
+}
+function drawFighterPortrait(pctx,f,w,h,cx,groundY,k,sk){
+  if(!pctx||!f)return;
+  const mainCtx=ctx;
+  try{
+    ctx=pctx;
+    pctx.setTransform(1,0,0,1,0,0); pctx.clearRect(0,0,w,h);
+    const g=pctx.createLinearGradient(0,0,0,h);
+    g.addColorStop(0,"#0b1020"); g.addColorStop(.55,sk.dark||"#141c2e"); g.addColorStop(1,"#05070d");
+    pctx.fillStyle=g; pctx.fillRect(0,0,w,h);
+    const rg=pctx.createRadialGradient(cx,groundY-95*k,6,cx,groundY-95*k,125*k);
+    rg.addColorStop(0,sk.accent||"#ffc400"); rg.addColorStop(1,"rgba(0,0,0,0)");
+    pctx.save(); pctx.globalAlpha=.32; pctx.fillStyle=rg; pctx.fillRect(0,0,w,h); pctx.restore();
+    pctx.save(); pctx.fillStyle="rgba(0,0,0,.45)"; pctx.beginPath(); pctx.ellipse(cx,groundY+4,54*k,9*k,0,0,7); pctx.fill(); pctx.restore();
+    f.x=f.rx=0; f.ry=0; f.y=GROUND; f.vy=0; f.vx=0; f.kvx=0; f.grounded=true;
+    f.energy=0; f.hitFlash=0; f.attack=null; f.attackT=0; f.hitStun=0; f.downT=0; f.dead=false; f.blocking=false; f.crouching=false; f.dashT=0; f.victory=false;
+    f.blinkT=((portraitTick+(f.charIndex||0)*47)%260)<7?-1:90;
+    f.anim=(f.anim||0)+1;
+    pctx.save(); pctx.translate(cx,groundY); pctx.scale(k,k); drawFighter(f); pctx.restore();
+    renderStats.portraits=(renderStats.portraits||0)+1;
+  }catch(e){} finally{ ctx=mainCtx; }
+}
+function ensurePreviewRigs(){
+  if(previewRigs)return;
+  previewRigs=[1,2].map(side=>{
+    const cv=$("previewP"+side); if(!cv)return null;
+    const f=new Fighter(0,side); applyCharacterTo(f,side===1?selCharP1:1); f.reset();
+    return {ctx:cv.getContext("2d"),f,sk:f.skin,charIndex:-1};
+  }).filter(Boolean);
+}
+function updatePreviewBoxes(previewP2Index){
+  ensurePreviewRigs();
+  const setRig=(rig,index)=>{ if(rig&&rig.charIndex!==index){ applyCharacterTo(rig.f,index); rig.f.reset(); rig.charIndex=index; rig.sk=rig.f.skin; } };
+  setRig(previewRigs[0],selCharP1); setRig(previewRigs[1],previewP2Index);
+  const fill=(side,index,random)=>{
+    const c=CHARACTERS[index]; if(!c)return;
+    const sk=effectiveSkin(c,side),box=$("previewBoxP"+side); if(!box)return;
+    box.style.setProperty("--cc",sk.primary); box.style.setProperty("--ca",sk.accent);
+    $("previewNameP"+side).textContent=random?"🎲 ALÉATOIRE":c.name;
+    $("previewTitleP"+side).textContent=random?"Adversaire surprise":(c.title+" • "+(c.superName||""));
+    $("previewStatsP"+side).innerHTML=random?"":statRows(c);
+  };
+  fill(1,selCharP1,false);
+  fill(2,previewP2Index,selCharP2<0&&pendingMode!=="arcade"&&pendingMode!=="story"&&pendingMode!=="survival");
+}
+function updateSelectPortraits(){
+  const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden"))return;
+  portraitTick++;
+  if(previewRigs)for(const rig of previewRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,324,1.5,rig.sk);
+  for(let i=0;i<portraitCards.length;i++)if((portraitTick+i)%6===0){ const pc=portraitCards[i]; drawFighterPortrait(pc.ctx,pc.f,220,250,110,238,1.08,pc.sk); }
+}
+/* Navigation clavier dans la grille de sélection (flèches : gauche/droite/haut/bas). */
+document.addEventListener("keydown",e=>{
+  const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden")||state!=="select")return;
+  const step=e.code==="ArrowRight"?1:e.code==="ArrowLeft"?-1:e.code==="ArrowDown"?3:e.code==="ArrowUp"?-3:0;
+  if(!step)return; e.preventDefault();
+  let n=selCharP1;
+  for(let k=0;k<CHARACTERS.length;k++){ n=(n+step+CHARACTERS.length)%CHARACTERS.length; if(!isCharLocked(CHARACTERS[n]))break; }
+  if(n!==selCharP1){ selCharP1=n; saveSelection(); refreshSelect(); }
+});
+
 function buildRosters(){
+  portraitCards=[];
   const build=(container,side,selected,allowRandom)=>{
     container.innerHTML="";
     CHARACTERS.forEach((c,i)=>{
       const sk=effectiveSkin(c,side),btn=document.createElement("button"),locked=isCharLocked(c);
       btn.className="charCard"+(selected===i&&!locked?" sel":"")+(locked?" locked":""); btn.type="button";
+      btn.style.setProperty("--cc",locked?"#546e7a":sk.primary); btn.style.setProperty("--ca",locked?"#ffc400":sk.accent);
       btn.innerHTML=locked
-        ?"<span class='avatar'>🔒</span><b>??? SECRET</b><small>Personnage légendaire</small><span class='stat'><span>???</span><i><b style='width:100%'></b></i></span><small>"+escapeHTML(c.lockedHint||"À débloquer")+"</small>"
-        :"<span class='avatar' style='background:linear-gradient(135deg,"+sk.primary+","+sk.accent+")'>"+c.letter+"</span><b>"+c.name+"</b><small>"+c.title+"<br>"+escapeHTML(c.superName||"")+"</small>"+statRows(c);
+        ?"<span class='portraitWrap'><span class='portraitFallback'>🔒</span></span><b>??? SECRET</b><small>Personnage légendaire</small><small>"+escapeHTML(c.lockedHint||"À débloquer")+"</small>"
+        :"<span class='portraitWrap'><canvas class='portraitCanvas' width='220' height='250'></canvas></span><b>"+c.name+"</b><small>"+c.title+"</small>";
       btn.onclick=()=>{
         if(locked){ showToast("🔒 Personnage secret — "+(c.lockedHint||"à débloquer")); return; }
         if(side===2&&(pendingMode==="arcade"||pendingMode==="story"||pendingMode==="survival"))return;
         if(side===1)selCharP1=i; else selCharP2=i; saveSelection(); refreshSelect();
       };
       container.appendChild(btn);
+      if(!locked){ const pcv=btn.querySelector("canvas"); if(pcv)portraitCards.push({ctx:pcv.getContext("2d"),f:portraitFighterFor(i,side),sk}); }
     });
     if(allowRandom){ const btn=document.createElement("button"); btn.className="charCard"+(selected===-1?" sel":""); btn.type="button";
-      btn.innerHTML="<span class='avatar' style='background:linear-gradient(135deg,#37474f,#90a4ae)'>?</span><b>ALÉATOIRE</b><small>Adversaire surprise</small><span class='stat'><span>FUN</span><i><b style='width:100%'></b></i></span>";
+      btn.style.setProperty("--cc","#607d8b"); btn.style.setProperty("--ca","#b0bec5");
+      btn.innerHTML="<span class='portraitWrap'><span class='portraitFallback'>🎲</span></span><b>ALÉATOIRE</b><small>Adversaire surprise</small>";
       btn.onclick=()=>{ if(pendingMode==="arcade"||pendingMode==="story"||pendingMode==="survival")return; selCharP2=-1; saveSelection(); refreshSelect(); }; container.appendChild(btn); }
   };
   build($("rosterP1"),1,selCharP1,false);
@@ -185,6 +262,7 @@ function refreshSelect(){
   $("selectTitle").textContent=titles[pendingMode]||"Choisis ton combattant";
   $("rosterTitleP1").textContent="🟦 "+((PROFILE.names.p1||"Joueur 1").toUpperCase());
   $("rosterTitleP2").textContent=pendingMode==="2p"?"🟥 JOUEUR 2":pendingMode==="training"?"🥋 MANNEQUIN":pendingMode==="arcade"?"🏆 ADVERSAIRE ARCADE (AUTO)":pendingMode==="story"?"📖 ADVERSAIRE DE L’HISTOIRE (AUTO)":pendingMode==="survival"?"🌊 VAGUE "+survival.wave+" (AUTO)":"🤖 BOT "+DIFFS[botDiff].label.toUpperCase();
+  updatePreviewBoxes(previewP2);
 }
 function enterSelect(newMode){ pendingMode=newMode; mode=newMode; refreshSelect(); showOnly("menuSelect"); }
 /* V3.3 : libellés du parcours (étape 3 = Difficulté seulement contre le bot),

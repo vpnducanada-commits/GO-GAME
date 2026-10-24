@@ -114,6 +114,10 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🎨 À partir des 3 planches déposées par le propriétaire : **KAEL** (Guerrier d'Acier), **Sora** (Magicienne) et **AEL-7** (Synthétique) deviennent jouables dans le style procédural du jeu ; roster 6 → 9, ajout en fin de grille (Histoire/sauvegardes intacts), présents en Arcade et Survie.
 - 🎭 Morphologies, têtes dédiées (chapeau pointu, visière cyan, épaulettes cuirassées), signatures VFX (lames/runes/circuits) et EX uniques ; planches archivées dans `assets/concepts/` (voir `docs/CONCEPTS_PERSONNAGES.md`). Réserve V3.7+ : Muscle, Pirate, Karatéka, Elfe…
 
+## ✅ V3.7 — « Sélection & Corps pleins » *(LIVRÉ le 24/10/2026 — 277 assertions source / 321 vérifications, suite verte)*
+- 🃏 Retour direct du propriétaire : sélection reconstruite avec **aperçu animé du vrai combattant dans chaque carte**, bordure aux couleurs du personnage (halo, reflet, pulsation de sélection), grand aperçu par camp avec nom/SUPER/statistiques et navigation par flèches.
+- 💪 Corps pleins en combat : jambes et bras volumineux, mollets articulés, torse élargi, gants et chaussures plus présents, présence visuelle +4 % — strictement render-only (hitboxes, replays et Online inchangés).
+
 Le socle connecté est livré et documenté dans `docs/V3_GO_GAME_FONDATIONS.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/SPRINT_V3_GO_GAME_ONLINE.md`. Les suites possibles sont le matchmaking public, un TURN dédié, la revanche synchronisée, les spectateurs et la relecture serveur des replays de tournoi. Le Sprint 09 local reste le prochain cap de contenu hors ligne.
 
 ## ⚠️ Risques & réponses
