@@ -99,6 +99,12 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🏷️ **Plaques de nom supprimées** en combat (HUD), **écran géant réduit et effacé à 30 %** pendant les combats, **textes flottants espacés** anti-chevauchement
 - 💡 **Halo de scène** qui suit l'action pour faire ressortir les combattants ; board : `docs/SPRINT_V34_ZONE_DEGAGEE.md`
 
+## ✅ V3.5 — « Prise en main paysage & impacts fluides » *(LIVRÉ le 24/10/2026 — 248 assertions source, suite verte)*
+- 🎮 **Combat immersif paysage** : en-tête masqué pendant les matchs, arène à 100 % de la hauteur, pause flottante, anti-scroll et safe-areas (encoches)
+- 👍 Grappes tactiles remontées dans **l'arc des pouces**, aux bords de l'écran
+- 🥊 **Gel d'impact divisé par ~3** (14–48 ms au lieu de 42–105 ms, contre ×1,2, parry 38 ms) : plus aucun ralentissement perceptible sur les coups normaux ; ralenti conservé uniquement sur le K.O.
+- 🎯 Boucle d'affichage uniquement : déterminisme, replays et Online intacts ; board : `docs/SPRINT_V35_PRISE_EN_MAIN.md`
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales

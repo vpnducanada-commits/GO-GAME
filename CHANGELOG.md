@@ -3,6 +3,21 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.5.0] — 24 octobre 2026 — « Prise en main paysage & impacts fluides » (retours directs du propriétaire)
+### Le téléphone se tient en paysage, à deux mains — Manager + Kenzo
+- 🎮 **Combat immersif** : sur téléphone tenu en paysage, dès qu'un match est en cours, l'en-tête disparaît et l'arène occupe **100 % de la hauteur de l'écran** (mode `combatImmersif`, synchronisé à chaque frame). Un bouton **⏸ flottant** discret remplace celui de l'en-tête.
+- 👍 **Pouces aux bons endroits** : les grappes tactiles sont relevées dans l'arc naturel des pouces (marge basse 4,5 vh), écartées vers les bords avec respect des **encoches** (safe-areas aussi appliquées au HUD), boutons de 48–62 px. Anti-scroll total pendant le jeu (`touch-action: none`, `overscroll-behavior: none`) : plus de page qui bouge ou se recharge en plein combo.
+- Les menus gardent l'en-tête et la navigation habituels ; l'immersion ne concerne que les combats (et les replays) en paysage court.
+
+### Fluidité des impacts — Nadia + Manager
+- 🥊 **Fini le ralentissement à chaque coup** : le gel d'impact (hitstop) mangeait 42 à 105 ms de simulation par coup touché — jusqu'à ~150 ms sur un contre. Nouvelles valeurs pro et fluides : **14 ms** (coups légers, < 1 frame), **24–26 ms** (moyens), **32–38 ms** (lourds/EX/projection), **48 ms** (SUPER), contre ×1,2 au lieu de ×1,45, parry 38 ms au lieu de 92 ms.
+- 🎬 Le ralenti ne subsiste que sur le **K.O.** (raccourci de 55 à 38 frames) ; secousse d'écran des coups légers réduite. L'Online était déjà sans gel (lockstep) et reste inchangé.
+
+### Garanties — Manager + Sarah
+- 🎯 Le gel d'impact et le ralenti vivent dans la boucle d'affichage, pas dans la simulation : **déterminisme, replays et Online intacts** (vérifiés par la suite complète, replays hashés inclus).
+- 🧪 Suite portée à **248 assertions source / 277 vérifications affichées** : plafond de gel mesuré dans les données d'attaques, coup de poing réel sans ralentissement (≤ 16 ms, aucun slow-mo), mode immersif et pause flottante présents et sûrs hors mobile.
+- 🛡️ Gate QA : contrôle permanent « Prise en main paysage & impacts fluides V3.5 » ; budget bundle relevé à **336 Ko** (documenté) après quatre chantiers d'interface successifs.
+
 ## [3.4.0] — 24 octobre 2026 — « Zone de combat dégagée » (retour direct du propriétaire)
 ### La scène appartient aux personnages — Kenzo + Manager
 - 📱 **Tactile compact aux coins** : les boutons ne s'étalent plus sur le stage. Grille resserrée en bas à gauche (déplacements) et en bas à droite (attaques), taille ramenée à ~46–52 px en paysage (bornée par la hauteur d'écran), fond semi-transparent flouté et libellés masqués en paysage court — on voit le décor et les jambes des combattants à travers.

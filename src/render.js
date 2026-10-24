@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.4 PRO — RENDU HAUT GRAPHISME, ZONE DÉGAGÉE & HUMANITÉ++
+   GÉDÉON - Godson ARENA V3.5 PRO — RENDU HAUT GRAPHISME, ZONE DÉGAGÉE & HUMANITÉ++
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -923,6 +923,7 @@ function loop(ts){
   if(SETTINGS.showFps&&rafCount%12===0){ const txt=Math.round(fpsEMA)+" FPS • "+renderStats.frameMs.toFixed(1)+" ms • Q"+qualityLevel; if(txt!==lastFpsShown){lastFpsShown=txt;$("fpsChip").textContent=txt;} }
   const onlineLive=mode==="online"&&onlineSession&&onlineSession.active&&!replayPlayback.active;
   renderStats.speedScale=onlineLive?1:(replayPlayback.active?replayPlayback.speed:SETTINGS.speed);
+  if(typeof syncImmersiveCombat==="function")syncImmersiveCombat();
   if(onlineLive){ hitStopT=0; slowmoT=0; }
   if(state==="pause"||(replayPlayback.active&&replayPlayback.paused)){ prepareInterpolation(1); updateCamera(0); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }
   if(hitStopT>0&&!onlineLive){ hitStopT-=dt; shake*=.9; prepareInterpolation(1); updateCamera(dt); render(); updateHUD(); if(typeof updateReplayBar==="function")updateReplayBar(); return; }

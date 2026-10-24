@@ -1,7 +1,7 @@
-/* ===== GÉDÉON - Godson ARENA V3.4 PRO — zone de combat dégagée, chargement & parcours d’écrans, signé Gideon - Godson ===== */
+/* ===== GÉDÉON - Godson ARENA V3.5 PRO — prise en main paysage & zone de combat dégagée, signé Gideon - Godson ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bleu:#00a2ff;--pink:#ff2e88;--or:#ffc400;--vert:#00e676;--panel:rgba(7,10,34,.86)}
-html,body{min-height:100%}
+html,body{min-height:100%;overscroll-behavior:none}
 body{font-family:'Segoe UI',system-ui,-apple-system,Arial,sans-serif;color:#fff;overflow-x:hidden;
  background:radial-gradient(1200px 700px at 15% -10%,#25439e 0%,transparent 55%),radial-gradient(1000px 700px at 92% -4%,#8b1d63 0%,transparent 50%),radial-gradient(900px 600px at 50% 115%,#0b5f6b 0%,transparent 55%),linear-gradient(180deg,#060a22,#0b1030 55%,#04061a)}
 #app{max-width:1440px;margin:0 auto;padding:12px 14px 26px}
@@ -305,3 +305,16 @@ footer strong{color:#ffe082}
 .diffCard{min-width:0!important;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:19px!important;border-radius:20px!important}
 .diffCard .diffIc{font-size:34px}
 .diffCard small{text-align:center;line-height:1.5}
+
+/* V3.5 — Prise en main paysage : le téléphone se tient à deux mains, pouces sur les bords */
+#gameWrap{touch-action:none}
+#btnPauseFloat{position:absolute;top:8px;left:calc(50% + 60px);z-index:9;width:38px;height:38px;border-radius:50%;border:1.5px solid rgba(255,255,255,.5);background:rgba(6,10,26,.5);backdrop-filter:blur(3px);color:#fff;font-size:15px;display:none;place-items:center;cursor:pointer}
+#touchUI{padding-bottom:max(14px,env(safe-area-inset-bottom),4.5vh);padding-left:max(12px,calc(env(safe-area-inset-left) + 8px));padding-right:max(12px,calc(env(safe-area-inset-right) + 8px))}
+.tBtn{width:clamp(48px,12.5vh,62px);height:clamp(48px,12.5vh,62px)}
+@media(orientation:landscape) and (max-height:580px){
+  body.combatImmersif header.sig{display:none}
+  body.combatImmersif #app{padding:4px}
+  body.combatImmersif #gameWrap{width:min(100%,calc((100dvh - 8px)*16/9))}
+  body.combatImmersif #btnPauseFloat{display:grid}
+  #hud{padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+}

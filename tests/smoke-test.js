@@ -602,7 +602,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^3\.[34]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -629,7 +629,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(ev('GAME_VERSION') === '3.4.0' && window.document.querySelector('h1').textContent.includes('V3.4 PRO'), 'version V3.4.0 affichée et exposée au moteur');
+  assert(/^3\.[45]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -642,6 +642,23 @@ try {
   ev('floaters=[{x:640,y:300,text:"A",c:"#ffffff",life:60,big:false},{x:645,y:305,text:"B",c:"#ffffff",life:60,big:false},{x:638,y:298,text:"C",c:"#ffffff",life:60,big:true}]; drawEffects();');
   assert(ev('renderStats.floaterSpread') >= 24, 'textes flottants décalés au lieu de se chevaucher');
   ev('floaters=[]; goMenu()');
+
+  console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
+  assert(ev('GAME_VERSION') === '3.5.0' && window.document.querySelector('h1').textContent.includes('V3.5 PRO'), 'version V3.5.0 affichée et exposée au moteur');
+  assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
+  ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
+  click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
+  ev('keys.clear(); p1.reset(); p2.reset(); p1.x=760; p2.x=850; p1.y=p2.y=GROUND; p1.facing=1; p2.facing=-1; hitStopT=0; slowmoT=0;');
+  press('KeyF', 2); step(5);
+  assert(ev('p1.hitConfirmed') === true && ev('hitStopT') <= 16 && ev('slowmoT') === 0, 'coup de poing réel : aucun ralentissement perceptible (gel ≤ 16 ms, pas de slow-mo)');
+  assert(ev('typeof syncImmersiveCombat') === 'function' && !!window.document.getElementById('btnPauseFloat'), 'combat immersif paysage + pause flottante disponibles');
+  let immersiveOk = true;
+  try { ev('syncImmersiveCombat()'); } catch (e) { immersiveOk = false; }
+  assert(immersiveOk, 'synchronisation immersive sans crash hors mobile paysage');
+  const css35 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
+  assert(css35.includes('body.combatImmersif header.sig') && css35.includes('touch-action:none') && css35.includes('safe-area-inset-left'), 'paysage tenu à deux mains : en-tête masqué en combat, anti-scroll, encoches respectées');
+  assert(fs.readFileSync(path.join(root, 'src/render.js'), 'utf8').includes('syncImmersiveCombat()'), 'boucle de jeu synchronisée avec le mode immersif');
+  ev('goMenu()');
 
   /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
      applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */

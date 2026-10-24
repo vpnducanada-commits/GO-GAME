@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.4 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V3.5 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="3.4.0";
+const GAME_VERSION="3.5.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -351,16 +351,16 @@ let currentArenaMood=resolveArenaMood(currentArena.id,selArenaMood);
 
 /* ---------------- DONNÉES : ATTAQUES (frame data pro) ---------------- */
 const ATTACKS={
-  punch:   {dur:16,start:4, end:9, dmg:6, range:104,knock:4.2,hitstun:11,blockstun:6, hitstop:42, energy:6, label:"Poing"},
-  kick:    {dur:24,start:7, end:15,dmg:9, range:116,knock:7.5,hitstun:14,blockstun:8, hitstop:62, energy:8, label:"Pied",hard:true},
-  uppercut:{dur:28,start:8, end:16,dmg:11,range:97, knock:2.5,hitstun:18,blockstun:9, hitstop:78, energy:9, label:"Uppercut",hard:true,launcher:11.5},
-  sweep:   {dur:27,start:8, end:16,dmg:8, range:118,knock:6,  hitstun:14,blockstun:8, hitstop:66, energy:8, label:"Balayage",hard:true,knockdown:true,low:true},
-  airPunch:{dur:15,start:3, end:9, dmg:6, range:99, knock:4,  hitstun:11,blockstun:6, hitstop:42, energy:6, label:"Poing aérien",air:true},
-  airKick: {dur:21,start:6, end:14,dmg:9, range:112,knock:6.5,hitstun:14,blockstun:8, hitstop:58, energy:8, label:"Pied aérien",hard:true,air:true},
-  special: {dur:27,start:8, end:9, dmg:14,range:0,  knock:7,  hitstun:15,blockstun:9, hitstop:70, energy:0, label:"Spécial"},
-  exspecial:{dur:24,start:7, end:9, dmg:17,range:0,  knock:8,  hitstun:16,blockstun:10,hitstop:84, energy:0, label:"EX Spécial",hard:true},
-  super:   {dur:32,start:9, end:10,dmg:23,range:0,  knock:11, hitstun:19,blockstun:11,hitstop:105,energy:0, label:"SUPER",hard:true,knockdown:true},
-  throw:   {dur:25,start:5, end:8, dmg:12,range:82, knock:10, hitstun:20,blockstun:0, hitstop:86, energy:10,label:"Projection",hard:true,knockdown:true,throw:true}
+  punch:   {dur:16,start:4, end:9, dmg:6, range:104,knock:4.2,hitstun:11,blockstun:6, hitstop:14, energy:6, label:"Poing"},
+  kick:    {dur:24,start:7, end:15,dmg:9, range:116,knock:7.5,hitstun:14,blockstun:8, hitstop:24, energy:8, label:"Pied",hard:true},
+  uppercut:{dur:28,start:8, end:16,dmg:11,range:97, knock:2.5,hitstun:18,blockstun:9, hitstop:34, energy:9, label:"Uppercut",hard:true,launcher:11.5},
+  sweep:   {dur:27,start:8, end:16,dmg:8, range:118,knock:6,  hitstun:14,blockstun:8, hitstop:26, energy:8, label:"Balayage",hard:true,knockdown:true,low:true},
+  airPunch:{dur:15,start:3, end:9, dmg:6, range:99, knock:4,  hitstun:11,blockstun:6, hitstop:14, energy:6, label:"Poing aérien",air:true},
+  airKick: {dur:21,start:6, end:14,dmg:9, range:112,knock:6.5,hitstun:14,blockstun:8, hitstop:24, energy:8, label:"Pied aérien",hard:true,air:true},
+  special: {dur:27,start:8, end:9, dmg:14,range:0,  knock:7,  hitstun:15,blockstun:9, hitstop:32, energy:0, label:"Spécial"},
+  exspecial:{dur:24,start:7, end:9, dmg:17,range:0,  knock:8,  hitstun:16,blockstun:10,hitstop:38, energy:0, label:"EX Spécial",hard:true},
+  super:   {dur:32,start:9, end:10,dmg:23,range:0,  knock:11, hitstun:19,blockstun:11,hitstop:48,energy:0, label:"SUPER",hard:true,knockdown:true},
+  throw:   {dur:25,start:5, end:8, dmg:12,range:82, knock:10, hitstun:20,blockstun:0, hitstop:38, energy:10,label:"Projection",hard:true,knockdown:true,throw:true}
 };
 const CANCELS={ punch:["punch","kick","uppercut","sweep","special","exspecial"], kick:["special","exspecial"], uppercut:["special","exspecial"], sweep:[], airPunch:["airKick"], airKick:[], special:[], exspecial:[], super:[], throw:[] };
 const DIFFS={
@@ -803,7 +803,7 @@ function spawnProjectile(f){
   const specs=abilitySpecs(f,isSuper,isEx);
   specs.forEach(sp=>{
     const atk={...baseAtk,dmg:sp.dmg};
-    if(specs.length>1){ atk.hitstun=Math.min(atk.hitstun,13); atk.hitstop=Math.min(atk.hitstop,55); if(sp.y!==specs[0].y)atk.knockdown=false; }
+    if(specs.length>1){ atk.hitstun=Math.min(atk.hitstun,13); atk.hitstop=Math.min(atk.hitstop,30); if(sp.y!==specs[0].y)atk.knockdown=false; }
     projectiles.push({x:sp.x,y:sp.y,px:sp.x,py:sp.y,rx:sp.x,ry:sp.y,vx:sp.vx,vy:sp.vy||0,r:sp.r,owner:f,super:isSuper,ex:isEx||!!sp.ex,life:sp.life||175,atk,kind:sp.kind||"bolt",grav:sp.grav||0,pierce:!!sp.pierce,homing:sp.homing||0});
   });
   ring(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail); spark(f.x+f.facing*50,f.y-112*f.char.scale,f.skin.trail,specs.length>2?22:13,3);
@@ -833,7 +833,7 @@ function applyDamage(att,def,atk,typeLabel){
     att.hitConfirmed=false; att.kvx=-att.facing*4.6; if(att.attackT>0)att.attackT=Math.max(att.attackT,11);
     spark(def.x+def.facing*44,hitY,"#ffc400",20,5); spark(def.x+def.facing*44,hitY,"#fff",10,3.4); ring(def.x+def.facing*44,hitY,"#ffc400");
     floater(def.x,def.y-196*def.char.scale,"✨ PARRY PARFAITE !","#ffc400",true);
-    hitStopT=Math.max(hitStopT,92); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
+    hitStopT=Math.max(hitStopT,38); shake=Math.max(shake,5.5); crowdExcite=110; SFX.parry();
     if(isLocalCareerFighter(def)){ PROFILE.stats.totalParries=(PROFILE.stats.totalParries||0)+1; PROFILE.stats.bestParriesMatch=Math.max(PROFILE.stats.bestParriesMatch||0,def.stats.parries); unlock("firstparry","Première parry parfaite"); if(def.stats.parries>=3)unlock("parry3","Défi Mur d’or — 3 parry dans un match"); }
     return;
   }
@@ -876,8 +876,8 @@ function applyDamage(att,def,atk,typeLabel){
   spark(midX,hitY,atk.hard?att.skin.trail:"#fff59d",atk.hard?22:14,atk.hard?6:4.4); spark(midX,hitY,"#ff5252",7,3.2);
   floater(def.x,def.y-184*def.char.scale,(isRiposte?"Riposte ! -":isCounter?"CONTRE ! -":"-")+dmg,isRiposte?"#ffc400":isCounter?"#ff9100":(atk.hard?att.skin.trail:"#ffffff"),atk.hard||isCounter||isRiposte);
   const seqName=comboSequenceName(att); if(att.combo>=3&&seqName)floater(att.x,att.y-212*att.char.scale,seqName,"#ffc400");
-  shake=Math.max(shake,(atk.hard?8.5:4.6)*((isCounter||isRiposte)?1.3:1)); crowdExcite=95;
-  hitStopT=Math.max(hitStopT,(atk.hitstop||45)*((isCounter||isRiposte)?1.45:1));
+  shake=Math.max(shake,(atk.hard?7:3.4)*((isCounter||isRiposte)?1.15:1)); crowdExcite=95;
+  hitStopT=Math.max(hitStopT,(atk.hitstop||20)*((isCounter||isRiposte)?1.2:1));
   if(isCounter||isRiposte)SFX.counter(); else SFX.hit(!!atk.hard);
   if(def.health<=0){
     if(state==="training"){ spark(def.x,hitY,"#ffffff",30,6); floater(def.x,def.y-220,"MANNEQUIN RÉINITIALISÉ","#69f0ae",true); def.health=def.maxHealth; def.comboVuln=false; att.combo=0; att.comboT=0; }
@@ -1102,7 +1102,7 @@ function endRound(winner,byKO,finishType){
   projectiles=[];
   if(winner){ winner.roundWins++; winner.victory=true; const loser=winner===p1?p2:p1;
     if(byKO){ loser.dead=true; loser.vy=-6.5; loser.kvx=winner.facing*7; } }
-  if(byKO){ announce("K.O. !",finishType==="super"?"FINISH PAR SUPER ATTAQUE !":"",true); SFX.ko(); slowmoT=55; shake=Math.max(shake,13); cinematic=110; }
+  if(byKO){ announce("K.O. !",finishType==="super"?"FINISH PAR SUPER ATTAQUE !":"",true); SFX.ko(); slowmoT=38; shake=Math.max(shake,13); cinematic=110; }
   else announce(winner?"TEMPS ÉCOULÉ":"ÉGALITÉ !",winner?winner.name+" remporte le round":"Aucun point marqué");
   crowdExcite=170; firework(240+Math.random()*800,150+Math.random()*90);
   if(typeof buildPips==="function")buildPips();

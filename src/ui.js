@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.4 PRO — PARCOURS D'ÉCRANS, TACTILE COMPACT & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.5 PRO — PRISE EN MAIN PAYSAGE & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -965,6 +965,14 @@ function handlePortraitChange(){
   document.body.classList.toggle("portraitSmall",portrait);
   if(portrait&&!document.body.classList.contains("allowPortrait")&&state==="fight"&&mode!=="online"&&!(typeof replayPlayback!=="undefined"&&replayPlayback.active))togglePause();
 }
+/* V3.5 : tenu en paysage sur téléphone, l'écran entier appartient au combat
+   (en-tête masqué, stage à 100 % de la hauteur) dès qu'un match est en cours. */
+let landscapeQuery=null;
+function syncImmersiveCombat(){
+  if(!landscapeQuery){ try{ landscapeQuery=window.matchMedia("(orientation: landscape) and (max-height: 580px)"); }catch(e){ return; } }
+  const on=!!(landscapeQuery&&landscapeQuery.matches)&&(((typeof isCombat==="function")&&isCombat())||state==="intro"||state==="roundEnd"||state==="pause"||(typeof replayPlayback!=="undefined"&&replayPlayback.active));
+  document.body.classList.toggle("combatImmersif",on);
+}
 function initPortraitGuard(){
   try{
     portraitQuery=window.matchMedia("(orientation: portrait) and (max-width: 860px)");
@@ -1219,6 +1227,7 @@ function bindUI(){
   $("btnFull").onclick=()=>{ if(document.fullscreenElement)document.exitFullscreen(); else requestImmersiveLandscape(); };
   const _bLand=$("btnLandscape"); if(_bLand)_bLand.onclick=requestImmersiveLandscape;
   const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); };
+  const _bPF=$("btnPauseFloat"); if(_bPF)_bPF.onclick=togglePause;
   initPortraitGuard();
   startBoot();
   $("btnTouch").onclick=function(){ touchEnabled=!touchEnabled; this.textContent=touchEnabled?"📱 Tactile : ON":"📱 Tactile"; $("touchUI").style.display=(touchEnabled&&(isCombat()||state==="intro"))?"flex":"none"; };

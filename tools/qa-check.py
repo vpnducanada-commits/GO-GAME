@@ -83,9 +83,9 @@ bundles = sorted(ROOT.glob("Gedeon*-Arena-V*.html"))
 target = bundle_arg if bundle_arg else (bundles[-1] if bundles else None)
 if target and target.exists():
     size_kb = target.stat().st_size // 1024
-    # V3 ajoute le client Online complet : budget relevé de 250 à 320 Ko,
+    # Budget relevé à 336 Ko en V3.5 (parcours d'écrans, zone dégagée, prise en main),
     # toujours très inférieur à une page web moyenne et sans ressource externe.
-    check("Bundle autonome ≤ 320 Ko", size_kb <= 320, f"{target.name} = {size_kb} Ko")
+    check("Bundle autonome ≤ 336 Ko", size_kb <= 336, f"{target.name} = {size_kb} Ko")
     b = target.read_text(encoding="utf-8", errors="ignore")
     ext_b = [u for u in re.findall(r'(?:src|href)\s*=\s*"(https?://[^"]+)"', b)]
     check("Bundle 100 % autonome (0 ressource externe)", not ext_b, str(ext_b[:3]) if ext_b else "vérifié")
@@ -124,6 +124,10 @@ flow_hooks = ["startBoot", "finishBoot", "launchFromFlow", "syncFlowUI", "flowDi
 check("Zone de combat dégagée V3.4 présente", "billboardAlpha" in all_js and "floaterSpread" in all_js and "spotlightX" in all_js and "f.ry-212" not in js["render"] and "ga-jump" in css and "11.5vh" in css, "tactile compact aux coins + écran géant discret en combat + floaters espacés")
 
 check("Chargement & parcours d'écrans V3.3 présents", all(h in all_js for h in flow_hooks) and "bootLoader" in html and "menuArena" in html and "btnSelectNext" in html and "flowSteps" in html and "#bootLoader" in css and "screenIn" in css, "boot rapide + étapes Personnages/Arène/Difficulté + transitions")
+
+
+# 19. Prise en main paysage & fluidité des impacts V3.5
+check("Prise en main paysage & impacts fluides V3.5 présents", "syncImmersiveCombat" in all_js and "btnPauseFloat" in html and "combatImmersif" in css and "touch-action:none" in css and "hitstop:14" in js["engine"] and "hitstop:105" not in js["engine"], "combat immersif 100dvh + pause flottante + gel d'impact micro (14-48 ms)")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
