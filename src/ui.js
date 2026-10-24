@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.7 PRO — SÉLECTION & CORPS PLEINS, GO GAME ONLINE
+   GÉDÉON - Godson ARENA V4.0 PRO — ARCADE PLEIN ÉCRAN & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -144,8 +144,8 @@ function updatePreviewBoxes(previewP2Index){
 function updateSelectPortraits(){
   const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden"))return;
   portraitTick++;
-  if(previewRigs)for(const rig of previewRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,324,1.5,rig.sk);
-  for(let i=0;i<portraitCards.length;i++)if((portraitTick+i)%6===0){ const pc=portraitCards[i]; drawFighterPortrait(pc.ctx,pc.f,220,250,110,238,1.08,pc.sk); }
+  if(previewRigs)for(const rig of previewRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,326,1.38,rig.sk);
+  for(let i=0;i<portraitCards.length;i++)if((portraitTick+i)%6===0){ const pc=portraitCards[i]; drawFighterPortrait(pc.ctx,pc.f,220,250,110,240,1.0,pc.sk); }
 }
 /* Navigation clavier dans la grille de sélection (flèches : gauche/droite/haut/bas). */
 document.addEventListener("keydown",e=>{
@@ -1045,11 +1045,11 @@ function handlePortraitChange(){
 }
 /* V3.5 : tenu en paysage sur téléphone, l'écran entier appartient au combat
    (en-tête masqué, stage à 100 % de la hauteur) dès qu'un match est en cours. */
-let landscapeQuery=null;
 function syncImmersiveCombat(){
-  if(!landscapeQuery){ try{ landscapeQuery=window.matchMedia("(orientation: landscape) and (max-height: 580px)"); }catch(e){ return; } }
-  const on=!!(landscapeQuery&&landscapeQuery.matches)&&(((typeof isCombat==="function")&&isCombat())||state==="intro"||state==="roundEnd"||state==="pause"||(typeof replayPlayback!=="undefined"&&replayPlayback.active));
-  document.body.classList.toggle("combatImmersif",on);
+  /* V4.0 : en combat, la barre système disparaît sur TOUS les écrans —
+     100 % de la scène appartient au jeu, seule la pause flottante reste. */
+  const on=(((typeof isCombat==="function")&&isCombat())||state==="intro"||state==="roundEnd"||state==="pause"||(typeof replayPlayback!=="undefined"&&replayPlayback.active));
+  document.body.classList.toggle("combatImmersif",!!on);
 }
 function initPortraitGuard(){
   try{

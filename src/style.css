@@ -1,4 +1,4 @@
-/* ===== GÉDÉON - Godson ARENA V3.5 PRO — prise en main paysage & zone de combat dégagée, signé Gideon - Godson ===== */
+/* ===== GÉDÉON - Godson ARENA V4.0 PRO — arcade plein écran, sélection Pro & corps HD, signé Gideon - Godson ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bleu:#00a2ff;--pink:#ff2e88;--or:#ffc400;--vert:#00e676;--panel:rgba(7,10,34,.86)}
 html,body{min-height:100%;overscroll-behavior:none}
@@ -348,4 +348,44 @@ footer strong{color:#ffe082}
   .previewMeta small{font-size:9.5px;margin:1px 0 3px}
   .roster{grid-template-columns:repeat(auto-fit,minmax(72px,1fr));gap:6px}
   .charCard b{font-size:11px}.charCard small{display:none}
+}
+
+/* ================= V4.0 — COQUE ARCADE PLEIN ÉCRAN =================
+   Le jeu n'est plus une page web avec un cadre au milieu : l'application
+   occupe tout le viewport, la scène 16:9 prend la plus grande surface
+   manipulable possible, la barre système vit DANS la scène et disparaît
+   en combat. Aucun pied de page, aucun panneau extérieur inactif. */
+html,body{width:100%;height:100dvh;overflow:hidden}
+#app{position:fixed;inset:0;width:100dvw;height:100dvh;max-width:none;margin:0;padding:0;display:grid;place-items:center;overflow:hidden;background:radial-gradient(1100px 620px at 18% -8%,rgba(0,162,255,.22),transparent 58%),radial-gradient(900px 620px at 84% 0%,rgba(255,46,136,.18),transparent 55%),linear-gradient(180deg,#03061a,#090d2a 52%,#02040f)}
+#app::before{content:"";position:absolute;inset:0;pointer-events:none;background:linear-gradient(115deg,transparent 42%,rgba(255,255,255,.035) 50%,transparent 58%);opacity:.75}
+#gameWrap{position:relative;z-index:1;width:min(100dvw,calc(100dvh * 16 / 9));height:min(100dvh,calc(100dvw * 9 / 16));aspect-ratio:16/9;margin:0;border-radius:0;overflow:hidden;box-shadow:0 0 0 1px rgba(255,255,255,.15),0 0 90px rgba(0,162,255,.18),0 0 140px rgba(255,46,136,.1)}
+#gameWrap:fullscreen{width:100%;height:100%}
+header.sig{position:absolute;top:max(8px,env(safe-area-inset-top));left:max(10px,env(safe-area-inset-left));right:max(10px,env(safe-area-inset-right));z-index:35;display:flex;justify-content:space-between;align-items:flex-start;gap:10px;padding:0;pointer-events:none;flex-wrap:nowrap}
+header.sig .logo,header.sig .topActions{pointer-events:auto}
+header.sig .logo{gap:8px;background:rgba(3,6,18,.55);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:4px 12px 4px 4px;backdrop-filter:blur(8px);box-shadow:0 10px 28px rgba(0,0,0,.35);min-width:0}
+header.sig .badge{width:34px;height:34px;border-radius:12px;font-size:18px;flex:none}
+header.sig .logo h1{font-size:15px;white-space:nowrap}
+.topActions{gap:6px;flex-wrap:nowrap;justify-content:flex-end}
+.topActions .chip{padding:7px 10px;font-size:12px;white-space:nowrap;background:rgba(3,6,18,.58)}
+#profileStats{padding:7px 10px;font-size:11.5px;white-space:nowrap;background:rgba(3,6,18,.58)}
+footer{display:none!important}
+.overlay{padding:62px 18px 18px}
+#bootLoader{z-index:90}
+#rotateHint{z-index:80}
+body.combatImmersif header.sig{display:none!important}
+body.combatImmersif #btnPauseFloat{display:grid}
+.portraitCanvas,.previewBox canvas{position:static}
+@media(orientation:landscape) and (max-height:580px){
+  .overlay{padding:50px 10px 10px}
+  #profileStats{display:none}
+  header.sig .logo h1{display:none}
+  header.sig .logo{padding:3px}
+  .topActions .chip{padding:6px 8px;font-size:11px}
+}
+@media(max-width:620px){
+  #profileStats{display:none}
+  header.sig .logo{display:none}
+  .topActions{margin-left:auto}
+  .topActions .chip{padding:6px 7px;font-size:10.5px}
+  .overlay{padding-top:48px}
 }

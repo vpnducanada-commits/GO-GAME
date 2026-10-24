@@ -134,8 +134,13 @@ champions_ok = all(x in js["engine"] for x in ('id:"kael"','id:"sora"','id:"ael"
 check("Nouveaux Champions V3.6 présents", champions_ok, "KAEL / Sora / AEL-7 jouables (moteur + morphologies + VFX) + planches archivées")
 
 # 21. Sélection & Corps pleins V3.7 (aperçus animés, bordures à effets, membres visibles)
-selection_ok = all(x in html for x in ('previewBoxP1','previewP1','previewBoxP2','previewP2','previewNameP1')) and all(x in js["ui"] for x in ('updateSelectPortraits','drawFighterPortrait','portraitCanvas','setProperty("--cc"','previewNameP')) and all(x in css for x in ('@keyframes cardPulse','@keyframes cardShine','.previewBox','border:3px solid var(--cc')) and all(x in js["render"] for x in ('const legW=20.2*human.limb','const armW=16.4*human.limb','ch.scale*1.04')) and 'let ctx=canvas.getContext' in js["engine"]
+selection_ok = all(x in html for x in ('previewBoxP1','previewP1','previewBoxP2','previewP2','previewNameP1')) and all(x in js["ui"] for x in ('updateSelectPortraits','drawFighterPortrait','portraitCanvas','setProperty("--cc"','previewNameP')) and all(x in css for x in ('@keyframes cardPulse','@keyframes cardShine','.previewBox','border:3px solid var(--cc')) and all(x in js["render"] for x in ('const legW=20.2*human.limb','const armW=16.4*human.limb')) and ('ch.scale*1.04' in js["render"] or 'ch.scale*1.08' in js["render"]) and 'let ctx=canvas.getContext' in js["engine"]
 check("Sélection & Corps pleins V3.7 présents", selection_ok, "portraits animés du moteur + grands aperçus + bordures colorées pulsantes + membres volumineux")
+
+# 22. Arcade plein écran & anatomie HD V4.0
+header_in_stage = html.find('id="gameWrap"') < html.find('<header class="sig">') < html.find('id="bootLoader"')
+shell_ok = header_in_stage and all(x in css for x in ('#app{position:fixed;inset:0','width:min(100dvw,calc(100dvh * 16 / 9))','height:min(100dvh,calc(100dvw * 9 / 16))','footer{display:none!important}','body.combatImmersif header.sig{display:none!important}')) and 'classList.toggle("combatImmersif",!!on)' in js["ui"] and all(x in js["render"] for x in ('headR:15.3','const hipY=lerp(-86,-63,cb)','clamp(1180/(dist+420),.88,1.34)','outfitDetails','HD Arcade V4'))
+check("Arcade plein écran & anatomie HD V4.0 présents", shell_ok, "viewport 100 % jeu + barre système intégrée/masquée en combat + proportions adultes + caméra 1,34×")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

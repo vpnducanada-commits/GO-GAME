@@ -2,9 +2,9 @@
 
 **Propriétaire / Product Owner** : Gideon - Godson  
 **Manager officiel & Développeur principal** : Assistant Arena  
-**Objectif de l’équipe** : faire passer Gideon - Godson ARENA d’un jeu pro à un rendu et une structure de niveau studio, sans perdre le principe fondateur : **1 fichier, 60 FPS, fun instantané**.
+**Objectif de l’équipe** : faire passer Gideon - Godson ARENA du mini-jeu à un **véritable jeu de combat arcade plein écran**, personnages détaillés inspirés des planches du propriétaire, sans perdre le principe fondateur : **1 fichier, 60 FPS, fun instantané**.
 
-> Note de gouvernance : les trois spécialistes ci-dessous constituent l’équipe studio interne pilotée par le Manager. Leurs fiches de poste, responsabilités et livrables sont également prêts à être repris par de vrais collaborateurs humains si le Product Owner souhaite recruter à l’extérieur.
+> Note de gouvernance : les spécialistes ci-dessous (noyau historique + renforts V4) constituent l’équipe studio interne pilotée par le Manager. Leurs fiches de poste, responsabilités et livrables sont également prêts à être repris par de vrais collaborateurs humains si le Product Owner souhaite recruter à l’extérieur.
 
 ---
 
@@ -74,6 +74,36 @@
 - 100 % des tests automatisés verts avant commit de release.
 - Zéro ressource externe dans le jeu livré.
 - Aucune release sans changelog, build autonome et tag Git.
+
+---
+
+## 4) Marco — Direction artistique personnages (renfort V4)
+
+**Expertise** : anatomie stylisée réaliste, character design de jeux de combat 2D, tenues, matières, silhouettes.
+
+**Responsabilités**
+- Traduire les planches du propriétaire en langage animé du moteur : proportions, masses, tenues signatures.
+- Garantir que chaque combattant se reconnaît à sa silhouette (tête, épaules, tenue, accessoires) avant même ses couleurs.
+- Relire chaque capture de line-up/duel avant release et exiger les reprises de palette ou de volume.
+
+**Indicateurs**
+- Membres, torse, mains/gants et chaussures lisibles en pleine action, jamais d'effet « bâtonnet ».
+- Aucune tenue recyclée entre deux personnages sans détail signature.
+
+---
+
+## 5) Lena — UX plein écran & ergonomie (renfort V4)
+
+**Expertise** : UX de jeux plein écran, navigation console/mobile, ergonomie tactile et accessibilité.
+
+**Responsabilités**
+- Garantir que 100 % du viewport sert le jeu : coque arcade, barre système intégrée, aucun panneau extérieur inactif.
+- Parcours Menu → Personnages → Arène → Difficulté → VS sans zone morte, lisible au pouce en paysage comme au clavier/manette.
+- Auditer chaque écran en captures réelles (desktop, mobile paysage, portrait contraint).
+
+**Indicateurs**
+- Aucun contrôle visible ne doit sembler inactif pendant un combat.
+- La scène manipulable occupe toujours la plus grande surface 16:9 possible.
 
 ---
 

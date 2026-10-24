@@ -3,6 +3,7 @@
 **Produit** : jeu de combat 1v1 navigateur, haute résolution, signé Gideon - Godson.
 **Propriétaire du produit (Product Owner)** : **Gideon - Godson** — vision, validation finale, marque.
 **Manager officiel & Développeur principal** : l'assistant Arena (nommé le 22/10/2026) — priorisation, architecture, développement, tests, livraisons.
+**Équipe studio renforcée (V4)** : Nadia (Game Design) • Kenzo (Rendu) • Sarah (QA/Release) • **Marco (Direction artistique personnages)** • **Lena (UX plein écran)** — fiches dans `docs/EQUIPE.md`.
 
 ---
 
@@ -11,6 +12,7 @@
 2. **60 FPS partout** : la fluidité passe avant les effets ; la qualité s'adapte automatiquement.
 3. **Toujours livrable** : chaque session se termine par une version jouable, testée et documentée.
 4. **Signature Gideon - Godson** visible et fière dans chaque écran.
+5. **Présentation de vrai jeu de combat** : plein écran manipulable, personnages détaillés inspirés des planches du propriétaire, caméra et interface dignes des grandes licences arcade 2D.
 
 ## 🔁 Méthode de travail (sprints par session)
 Chaque session = 1 sprint complet :
@@ -25,19 +27,19 @@ Chaque session = 1 sprint complet :
 - [ ] Commit Git + tag de version
 
 ## 🏷️ Versionnage
-`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 GO GAME Online & Combat Pro • V3.1 Humanité++ (personnages plus humains, 100 % visuel) • V3.2 Paysage & Interface Épurée • V3.3 Flux d’écrans & Chargement • V3.4 Zone de combat dégagée • V3.5 Prise en main paysage & impacts fluides • V3.6 Nouveaux Champions (roster 9, planches du propriétaire) • V3.7 Sélection & Corps pleins.
+`MAJEUR.MINEUR.CORRECTIF` — V1.0 prototype • V2.0 édition PRO • V2.1 progression & histoire • V2.2 profondeur de combat • V2.3 studio quality (équipe Nadia/Kenzo/Sarah) • V2.4 Libreville Rising (Zara + Chapitre 2) • V2.5 Human Motion & Living Arenas • V2.6 Replays déterministes • V2.7 Replay Studio & Victoires • V2.8 Arena Moods & Polish • V3.0 GO GAME Online & Combat Pro • V3.1 Humanité++ (personnages plus humains, 100 % visuel) • V3.2 Paysage & Interface Épurée • V3.3 Flux d’écrans & Chargement • V3.4 Zone de combat dégagée • V3.5 Prise en main paysage & impacts fluides • V3.6 Nouveaux Champions (roster 9, planches du propriétaire) • V3.7 Sélection & Corps pleins • V4.0 Arcade plein écran & anatomie HD.
 
 ## 📊 Indicateurs suivis par le manager
-| Indicateur | Cible | V3.7 (actuel) |
+| Indicateur | Cible | V4.0 (actuel) |
 |---|---|---|
-| Tests automatisés | 100 % verts | 248 assertions source / 277 vérifications affichées ✅ + gate QA statique + contrôle visuel par captures |
-| Taille version 1-fichier | ≤ 320 Ko avec client Online | 293 Ko ✅ |
+| Tests automatisés | 100 % verts | 287 assertions source / 331 vérifications affichées ✅ + gate QA statique + contrôle visuel par captures |
+| Taille version 1-fichier | ≤ 352 Ko avec client Online | 342 Ko ✅ |
 | Dépendances externes | 0 pour jouer en local ; Supabase/WebRTC uniquement en Online opt-in | Conforme ✅ |
 | Fluidité cible | 60 FPS | interpolation + qualité auto ✅ |
-| Modes / Personnages / Arènes | en croissance | 6 locaux + Duel Online (+ Défis) / 6 / 4 |
+| Modes / Personnages / Arènes | en croissance | 6 locaux + Duel Online (+ Défis) / 9 / 4 |
 
 ## 🗂️ Sprint en cours
-V3.7 « Sélection & Corps pleins » livrée : portraits animés en sélection, bordures à effets et membres volumineux en combat. V3.6 « Nouveaux Champions » livrée : KAEL, Sora et AEL-7 jouables à partir des planches du propriétaire. V3.5 « Prise en main paysage & impacts fluides » livrée : combat immersif tenu à deux mains et gel d’impact quasi supprimé. V3.4 « Zone de combat dégagée » livrée : tactile compact aux coins, plaques retirées, écran géant discret en combat. V3.3 « Flux d’écrans & Chargement » livrée : écran de chargement + parcours Menu → Personnages → Arène → Difficulté. V3.2 « Paysage & Interface Épurée » livrée : retour direct du propriétaire — jeu en paysage prioritaire et cure de textes dans toute l’interface. V3.1 « Humanité++ » livrée : refonte visuelle complète des personnages (proportions adultes, visages expressifs, regard vivant, IK), strictement render-only. Track V3 « GO GAME Online & Combat Pro » livrée (V3.0). Voir `docs/SPRINT_V3_GO_GAME_ONLINE.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/ROADMAP.md`. Le jeu local reste autonome hors ligne ; les duels privés, le cloud et le classement co-vérifié sont branchés sur Supabase + WebRTC. Le Sprint 09 « Compétition locale » reste le prochain cap de contenu local.
+V4.0 « Arcade plein écran & anatomie HD » livrée : coque 100 % viewport, barre système intégrée/masquée en combat, proportions adultes, tenues HD et caméra 1,34×. V3.7 « Sélection & Corps pleins » livrée : portraits animés en sélection, bordures à effets et membres volumineux en combat. V3.6 « Nouveaux Champions » livrée : KAEL, Sora et AEL-7 jouables à partir des planches du propriétaire. V3.5 « Prise en main paysage & impacts fluides » livrée : combat immersif tenu à deux mains et gel d’impact quasi supprimé. V3.4 « Zone de combat dégagée » livrée : tactile compact aux coins, plaques retirées, écran géant discret en combat. V3.3 « Flux d’écrans & Chargement » livrée : écran de chargement + parcours Menu → Personnages → Arène → Difficulté. V3.2 « Paysage & Interface Épurée » livrée : retour direct du propriétaire — jeu en paysage prioritaire et cure de textes dans toute l’interface. V3.1 « Humanité++ » livrée : refonte visuelle complète des personnages (proportions adultes, visages expressifs, regard vivant, IK), strictement render-only. Track V3 « GO GAME Online & Combat Pro » livrée (V3.0). Voir `docs/SPRINT_V3_GO_GAME_ONLINE.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/ROADMAP.md`. Le jeu local reste autonome hors ligne ; les duels privés, le cloud et le classement co-vérifié sont branchés sur Supabase + WebRTC. Le Sprint 09 « Compétition locale » reste le prochain cap de contenu local.
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

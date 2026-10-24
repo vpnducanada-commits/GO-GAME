@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.7 PRO — RENDU HAUT GRAPHISME, CORPS PLEINS & HUMANITÉ++
+   GÉDÉON - Godson ARENA V4.0 PRO — RENDU HD ARCADE, ANATOMIE & MATIÈRES
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -8,7 +8,7 @@ let renderTicker=0,renderDtFactor=1,arenaCache={},vignetteGrad=null;
 const glowCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,artDirection:"HD Arcade V4",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -239,9 +239,9 @@ function prepareInterpolation(alpha){
 }
 function updateCamera(dtMs){
   const mid=(p1.rx+p2.rx)/2, dist=Math.abs(p2.rx-p1.rx);
-  let tz=(state==="menu"||state==="select"||state==="vs"||state==="scene")?1:clamp(1020/(dist+455),.78,1.11);
-  if(state==="intro"||state==="roundEnd")tz=Math.min(1.16,tz+.06);
-  const tx=(state==="menu"||state==="select"||state==="vs"||state==="scene")?640:clamp(mid,505,775);
+  let tz=(state==="menu"||state==="select"||state==="vs"||state==="scene")?1.06:clamp(1180/(dist+420),.88,1.34);
+  if(state==="intro"||state==="roundEnd")tz=Math.min(1.42,tz+.08);
+  const halfView=640/Math.max(.7,tz),tx=(state==="menu"||state==="select"||state==="vs"||state==="scene")?640:clamp(mid,Math.min(640,halfView),Math.max(640,1280-halfView));
   const k=dtMs<=0?1:1-Math.exp(-dtMs/135);
   cam.x+=(tx-cam.x)*k; cam.zoom+=(tz-cam.zoom)*k;
 }
@@ -429,9 +429,9 @@ function drawShadow(f){ const air=GROUND-f.ry,s=Math.max(.34,1-air/430)*f.char.s
 function drawReflection(f){
   if(qualityLevel===0)return;
   ctx.save(); ctx.globalAlpha=currentArena.id==="tokyo"?.2:currentArena.id==="Libreville"?.16:.1; ctx.translate(f.rx,GROUND+18+(GROUND-f.ry)*.18); ctx.scale(f.facing*f.char.scale,-.32*f.char.scale);
-  ctx.fillStyle=f.skin.primary; ctx.beginPath(); ctx.moveTo(-20,-126); ctx.quadraticCurveTo(0,-136,20,-126); ctx.quadraticCurveTo(17,-96,18,-78); ctx.lineTo(-18,-78); ctx.quadraticCurveTo(-17,-100,-20,-126); ctx.fill();
-  ctx.fillStyle=f.skin.skin; ctx.beginPath(); ctx.ellipse(7,-150,15,18,0,0,7); ctx.fill();
-  ctx.strokeStyle=f.skin.pants; ctx.lineWidth=14; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-7,-80); ctx.lineTo(-14,-38); ctx.lineTo(-18,-4); ctx.moveTo(8,-80); ctx.lineTo(16,-39); ctx.lineTo(23,-4); ctx.stroke(); ctx.restore();
+  ctx.fillStyle=f.skin.primary; ctx.beginPath(); ctx.moveTo(-20,-138); ctx.quadraticCurveTo(0,-148,20,-138); ctx.quadraticCurveTo(17,-106,18,-86); ctx.lineTo(-18,-86); ctx.quadraticCurveTo(-17,-110,-20,-138); ctx.fill();
+  ctx.fillStyle=f.skin.skin; ctx.beginPath(); ctx.ellipse(7,-163,14,16,0,0,7); ctx.fill();
+  ctx.strokeStyle=f.skin.pants; ctx.lineWidth=14; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(-7,-88); ctx.lineTo(-14,-42); ctx.lineTo(-18,-4); ctx.moveTo(8,-88); ctx.lineTo(16,-39); ctx.lineTo(23,-4); ctx.stroke(); ctx.restore();
 }
 function limb(x1,y1,x2,y2,x3,y3,w,c,endC,endR){
   ctx.lineCap="round"; ctx.lineJoin="round";
@@ -445,15 +445,15 @@ function limb(x1,y1,x2,y2,x3,y3,w,c,endC,endR){
    Les proportions restent stylisées arcade, mais la tête redevient celle
    d'un adulte et chaque combattant reçoit sa morphologie propre. */
 const HUMAN_PROFILES={
-  gideon:{label:"athlète équilibré",headR:17.4,jaw:.68,neck:9,shoulder:22,hip:17,limb:1.06,hair:"court texturé",beard:.2,brow:.72},
-  kira:{label:"sprinteuse agile",headR:16.5,jaw:.48,neck:7.4,shoulder:18.4,hip:16.2,limb:.95,hair:"queue haute",beard:0,brow:.62},
-  titan:{label:"colosse puissant",headR:17.8,jaw:.94,neck:12.2,shoulder:28,hip:20,limb:1.28,hair:"rasé",beard:.52,brow:.92},
-  nova:{label:"stratège élancée",headR:16.8,jaw:.52,neck:8,shoulder:19.6,hip:16.8,limb:1,hair:"long ondulé",beard:0,brow:.58},
-  "godson-prime":{label:"champion royal",headR:17.5,jaw:.72,neck:10,shoulder:23.4,hip:18,limb:1.12,hair:"court royal",beard:.16,brow:.76},
-  zara:{label:"vague athlétique",headR:16.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:1.02,hair:"tresses marines",beard:0,brow:.6},
-  kael:{label:"guerrier cuirassé",headR:17.6,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.16,hair:"court guerrier",beard:.3,brow:.8},
-  sora:{label:"magicienne gracieuse",headR:16.6,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.96,hair:"long argenté",beard:0,brow:.55},
-  ael:{label:"androïde athlétique",headR:16.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:1.04,hair:"casque synthétique",beard:0,brow:.3}
+  gideon:{label:"athlète équilibré",headR:15.3,jaw:.68,neck:9,shoulder:22,hip:17,limb:1.06,hair:"court texturé",beard:.2,brow:.72},
+  kira:{label:"sprinteuse agile",headR:14.6,jaw:.48,neck:7.4,shoulder:18.4,hip:16.2,limb:.95,hair:"queue haute",beard:0,brow:.62},
+  titan:{label:"colosse puissant",headR:15.7,jaw:.94,neck:12.2,shoulder:28,hip:20,limb:1.28,hair:"rasé",beard:.52,brow:.92},
+  nova:{label:"stratège élancée",headR:14.8,jaw:.52,neck:8,shoulder:19.6,hip:16.8,limb:1,hair:"long ondulé",beard:0,brow:.58},
+  "godson-prime":{label:"champion royal",headR:15.4,jaw:.72,neck:10,shoulder:23.4,hip:18,limb:1.12,hair:"court royal",beard:.16,brow:.76},
+  zara:{label:"vague athlétique",headR:14.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:1.02,hair:"tresses marines",beard:0,brow:.6},
+  kael:{label:"guerrier cuirassé",headR:15.5,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.16,hair:"court guerrier",beard:.3,brow:.8},
+  sora:{label:"magicienne gracieuse",headR:14.7,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.96,hair:"long argenté",beard:0,brow:.55},
+  ael:{label:"androïde athlétique",headR:14.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:1.04,hair:"casque synthétique",beard:0,brow:.3}
 };
 const HUMAN_PROFILE_LOOKUP={}; Object.keys(HUMAN_PROFILES).forEach(k=>{ HUMAN_PROFILE_LOOKUP[k.toLowerCase()]=HUMAN_PROFILES[k]; });
 function humanProfile(f){ const key=String((f&&f.char&&f.char.id)||"gideon").toLowerCase(); return HUMAN_PROFILE_LOOKUP[key]||HUMAN_PROFILES.gideon; }
@@ -471,8 +471,11 @@ function taperedSegment(x1,y1,x2,y2,w1,w2,color,highlight){
   ctx.quadraticCurveTo(x2+dx/len*w2*.22,y2+dy/len*w2*.22,x2-nx*w2/2,y2-ny*w2/2);
   ctx.quadraticCurveTo((x1+x2)/2-nx*(w1+w2)*.27,(y1+y2)/2-ny*(w1+w2)*.27,x1-nx*w1/2,y1-ny*w1/2);
   ctx.quadraticCurveTo(x1-dx/len*w1*.2,y1-dy/len*w1*.2,x1+nx*w1/2,y1+ny*w1/2);
-  ctx.fillStyle=color; ctx.fill(); ctx.strokeStyle="rgba(5,8,16,.46)"; ctx.lineWidth=1.6; ctx.stroke();
-  if(highlight){ ctx.save(); ctx.globalAlpha=.2; ctx.strokeStyle="#ffffff"; ctx.lineWidth=Math.max(1.4,w1*.16); ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(lerp(x1,x2,.14)-nx*w1*.2,lerp(y1,y2,.14)-ny*w1*.2); ctx.lineTo(lerp(x1,x2,.78)-nx*w2*.18,lerp(y1,y2,.78)-ny*w2*.18); ctx.stroke(); ctx.restore(); }
+  ctx.fillStyle=color; ctx.fill(); ctx.strokeStyle="rgba(5,8,16,.38)"; ctx.lineWidth=1.25; ctx.stroke();
+  ctx.save(); ctx.lineCap="round";
+  ctx.globalAlpha=.23; ctx.strokeStyle="#000000"; ctx.lineWidth=Math.max(1.6,w1*.21); ctx.beginPath(); ctx.moveTo(lerp(x1,x2,.13)+nx*w1*.21,lerp(y1,y2,.13)+ny*w1*.21); ctx.lineTo(lerp(x1,x2,.84)+nx*w2*.19,lerp(y1,y2,.84)+ny*w2*.19); ctx.stroke();
+  ctx.globalAlpha=highlight?.3:.17; ctx.strokeStyle="#ffffff"; ctx.lineWidth=Math.max(1.3,w1*.16); ctx.beginPath(); ctx.moveTo(lerp(x1,x2,.13)-nx*w1*.2,lerp(y1,y2,.13)-ny*w1*.2); ctx.lineTo(lerp(x1,x2,.82)-nx*w2*.18,lerp(y1,y2,.82)-ny*w2*.18); ctx.stroke();
+  ctx.restore();
 }
 function drawFist(x,y,r,angle,color){
   ctx.save(); ctx.translate(x,y); ctx.rotate(angle||0);
@@ -484,7 +487,7 @@ function drawFist(x,y,r,angle,color){
   ctx.restore();
 }
 function drawHumanArm(x1,y1,x2,y2,x3,y3,width,sleeve,skin,glove,front){
-  const solved=solveJoint(x1,y1,x3,y3,34,33,1),ex=lerp(x2,solved.x,.48),ey=lerp(y2,solved.y,.48);
+  const solved=solveJoint(x1,y1,x3,y3,37,36,1),ex=lerp(x2,solved.x,.48),ey=lerp(y2,solved.y,.48);
   const wrist={x:lerp(ex,x3,.8),y:lerp(ey,y3,.8)},angle=Math.atan2(y3-wrist.y,x3-wrist.x);
   taperedSegment(x1,y1,ex,ey,width,width*.8,sleeve,front);
   taperedSegment(ex,ey,wrist.x,wrist.y,width*.74,width*.56,skin,front);
@@ -505,15 +508,16 @@ function drawHumanLeg(x1,y1,x2,y2,x3,y3,width,pants,accent,front,shoeAngle){
   taperedSegment(x1,y1,x2,y2,width,width*.8,pants,front);
   taperedSegment(x2,y2,ankle.x,ankle.y,width*.74,width*.52,shade(pants,-16),front);
   taperedSegment(lerp(x2,ankle.x,.78),lerp(y2,ankle.y,.78),ankle.x,ankle.y,width*.56,width*.54,pants,false);
+  if(front){ ctx.save(); ctx.globalAlpha=.72; ctx.strokeStyle=accent; ctx.lineWidth=2.2; ctx.lineCap="round"; ctx.beginPath(); ctx.moveTo(x1+width*.2,y1+5); ctx.quadraticCurveTo(x2+width*.22,y2,ankle.x+width*.13,ankle.y-4); ctx.stroke(); ctx.restore(); }
   ctx.fillStyle=front?"rgba(255,255,255,.18)":"rgba(0,0,0,.18)"; ctx.beginPath(); ctx.arc(x2,y2,width*.34,0,7); ctx.fill();
   drawShoe(x3+4,y3-1,shoeAngle||0,front?1.14:1.06,accent,front);
 }
 
 function drawGhosts(){
   for(const g of ghosts){ ctx.save(); ctx.globalAlpha=(g.life/g.max)*.34; ctx.translate(g.x,g.y); ctx.scale(g.facing*g.scale,g.scale);
-    ctx.fillStyle=g.c; ctx.beginPath(); ctx.ellipse(8,-151,15,18,0,0,7); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(-20*g.bulk,-126); ctx.quadraticCurveTo(2,-137,21*g.bulk,-124); ctx.quadraticCurveTo(17*g.bulk,-96,18*g.bulk,-76); ctx.lineTo(-18*g.bulk,-76); ctx.quadraticCurveTo(-18*g.bulk,-103,-20*g.bulk,-126); ctx.fill();
-    taperedSegment(-5,-78,-16,-38,13*g.bulk,8,g.c,false); taperedSegment(7,-78,17,-39,13*g.bulk,8,g.c,false);
+    ctx.fillStyle=g.c; ctx.beginPath(); ctx.ellipse(8,-164,14,16,0,0,7); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(-20*g.bulk,-138); ctx.quadraticCurveTo(2,-149,21*g.bulk,-136); ctx.quadraticCurveTo(17*g.bulk,-106,18*g.bulk,-84); ctx.lineTo(-18*g.bulk,-84); ctx.quadraticCurveTo(-18*g.bulk,-113,-20*g.bulk,-138); ctx.fill();
+    taperedSegment(-5,-86,-16,-42,15*g.bulk,9,g.c,false); taperedSegment(7,-86,17,-43,15*g.bulk,9,g.c,false);
     ctx.strokeStyle=g.accent; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-24,-104); ctx.lineTo(-48,-92); ctx.stroke(); ctx.restore(); }
 }
 function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
@@ -651,43 +655,43 @@ function drawFighter(f){
   const bob=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1):0;
   const walking=motion.run>.07&&f.grounded&&f.dashT<=0,hurt=f.hitStun>0,down=f.downT>0;
   drawShadow(f);
-  if(f.energy>=50&&!f.dead&&!down){ const size=f.energy>=100?225:168,pulse=1+Math.sin(renderTicker*.12+f.id)*.06; ctx.save(); ctx.globalAlpha=f.energy>=100?.62:.42; ctx.drawImage(glowSprite(sk.trail),f.rx-size*pulse/2,f.ry-92*ch.scale-size*pulse/2,size*pulse,size*pulse); ctx.restore(); }
+  if(f.energy>=50&&!f.dead&&!down){ const size=f.energy>=100?225:168,pulse=1+Math.sin(renderTicker*.12+f.id)*.06; ctx.save(); ctx.globalAlpha=f.energy>=100?.62:.42; ctx.drawImage(glowSprite(sk.trail),f.rx-size*pulse/2,f.ry-104*ch.scale-size*pulse/2,size*pulse,size*pulse); ctx.restore(); }
   ctx.save(); ctx.translate(f.rx,f.ry);
   if(f.dead){ const k=easeOutCubic(Math.min(1,f.koT/25)); ctx.rotate(-f.facing*1.42*k); }
   else if(down){ const k=easeOutCubic(Math.min(1,(42-f.downT)/10)); ctx.rotate(-f.facing*1.38*k); }
   else ctx.rotate((motion.lean+motion.air*clamp(f.vy*.0016,-.025,.035)-motion.hurt*.055+motion.dash*.09)*(f.facing||1));
-  let sx=ch.scale*1.04,sy=ch.scale*1.04;
+  let sx=ch.scale*1.08,sy=ch.scale*1.08;
   sy*=1+motion.squash*.045+motion.air*clamp(-f.vy*.0018,-.015,.045); sx*=1-motion.squash*.035;
   const visualFace=Math.abs(motion.face)<.22?(motion.face<0?-.22:.22):motion.face;
   ctx.scale(visualFace*sx,sy);
   if(f.hitFlash>0){ try{ctx.filter="brightness(2.05) saturate(.45)";}catch(e){} }
-  const hipY=lerp(-79,-58,cb)+bob,shY=lerp(-129,-104,cb)+bob+motion.fatigue*2.1,headY=lerp(-152,-126,cb)+bob+motion.fatigue*1.2;
+  const hipY=lerp(-86,-63,cb)+bob,shY=lerp(-140,-113,cb)+bob+motion.fatigue*2.1,headY=lerp(-166,-137,cb)+bob+motion.fatigue*1.2;
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0);
   const hipX=motion.lean*9+motion.weight*1.15-motion.hurt*2,shX=motion.lean*25+motion.weight*2.1+attackShift+motion.guard*3-motion.hurt*6,headX=6+shX*.62+motion.head*9+(motion.headLag||0)-motion.hurt*3;
   // Cape de Nova et de GODSON PRIME
   if((ch.style==="nova"||ch.style==="prime"||ch.style==="guerrier"||ch.style==="magicienne")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*(6+motion.run*5)-((f.vx||0)+(f.kvx||0))*(f.facing||1)*1.7-motion.dash*9; const cg=cachedLinearGradient("cape:"+sk.dark+":"+sk.accent+":"+Math.round(shY/4),0,shY,0,-8,[[0,sk.dark],[1,sk.accent]]); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(shX-13,shY+4); ctx.quadraticCurveTo(shX-44+wv,-62,hipX-35+wv*1.3,-8); ctx.quadraticCurveTo(hipX-14,-28,hipX-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
   // Jambes : cycle de marche/course lié à la vitesse, appuis et genoux articulés
-  let bFoot={x:hipX-23-motion.lean*8,y:0},fFoot={x:hipX+25+motion.lean*5,y:0},bKnee={x:hipX-16,y:lerp(-40,-28,cb)},fKnee={x:hipX+18,y:lerp(-39,-27,cb)};
+  let bFoot={x:hipX-23-motion.lean*8,y:0},fFoot={x:hipX+25+motion.lean*5,y:0},bKnee={x:hipX-16,y:lerp(-44,-31,cb)},fKnee={x:hipX+18,y:lerp(-43,-30,cb)};
   if(cb>.12){ bFoot.x=lerp(bFoot.x,hipX-29,cb); fFoot.x=lerp(fFoot.x,hipX+27,cb); }
   if(walking){
     const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stride=(15+motion.run*18)*strideDir,s=Math.sin(f.walkPhase||0),c=Math.cos(f.walkPhase||0),mix=clamp(motion.run*1.35,0,1);
     bFoot.x=lerp(bFoot.x,hipX-4-s*stride,mix); fFoot.x=lerp(fFoot.x,hipX+6+s*stride,mix);
     bFoot.y=lerp(bFoot.y,-Math.max(0,-c)*(4+motion.run*8),mix); fFoot.y=lerp(fFoot.y,-Math.max(0,c)*(4+motion.run*8),mix);
     bKnee.x=(hipX-4+bFoot.x)/2+7*strideDir; fKnee.x=(hipX+5+fFoot.x)/2+8*strideDir;
-    bKnee.y=lerp(bKnee.y,-42-Math.max(0,-c)*7,mix); fKnee.y=lerp(fKnee.y,-42-Math.max(0,c)*7,mix);
+    bKnee.y=lerp(bKnee.y,-46-Math.max(0,-c)*7,mix); fKnee.y=lerp(fKnee.y,-46-Math.max(0,c)*7,mix);
   }
   if(!f.dead&&motion.air>.03){
     const a=motion.air,airSwing=clamp(f.vy*.22,-3,4);
     bFoot={x:lerp(bFoot.x,hipX-18-airSwing,a),y:lerp(bFoot.y,-29+airSwing,a)}; fFoot={x:lerp(fFoot.x,hipX+23+airSwing,a),y:lerp(fFoot.y,-18-airSwing,a)};
-    bKnee={x:lerp(bKnee.x,hipX-12,a),y:lerp(bKnee.y,-49,a)}; fKnee={x:lerp(fKnee.x,hipX+20,a),y:lerp(fKnee.y,-49,a)};
+    bKnee={x:lerp(bKnee.x,hipX-12,a),y:lerp(bKnee.y,-55,a)}; fKnee={x:lerp(fKnee.x,hipX+20,a),y:lerp(fKnee.y,-55,a)};
   }
-  if(f.attackType==="kick"){ fFoot={x:hipX+45+kickExt,y:-78-phase*4}; fKnee={x:hipX+27+kickExt*.45,y:-83}; }
-  if(f.attackType==="airKick"){ fFoot={x:hipX+45+kickExt,y:-48-phase*3}; fKnee={x:hipX+27+kickExt*.4,y:-63}; }
+  if(f.attackType==="kick"){ fFoot={x:hipX+45+kickExt,y:-92-phase*4}; fKnee={x:hipX+27+kickExt*.45,y:-96}; }
+  if(f.attackType==="airKick"){ fFoot={x:hipX+45+kickExt,y:-56-phase*3}; fKnee={x:hipX+27+kickExt*.4,y:-70}; }
   if(f.attackType==="sweep"){ fFoot={x:hipX+45+kickExt,y:-8}; fKnee={x:hipX+27+kickExt*.45,y:-25}; }
   if(motion.dash>.04){ const d=motion.dash; bFoot={x:lerp(bFoot.x,hipX-34,d),y:lerp(bFoot.y,-7,d)}; fFoot={x:lerp(fFoot.x,hipX+31,d),y:lerp(fFoot.y,-2,d)}; }
   if(!f.dead){
-    bKnee=solveJoint(hipX-4,hipY,bFoot.x,bFoot.y-7,42,41,-1);
-    if(f.attackType!=="kick"&&f.attackType!=="airKick"&&f.attackType!=="sweep")fKnee=solveJoint(hipX+5,hipY,fFoot.x,fFoot.y-7,42,41,-1);
+    bKnee=solveJoint(hipX-4,hipY,bFoot.x,bFoot.y-7,46,45,-1);
+    if(f.attackType!=="kick"&&f.attackType!=="airKick"&&f.attackType!=="sweep")fKnee=solveJoint(hipX+5,hipY,fFoot.x,fFoot.y-7,46,45,-1);
   }
   const legW=20.2*human.limb;
   const backShoeAngle=clamp(-bFoot.y*.018,0,.34),frontShoeAngle=f.attackType==="kick"||f.attackType==="airKick"?-.1:clamp(-fFoot.y*.018,0,.34);
@@ -731,6 +735,33 @@ function drawFighter(f){
   ctx.save(); ctx.strokeStyle="rgba(0,0,0,.24)"; ctx.lineWidth=1.5;
   [-.38,0,.36].forEach((o,i)=>{ ctx.beginPath(); ctx.moveTo(shX+shoulderHalf*o,shY+12); ctx.quadraticCurveTo(waistX+hipHalf*o+(motion.clothSway||0)*(.22+i*.08),waistY,hipX+hipHalf*o*.82,hipY-2); ctx.stroke(); });
   ctx.strokeStyle="rgba(255,255,255,.24)"; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.55,shY+8); ctx.quadraticCurveTo(shX,shY+1,shX+shoulderHalf*.52,shY+8); ctx.stroke(); ctx.restore();
+  // Tenues signatures V4 HD : col, lumière rasante et détails propres à chaque style.
+  ctx.save(); ctx.lineCap="round"; ctx.lineJoin="round";
+  ctx.strokeStyle=sk.accent; ctx.lineWidth=2.2; ctx.globalAlpha=.8; ctx.beginPath(); ctx.moveTo(shX-8,shY+2); ctx.lineTo(shX+3,shY+17); ctx.lineTo(shX+13,shY+2); ctx.stroke();
+  ctx.globalAlpha=.3; ctx.strokeStyle="#ffffff"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(shoulderFront.x-2,shoulderFront.y+5); ctx.quadraticCurveTo(waistX+hipHalf*.76,waistY,hipFront.x-1,hipFront.y+2); ctx.stroke();
+  ctx.globalAlpha=.9; ctx.lineWidth=2.1;
+  if(ch.style==="guerrier"||ch.style==="titan"){
+    ctx.strokeStyle="rgba(0,0,0,.34)"; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.62,shY+20); ctx.quadraticCurveTo(shX,shY+28,shX+shoulderHalf*.62,shY+20); ctx.moveTo(shX-shoulderHalf*.55,shY+34); ctx.quadraticCurveTo(shX,shY+42,shX+shoulderHalf*.55,shY+34); ctx.stroke();
+    ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX+2,shY+16); ctx.lineTo(shX+2,hipY-3); ctx.stroke();
+  }else if(ch.style==="synthetique"){
+    ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.58,shY+22); ctx.lineTo(shX+shoulderHalf*.58,shY+22); ctx.moveTo(shX+3,shY+34); ctx.lineTo(shX+3,hipY-4); ctx.stroke();
+    ctx.fillStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX+3,shY+39); ctx.lineTo(shX+8,shY+45); ctx.lineTo(shX+3,shY+51); ctx.lineTo(shX-2,shY+45); ctx.closePath(); ctx.fill();
+  }else if(ch.style==="magicienne"){
+    ctx.strokeStyle="#ffd54f"; ctx.beginPath(); ctx.moveTo(shX-6,shY+8); ctx.quadraticCurveTo(shX+3,waistY,shX+2,hipY-2); ctx.moveTo(shX+12,shY+8); ctx.quadraticCurveTo(shX+6,waistY,shX+8,hipY-2); ctx.stroke();
+    ctx.fillStyle=sk.accent; ctx.beginPath(); ctx.arc(shX+4,waistY+5,3.2,0,7); ctx.fill();
+  }else if(ch.style==="prime"){
+    ctx.strokeStyle="#ffc400"; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(shoulderBack.x+7,shoulderBack.y+8); ctx.quadraticCurveTo(waistX,waistY,hipFront.x-4,hipFront.y); ctx.stroke();
+  }else if(ch.style==="kunoichi"){
+    ctx.strokeStyle=sk.dark; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(shoulderFront.x-6,shoulderFront.y+7); ctx.quadraticCurveTo(waistX,waistY,hipBack.x+5,hipBack.y); ctx.stroke();
+    ctx.strokeStyle=sk.accent; ctx.lineWidth=1.8; ctx.beginPath(); ctx.moveTo(shoulderFront.x-9,shoulderFront.y+10); ctx.quadraticCurveTo(waistX-2,waistY+2,hipBack.x+3,hipBack.y+3); ctx.stroke();
+  }else if(ch.style==="nova"){
+    ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.arc(shX+4,shY+24,15,3.75,5.75); ctx.stroke(); ctx.beginPath(); ctx.arc(shX+4,shY+24,19,0.55,2.35); ctx.stroke();
+  }else if(ch.style==="Zara"){
+    ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.55,shY+37); ctx.quadraticCurveTo(shX-shoulderHalf*.2,shY+30,shX,shY+37); ctx.quadraticCurveTo(shX+shoulderHalf*.25,shY+44,shX+shoulderHalf*.55,shY+36); ctx.stroke();
+  }else{
+    ctx.strokeStyle=sk.accent; ctx.beginPath(); ctx.moveTo(shX-shoulderHalf*.58,shY+18); ctx.lineTo(shX+shoulderHalf*.58,shY+18); ctx.moveTo(shX-shoulderHalf*.5,shY+31); ctx.lineTo(shX+shoulderHalf*.5,shY+31); ctx.stroke();
+  }
+  renderStats.outfitDetails=(renderStats.outfitDetails||0)+1; ctx.restore();
   const emblemX=shX+4,emblemY=shY+24;
   ctx.fillStyle="rgba(255,255,255,.94)"; ctx.beginPath(); ctx.arc(emblemX,emblemY,9.5,0,7); ctx.fill(); ctx.strokeStyle="rgba(0,0,0,.25)"; ctx.stroke();
   ctx.fillStyle=sk.dark; ctx.font="1000 11px Arial"; ctx.textAlign="center";
@@ -740,7 +771,7 @@ function drawFighter(f){
   // Bras avant selon pose
   const armW=16.4*human.limb;
   if(f.victory&&(state==="roundEnd"||state==="matchEnd")&&!f.dead){
-    drawHumanArm(shX+8,shY+4,shX+22,-142+bob,shX+27,-176+bob+Math.sin(renderTicker*.15)*4,armW,sk.primary,sk.skin,sk.glove,true);
+    drawHumanArm(shX+8,shY+4,shX+22,-154+bob,shX+27,-190+bob+Math.sin(renderTicker*.15)*4,armW,sk.primary,sk.skin,sk.glove,true);
   }else if(guardMix>.08&&f.attackT<=0){
     const g=guardMix,frontSwing=-armSwing*.35*(1-g);
     drawHumanArm(shX+8,shY+4,lerp(shX+24+frontSwing,shX+27,g),lerp(shY+16,shY+15,g),lerp(shX+34+frontSwing*1.35,shX+24,g),lerp(shY+12+Math.sin(motion.breath)*1.2,shY+21,g),armW,sk.primary,sk.skin,sk.glove,true);
@@ -773,7 +804,7 @@ function drawFighter(f){
   try{ctx.filter="none";}catch(e){}
   ctx.restore();
   if(down||f.dead){ ctx.save(); ctx.fillStyle="#ffd54f"; ctx.font="15px Arial"; ctx.textAlign="center"; for(let i=0;i<3;i++){ const a=renderTicker*.09+i*2.1; ctx.fillText("★",f.rx+Math.cos(a)*24,f.ry-30+Math.sin(a)*7); } ctx.restore(); }
-  if(f.blocking||f.parryFlashT>0){ const parryReady=f.parryT>0||f.parryFlashT>0; ctx.save(); ctx.strokeStyle=parryReady?"rgba(255,196,0,.98)":"rgba(129,212,250,.95)"; ctx.fillStyle=parryReady?"rgba(255,196,0,.2)":"rgba(79,195,247,.15)"; ctx.lineWidth=parryReady?5:4; ctx.drawImage(glowSprite(parryReady?"#ffc400":"#4fc3f7"),f.rx+f.facing*36-48,f.ry-102*ch.scale-48,96,96); ctx.beginPath(); ctx.arc(f.rx+f.facing*36,f.ry-96*ch.scale,(50+(f.parryFlashT>0?(16-f.parryFlashT)*1.4:0))*ch.scale,f.facing>0?-.95:Math.PI-.95,f.facing>0?.95:Math.PI+.95); ctx.fill(); ctx.stroke(); ctx.restore(); }
+  if(f.blocking||f.parryFlashT>0){ const parryReady=f.parryT>0||f.parryFlashT>0; ctx.save(); ctx.strokeStyle=parryReady?"rgba(255,196,0,.98)":"rgba(129,212,250,.95)"; ctx.fillStyle=parryReady?"rgba(255,196,0,.2)":"rgba(79,195,247,.15)"; ctx.lineWidth=parryReady?5:4; ctx.drawImage(glowSprite(parryReady?"#ffc400":"#4fc3f7"),f.rx+f.facing*36-48,f.ry-112*ch.scale-48,96,96); ctx.beginPath(); ctx.arc(f.rx+f.facing*36,f.ry-106*ch.scale,(50+(f.parryFlashT>0?(16-f.parryFlashT)*1.4:0))*ch.scale,f.facing>0?-.95:Math.PI-.95,f.facing>0?.95:Math.PI+.95); ctx.fill(); ctx.stroke(); ctx.restore(); }
   if(f.counterWindowT>0&&isCombat()){ ctx.save(); ctx.font="1000 12px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle="rgba(90,50,0,.82)"; rr(f.rx-43,f.ry-236*ch.scale,86,20,10); ctx.fill(); ctx.fillStyle="#ffc400"; ctx.fillText("⚡ RIPOSTE !",f.rx,f.ry-222*ch.scale); ctx.restore(); }
   /* V3.4 : plus de plaque de nom au-dessus des combattants — le HUD affiche déjà les noms ; la zone de combat reste dégagée. */
 }

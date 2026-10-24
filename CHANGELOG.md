@@ -3,6 +3,25 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [4.0.0] — 24 octobre 2026 — « Arcade plein écran & anatomie HD » (nouvelle direction du propriétaire)
+### Quitter le mini-jeu : coque de vrai jeu — Manager + Lena
+- 🖥️ **100 % de l’écran appartient au jeu** : l’application occupe tout le viewport et la scène 16:9 prend la plus grande surface manipulable possible. Fini la page avec cadre réduit, pied de page et zones mortes.
+- 🎛️ **Barre système intégrée à la scène** : logo, statistiques, Réglages, Tactile, Paysage et Pause vivent dans le jeu ; en combat, elle disparaît complètement sur tous les écrans — seule la pause flottante demeure.
+- 📱 Safe-areas conservées, défilement de page supprimé, menus et overlays recalés sous la barre système.
+
+### Personnages HD inspirés des planches — Kenzo + Marco
+- 🧍 **Proportions adultes renforcées** : tête réduite (14,5–16 px), jambes et bras allongés (IK 46/45 et 37/36), squelette relevé et présence visuelle +8 %.
+- 🎨 **Matières et volumes** : chaque membre reçoit ombre portée et lumière rasante (volume cylindrique), contours adoucis, bande latérale de pantalon et reflets alignés sur la nouvelle anatomie.
+- 👕 **Tenues signatures par style** : plastron du Guerrier/Titan, circuits et cœur lumineux d’AEL-7, liserés dorés de Sora, écharpe royale de Prime, sash de Kira, orbites de Nova, vague de Zara.
+- 🎥 **Caméra de jeu de combat** : zoom rapproché jusqu’à **1,34×** (1,42× en intro/fin de round) avec cadrage adaptatif — les combattants occupent enfin l’écran comme dans les grandes licences 2D.
+
+### Garanties — Nadia + Sarah
+- 🎯 Refonte strictement présentation/rendu : hitboxes, équilibrage, déterminisme, replays, sauvegardes et Online inchangés.
+- 🧪 Suite portée à **287 assertions source / 331 vérifications affichées** ; gate QA avec contrôle permanent n°22 ; captures natives relues (grille des cartes + vrai duel Kael vs AEL-7 à zoom 1,34×).
+- 👥 Équipe renforcée : **Marco** (direction artistique personnages) et **Lena** (UX plein écran) rejoignent Nadia, Kenzo et Sarah — voir `docs/EQUIPE.md` et `docs/SPRINT_V40_ARCADE_PRO.md`.
+
+---
+
 ## [3.7.0] — 24 octobre 2026 — « Sélection & Corps pleins » (retour direct du propriétaire)
 ### Écran de sélection reconstruit — Manager + Kenzo
 - 🃏 **Cartes avec aperçu animé du vrai combattant** : fini le simple médaillon avec une lettre. Chaque personnage est dessiné en miniature par le moteur du jeu — tête, torse, bras, gants, jambes et chaussures visibles — avec respiration et clignements.
