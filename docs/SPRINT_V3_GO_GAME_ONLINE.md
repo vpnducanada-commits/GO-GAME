@@ -47,6 +47,7 @@ Livrer la première expérience connectée complète de GO GAME sans sacrifier l
 - Test lockstep invité/hôte, frame bloquée sans input distant, checksum divergent différé, pause interdite et restauration des réglages.
 - Client Supabase/WebRTC exercé contre une API simulée déterministe, lectures publiques réelles vérifiées par `tools/supabase-smoke.mjs`, puis **test réel avec deux comptes QA jetables** : profils, cloud, replay privé, salon/RPC/signaux, premier claim `waiting_counterparty`, second claim `verified` et classement contrôlé. Toutes les données et les quatre comptes QA (dont la première tentative ayant révélé le `BOOT_ERROR`) ont été supprimés après preuve.
 - Un test manuel final avec deux comptes et deux navigateurs/appareils reste recommandé avant un tournoi public, car JSDOM ne remplace ni les NAT ni les réseaux mobiles réels.
+- Déploiement public vérifié en HTTPS : https://vpnducanada-commits.github.io/GO-GAME/ (branche `gh-pages` synchronisée avec la release).
 
 ---
 ✍️ Track pilotée par le Manager officiel du Studio Gideon - Godson ARENA.
