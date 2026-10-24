@@ -266,8 +266,8 @@ try {
   assert(ev('PROFILE.names.p1') === 'Champion GG', 'nom personnalisé sauvegardé');
   for (const id of ['stadium', 'tokyo', 'temple', 'Libreville']) { ev(`setArenaById(${JSON.stringify(id)})`); ev('render()'); }
   assert(ev('currentArena.id') === 'Libreville' && ev('ARENAS.length') === 4, 'les 4 arènes se rendent sans erreur, dont Libreville');
-  for (let i = 0; i < 6; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); render();`); }
-  assert(ev('CHARACTERS.length') === 6, 'les 6 personnages se rendent sans erreur');
+  for (let i = 0; i < 9; i++) { ev(`applyCharacterTo(p1,${i}); p1.reset(); render();`); }
+  assert(ev('CHARACTERS.length') === 9, 'les 9 personnages se rendent sans erreur');
   ev('applyCharacterTo(p1,5); p1.reset(); p1.x=300; p1.facing=1; p2.x=1000; p1.y=p2.y=GROUND; projectiles=[]; p1.attackType="super"; spawnProjectile(p1); updateProjectiles();');
   assert(ev('projectiles[0].kind') === 'wave' && ev('projectiles[0].y') === 572, 'physique Zara : la vague reste au ras du sol');
 
@@ -363,7 +363,7 @@ try {
 
   console.log('\n— V2.7 : Replay Studio & lignes de victoire —');
   assert(ev('typeof loadReplayLibrary') === 'function' && ev('typeof renderReplayLibrary') === 'function' && ev('typeof renameReplayById') === 'function', 'bibliothèque de replays disponible');
-  assert(ev('CHARACTERS.every(c=>c.victoryLine&&c.victoryLine.length>12)') === true, 'les 6 combattants ont une ligne de victoire signature');
+  assert(ev('CHARACTERS.every(c=>c.victoryLine&&c.victoryLine.length>12)') === true, 'les 9 combattants ont une ligne de victoire signature');
   const firstStudioReplayId = ev('lastReplayData.id'), firstStudioHash = ev('lastReplayData.finalHash');
   assert(!!firstStudioReplayId && ev('replayLibrary[0].id') === firstStudioReplayId && ev('loadReplayLibrary()[0].finalHash') === firstStudioHash, 'le replay V2.6 devient le premier élément persisté de la bibliothèque');
   ev(`renameReplayById(${JSON.stringify(firstStudioReplayId)},"Finale Godson Studio"); setReplayFavorite(${JSON.stringify(firstStudioReplayId)},true);`);
@@ -420,12 +420,12 @@ try {
   }
 
   const signatureStyles = new Set();
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 9; i++) {
     ev(`applyCharacterTo(p1,${i}); p1.reset(); projectiles=[{x:640,y:400,px:640,py:400,rx:640,ry:400,vx:8,vy:0,r:18,owner:p1,super:false,life:100,kind:"bolt"}]; renderStats.signatureVfx=0; qualityLevel=0; drawProjectiles();`);
     signatureStyles.add(ev('renderStats.lastSignatureVfx'));
     assert(ev('renderStats.signatureVfx') === 1, 'VFX signature actif même en qualité basse : ' + ev('CHARACTERS[' + i + '].name'));
   }
-  assert(signatureStyles.size === 6, '6 signatures VFX distinctes pour les 6 combattants');
+  assert(signatureStyles.size === 9, '9 signatures VFX distinctes pour les 9 combattants');
   ev('projectiles=[]; qualityLevel=2; resizeCanvas();');
 
   ev('clearTouchInputs(); setTouchPointer("right",101,true); setTouchPointer("right",102,true);');
@@ -477,9 +477,9 @@ try {
   holdCodes(['KeyF', 'KeyG'], 2); step(24); ev('keys.delete("ArrowDown")');
   assert(ev('p1.stats.throws') === 1 && ev('p2.health') < hpBeforeThrow, 'projection Poing+Pied : traverse la garde, dégâts et statistique comptabilisés');
 
-  /* EX : une variante renforcée et marquée pour chacun des 6 combattants. */
-  const expectedExCounts = [1, 4, 2, 2, 3, 3];
-  for (let i = 0; i < 6; i++) {
+  /* EX : une variante renforcée et marquée pour chacun des 9 combattants. */
+  const expectedExCounts = [1, 4, 2, 2, 3, 3, 2, 3, 4];
+  for (let i = 0; i < 9; i++) {
     ev(`applyCharacterTo(p1,${i}); p1.reset(); p1.x=420; p2.x=880; p1.y=p2.y=GROUND; projectiles=[]; p1.attackType="exspecial"; p1.attackEx=true; spawnProjectile(p1);`);
     assert(ev('projectiles.length') === expectedExCounts[i] && ev('projectiles.every(p=>p.ex)') === true, 'EX unique et marqué : ' + ev('CHARACTERS[' + i + '].name'));
   }
@@ -547,15 +547,15 @@ try {
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
   assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
-  assert(ev('Object.keys(HUMAN_PROFILES).length') === 6, '6 morphologies humaines déclarées');
+  assert(ev('Object.keys(HUMAN_PROFILES).length') === 9, '9 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 9; i++) {
     const prof = ev(`(()=>{const p=humanProfile({char:CHARACTERS[${i}]}); return p.label+'|'+p.headR+'|'+p.shoulder+'|'+p.hip+'|'+p.limb+'|'+p.hair;})()`);
     humanSignatures.add(prof);
     const shoulder = Number(prof.split('|')[2]); minShoulder = Math.min(minShoulder, shoulder); maxShoulder = Math.max(maxShoulder, shoulder);
   }
-  assert(humanSignatures.size === 6 && maxShoulder - minShoulder >= 9, 'silhouettes distinctes : épaules de ' + minShoulder + ' à ' + maxShoulder);
-  assert(ev('(()=>{const rs=Object.values(HUMAN_PROFILES).map(p=>p.headR); return Math.max(...rs)<=18&&Math.min(...rs)>=16;})()') === true, 'proportions adultes : tête réduite (16 à 18 px) pour les 6 combattants');
+  assert(humanSignatures.size === 9 && maxShoulder - minShoulder >= 9, 'silhouettes distinctes : épaules de ' + minShoulder + ' à ' + maxShoulder);
+  assert(ev('(()=>{const rs=Object.values(HUMAN_PROFILES).map(p=>p.headR); return Math.max(...rs)<=18&&Math.min(...rs)>=16;})()') === true, 'proportions adultes : tête réduite (16 à 18 px) pour les 9 combattants');
   assert(ev('(()=>{const j=solveJoint(0,0,60,20,42,41,-1); return Math.abs(Math.hypot(j.x,j.y)-42)<1.5&&Math.abs(Math.hypot(60-j.x,20-j.y)-41)<1.5;})()') === true, 'IK deux segments : longueurs des membres respectées');
   assert(ev('(()=>{const j=solveJoint(0,0,400,0,42,41,1); return Number.isFinite(j.x)&&Number.isFinite(j.y);})()') === true, 'IK : cible hors de portée clampée sans NaN');
   ev('p1.reset(); p2.reset(); p1.x=p1.rx=500; p2.x=p2.rx=900; p1.y=p1.ry=p2.y=p2.ry=GROUND; p1.facing=1; p2.facing=-1; p1.health=p1.maxHealth;');
@@ -573,11 +573,11 @@ try {
   assert(ev('renderStats.lastFacialExpression') === 'douleur', 'visage : expression de douleur sur impact');
   ev('p1.blocking=true; drawFighter(p1); p1.blocking=false;');
   assert(ev('renderStats.lastFacialExpression') === 'garde', 'visage : expression de garde');
-  for (let i = 0; i < 6; i++) {
+  for (let i = 0; i < 9; i++) {
     ev(`applyCharacterTo(p1,${i}); p1.reset(); if(p1.motion)p1.motion.fatigue=0; drawFighter(p1);`);
     assert(ev('renderStats.lastHumanProfile') === ev('CHARACTERS[' + i + '].id'), 'rendu humain complet sans erreur : ' + ev('CHARACTERS[' + i + '].name'));
   }
-  assert(ev('renderStats.humanProfiles') === 6, 'métriques Humanité++ exposées (6 profils actifs)');
+  assert(ev('renderStats.humanProfiles') === 9, 'métriques Humanité++ exposées (9 profils actifs)');
   const logicalBeforeHuman = ev('p1.x+","+p1.y+","+p1.health+","+p1.vx');
   ev('drawFighter(p1); drawFighter(p2);');
   assert(ev('p1.x+","+p1.y+","+p1.health+","+p1.vx') === logicalBeforeHuman, 'Humanité++ 100 % visuel : physique, hitboxes et déterminisme inchangés');
@@ -629,7 +629,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^3\.[45]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -644,7 +644,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(ev('GAME_VERSION') === '3.5.0' && window.document.querySelector('h1').textContent.includes('V3.5 PRO'), 'version V3.5.0 affichée et exposée au moteur');
+  assert(/^3\.[56]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Math.max(...Object.values(ATTACKS).map(a=>a.hitstop||0))') <= 48 && ev('ATTACKS.punch.hitstop') <= 16, 'gel d’impact micro : coup léger ≤ 16 ms, aucun coup > 48 ms (avant : 42 à 105 ms)');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -771,6 +771,34 @@ try {
 }
 
 function finishTestRun() {
+
+  console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
+  assert(ev('GAME_VERSION') === '3.6.0' && window.document.querySelector('h1').textContent.includes('V3.6 PRO'), 'version V3.6.0 exposée');
+  assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
+  assert(ev('CHARACTERS.slice(6).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
+  assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 9, 'identifiants uniques pour les 9 combattants');
+  assert(ev('CHARACTERS.slice(6).every(c=>c.hp>=90&&c.hp<=115&&c.speed>=.9&&c.speed<=1.25)') === true, 'équilibrage : PV et vitesse des champions dans la fourchette du roster');
+  assert(ev('Boolean(HUMAN_PROFILES.kael&&HUMAN_PROFILES.sora&&HUMAN_PROFILES.ael)') === true, 'morphologies humaines dédiées aux 3 champions');
+  for (let i = 6; i < 9; i++) {
+    ev(`applyCharacterTo(p1,${i}); p1.reset(); p1.x=420; p2.x=880; p1.y=p2.y=GROUND; projectiles=[]; p1.attackType="special"; p1.attackEx=false; spawnProjectile(p1);`);
+    assert(ev('projectiles.length') === [1, 1, 2][i - 6], 'spécial du champion : ' + ev('CHARACTERS[' + i + '].name'));
+    ev('projectiles=[]; p1.attackType="super"; spawnProjectile(p1);');
+    assert(ev('projectiles.length') === [3, 3, 1][i - 6], 'super du champion : ' + ev('CHARACTERS[' + i + '].name'));
+  }
+  assert(ev('(()=>{applyCharacterTo(p1,6); p1.reset(); p1.x=420; p2.x=880; p1.y=GROUND; projectiles=[]; p1.attackType="special"; p1.attackEx=false; spawnProjectile(p1); return projectiles[0].kind==="blade"&&projectiles[0].pierce;})()') === true, 'KAEL : lame perçante signature');
+  assert(ev('(()=>{applyCharacterTo(p1,7); p1.reset(); p1.x=420; p2.x=880; p1.y=GROUND; projectiles=[]; p1.attackType="special"; p1.attackEx=false; spawnProjectile(p1); return projectiles[0].kind==="orb"&&projectiles[0].homing>0;})()') === true, 'Sora : orbe chercheuse signature');
+  assert(ev('(()=>{applyCharacterTo(p1,8); p1.reset(); p1.x=420; p2.x=880; p1.y=GROUND; projectiles=[]; p1.attackType="super"; spawnProjectile(p1); return projectiles[0].kind==="judgment"&&projectiles[0].r>=30;})()') === true, 'AEL-7 : Canon Orbital (projectile lourd)');
+  for (let i = 6; i < 9; i++) {
+    ev(`applyCharacterTo(p1,${i}); p1.reset(); if(p1.motion)p1.motion.fatigue=0; drawFighter(p1);`);
+    assert(ev('renderStats.lastHumanProfile') === ev('CHARACTERS[' + i + '].id'), 'rendu du champion avec sa morphologie : ' + ev('CHARACTERS[' + i + '].name'));
+  }
+  const renderSrcV36 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
+  assert(renderSrcV36.includes('chapeau pointu pour Sora') && renderSrcV36.includes('ch.style==="synthetique"') && renderSrcV36.includes('kael:"lames"') && renderSrcV36.includes('ael:"circuits"'), 'visuels dédiés : chapeau, visière et signatures VFX des champions');
+  const uiSrcV36 = fs.readFileSync(path.join(root, 'src/ui.js'), 'utf8');
+  assert(uiSrcV36.includes('normalPool=[0,1,2,3,5,6,7,8]') && uiSrcV36.includes('order=[0,1,2,3,5,6,7,8]'), 'Arcade et Survie peuvent présenter les nouveaux champions');
+  assert(['planche-personnages-1.jpg', 'planche-personnages-2.jpg', 'planche-personnages-3.jpg'].every(f => fs.existsSync(path.join(root, 'assets/concepts', f))) && fs.existsSync(path.join(root, 'docs/CONCEPTS_PERSONNAGES.md')), 'planches du propriétaire archivées en art conceptuel officiel');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu();');
+
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
   console.log('✅ TOUS LES TESTS PASSENT — aucune erreur d’exécution.');

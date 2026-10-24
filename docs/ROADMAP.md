@@ -110,6 +110,10 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
 
 ## 🌐 Après la V3.0 *(pistes, non engagées)*
+## ✅ V3.6 — « Nouveaux Champions » *(LIVRÉ le 24/10/2026 — 263 assertions source / 307 vérifications, suite verte)*
+- 🎨 À partir des 3 planches déposées par le propriétaire : **KAEL** (Guerrier d'Acier), **Sora** (Magicienne) et **AEL-7** (Synthétique) deviennent jouables dans le style procédural du jeu ; roster 6 → 9, ajout en fin de grille (Histoire/sauvegardes intacts), présents en Arcade et Survie.
+- 🎭 Morphologies, têtes dédiées (chapeau pointu, visière cyan, épaulettes cuirassées), signatures VFX (lames/runes/circuits) et EX uniques ; planches archivées dans `assets/concepts/` (voir `docs/CONCEPTS_PERSONNAGES.md`). Réserve V3.7+ : Muscle, Pirate, Karatéka, Elfe…
+
 Le socle connecté est livré et documenté dans `docs/V3_GO_GAME_FONDATIONS.md`, `docs/BACKEND_SUPABASE_GO_GAME.md` et `docs/SPRINT_V3_GO_GAME_ONLINE.md`. Les suites possibles sont le matchmaking public, un TURN dédié, la revanche synchronisée, les spectateurs et la relecture serveur des replays de tournoi. Le Sprint 09 local reste le prochain cap de contenu hors ligne.
 
 ## ⚠️ Risques & réponses

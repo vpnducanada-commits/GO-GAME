@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.5 PRO — MOTEUR DE JEU
+   GÉDÉON - Godson ARENA V3.6 PRO — MOTEUR DE JEU
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne GO GAME.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="3.5.0";
+const GAME_VERSION="3.6.0";
 const W=1280,H=720,GROUND=600;
 const canvas=document.getElementById("game"),ctx=canvas.getContext("2d",{alpha:false});
 const $=id=>document.getElementById(id);
@@ -323,7 +323,13 @@ const CHARACTERS=[
  {id:"godson-prime",name:"GODSON PRIME",title:"Le Champion Légendaire Secret",letter:"G",style:"prime",specName:"👑 Double Vague Royale",superName:"👑 Triple Jugement Royal",victoryLine:"Agenouille-toi devant la légende — puis relève-toi et deviens-en une.",unlockKey:"prime",lockedHint:"Termine le Chapitre 1 de l’Histoire pour le débloquer",hp:108,speed:1.12,power:1.12,atkSpeed:1.1,energyGain:1.25,scale:1.04,bulk:1.08,reach:1.05,gravity:.8,jump:16.4,knockRes:.9,dashCD:23,
   skin:{primary:"#f5a623",dark:"#7a3b00",accent:"#00e5ff",pants:"#17202b",skin:"#8d5524",hair:"#120b02",glove:"#0b1c2c",trail:"#ffc400"}},
  {id:"Zara",name:"Zara",title:"La Vague de Libreville",letter:"Z",style:"Zara",specName:"🌊 Lames de Marée",superName:"🌀 Raz-de-Marée Libreville",victoryLine:"La marée de Libreville finit toujours par emporter les certitudes.",hp:102,speed:1.14,power:1,atkSpeed:1.09,energyGain:1.18,scale:1,bulk:.94,reach:1.05,gravity:.77,jump:16.7,knockRes:.98,dashCD:22,
-  skin:{primary:"#00acc1",dark:"#006064",accent:"#ff7043",pants:"#073642",skin:"#7a4a21",hair:"#06202b",glove:"#ffd54f",trail:"#4dd0e1"}}
+  skin:{primary:"#00acc1",dark:"#006064",accent:"#ff7043",pants:"#073642",skin:"#7a4a21",hair:"#06202b",glove:"#ffd54f",trail:"#4dd0e1"}},
+ {id:"kael",name:"KAEL",title:"Le Guerrier d'Acier",letter:"K",style:"guerrier",specName:"⚔️ Lame d'Acier",superName:"⚔️ Croisade d'Acier",victoryLine:"Mon épée a tranché le doute bien avant ton premier pas.",hp:112,speed:.95,power:1.15,atkSpeed:.97,energyGain:1,scale:1.06,bulk:1.12,reach:1.12,gravity:.84,jump:15.2,knockRes:.88,dashCD:30,
+  skin:{primary:"#607d8b",dark:"#263238",accent:"#e53935",pants:"#2b343a",skin:"#d9a066",hair:"#16181c",glove:"#546e7a",trail:"#ff5252"}},
+ {id:"sora",name:"SORA",title:"La Magicienne des Arcanes",letter:"S",style:"magicienne",specName:"🔮 Orbe Arcanique",superName:"☄️ Comète Pourpre",victoryLine:"Les étoiles avaient déjà écrit ta défaite, je n'ai fait que la lire.",hp:94,speed:1.02,power:1.02,atkSpeed:1,energyGain:1.4,scale:.99,bulk:.88,reach:1,gravity:.74,jump:16.4,knockRes:1.05,dashCD:24,
+  skin:{primary:"#5e35b1",dark:"#2a1454",accent:"#b388ff",pants:"#1d1038",skin:"#e8b98d",hair:"#e8e6f5",glove:"#ffd54f",trail:"#b388ff"}},
+ {id:"ael",name:"AEL-7",title:"L'Unité Synthétique",letter:"A",style:"synthetique",specName:"🔷 Tir Plasma",superName:"🛰️ Canon Orbital",victoryLine:"Probabilité de ta victoire recalculée : 0,00 %.",hp:104,speed:1.18,power:.98,atkSpeed:1.12,energyGain:1.1,scale:1.02,bulk:.95,reach:1.04,gravity:.79,jump:16.8,knockRes:.95,dashCD:21,
+  skin:{primary:"#eceff1",dark:"#90a4ae",accent:"#18ffff",pants:"#263238",skin:"#cfd8dc",hair:"#eceff1",glove:"#102027",trail:"#18ffff"}}
 ];
 function charStatBars(c){ return {VIT:clamp(Math.round(c.speed*58),5,100),PUI:clamp(Math.round(c.power*62),5,100),VIE:clamp(Math.round(c.hp*.78),5,100),ÉNER:clamp(Math.round(c.energyGain*55),5,100)}; }
 
@@ -787,6 +793,24 @@ function abilitySpecs(f,isSuper,isEx){
         ?[S({y:GROUND-28,vx:dir*8.4,r:40,dmg:25,kind:"wave",life:190})]
         :isEx?[-1,0,1].map(i=>S({y:baseY+i*13,vx:dir*11.7,vy:i*.6,r:15,dmg:8,kind:"blade",pierce:i===0}))
         :[-1,1].map(i=>S({y:baseY+i*13,vx:dir*10.8,vy:i*.62,r:14,dmg:8,kind:"blade"}));
+      break;
+    case "kael":
+      specs=isSuper
+        ?[-26,0,26].map(off=>S({y:baseY+off,vx:dir*11.2,r:off===0?22:17,dmg:off===0?12:9,kind:"blade"}))
+        :isEx?[-16,16].map(off=>S({y:baseY+off,vx:dir*12,r:16,dmg:9,kind:"blade",pierce:true}))
+        :[S({vx:dir*11.8,r:16,dmg:13,kind:"blade",pierce:true})];
+      break;
+    case "sora":
+      specs=isSuper
+        ?[-70,0,70].map((off,i)=>S({x:clamp(op.x+off,45,W-45),y:70+i*24,vx:-off/60,vy:5.4,r:18,dmg:10,kind:"meteor",grav:.15,life:150}))
+        :isEx?[-26,0,26].map(off=>S({y:baseY+off,vx:dir*8.2,r:15,dmg:8,kind:"orb",homing:.15,life:190}))
+        :[S({vx:dir*7.4,r:20,dmg:13,kind:"orb",homing:.22,life:200})];
+      break;
+    case "ael":
+      specs=isSuper
+        ?[S({vx:dir*9.8,r:32,dmg:24,kind:"judgment",pierce:true,life:190})]
+        :isEx?[-24,-8,8,24].map(off=>S({y:baseY+off,vx:dir*12.6,r:12,dmg:6,kind:"bolt",pierce:true}))
+        :[-8,8].map(off=>S({y:baseY+off,vx:dir*12.2,r:12,dmg:7,kind:"bolt"}));
       break;
     default: // Gideon
       specs=isSuper

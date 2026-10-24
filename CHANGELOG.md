@@ -3,6 +3,22 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.6.0] — 24 octobre 2026 — « Nouveaux Champions » (planches déposées par le propriétaire)
+### Vos personnages entrent dans l'arène — Manager + Kenzo + Nadia
+- 🎨 Le propriétaire a déposé **3 planches de personnages** (≈ 33 designs). Décision d'équipe : les traduire en **combattants jouables dans le style animé du jeu** (même squelette Humanité++, mêmes expressions, 60 fps) plutôt que coller des images 3D qui jureraient avec le combat. Les planches sont archivées en art conceptuel officiel (`assets/concepts/` + `docs/CONCEPTS_PERSONNAGES.md`).
+- ⚔️ **KAEL — le Guerrier d'Acier** : armure acier clair, cape rouge, épaulettes cuirassées, 112 PV et la plus longue allonge du roster. Spécial : Lame d'Acier **perforante** ; SUPER : Croisade d'Acier (3 lames).
+- 🔮 **Sora — la Magicienne des Arcanes** : chapeau pointu à gemme, cheveux longs argentés, cape violette. Elle flotte (gravité réduite), recharge son énergie 40 % plus vite et tire des **orbes chercheuses** ; SUPER : Comète Pourpre (3 météores).
+- 🔷 **AEL-7 — l'Unité Synthétique** : casque lisse blanc, visière cyan lumineuse qui suit le regard, bouche à segments sonores. Le plus rapide au sol après Kira ; rafales plasma et SUPER Canon Orbital (projectile lourd perforant).
+- 🎭 Chaque champion a sa **morphologie**, sa **signature VFX** (lames / runes / circuits), son **EX unique** (2 / 3 / 4 projectiles) et sa ligne de victoire — aucun recolor.
+- 🗺️ Roster porté de **6 à 9 combattants**, ajoutés en fin de grille : Histoire, sauvegardes et replays existants intacts. Les champions apparaissent en **Arcade** et **Survie** (Kael peut même y être boss de vague).
+
+### Garanties — Sarah
+- 🧪 Suite portée à **263 assertions source / 307 vérifications affichées** : spéciaux/EX/supers des 9 combattants mesurés, morphologies et signatures distinctes, équilibrage borné, planches archivées.
+- 📸 Contrôle visuel par capture native : line-up des 3 champions + duel Kael vs AEL-7 relus avant release (palette de Kael éclaircie après relecture : il lisait « Ninja sombre »).
+- 🛡️ Gate QA : contrôle permanent n°20 « Nouveaux Champions V3.6 » ; budget bundle documenté à 352 Ko (327 Ko réels). Déterminisme, replays et Online inchangés (ajout en fin de roster uniquement).
+
+---
+
 ## [3.5.0] — 24 octobre 2026 — « Prise en main paysage & impacts fluides » (retours directs du propriétaire)
 ### Le téléphone se tient en paysage, à deux mains — Manager + Kenzo
 - 🎮 **Combat immersif** : sur téléphone tenu en paysage, dès qu'un match est en cours, l'en-tête disparaît et l'arène occupe **100 % de la hauteur de l'écran** (mode `combatImmersif`, synchronisé à chaque frame). Un bouton **⏸ flottant** discret remplace celui de l'en-tête.

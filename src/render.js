@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.5 PRO — RENDU HAUT GRAPHISME, ZONE DÉGAGÉE & HUMANITÉ++
+   GÉDÉON - Godson ARENA V3.6 PRO — RENDU HAUT GRAPHISME, NOUVEAUX CHAMPIONS & HUMANITÉ++
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -450,7 +450,10 @@ const HUMAN_PROFILES={
   titan:{label:"colosse puissant",headR:17.8,jaw:.94,neck:12.2,shoulder:28,hip:20,limb:1.28,hair:"rasé",beard:.52,brow:.92},
   nova:{label:"stratège élancée",headR:16.8,jaw:.52,neck:8,shoulder:19.6,hip:16.8,limb:.92,hair:"long ondulé",beard:0,brow:.58},
   "godson-prime":{label:"champion royal",headR:17.5,jaw:.72,neck:10,shoulder:23.4,hip:18,limb:1.05,hair:"court royal",beard:.16,brow:.76},
-  zara:{label:"vague athlétique",headR:16.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:.94,hair:"tresses marines",beard:0,brow:.6}
+  zara:{label:"vague athlétique",headR:16.9,jaw:.55,neck:8.1,shoulder:19.2,hip:17.4,limb:.94,hair:"tresses marines",beard:0,brow:.6},
+  kael:{label:"guerrier cuirassé",headR:17.6,jaw:.8,neck:10.5,shoulder:25,hip:18.5,limb:1.1,hair:"court guerrier",beard:.3,brow:.8},
+  sora:{label:"magicienne gracieuse",headR:16.6,jaw:.5,neck:7.8,shoulder:18.8,hip:16.6,limb:.88,hair:"long argenté",beard:0,brow:.55},
+  ael:{label:"androïde athlétique",headR:16.9,jaw:.55,neck:8.6,shoulder:21,hip:15.8,limb:.97,hair:"casque synthétique",beard:0,brow:.3}
 };
 const HUMAN_PROFILE_LOOKUP={}; Object.keys(HUMAN_PROFILES).forEach(k=>{ HUMAN_PROFILE_LOOKUP[k.toLowerCase()]=HUMAN_PROFILES[k]; });
 function humanProfile(f){ const key=String((f&&f.char&&f.char.id)||"gideon").toLowerCase(); return HUMAN_PROFILE_LOOKUP[key]||HUMAN_PROFILES.gideon; }
@@ -525,7 +528,7 @@ function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
     ctx.strokeStyle=sk.hair; ctx.lineWidth=8; ctx.beginPath(); ctx.moveTo(-r*.42,-r*.72); ctx.quadraticCurveTo(-r*1.25+sway*.55,-r*.18,-r*1.05+sway,r*1.95); ctx.stroke();
     ctx.lineWidth=4.5; ctx.beginPath(); ctx.moveTo(-r*.3,-r*.66); ctx.quadraticCurveTo(-r*.98+sway*.45,0,-r*.82+sway*.85,r*1.62); ctx.stroke();
     ctx.fillStyle=sk.accent; ctx.beginPath(); ctx.arc(-r*.44,-r*.72,3.4,0,7); ctx.fill();
-  }else if(ch.style==="nova"){
+  }else if(ch.style==="nova"||ch.style==="magicienne"){
     ctx.strokeStyle=sk.hair; ctx.lineWidth=9; ctx.beginPath(); ctx.moveTo(-r*.62,-r*.58); ctx.quadraticCurveTo(-r*1.02+sway*.45,r*.55,-r*.72+sway*.9,r*2.05); ctx.stroke();
     ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(-r*.2,-r*.72); ctx.quadraticCurveTo(-r*.72+sway*.35,r*.55,-r*.5+sway*.75,r*1.72); ctx.stroke();
   }else if(ch.style==="Zara"){
@@ -557,18 +560,30 @@ function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
   }else if(ch.style==="kunoichi"){
     ctx.beginPath(); ctx.moveTo(-r*.76,-r*.34); ctx.quadraticCurveTo(-r*.66,-r*1.08,r*.14,-r*1.1); ctx.quadraticCurveTo(r*.82,-r*1.02,r*.76,-r*.48); ctx.quadraticCurveTo(r*.3,-r*.62,0,-r*.47); ctx.quadraticCurveTo(-r*.42,-r*.7,-r*.76,-r*.34); ctx.fill();
     ctx.beginPath(); ctx.moveTo(r*.55,-r*.72); ctx.lineTo(r*.78,-r*.24); ctx.lineTo(r*.55,-r*.3); ctx.closePath(); ctx.fill();
-  }else if(ch.style==="nova"){
+  }else if(ch.style==="nova"||ch.style==="magicienne"){
     ctx.beginPath(); ctx.moveTo(-r*.78,-r*.28); ctx.quadraticCurveTo(-r*.72,-r*1.1,r*.1,-r*1.12); ctx.quadraticCurveTo(r*.86,-r*1.02,r*.8,-r*.4); ctx.quadraticCurveTo(r*.42,-r*.56,-r*.06,-r*.62); ctx.quadraticCurveTo(-r*.52,-r*.68,-r*.78,-r*.28); ctx.fill();
     ctx.strokeStyle=sk.hair; ctx.lineWidth=5; ctx.beginPath(); ctx.moveTo(r*.64,-r*.55); ctx.quadraticCurveTo(r*.8,r*.1,r*.58,r*.68); ctx.stroke();
   }else if(ch.style==="Zara"){
     ctx.beginPath(); ctx.moveTo(-r*.78,-r*.3); ctx.quadraticCurveTo(-r*.7,-r*1.1,r*.08,-r*1.12); ctx.quadraticCurveTo(r*.82,-r*1.03,r*.78,-r*.42); ctx.quadraticCurveTo(r*.32,-r*.62,-r*.18,-r*.54); ctx.quadraticCurveTo(-r*.58,-r*.7,-r*.78,-r*.3); ctx.fill();
     ctx.strokeStyle=shade(sk.hair,34); ctx.lineWidth=1.5; [-.46,-.18,.12,.4].forEach(o=>{ ctx.beginPath(); ctx.moveTo(r*o,-r*1.02); ctx.quadraticCurveTo(r*(o+.12),-r*.72,r*(o-.05),-r*.5); ctx.stroke(); });
+  }else if(ch.style==="synthetique"){
+    ctx.beginPath(); ctx.moveTo(-r*.8,-r*.3); ctx.quadraticCurveTo(-r*.75,-r*1.08,0,-r*1.12); ctx.quadraticCurveTo(r*.8,-r*1.05,r*.78,-r*.4); ctx.quadraticCurveTo(r*.3,-r*.58,-r*.1,-r*.55); ctx.quadraticCurveTo(-r*.55,-r*.62,-r*.8,-r*.3); ctx.fill();
+    ctx.strokeStyle="rgba(24,255,255,.8)"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-r*.2,-r*1.05); ctx.quadraticCurveTo(0,-r*.78,r*.05,-r*.58); ctx.stroke();
+    ctx.fillStyle="#18ffff"; ctx.beginPath(); ctx.arc(-r*.62,-r*.32,2,0,7); ctx.fill();
   }else{
     ctx.beginPath(); ctx.moveTo(-r*.78,-r*.34); ctx.quadraticCurveTo(-r*.68,-r*1.08,0,-r*1.11); ctx.quadraticCurveTo(r*.76,-r*1.04,r*.8,-r*.42); ctx.quadraticCurveTo(r*.36,-r*.62,-r*.08,-r*.56); ctx.quadraticCurveTo(-r*.54,-r*.68,-r*.78,-r*.34); ctx.fill();
     ctx.beginPath(); [-.46,-.16,.16,.44].forEach((o,i)=>{ ctx.moveTo(r*o,-r*.94); ctx.lineTo(r*(o+.08),-r*(1.13+(i%2)*.08)); ctx.lineTo(r*(o+.22),-r*.92); }); ctx.fill();
   }
-  // Bandeau qui épouse le front ; la couronne remplace celui de Prime.
-  if(ch.style!=="prime"){
+  // Bandeau qui épouse le front ; couronne pour Prime, chapeau pointu pour Sora, capteur pour AEL-7.
+  if(ch.style==="magicienne"){
+    ctx.fillStyle=sk.primary; ctx.strokeStyle="rgba(10,4,24,.55)"; ctx.lineWidth=1.6;
+    ctx.beginPath(); ctx.moveTo(-r*.55,-r*.6); ctx.quadraticCurveTo(-r*.32,-r*1.5,r*.1,-r*1.95+sway*.14); ctx.quadraticCurveTo(r*.48,-r*1.5,r*.52,-r*.6); ctx.quadraticCurveTo(0,-r*.76,-r*.55,-r*.6); ctx.fill(); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(0,-r*.52,r*1.06,r*.21,-.06,0,7); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle=sk.accent; ctx.lineWidth=2.4; ctx.beginPath(); ctx.moveTo(-r*.5,-r*.64); ctx.quadraticCurveTo(0,-r*.78,r*.48,-r*.64); ctx.stroke();
+    ctx.fillStyle=sk.accent; ctx.beginPath(); ctx.arc(r*.04,-r*.98,3,0,7); ctx.fill();
+  }else if(ch.style==="synthetique"){
+    ctx.fillStyle="#18ffff"; ctx.beginPath(); ctx.arc(r*.1,-r*.55,2.2,0,7); ctx.fill();
+  }else if(ch.style!=="prime"){
     ctx.strokeStyle=sk.primary; ctx.lineWidth=6.5; ctx.beginPath(); ctx.moveTo(-r*.74,-r*.4); ctx.quadraticCurveTo(0,-r*.73,r*.79,-r*.42); ctx.stroke();
     ctx.strokeStyle="rgba(255,255,255,.28)"; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-r*.68,-r*.45); ctx.quadraticCurveTo(0,-r*.75,r*.7,-r*.47); ctx.stroke();
     ctx.strokeStyle=sk.primary; ctx.lineWidth=4; ctx.beginPath(); ctx.moveTo(-r*.73,-r*.38); ctx.quadraticCurveTo(-r*1.12+sway*.35,-r*.08,-r*1.02+sway*.65,r*.34); ctx.stroke();
@@ -583,7 +598,12 @@ function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
   const tension=motion.browTension||0,eyeX=r*.43,eyeY=-r*.02;
   ctx.strokeStyle= shade(sk.hair,-8); ctx.lineWidth=2.5; ctx.beginPath(); ctx.moveTo(r*.13,-r*.3+tension*1.2); ctx.quadraticCurveTo(r*.42,-r*.39,r*.69,-r*.29+tension*2.6); ctx.stroke();
   ctx.save(); ctx.globalAlpha=.55; ctx.lineWidth=1.4; ctx.beginPath(); ctx.moveTo(-r*.12,-r*.27); ctx.lineTo(r*.08,-r*.25); ctx.stroke(); ctx.restore();
-  if(f.dead||down){
+  if(ch.style==="synthetique"&&!f.dead&&!down){
+    ctx.fillStyle="#0b1c22"; ctx.beginPath(); ctx.ellipse(r*.32,eyeY,r*.5,r*.2,-.08,0,7); ctx.fill();
+    const gx=(motion.gazeX||0)*r*.18;
+    ctx.strokeStyle="#18ffff"; ctx.lineWidth=2.6; ctx.beginPath(); ctx.moveTo(r*.05+gx,eyeY); ctx.lineTo(r*.58+gx,eyeY-1); ctx.stroke();
+    ctx.fillStyle="#aefcff"; ctx.beginPath(); ctx.arc(r*.42+gx,eyeY,2,0,7); ctx.fill();
+  }else if(f.dead||down){
     ctx.strokeStyle="#161616"; ctx.lineWidth=2.1; ctx.beginPath(); ctx.moveTo(eyeX-4,eyeY-4); ctx.lineTo(eyeX+4,eyeY+4); ctx.moveTo(eyeX+4,eyeY-4); ctx.lineTo(eyeX-4,eyeY+4); ctx.stroke();
   }else if(f.blinkT<0){
     ctx.strokeStyle="#161616"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(eyeX-r*.24,eyeY); ctx.quadraticCurveTo(eyeX,eyeY+2,eyeX+r*.25,eyeY); ctx.stroke();
@@ -592,13 +612,16 @@ function drawHumanHead(f,sk,ch,human,headX,headY,motion,hurt,down){
     const irisX=eyeX+(motion.gazeX||0)*2.2,irisY=eyeY+(motion.gazeY||0)*1.25;
     ctx.fillStyle="#3a2110"; ctx.beginPath(); ctx.arc(irisX,irisY,r*.105,0,7); ctx.fill(); ctx.fillStyle="#050505"; ctx.beginPath(); ctx.arc(irisX,irisY,r*.055,0,7); ctx.fill(); ctx.fillStyle="#fff"; ctx.beginPath(); ctx.arc(irisX+r*.035,irisY-r*.04,r*.026,0,7); ctx.fill();
     ctx.strokeStyle="#161616"; ctx.lineWidth=1.7; ctx.beginPath(); ctx.moveTo(eyeX-r*.25,eyeY-r*.02); ctx.quadraticCurveTo(eyeX,eyeY-r*.18,eyeX+r*.26,eyeY-r*.02); ctx.stroke();
-    if(ch.style==="kunoichi"||ch.style==="nova"||ch.style==="Zara"){ ctx.lineWidth=1.1; ctx.beginPath(); ctx.moveTo(eyeX+r*.2,eyeY-r*.08); ctx.lineTo(eyeX+r*.31,eyeY-r*.13); ctx.stroke(); }
+    if(ch.style==="kunoichi"||ch.style==="nova"||ch.style==="Zara"||ch.style==="magicienne"){ ctx.lineWidth=1.1; ctx.beginPath(); ctx.moveTo(eyeX+r*.2,eyeY-r*.08); ctx.lineTo(eyeX+r*.31,eyeY-r*.13); ctx.stroke(); }
   }
   // Nez, narine et bouche expressive.
   ctx.strokeStyle="rgba(65,32,12,.68)"; ctx.lineWidth=1.5; ctx.beginPath(); ctx.moveTo(r*.78,r*.08); ctx.quadraticCurveTo(r*.95,r*.25,r*.9,r*.38); ctx.stroke();
   ctx.fillStyle="rgba(45,20,8,.72)"; ctx.beginPath(); ctx.arc(r*.78,r*.41,1.25,0,7); ctx.fill();
   const mouthX=r*.58,mouthY=r*.61,open=clamp(motion.mouthOpen||0,0,1);
-  if(open>.14){
+  if(ch.style==="synthetique"){
+    ctx.strokeStyle="rgba(16,32,39,.8)"; ctx.lineWidth=1.6; ctx.beginPath(); ctx.moveTo(mouthX-r*.14,mouthY); ctx.lineTo(mouthX+r*.14,mouthY); ctx.stroke();
+    ctx.fillStyle="#18ffff"; const lvl=1+Math.round(open*2); for(let i=0;i<lvl;i++)ctx.fillRect(mouthX-6+i*5,mouthY+3,3,2);
+  }else if(open>.14){
     ctx.fillStyle="#321109"; ctx.beginPath(); ctx.ellipse(mouthX,mouthY+open*2.2,r*.17,r*(.05+open*.13),-.08,0,7); ctx.fill();
     ctx.fillStyle="#fff"; ctx.fillRect(mouthX-r*.13,mouthY-r*.035,r*.25,r*.055);
     if(open>.55){ ctx.fillStyle="#b44a55"; ctx.beginPath(); ctx.ellipse(mouthX,mouthY+r*.09,r*.09,r*.045,0,0,7); ctx.fill(); }
@@ -641,7 +664,7 @@ function drawFighter(f){
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0);
   const hipX=motion.lean*9+motion.weight*1.15-motion.hurt*2,shX=motion.lean*25+motion.weight*2.1+attackShift+motion.guard*3-motion.hurt*6,headX=6+shX*.62+motion.head*9+(motion.headLag||0)-motion.hurt*3;
   // Cape de Nova et de GODSON PRIME
-  if((ch.style==="nova"||ch.style==="prime")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*(6+motion.run*5)-((f.vx||0)+(f.kvx||0))*(f.facing||1)*1.7-motion.dash*9; const cg=cachedLinearGradient("cape:"+sk.dark+":"+sk.accent+":"+Math.round(shY/4),0,shY,0,-8,[[0,sk.dark],[1,sk.accent]]); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(shX-13,shY+4); ctx.quadraticCurveTo(shX-44+wv,-62,hipX-35+wv*1.3,-8); ctx.quadraticCurveTo(hipX-14,-28,hipX-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
+  if((ch.style==="nova"||ch.style==="prime"||ch.style==="guerrier"||ch.style==="magicienne")&&!f.dead){ ctx.save(); const wv=Math.sin(renderTicker*.09+f.anim*.05)*(6+motion.run*5)-((f.vx||0)+(f.kvx||0))*(f.facing||1)*1.7-motion.dash*9; const cg=cachedLinearGradient("cape:"+sk.dark+":"+sk.accent+":"+Math.round(shY/4),0,shY,0,-8,[[0,sk.dark],[1,sk.accent]]); ctx.fillStyle=cg; ctx.beginPath(); ctx.moveTo(shX-13,shY+4); ctx.quadraticCurveTo(shX-44+wv,-62,hipX-35+wv*1.3,-8); ctx.quadraticCurveTo(hipX-14,-28,hipX-8,hipY); ctx.closePath(); ctx.fill(); ctx.restore(); }
   // Jambes : cycle de marche/course lié à la vitesse, appuis et genoux articulés
   let bFoot={x:hipX-23-motion.lean*8,y:0},fFoot={x:hipX+25+motion.lean*5,y:0},bKnee={x:hipX-16,y:lerp(-40,-28,cb)},fKnee={x:hipX+18,y:lerp(-39,-27,cb)};
   if(cb>.12){ bFoot.x=lerp(bFoot.x,hipX-29,cb); fFoot.x=lerp(fFoot.x,hipX+27,cb); }
@@ -702,7 +725,7 @@ function drawFighter(f){
   ctx.fillStyle=sk.accent; ctx.fillRect(hipX-8,hipY-3+(motion.pelvisRoll||0)*.25,17,9); ctx.fillStyle="rgba(0,0,0,.35)"; ctx.fillRect(hipX-4,hipY-1+(motion.pelvisRoll||0)*.25,9,5);
   // Deltoïdes, clavicule, ombre latérale et plis qui suivent l'inertie du tissu.
   ctx.fillStyle=sk.primary; ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+3,8.5*human.limb,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+3,9*human.limb,0,7); ctx.fill();
-  if(ch.style==="titan"||ch.style==="prime"){ ctx.fillStyle=ch.style==="prime"?"#ffc400":"#37474f"; ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+2,9.5,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+2,9.5,0,7); ctx.fill(); ctx.strokeStyle=ch.style==="prime"?"#fff3c4":"#90a4ae"; ctx.stroke(); }
+  if(ch.style==="titan"||ch.style==="prime"||ch.style==="guerrier"||ch.style==="synthetique"){ ctx.fillStyle=ch.style==="prime"?"#ffc400":(ch.style==="synthetique"?sk.primary:(ch.style==="guerrier"?"#90a4ae":"#37474f")); ctx.beginPath(); ctx.arc(shoulderBack.x+2,shoulderBack.y+2,9.5,0,7); ctx.arc(shoulderFront.x-2,shoulderFront.y+2,9.5,0,7); ctx.fill(); ctx.strokeStyle=ch.style==="prime"?"#fff3c4":"#90a4ae"; ctx.stroke(); }
   ctx.save(); ctx.globalAlpha=.18; ctx.fillStyle="#000"; ctx.beginPath(); ctx.ellipse(waistX-hipHalf*.48,waistY+4,hipHalf*.28,25,.08,0,7); ctx.fill(); ctx.restore();
   ctx.save(); ctx.strokeStyle="rgba(0,0,0,.24)"; ctx.lineWidth=1.5;
   [-.38,0,.36].forEach((o,i)=>{ ctx.beginPath(); ctx.moveTo(shX+shoulderHalf*o,shY+12); ctx.quadraticCurveTo(waistX+hipHalf*o+(motion.clothSway||0)*(.22+i*.08),waistY,hipX+hipHalf*o*.82,hipY-2); ctx.stroke(); });
@@ -753,7 +776,7 @@ function drawFighter(f){
   if(f.counterWindowT>0&&isCombat()){ ctx.save(); ctx.font="1000 12px 'Segoe UI',Arial"; ctx.textAlign="center"; ctx.fillStyle="rgba(90,50,0,.82)"; rr(f.rx-43,f.ry-236*ch.scale,86,20,10); ctx.fill(); ctx.fillStyle="#ffc400"; ctx.fillText("⚡ RIPOSTE !",f.rx,f.ry-222*ch.scale); ctx.restore(); }
   /* V3.4 : plus de plaque de nom au-dessus des combattants — le HUD affiche déjà les noms ; la zone de combat reste dégagée. */
 }
-const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume"};
+const SIGNATURE_VFX={gideon:"foudre",kira:"traînées",titan:"éclats sismiques",nova:"orbites","godson-prime":"couronne royale",Zara:"écume",kael:"lames",sora:"runes",ael:"circuits"};
 function signatureVfxStyle(owner){ return SIGNATURE_VFX[(owner&&owner.char&&owner.char.id)||""]||"énergie"; }
 function drawSignatureVfx(pr){
   const owner=pr.owner||{},style=signatureVfxStyle(owner),trail=(owner.skin&&owner.skin.trail)||"#ffc400";
@@ -781,6 +804,16 @@ function drawSignatureVfx(pr){
     ctx.fillStyle="#e0f7fa"; ctx.strokeStyle=trail; ctx.lineWidth=1.8;
     for(let i=0;i<count;i++){ const x=pr.rx-dir*i*r*.34,y=pr.ry+Math.sin(renderTicker*.09+i*1.4)*r*.34; ctx.beginPath(); ctx.arc(x,y,r*(.18+(i%3)*.05),0,7); ctx.fill(); }
     ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r*1.02,renderTicker*.03,renderTicker*.03+4.4); ctx.stroke();
+  }else if(style==="lames"){
+    ctx.strokeStyle="#eceff1"; ctx.lineWidth=2.4; ctx.globalAlpha=.9;
+    for(let i=0;i<count;i++){ const a=renderTicker*.09+i*1.7,x=pr.rx+Math.cos(a)*r*.8,y=pr.ry+Math.sin(a)*r*.55; ctx.beginPath(); ctx.moveTo(x-6,y+6); ctx.quadraticCurveTo(x,y-2,x+7,y-8); ctx.stroke(); }
+  }else if(style==="runes"){
+    ctx.strokeStyle=trail; ctx.fillStyle="#ffffff"; ctx.lineWidth=1.6; ctx.globalAlpha=.9;
+    ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r*1.02,renderTicker*.05,renderTicker*.05+5.1); ctx.stroke();
+    for(let i=0;i<count;i++){ const a=renderTicker*.06+i*(6.28/count),x=pr.rx+Math.cos(a)*r*1.02,y=pr.ry+Math.sin(a)*r*1.02; ctx.fillRect(x-1.6,y-1.6,3.2,3.2); }
+  }else if(style==="circuits"){
+    ctx.strokeStyle=trail; ctx.fillStyle=trail; ctx.lineWidth=1.6; ctx.globalAlpha=.9;
+    for(let i=0;i<count;i++){ const a=i*1.9+renderTicker*.04,x=pr.rx+Math.cos(a)*r*.9,y=pr.ry+Math.sin(a)*r*.65; ctx.strokeRect(x-3.4,y-3.4,6.8,6.8); ctx.beginPath(); ctx.arc(x,y,1.4,0,7); ctx.fill(); }
   }else{
     ctx.strokeStyle=trail; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(pr.rx,pr.ry,r,0,7); ctx.stroke();
   }

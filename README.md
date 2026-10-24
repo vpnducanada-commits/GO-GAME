@@ -1,4 +1,4 @@
-# 🎮 GÉDÉON - Godson ARENA — V3.5 PRO « Prise en main paysage, impacts fluides & GO GAME Online »
+# 🎮 GÉDÉON - Godson ARENA — V3.6 PRO « Nouveaux Champions & GO GAME Online »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Gedeon-GODSON-Arena-V3.5-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; GO GAME Online demande une connexion. |
+| ⭐ **`Gedeon-GODSON-Arena-V3.6-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; GO GAME Online demande une connexion. |
 | 🌐 **[Jouer en ligne (GitHub Pages HTTPS)](https://vpnducanada-commits.github.io/GO-GAME/)** | Version publique recommandée pour créer un compte et disputer des duels WebRTC. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
@@ -27,7 +27,7 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 - 🏅 **Hall of Fame** : Top 10 local de tes meilleurs scores + grades de carrière (Débutant → 👑 Légende Godson)
 - 🌐 **GO GAME Online** *(nouveau V3.0)* : compte Supabase, profil mondial, **salon privé par code**, duel WebRTC en lockstep, classement uniquement co-vérifié, sauvegarde cloud et replays publics/privés. Les deux joueurs doivent utiliser la même version du jeu.
 
-## 🥋 Les 6 combattants
+## 🥋 Les 9 combattants
 | Personnage | Style | Spécial (50%) / SUPER (100%) uniques |
 |---|---|---|
 | **GÉDÉON** | Champion équilibré | ⚡ Foudre Gideon / 🌟 Jugement perforant |
@@ -36,6 +36,9 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 | **NOVA** | Maîtresse de l'énergie | 🔮 Orbe chercheuse / 🌠 Pluie de météores |
 | 👑 **GODSON PRIME** | **Secret** (finir le Chapitre 1) | 👑 Double vague / Triple Jugement royal |
 | **Zara** *(nouvelle V2.4)* | Vague rapide de Libreville | 🌊 Lames de Marée ×2 / 🌀 Raz-de-Marée au sol |
+| **KAEL** *(nouveau V3.6)* | Guerrier d'Acier : 112 PV, grande allonge | ⚔️ Lame perforante / ⚔️ Croisade d'Acier ×3 |
+| **Sora** *(nouvelle V3.6)* | Magicienne flottante, énergie ×1,4 | 🔮 Orbe chercheuse / ☄️ Comète Pourpre ×3 |
+| **AEL-7** *(nouveau V3.6)* | Synthétique ultra-rapide | 🔷 Double plasma / 🛰️ Canon Orbital |
 
 ## 🏟️ Arènes
 🌇 Stade Gideon Sunset • 🌧️ Néon Tokyo Pluie • ⛩️ Temple Céleste • 🌴 **Plage de Libreville au coucher de soleil** — musiques dédiées, caméra dynamique et **Arena Moods V2.8** : chaque lieu peut se jouer en **Jour, Crépuscule ou Nuit**, ou en Auto signature.
@@ -61,7 +64,7 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 - **Netcode lockstep** : seuls des masques d’inputs de 8 bits circulent, avec délai adaptatif, checksums périodiques et arrêt propre en cas de désynchronisation/déconnexion. La pause et le turbo local sont désactivés pour garder les deux simulations identiques.
 - **Classement anti-triche** : aucun navigateur ne peut insérer directement un résultat vérifié. Les deux clients envoient un claim à l’Edge Function `submit-match-result` ; le classement n’est mis à jour que si joueurs, vainqueur et hash final concordent.
 - **Cloud** : sauvegarde/restauration du profil et publication/import de replays déterministes, publics ou privés.
-- **Combat enrichi** : projection anti-garde avant/arrière, EX unique pour les 6 combattants, Godson Cancel, backdash défensif, scaling anti-combo infini, bot qui projette/utilise les EX et arsenal affiché à la sélection.
+- **Combat enrichi** : projection anti-garde avant/arrière, EX unique pour les 9 combattants, Godson Cancel, backdash défensif, scaling anti-combo infini, bot qui projette/utilise les EX et arsenal affiché à la sélection.
 - **Performance** : métriques CPU/logic/render, échelle FX adaptative et qualité automatique renforcée pour protéger les 60 FPS sans sacrifier la lisibilité.
 
 ## 🕺 Animation humaine & décors vivants (V2.5)
@@ -93,11 +96,11 @@ Noms, initiales, couleurs (tenues/auras/projectiles), volumes, qualité auto sel
 | **Kenzo** | Directeur Artistique & Rendering Lead | Pipeline de rendu en 7 passes, VFX, lumière, post-traitement (`docs/ARCHITECTURE.md`) |
 | **Sarah** | Lead QA, Performance & Release | Tests, budgets performance, veto qualité (`docs/QA_QUALITE.md`, `tools/qa-check.py`) |
 
-**V3.5 « Prise en main paysage & impacts fluides »** : tenu à deux mains en paysage, le combat devient immersif (arène pleine hauteur, pause flottante, pouces et encoches respectés) et le gel d’impact passe de 42–105 ms à 14–48 ms — les coups ne ralentissent plus le jeu. **V3.4 « Zone de combat dégagée »** : boutons tactiles compacts et semi-transparents dans les coins, plus de plaque de nom sur les combattants, écran géant des arènes discret pendant les combats, textes de dégâts espacés et halo de lumière qui suit l’action. **V3.3 « Flux d’écrans & Chargement »** : écran de chargement rapide, puis un vrai parcours Menu → Personnages → Arène → Difficulté → VS, avec indicateur d’étapes et transitions. **V3.2 « Paysage & Interface Épurée »** : le jeu se joue en paysage (invite à tourner l’appareil, plein écran immersif, pause protectrice en portrait) et l’interface respire — textes superflus supprimés, aide repliée, scène toujours visible sans défiler. **V3.1 « Humanité++ »** : personnages aux proportions adultes, visages expressifs, regard vivant, membres articulés en IK et fatigue visible — refonte 100 % visuelle, sans toucher aux hitboxes, aux replays ni au netcode. **V3.0 « GO GAME Online & Combat Pro »** : duels privés WebRTC lockstep, classement mondial co-vérifié, profils/sauvegardes/replays cloud, projections, EX uniques et Godson Cancel. Arena Moods V2.8, le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés — et tout le jeu local reste jouable hors ligne.
+**V3.6 « Nouveaux Champions »** : les planches de personnages du propriétaire deviennent 3 combattants jouables — KAEL le Guerrier d'Acier, Sora la Magicienne et AEL-7 le Synthétique — avec morphologies, signatures VFX et EX dédiés ; roster porté à 9 sans toucher à l'Histoire ni aux sauvegardes. **V3.5 « Prise en main paysage & impacts fluides »** : tenu à deux mains en paysage, le combat devient immersif (arène pleine hauteur, pause flottante, pouces et encoches respectés) et le gel d’impact passe de 42–105 ms à 14–48 ms — les coups ne ralentissent plus le jeu. **V3.4 « Zone de combat dégagée »** : boutons tactiles compacts et semi-transparents dans les coins, plus de plaque de nom sur les combattants, écran géant des arènes discret pendant les combats, textes de dégâts espacés et halo de lumière qui suit l’action. **V3.3 « Flux d’écrans & Chargement »** : écran de chargement rapide, puis un vrai parcours Menu → Personnages → Arène → Difficulté → VS, avec indicateur d’étapes et transitions. **V3.2 « Paysage & Interface Épurée »** : le jeu se joue en paysage (invite à tourner l’appareil, plein écran immersif, pause protectrice en portrait) et l’interface respire — textes superflus supprimés, aide repliée, scène toujours visible sans défiler. **V3.1 « Humanité++ »** : personnages aux proportions adultes, visages expressifs, regard vivant, membres articulés en IK et fatigue visible — refonte 100 % visuelle, sans toucher aux hitboxes, aux replays ni au netcode. **V3.0 « GO GAME Online & Combat Pro »** : duels privés WebRTC lockstep, classement mondial co-vérifié, profils/sauvegardes/replays cloud, projections, EX uniques et Godson Cancel. Arena Moods V2.8, le Replay Studio V2.7, les replays déterministes V2.6, l’animation humaine V2.5 et Libreville V2.4 restent intégralement conservés — et tout le jeu local reste jouable hors ligne.
 
 ## 🧱 Projet (gestion professionnelle)
 ```
-├── Gedeon-GODSON-Arena-V3.5-PRO.html   ⭐ build autonome
+├── Gedeon-GODSON-Arena-V3.6-PRO.html   ⭐ build autonome
 ├── index.html + src/ (engine/render/ui/style)
 ├── docs/ EQUIPE • ARCHITECTURE • GAME_DESIGN • QA_QUALITE • ROADMAP • sprints
 ├── tests/smoke-test.js   → 248 assertions source / 277 vérifications affichées ✅
