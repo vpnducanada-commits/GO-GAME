@@ -37,7 +37,7 @@ Chaque session = 1 sprint complet :
 | Modes / Personnages / Arènes | en croissance | 6 (+ Défis) / 6 / 4 |
 
 ## 🗂️ Sprint en cours
-Sprint 08 « Arena Moods & Polish » livré (V2.8). Voir `docs/SPRINT_08_ARENA_MOODS.md` et `docs/ROADMAP.md`. Prochain cap envisagé : Sprint 09 « Compétition locale » ; le mode en ligne reste réservé à une éventuelle V3 après validation explicite du Product Owner.
+Sprint 08 « Arena Moods & Polish » livré (V2.8). Voir `docs/SPRINT_08_ARENA_MOODS.md` et `docs/ROADMAP.md`. La V2.8 reste la version jouable stable. Après validation du Product Owner, les fondations V3 GO GAME sont ouvertes : dépôt GitHub `GO-GAME`, backend Supabase initial versionné et testé (`docs/V3_GO_GAME_FONDATIONS.md`). Le Sprint 09 « Compétition locale » reste le cap contenu local ; le branchement client Online suivra les tickets V3-01 → V3-07.
 
 ---
 ✍️ Document officiel du projet **Gideon - Godson ARENA** — tenu par le Manager & Développeur principal.

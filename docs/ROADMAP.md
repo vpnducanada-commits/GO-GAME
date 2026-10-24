@@ -72,8 +72,8 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
 
-## 🌐 V3.0 « Connecté » *(décision du manager : après validation PO)*
-Nécessite un serveur (comptes, classement mondial, duels en ligne). N'engagé qu'après feu vert explicite du Product Owner, car il casse le principe « 1 fichier, zéro installation ».
+## 🌐 V3.0 « Connecté » *(fondations GO GAME engagées après validation PO)*
+Le Product Owner a validé la préparation serveur : dépôt GitHub **GO-GAME** alimenté, projet Supabase **GO GAME** créé en `eu-central-1`, tables profils/sauvegardes/replays/résultats et vue classement protégées par RLS. Voir `docs/V3_GO_GAME_FONDATIONS.md` et `docs/BACKEND_SUPABASE_GO_GAME.md`. La V2.8 locale reste la version jouable stable ; le client Online sera branché progressivement (auth/profil, cloud save, leaderboard, replays partagés, puis duels lockstep).
 
 ## ⚠️ Risques & réponses
 | Risque | Réponse du manager |

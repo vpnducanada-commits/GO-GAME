@@ -1,0 +1,8 @@
+{
+  "projectName": "GO GAME",
+  "projectRef": "mcyousugmxgugfremmsq",
+  "region": "eu-central-1",
+  "supabaseUrl": "https://mcyousugmxgugfremmsq.supabase.co",
+  "publishableKey": "sb_publishable_F4-BiEBa5ZHkESEXD93qnA_OkCBQd9K",
+  "notes": "Configuration publique uniquement. Ne jamais ajouter de clé sb_secret_ ou service_role dans le dépôt."
+}
