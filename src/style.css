@@ -1,4 +1,4 @@
-/* ===== GÉDÉON - Godson ARENA V3.2 PRO — paysage prioritaire & interface épurée, signé Gideon - Godson ===== */
+/* ===== GÉDÉON - Godson ARENA V3.3 PRO — chargement, parcours d’écrans & paysage, signé Gideon - Godson ===== */
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 :root{--bleu:#00a2ff;--pink:#ff2e88;--or:#ffc400;--vert:#00e676;--panel:rgba(7,10,34,.86)}
 html,body{min-height:100%}
@@ -78,7 +78,7 @@ canvas{position:absolute;inset:0;width:100%;height:100%;display:block}
 #toast{position:absolute;bottom:18px;left:50%;transform:translate(-50%,90px);z-index:30;background:linear-gradient(135deg,#20140a,#3a2403);border:1.5px solid var(--or);color:#ffe082;font-weight:1000;padding:13px 20px;border-radius:16px;box-shadow:0 18px 44px rgba(0,0,0,.6);transition:transform .45s cubic-bezier(.2,1.4,.4,1);pointer-events:none;text-align:center}
 #toast.show{transform:translate(-50%,0)}
 /* MENUS PRO */
-.overlay{position:absolute;inset:0;z-index:10;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:18px;text-align:center;background:linear-gradient(180deg,rgba(4,6,25,.34),rgba(4,6,25,.66)),radial-gradient(760px 400px at 50% 28%,rgba(0,162,255,.22),transparent 65%);overflow-y:auto}
+.overlay{position:absolute;inset:0;z-index:10;animation:screenIn .22s ease both;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:13px;padding:18px;text-align:center;background:linear-gradient(180deg,rgba(4,6,25,.34),rgba(4,6,25,.66)),radial-gradient(760px 400px at 50% 28%,rgba(0,162,255,.22),transparent 65%);overflow-y:auto}
 .hidden{display:none!important}
 .gameTitle{animation:floaty 3.4s ease-in-out infinite}
 @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
@@ -113,16 +113,16 @@ kbd{background:#111827;border:1px solid rgba(255,255,255,.35);border-bottom-widt
 @media(max-width:780px){.selectGrid{grid-template-columns:1fr}}
 .rosterPanel{background:var(--panel);border:1px solid rgba(255,255,255,.16);border-radius:20px;padding:12px;backdrop-filter:blur(8px)}
 .rosterPanel h4{letter-spacing:2px;font-size:13px;margin-bottom:9px}
-.roster{display:grid;grid-template-columns:repeat(auto-fit,minmax(85px,1fr));gap:7px}
+.roster{display:grid;grid-template-columns:repeat(auto-fit,minmax(98px,1fr));gap:8px}
 .charCard{border:2px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:#fff;border-radius:15px;padding:9px 7px;cursor:pointer;text-align:center;transition:.13s}
 .charCard:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.7)}
 .charCard.sel{border-color:var(--or);background:rgba(255,196,0,.13);box-shadow:0 0 0 2px rgba(255,196,0,.45),0 12px 26px rgba(0,0,0,.4)}
-.avatar{width:46px;height:46px;margin:0 auto 5px;border-radius:50%;display:grid;place-items:center;font-weight:1000;font-size:21px;color:#fff;text-shadow:0 2px 6px #000;border:2.5px solid rgba(255,255,255,.75)}
+.avatar{width:54px;height:54px;margin:0 auto 5px;border-radius:50%;display:grid;place-items:center;font-weight:1000;font-size:21px;color:#fff;text-shadow:0 2px 6px #000;border:2.5px solid rgba(255,255,255,.75)}
 .charCard b{display:block;font-size:13px}.charCard small{display:block;opacity:.8;font-size:10px;margin:2px 0 6px}
 .stat{display:flex;align-items:center;gap:4px;font-size:8.5px;font-weight:900;letter-spacing:.5px;opacity:.95;margin-top:2px;text-align:left}
 .stat span{width:27px}.stat i{flex:1;height:5px;background:rgba(255,255,255,.16);border-radius:99px;overflow:hidden}.stat i b{display:block;height:100%;background:linear-gradient(90deg,#00e5ff,#00e676)}
 .arenaRow{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;width:min(98%,980px)}
-.arenaCard{width:158px;height:74px;border-radius:15px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;color:#fff;font-weight:1000;font-size:13px;text-shadow:0 2px 9px #000;display:flex;align-items:flex-end;padding:9px;transition:.13s;text-align:left}
+.arenaCard{width:min(44vw,212px);height:110px;border-radius:17px;border:2.5px solid rgba(255,255,255,.25);cursor:pointer;color:#fff;font-weight:1000;font-size:15px;text-shadow:0 2px 9px #000;display:flex;align-items:flex-end;padding:9px;transition:.13s;text-align:left}
 .arenaCard:hover{transform:translateY(-2px)}
 .arenaCard.sel{border-color:var(--or);box-shadow:0 0 0 2px rgba(255,196,0,.5),0 12px 26px rgba(0,0,0,.45)}
 .arenaMoodRow{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;width:min(98%,980px)}
@@ -274,3 +274,30 @@ footer strong{color:#ffe082}
   .btn{padding:10px 16px}
   .storyBanner{padding:9px 13px}
 }
+
+@keyframes screenIn{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:none}}
+/* V3.3 — Écran de chargement */
+#bootLoader{position:absolute;inset:0;z-index:60;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;text-align:center;padding:24px;background:radial-gradient(760px 420px at 50% 30%,rgba(0,162,255,.28),transparent 65%),linear-gradient(180deg,#070b28,#04061a);transition:opacity .28s ease}
+#bootLoader.done{opacity:0;pointer-events:none}
+.bootLogo{display:flex;flex-direction:column;align-items:center;gap:13px;animation:floaty 2.6s ease-in-out infinite}
+.bootLogo .badge{width:74px;height:74px;border-radius:22px;font-size:38px}
+.bootTitle{font-size:clamp(24px,4.6vw,44px);font-weight:1000;font-style:italic;letter-spacing:.5px;background:linear-gradient(90deg,#fff,#ffc400,#ff7a00,#ff2e88,#00a2ff,#fff);background-size:200% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:shine 4s linear infinite}
+.bootTitle span{background:linear-gradient(90deg,#fff,var(--or),#ff8a00);-webkit-background-clip:text;background-clip:text;color:transparent}
+.bootBarWrap{width:min(84%,520px)}
+.bootBar{height:16px;border-radius:99px;background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.4);overflow:hidden;box-shadow:0 10px 26px rgba(0,0,0,.5)}
+.bootBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,#00a2ff,#00e676,#ffc400,#ff2e88);border-radius:99px;transition:width .12s ease}
+.bootPct{margin-top:7px;font-weight:1000;font-variant-numeric:tabular-nums;color:#ffe082}
+.bootStep{font-weight:900;letter-spacing:1.5px;font-size:14px;opacity:.95}
+.bootTip{font-size:13.5px;opacity:.88;line-height:1.55;max-width:560px;min-height:1.6em}
+/* V3.3 — Parcours en étapes */
+.flowSteps{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:center;background:rgba(3,7,24,.55);border:1px solid rgba(255,255,255,.18);border-radius:999px;padding:6px 10px;backdrop-filter:blur(6px)}
+.flowSteps .fs{font-size:12px;font-weight:1000;letter-spacing:.4px;padding:6px 12px;border-radius:999px;color:rgba(255,255,255,.72);white-space:nowrap}
+.flowSteps .fs.done{color:#69f0ae}
+.flowSteps .fs.on{background:linear-gradient(135deg,#ffc400,#ff7a00);color:#221200;box-shadow:0 6px 18px rgba(255,150,0,.4)}
+.flowSteps .fsSep{opacity:.55;font-weight:1000}
+.arenaImposed{background:rgba(255,196,0,.14);border:1.5px solid rgba(255,196,0,.65);color:#ffe9a8;font-weight:900;font-size:13px;border-radius:999px;padding:8px 16px}
+.diffCards{display:grid;grid-template-columns:repeat(3,minmax(170px,1fr));gap:12px;width:min(96%,760px)}
+@media(max-width:680px){.diffCards{grid-template-columns:1fr;width:min(94%,340px)}}
+.diffCard{min-width:0!important;min-height:132px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;font-size:19px!important;border-radius:20px!important}
+.diffCard .diffIc{font-size:34px}
+.diffCard small{text-align:center;line-height:1.5}

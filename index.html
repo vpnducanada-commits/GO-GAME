@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>GÉDÉON - Godson ARENA V3.2 PRO | Combat 1v1 — signé Gideon - Godson</title>
+<title>GÉDÉON - Godson ARENA V3.3 PRO | Combat 1v1 — signé Gideon - Godson</title>
 <link rel="stylesheet" href="src/style.css">
 </head>
 <body>
@@ -12,7 +12,7 @@
     <div class="logo">
       <div class="badge">G</div>
       <div>
-        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V3.2 PRO</em></h1>
+        <h1>GÉDÉON <span>- Godson</span> ARENA <em>V3.3 PRO</em></h1>
       </div>
     </div>
     <div class="topActions">
@@ -27,6 +27,14 @@
 
   <div id="gameWrap">
     <canvas id="game" width="1280" height="720"></canvas>
+
+    <div id="bootLoader" role="status" aria-label="Chargement du jeu">
+      <div class="bootLogo"><div class="badge">G</div><div class="bootTitle">GÉDÉON <span>- Godson</span> ARENA</div></div>
+      <div class="bootBarWrap"><div class="bootBar"><i id="bootFill"></i></div><div class="bootPct" id="bootPct">0%</div></div>
+      <div class="bootStep" id="bootStep">Chargement…</div>
+      <div class="bootTip" id="bootTip">💡 Astuce : garde juste avant l’impact = PARRY dorée !</div>
+      <div class="signed">✍️ Un jeu signé Gédéon - Godson</div>
+    </div>
 
     <div id="hud">
       <div class="fighterHud">
@@ -101,29 +109,43 @@
 
     <!-- DIFFICULTÉ BOT -->
     <div class="overlay hidden" id="menuBot">
+      <div class="flowSteps"><span class="fs done">1 · Personnages</span><span class="fsSep">›</span><span class="fs done">2 · Arène</span><span class="fsSep">›</span><span class="fs on">3 · Difficulté</span></div>
       <div class="gameTitle"><div class="small">VERSUS BOT</div><h2 style="font-size:clamp(30px,5vw,54px)">Niveau de l’IA</h2></div>
-      <div class="btnRow">
-        <button class="btn green" data-diff="facile">😊 FACILE<small>Réactions lentes, idéal pour débuter</small></button>
-        <button class="btn orange" data-diff="moyen">🔥 MOYEN<small>Gardes, dash et combos simples</small></button>
-        <button class="btn red" data-diff="difficile">💀 DIFFICILE<small>Anti-aériens, jongles, punitions, adaptation</small></button>
+      <div class="diffCards">
+        <button class="btn green diffCard" data-diff="facile"><span class="diffIc">😊</span>FACILE<small>Réactions lentes<br>Idéal pour débuter</small></button>
+        <button class="btn orange diffCard" data-diff="moyen"><span class="diffIc">🔥</span>MOYEN<small>Gardes, dash et combos<br>Un vrai duel équilibré</small></button>
+        <button class="btn red diffCard" data-diff="difficile"><span class="diffIc">💀</span>DIFFICILE<small>Anti-aériens, jongles, adaptation<br>Pour les champions</small></button>
       </div>
-      <button class="btn dark" id="btnBotBack">⬅ Retour</button>
+      <button class="btn dark" id="btnBotBack">⬅ Arène</button>
     </div>
 
     <!-- SÉLECTION PERSONNAGES + ARÈNE -->
     <div class="overlay hidden" id="menuSelect">
+      <div class="flowSteps"><span class="fs on">1 · Personnages</span><span class="fsSep">›</span><span class="fs">2 · Arène</span><span class="fsSep">›</span><span class="fs">3 · <span class="flowLast">Combat</span></span></div>
       <div class="gameTitle" style="animation:none"><div class="small" id="selectKicker">PRÉPARATION DU COMBAT</div><h2 style="font-size:clamp(26px,4.4vw,46px)" id="selectTitle">Choisis ton combattant</h2></div>
       <div class="selectGrid">
         <div class="rosterPanel"><h4 id="rosterTitleP1">🟦 JOUEUR 1</h4><div class="roster" id="rosterP1"></div></div>
         <div class="rosterPanel"><h4 id="rosterTitleP2">🟥 ADVERSAIRE</h4><div class="roster" id="rosterP2"></div></div>
       </div>
-      <div class="arenaRow" id="arenaRow"></div>
-      <div class="arenaMoodRow" id="arenaMoodRow" aria-label="Choix de l’ambiance de l’arène"></div>
       <div class="btnRow">
-        <button class="btn dark" id="btnSelectBack">⬅ Retour</button>
-        <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
+        <button class="btn dark" id="btnSelectBack">⬅ Menu</button>
+        <button class="btn orange" id="btnSelectNext" style="min-width:260px">🏟️ Choisir l’arène ▶</button>
       </div>
       <details class="moveDetails"><summary>🥋 Techniques du combattant</summary><div class="moveList" id="moveList" aria-live="polite"></div></details>
+    </div>
+
+    <!-- ÉTAPE 2 : ARÈNE -->
+    <div class="overlay hidden" id="menuArena">
+      <div class="flowSteps"><span class="fs done">1 · Personnages</span><span class="fsSep">›</span><span class="fs on">2 · Arène</span><span class="fsSep">›</span><span class="fs">3 · <span class="flowLast">Combat</span></span></div>
+      <div class="gameTitle" style="animation:none"><h2 style="font-size:clamp(26px,4.4vw,46px)">Choisis l’arène</h2></div>
+      <div class="arenaImposed hidden" id="arenaImposed">🏟️ Arène imposée par le scénario — choisis l’ambiance 🌤️</div>
+      <div class="arenaRow" id="arenaRow"></div>
+      <div style="font-weight:1000;letter-spacing:3px;font-size:11px;opacity:.9">🌤️ AMBIANCE</div>
+      <div class="arenaMoodRow" id="arenaMoodRow" aria-label="Choix de l’ambiance de l’arène"></div>
+      <div class="btnRow">
+        <button class="btn dark" id="btnArenaBack">⬅ Personnages</button>
+        <button class="btn orange" id="btnLaunchFight" style="min-width:280px">⚔️ LANCER LE COMBAT<small id="launchSummary">Gideon vs Adversaire</small></button>
+      </div>
     </div>
 
     <!-- ÉCRAN VS -->
@@ -372,7 +394,7 @@
     </div>
   </div>
 
-  <footer>✍️ <strong>Gédéon - Godson ARENA V3.2 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
+  <footer>✍️ <strong>Gédéon - Godson ARENA V3.3 PRO</strong> — créé et signé par <strong>Gédéon - Godson</strong> © 2026 • Libreville, Gabon</footer>
 </div>
 
 <script src="src/engine.js"></script>

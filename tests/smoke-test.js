@@ -545,7 +545,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^3\.[12]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^3\.\d+\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 6, '6 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -584,7 +584,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(ev('GAME_VERSION') === '3.2.0' && window.document.querySelector('h1').textContent.includes('V3.2 PRO'), 'version V3.2.0 affichée et exposée au moteur');
+  assert(/^3\.[23]\.\d+$/.test(ev('GAME_VERSION')) && window.document.querySelector('h1').textContent.includes('PRO'), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -600,6 +600,33 @@ try {
   assert(!!window.document.getElementById('moveList') && !!window.document.querySelector('.moveDetails summary'), 'techniques repliées sous un résumé dépliable à la sélection');
   ev('goMenu()');
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
+
+  console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
+  assert(ev('GAME_VERSION') === '3.3.0' && window.document.querySelector('h1').textContent.includes('V3.3 PRO'), 'version V3.3.0 affichée et exposée au moteur');
+  assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
+  ev('finishBoot()');
+  assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
+  assert(window.document.querySelectorAll('.flowSteps').length >= 3, 'indicateur d’étapes présent sur les écrans du parcours');
+  assert(!!window.document.getElementById('menuArena') && !!window.document.getElementById('btnSelectNext') && !!window.document.getElementById('btnArenaBack'), 'écran Arène dédié avec navigation avant/arrière');
+  /* Parcours 2 joueurs : Menu -> Personnages -> Arène -> VS */
+  ev('goMenu()'); click('btnMode2P');
+  assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && window.document.getElementById('menuArena').classList.contains('hidden'), 'étape 1 : écran Personnages d’abord');
+  click('btnSelectNext');
+  assert(!window.document.getElementById('menuArena').classList.contains('hidden') && window.document.getElementById('menuSelect').classList.contains('hidden'), 'étape 2 : écran Arène ensuite');
+  click('btnArenaBack');
+  assert(!window.document.getElementById('menuSelect').classList.contains('hidden'), 'retour Arène -> Personnages');
+  click('btnSelectNext'); click('btnLaunchFight');
+  assert(ev('state') === 'vs' && !window.document.getElementById('menuVS').classList.contains('hidden'), 'parcours 2 joueurs : l’arène mène à l’écran VS');
+  /* Parcours Bot : la difficulté arrive EN DERNIER, après l’arène */
+  ev('goMenu()'); click('btnModeBot');
+  assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && window.document.getElementById('menuBot').classList.contains('hidden'), 'bot : Personnages avant la difficulté');
+  click('btnSelectNext'); click('btnLaunchFight');
+  assert(!window.document.getElementById('menuBot').classList.contains('hidden') && ev('state') !== 'vs', 'bot : difficulté demandée après l’arène, avant le combat');
+  window.document.querySelector('#menuBot [data-diff="difficile"]').click();
+  assert(ev('botDiff') === 'difficile' && ev('state') === 'vs', 'bot : choisir la difficulté lance le match (VS)');
+  ev('skipVS()'); step(170);
+  assert(ev('state') === 'fight', 'bot : combat démarré au bout du parcours complet');
+  ev('goMenu()');
 
   /* Client Supabase/WebRTC : transport et API simulés, mais tout le code
      applicatif réel (auth, REST, salons, signaux, cloud) est exercé. */

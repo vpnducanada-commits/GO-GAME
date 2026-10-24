@@ -1,10 +1,13 @@
 "use strict";
 /* =====================================================================
-   GÉDÉON - Godson ARENA V3.2 PRO — INTERFACE ÉPURÉE, PAYSAGE & GO GAME ONLINE
+   GÉDÉON - Godson ARENA V3.3 PRO — CHARGEMENT, PARCOURS D'ÉCRANS & GO GAME ONLINE
    Signed: Gideon - Godson
    ===================================================================== */
-const MENUS=["menuMain","menuBot","menuSelect","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
+const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
 let settingsReturn="menuMain",vsTimeout=null,preparedCharP2=1,preparedArenaId="stadium";
+/* V3.3 : le parcours Personnages -> Arène -> Difficulté ne demande le niveau
+   du bot qu'à la dernière étape (sauf s'il est déjà choisi dans ce parcours). */
+let flowDifficultyChosen=false,pendingLaunch=false;
 let storyPhase="intro",lastHallRank=0,lastEndWinner=null,recordedMatchKey="";
 /* Tactile V2.8 : suivi indépendant de chaque pointerId pour éviter
    qu’un doigt relâché coupe une touche encore tenue par un autre doigt. */
@@ -33,7 +36,7 @@ function clearTouchInputs(){
 function showOnly(id){
   MENUS.forEach(m=>$(m).classList.toggle("hidden",m!==id));
   if(id==="menuMain"||id==="menuBot"||id==="menuHow"||id==="menuCustomize"||id==="menuHall"||id==="menuReplays"||id==="menuOnline"){ if(state!=="pause")state="menu"; }
-  else if(id==="menuSelect")state="select";
+  else if(id==="menuSelect"||id==="menuArena")state="select";
   else if(id==="menuVS")state="vs";
   else if(id==="menuStory")state="scene";
 }
@@ -169,7 +172,7 @@ function renderMoveList(){
 }
 function refreshSelect(){
   mode=pendingMode;
-  buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary(); renderMoveList();
+  buildRosters(); buildArenaCards(); buildArenaMoodCards(); updateLaunchSummary(); renderMoveList(); syncFlowUI();
   let previewP2=selCharP2<0?1:selCharP2;
   if(pendingMode==="arcade")previewP2=stageOpponent().char;
   if(pendingMode==="story")previewP2=currentStoryFight().char;
@@ -184,6 +187,15 @@ function refreshSelect(){
   $("rosterTitleP2").textContent=pendingMode==="2p"?"🟥 JOUEUR 2":pendingMode==="training"?"🥋 MANNEQUIN":pendingMode==="arcade"?"🏆 ADVERSAIRE ARCADE (AUTO)":pendingMode==="story"?"📖 ADVERSAIRE DE L’HISTOIRE (AUTO)":pendingMode==="survival"?"🌊 VAGUE "+survival.wave+" (AUTO)":"🤖 BOT "+DIFFS[botDiff].label.toUpperCase();
 }
 function enterSelect(newMode){ pendingMode=newMode; mode=newMode; refreshSelect(); showOnly("menuSelect"); }
+/* V3.3 : libellés du parcours (étape 3 = Difficulté seulement contre le bot),
+   note d'arène imposée et bouton de l'écran Arène adaptés au contexte. */
+function syncFlowUI(){
+  document.querySelectorAll(".flowLast").forEach(e=>e.textContent=pendingMode==="bot"?"Difficulté":"Combat");
+  const imp=$("arenaImposed"); if(imp)imp.classList.toggle("hidden",!(pendingMode==="story"||pendingMode==="survival"));
+  const lf=$("btnLaunchFight");
+  if(lf&&lf.firstChild)lf.firstChild.textContent=(pendingMode==="bot"&&!flowDifficultyChosen)?"🎯 Choisir la difficulté ":"⚔️ LANCER LE COMBAT";
+}
+function launchFromFlow(){ if(pendingMode==="story")showStoryScene("intro"); else showVS(false); }
 function setupArcadeRun(){
   arcade.stage=1;
   const order=[0,1,2,3,5].sort(()=>Math.random()-.5).slice(0,4),diffs=["facile","facile","moyen","difficile"];
@@ -914,6 +926,7 @@ function storyContinue(){
 
 /* ---------------- NAVIGATION MENUS ---------------- */
 function goMenu(){
+  flowDifficultyChosen=false; pendingLaunch=false;
   clearTimeout(vsTimeout); clearTouchInputs();
   cancelReplayRecording();
   if(replayPlayback.active||replayPlayback.ended)stopReplayPlayback(true);
@@ -1139,13 +1152,43 @@ function bindCustomize(){
 }
 
 /* ---------------- LIAISONS GÉNÉRALES ---------------- */
+/* V3.3 — Écran de chargement rapide : barre de progression, étapes et
+   astuces, puis fondu vers le menu (environ 1,2 s, skippable au clic). */
+const BOOT_TIPS=["💡 Astuce : garde juste avant l’impact = PARRY dorée, 0 dégât !","💡 Astuce : Poing + Pied au corps-à-corps = projection qui traverse la garde.","💡 Astuce : Spécial + Poing à 75 % d’énergie = attaque EX renforcée.","💡 Astuce : dash après un coup confirmé = Godson Cancel, le combo continue !"];
+let bootTimer=null,bootDone=false;
+function finishBoot(){
+  if(bootDone)return; bootDone=true; window.__bootDone=true;
+  if(bootTimer){ clearInterval(bootTimer); bootTimer=null; }
+  const el=$("bootLoader"); if(!el)return;
+  el.classList.add("done"); setTimeout(()=>el.classList.add("hidden"),300);
+}
+function startBoot(){
+  const el=$("bootLoader"); if(!el){ bootDone=true; window.__bootDone=true; return; }
+  const fill=$("bootFill"),pct=$("bootPct"),step=$("bootStep"),tip=$("bootTip");
+  const steps=["Chargement du moteur…","Préparation des combattants…","Ouverture des arènes…","Accordage de l’ambiance…","Prêt !"];
+  let p=0,tipIndex=0;
+  const show=()=>{
+    if(fill)fill.style.width=p+"%";
+    if(pct)pct.textContent=p+"%";
+    if(step)step.textContent=steps[Math.min(steps.length-1,Math.floor(p/25))];
+    if(tip&&p>0&&p%34<9)tip.textContent=BOOT_TIPS[tipIndex++%BOOT_TIPS.length];
+  };
+  show();
+  bootTimer=setInterval(()=>{
+    p=Math.min(100,p+Math.ceil(Math.random()*13)+6); show();
+    if(p>=100){ clearInterval(bootTimer); bootTimer=null; setTimeout(finishBoot,190); }
+  },105);
+  el.addEventListener("click",finishBoot);
+  window.addEventListener("keydown",function skipBoot(){ finishBoot(); window.removeEventListener("keydown",skipBoot); });
+  setTimeout(finishBoot,4200); /* filet de sécurité : jamais bloqué au chargement */
+}
 function bindUI(){
   document.addEventListener("pointerdown",()=>{ audio(); if((state==="menu"||state==="select"||state==="scene")&&AC&&!musicTimer)startMusic(); },{once:true});
   document.addEventListener("click",e=>{ if(e.target.closest("button")&&AC)SFX.click(); });
   $("btnModeStory").onclick=()=>{ audio(); setupStoryRun(); enterSelect("story"); };
-  $("btnModeBot").onclick=()=>{ audio(); pendingMode="bot"; showOnly("menuBot"); };
-  document.querySelectorAll("#menuBot [data-diff]").forEach(b=>b.onclick=()=>{ botDiff=b.dataset.diff; enterSelect("bot"); });
-  $("btnBotBack").onclick=()=>showOnly("menuMain");
+  $("btnModeBot").onclick=()=>{ audio(); flowDifficultyChosen=false; pendingLaunch=false; enterSelect("bot"); };
+  document.querySelectorAll("#menuBot [data-diff]").forEach(b=>b.onclick=()=>{ botDiff=b.dataset.diff; flowDifficultyChosen=true; refreshSelect(); if(pendingLaunch){ pendingLaunch=false; launchFromFlow(); } else enterSelect("bot"); });
+  $("btnBotBack").onclick=()=>{ pendingLaunch=false; showOnly("menuArena"); };
   $("btnMode2P").onclick=()=>enterSelect("2p");
   $("btnModeArcade").onclick=()=>{ setupArcadeRun(); enterSelect("arcade"); };
   $("btnModeSurvival").onclick=()=>{ audio(); setupSurvivalRun(); enterSelect("survival"); };
@@ -1158,8 +1201,10 @@ function bindUI(){
   $("btnHow").onclick=()=>showOnly("menuHow");
   $("btnHowBack").onclick=()=>showOnly("menuMain");
   $("btnSettings").onclick=openSettings; $("btnSettingsTop").onclick=openSettings; $("btnPauseSettings").onclick=openSettings;
-  $("btnSelectBack").onclick=()=>{ if(pendingMode==="bot")showOnly("menuBot"); else goMenu(); };
-  $("btnLaunchFight").onclick=()=>{ if(pendingMode==="story")showStoryScene("intro"); else showVS(false); };
+  $("btnSelectBack").onclick=()=>goMenu();
+  $("btnSelectNext").onclick=()=>{ refreshSelect(); showOnly("menuArena"); };
+  $("btnArenaBack").onclick=()=>showOnly("menuSelect");
+  $("btnLaunchFight").onclick=()=>{ if(pendingMode==="bot"&&!flowDifficultyChosen){ pendingLaunch=true; showOnly("menuBot"); } else launchFromFlow(); };
   $("menuVS").onclick=skipVS;
   $("btnStoryContinue").onclick=storyContinue;
   $("btnStoryQuit").onclick=()=>{ saveProfile(); goMenu(); showToast("📖 Progression de l’Histoire sauvegardée — combat "+story.step+"/"+story.total); };
@@ -1175,6 +1220,7 @@ function bindUI(){
   const _bLand=$("btnLandscape"); if(_bLand)_bLand.onclick=requestImmersiveLandscape;
   const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); };
   initPortraitGuard();
+  startBoot();
   $("btnTouch").onclick=function(){ touchEnabled=!touchEnabled; this.textContent=touchEnabled?"📱 Tactile : ON":"📱 Tactile"; $("touchUI").style.display=(touchEnabled&&(isCombat()||state==="intro"))?"flex":"none"; };
   // Entraînement
   document.querySelectorAll("#trainingBar [data-dummy]").forEach(b=>b.onclick=()=>{ dummyMode=b.dataset.dummy; document.querySelectorAll("#trainingBar [data-dummy]").forEach(x=>x.classList.toggle("on",x===b)); floater(640,240,"Mannequin : "+b.textContent,"#69f0ae"); });

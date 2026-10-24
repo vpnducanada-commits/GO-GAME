@@ -118,6 +118,10 @@ check("Humanité++ V3.1 présente", all(h in all_js for h in human_hooks), "6 mo
 landscape_hooks = ["requestImmersiveLandscape", "handlePortraitChange", "initPortraitGuard", "btnLandscape", "btnPortraitAnyway"]
 check("Paysage & interface épurée V3.2 présents", all(h in all_js for h in landscape_hooks) and "rotateHint" in html and "orientation:portrait" in css and "orientation:landscape" in css and ":fullscreen" in css and "helpBar" not in html, "invite portrait + mode cinéma paysage + textes allégés")
 
+# 17. Chargement & parcours d'écrans V3.3
+flow_hooks = ["startBoot", "finishBoot", "launchFromFlow", "syncFlowUI", "flowDifficultyChosen", "pendingLaunch"]
+check("Chargement & parcours d'écrans V3.3 présents", all(h in all_js for h in flow_hooks) and "bootLoader" in html and "menuArena" in html and "btnSelectNext" in html and "flowSteps" in html and "#bootLoader" in css and "screenIn" in css, "boot rapide + étapes Personnages/Arène/Difficulté + transitions")
+
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js
 secret_hits = [p for p in ("sb_secret_", "service_role", "SUPABASE_SERVICE_ROLE_KEY") if p in client_blob]

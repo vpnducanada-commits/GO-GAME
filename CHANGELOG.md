@@ -3,6 +3,24 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [3.3.0] — 24 octobre 2026 — « Flux d'écrans & Chargement » (retour direct du propriétaire)
+### Un vrai parcours d'écrans — Manager + Nadia
+- ⏳ **Écran de chargement** à l'ouverture : logo animé, barre de progression avec pourcentage, étapes affichées (« Préparation des combattants… », « Ouverture des arènes… ») et astuces de combat — environ **1,2 seconde**, skippable au clic ou au clavier, avec fondu de sortie et filet de sécurité anti-blocage.
+- 🗂️ **Parcours en étapes** au lieu d'un méga-écran fourre-tout : **1 · Menu → 2 · Personnages → 3 · Arène → 4 · Difficulté (contre le bot) → VS → Combat**, avec indicateur d'étapes visible sur chaque écran et boutons retour en chaîne (Difficulté → Arène → Personnages → Menu).
+- 🏟️ **Écran Arène dédié** : grandes cartes d'arènes + choix d'ambiance Arena Moods. En Histoire/Survie, l'arène imposée est signalée et l'ambiance reste libre.
+- 🎯 **Difficulté en dernière étape** contre le bot, présentée en 3 grandes cartes (Facile/Moyen/Difficile) ; le bouton de l'écran Arène devient « Choisir la difficulté » tant qu'elle n'est pas fixée dans le parcours.
+- Les autres modes gardent leur logique : Arcade/Survie/Histoire (difficulté scénarisée), 2 Joueurs et Entraînement enchainent directement de l'Arène vers le VS.
+
+### Affichage amélioré — Kenzo
+- ✨ **Transitions d'écran** : chaque panneau entre en fondu glissé (220 ms), fini les apparitions sèches.
+- 🃏 Cartes personnages agrandies (avatars 54 px, grille aérée) maintenant que l'écran Personnages ne partage plus la place avec les arènes ; cartes d'arène portées à 110 px de haut sur leur écran dédié.
+- L'ensemble conserve le paysage prioritaire, l'interface épurée V3.2 et les personnages Humanité++ V3.1.
+
+### Garanties — Manager + Sarah
+- 🎯 **Navigation uniquement** : aucun changement de gameplay, physique, déterminisme, replays ou protocole Online. `menuArena` rejoint la liste `MENUS`/`showOnly` avec l'état `select`, et le lancement réutilise exactement le même code (`launchFromFlow`).
+- 🧪 Suite portée à **234 assertions source / 263 vérifications affichées** : chargement présent et terminé proprement, parcours 2 joueurs complet écran par écran, difficulté du bot exigée après l'arène puis lancement réel du combat — en plus de toutes les anciennes traversées de menus qui restent compatibles.
+- 🛡️ Gate QA enrichie d'un contrôle permanent « Chargement & parcours d'écrans V3.3 ».
+
 ## [3.2.0] — 24 octobre 2026 — « Paysage & Interface Épurée » (retour direct du propriétaire)
 ### Le jeu se joue en paysage — Manager + Kenzo
 - 🌄 **Scène paysage d'abord** : la zone de jeu tient désormais toujours dans la hauteur visible de l'écran (largeur bornée par `100dvh` en 16:9), sans défilement parasite pendant les combats.

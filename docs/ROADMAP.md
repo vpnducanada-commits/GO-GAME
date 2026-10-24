@@ -88,6 +88,12 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - ✂️ **Interface épurée** : barre d'aide sous la scène supprimée, footer d'une ligne, notes et signatures redondantes retirées, techniques repliées, statuts Online et carrière condensés
 - 🎯 Présentation uniquement : gameplay, déterminisme, replays et Online inchangés ; board : `docs/SPRINT_V32_PAYSAGE.md`
 
+## ✅ V3.3 — « Flux d'écrans & Chargement » *(LIVRÉ le 24/10/2026 — 234 assertions source, suite verte)*
+- ⏳ **Écran de chargement** rapide : progression, étapes, astuces, fondu de sortie, skippable
+- 🗂️ **Parcours en étapes** : Menu → Personnages → Arène → Difficulté (bot) → VS, indicateur d'étapes et retours en chaîne
+- 🏟️ **Écran Arène dédié** (grandes cartes + Arena Moods ; arène imposée signalée en Histoire/Survie)
+- ✨ Transitions d'écran en fondu glissé, cartes personnages et arènes agrandies ; gameplay et Online inchangés — board : `docs/SPRINT_V33_FLUX_ECRANS.md`
+
 ## 🔜 SPRINT 09 — « Compétition locale » *(envisagé)*
 - **Nadia** : tournoi local en tableau, défi tournant et équilibrage post-Zara fondé sur les données de combat
 - **Manager** : historique de tournoi et récompenses cosmétiques locales
