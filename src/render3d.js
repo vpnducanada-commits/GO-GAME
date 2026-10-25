@@ -6,7 +6,7 @@
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.
    Signé : Gédéon - Godson
    ===================================================================== */
-const renderer3DState={requested:true,mode:"auto",active:false,available:false,initialized:false,initFailed:false,fallback:"",frames:0,vertices:0,drawCalls:0,arenaKey:"",autoDisabled:false,camera:{x:0,y:2.05,z:8.6}};
+const renderer3DState={requested:true,mode:"auto",active:false,available:false,initialized:false,initFailed:false,fallback:"",frames:0,vertices:0,drawCalls:0,arenaKey:"",autoDisabled:false,camera:{x:0,y:2.05,z:8.6},cameraSmooth:{x:0,y:1.07,dist:6.55,init:false}};
 const R3D={canvas:null,gl:null,program:null,pointProgram:null,depthProgram:null,attribs:{},uniforms:{},pointAttribs:{},pointUniforms:{},dyn:null,dynTrans:null,points:null,arena:null,arenaTrans:null,vp:null,view:null,lightVP:null,camPos:[0,2.05,8.6],lightDir:[-.45,.82,.35],lightColor:[1,.86,.68],fillColor:[.32,.48,.78],fogColor:[.04,.05,.12],materialTexture:null,indexUint:false,renderScale:1,shadow:null,shadowEnabled:false,shadowFailed:false};
 const R3D_WORLD=1/95;
 function syncRenderer3DStats(){
@@ -1048,16 +1048,16 @@ function buildFighterPose3D(f){
   const ch=f.char,human=humanProfile(f),model=boardModel3D(f),motion=fighterMotion(f),atk=f.attack,phase=motion.attack||0,S=ch.scale||1,stance=stanceProfile3D(f);
   if(f.crouchBlend==null)f.crouchBlend=0;
   f.crouchBlend=smoothMotionValue(f.crouchBlend,(f.crouching||f.attackType==="uppercut"||f.attackType==="sweep")?1:0,14);
-  const cb=(f.dead||f.downT>0)?f.crouchBlend:clamp(Math.max(f.crouchBlend,stance.crouch*(f.grounded?1:.25)*(1-phase*.3)),0,.85),gaitLift=Math.abs(Math.sin(f.walkPhase||0))*motion.run;
-  const bobPx=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*stance.bounce*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1):0;
+  const cb=(f.dead||f.downT>0)?f.crouchBlend:clamp(Math.max(f.crouchBlend,stance.crouch*(f.grounded?1:.25)*(1-phase*.3)),0,.85),gaitPhase=motion.gaitPhase==null?(f.walkPhase||0):motion.gaitPhase,gaitLift=Math.abs(Math.sin(gaitPhase))*motion.run;
+  const bobPx=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*stance.bounce*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1-(motion.landingPulse||0)*2.2+(motion.takeoffPulse||0)*1.1-(motion.turnPulse||0)*.8):0;
   const bob=bobPx/95,m1Boost=atk&&atk.m1?(4+(atk.m1Step||0)*3+(atk.m1Final?7:0)):0;
   const punchExt=(f.attackType==="punch"||f.attackType==="airPunch")?phase*(48+m1Boost)/95:0;
   const kickExt=(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")?phase*(54+m1Boost)/95:0;
   const upperExt=f.attackType==="uppercut"?phase*(44+m1Boost)/95:0;
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0)/95;
   const walking=motion.run>.07&&f.grounded&&f.dashT<=0,local={};
-  local.pelvis=[motion.lean*.1+stance.lean*.35+motion.weight*.014-motion.hurt*.02,lerp(.97,.69,cb)+bob,0];
-  local.chest=[motion.lean*.27+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018,0];
+  local.pelvis=[motion.lean*.1+(motion.accelLean||0)*.18+stance.lean*.35+motion.weight*.014-motion.hurt*.02,lerp(.97,.69,cb)+bob,0];
+  local.chest=[motion.lean*.27+(motion.accelLean||0)*.38+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018,0];
   local.head=[.04+local.chest[0]*.62+motion.head*.09+(motion.headLag||0)/95-motion.hurt*.03,lerp(1.78,1.47,cb)+bob+motion.fatigue*.012,0];
   local.neck=mix3(local.chest,local.head,.55);
   const shoulderHalf=(human.shoulder/95)*(.9+ch.bulk*.09)*(.72+(model.shoulders||1)*.28),hipHalf=(human.hip/95)*(.92+ch.bulk*.08)*(.76+(model.hips||1)*.24);
@@ -1068,11 +1068,12 @@ function buildFighterPose3D(f){
   let bFoot=[stance.feet[0]-motion.lean*.08,0,-.17*stance.width],fFoot=[stance.feet[1]+motion.lean*.05,0,.17*stance.width];
   if(cb>.12){ bFoot[0]=lerp(bFoot[0],-.36,cb); fFoot[0]=lerp(fFoot[0],.34,cb); }
   if(walking){
-    const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stride=(.16+motion.run*.19)*strideDir,s=Math.sin(f.walkPhase||0),c=Math.cos(f.walkPhase||0),mix=clamp(motion.run*1.35,0,1);
+    const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stride=(.16+motion.run*.19)*strideDir,s=Math.sin(gaitPhase),c=Math.cos(gaitPhase),mix=clamp(motion.run*1.35,0,1);
     bFoot[0]=lerp(bFoot[0],-.03-s*stride,mix); fFoot[0]=lerp(fFoot[0],.05+s*stride,mix);
     bFoot[1]=lerp(bFoot[1],Math.max(0,-c)*(.035+motion.run*.075),mix); fFoot[1]=lerp(fFoot[1],Math.max(0,c)*(.035+motion.run*.075),mix);
   }
-  if(!f.dead&&motion.air>.03){ const a=motion.air,sw=clamp((f.vy||0)*.006,-.035,.045); bFoot=mix3(bFoot,[-.22-sw,.3+sw,-.17],a); fFoot=mix3(fFoot,[.27+sw,.2-sw,.17],a); }
+  if(f.grounded&&(motion.turnPulse||0)>.03){ const tp=(motion.turnPulse||0)*.7; bFoot=mix3(bFoot,[stance.feet[0]-.07,.015,-.2*stance.width],tp); fFoot=mix3(fFoot,[stance.feet[1]+.05,.055,.2*stance.width],tp); }
+  if(!f.dead&&motion.air>.03){ const a=motion.air,sw=clamp((motion.airPitch||0)*.42,-.045,.055); bFoot=mix3(bFoot,[-.22-sw,.3+sw,-.17],a); fFoot=mix3(fFoot,[.27+sw,.2-sw,.17],a); }
   const kickPose74={devant:[.44,.94,.17,.82],circulaire:[.42,1.06,.24,.8],lateral:[.5,.82,.12,.9],hache:[.4,1.26,.18,.72],bas:[.46,.42,.18,.85],genou:[.36,.8,.16,.5],retourne:[.43,1.03,.03,.8]}[stance.kick]||[.44,.94,.17,.82];
   if(f.attackType==="kick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],kickPose74[1],kickPose74[2]];
   if(f.attackType==="airKick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],Math.max(.34,kickPose74[1]-.34),kickPose74[2]];
@@ -1084,7 +1085,7 @@ function buildFighterPose3D(f){
     const k=solveJoint(hip[0],hip[1],foot[0],foot[1],.54,.53,-1); return [k.x,k.y,foot[2]];
   };
   local.kneeBack=kneeFor(local.hipBack,bFoot,false); local.kneeFront=kneeFor(local.hipFront,fFoot,f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep");
-  const armSwing=Math.sin(f.walkPhase||0)*.09*motion.run*strideSign3(f),guard=motion.guard;
+  const armSwing=Math.sin(gaitPhase)*.09*motion.run*strideSign3(f),guard=motion.guard;
   let backHand=[lerp(stance.guardB[0]+armSwing,.29,guard),lerp(local.chest[1]+stance.guardB[1]+bob+cb*.04,local.chest[1]-.03,guard),-.245];
   let frontHand=[stance.guardF[0]+punchExt-armSwing*.5,local.chest[1]+stance.guardF[1],.255];
   if(f.attackType==="punch"||f.attackType==="airPunch"){
@@ -1120,7 +1121,7 @@ function buildFighterPose3D(f){
   }
   const root=[((f.rx==null?f.x:f.rx)-640)*R3D_WORLD,(GROUND-(f.ry==null?f.y:f.ry))*R3D_WORLD,0];
   const visualFace=clamp(Math.abs(motion.face)<.22?(motion.face<0?-.22:.22):motion.face,-1,1),yaw=(1-visualFace)*Math.PI/2-visualFace*.2;
-  const roll=(f.dead||f.downT>0)?0:clamp(-(motion.lean+motion.air*clamp((f.vy||0)*.0016,-.025,.035)-motion.hurt*.055+motion.dash*.09),-.2,.24);
+  const roll=(f.dead||f.downT>0)?0:clamp(-(motion.lean+(motion.accelLean||0)*.65+motion.air*((motion.airPitch||0)*.55+clamp((f.vy||0)*.0008,-.012,.018))-motion.hurt*.055+motion.dash*.09+(motion.turnPulse||0)*.025),-.24,.28);
   const twistSign=Math.sign(visualFace||1);
   const twistForY=y=>{
     const t=clamp((y-.82)/.72,0,1),smooth=t*t*(3-2*t);
@@ -1137,9 +1138,9 @@ function buildFighterPose3D(f){
   };
   const world={}; Object.keys(local).forEach(k=>world[k]=toWorld(local[k]));
   const velocityLag=clamp(-(((f.vx||0)+(f.kvx||0))*(f.facing||1))*.007,-.075,.075);
-  const hairSway=clamp(velocityLag+Math.sin(renderTicker*.09+(f.id||0)*1.7)*.008-motion.dash*.035,-.11,.11);
+  const hairSway=clamp(velocityLag-(motion.accelLean||0)*.18+(motion.landingPulse||0)*.01-(motion.takeoffPulse||0)*.012+Math.sin(renderTicker*.09+(f.id||0)*1.7)*.008-motion.dash*.035,-.11,.11);
   const clothSway=clamp(velocityLag*1.2+Math.sin(renderTicker*.075+(f.id||0))*.012-motion.dash*.06,-.13,.13);
-  return {motion,human,model,cb,phase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,hairSway,clothSway};
+  return {motion,human,model,cb,phase,gaitPhase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,hairSway,clothSway};
 }
 function strideSign3(f){ return Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1; }
 function addFighter3D(opaque,trans,f){
@@ -1272,6 +1273,12 @@ function addFighter3D(opaque,trans,f){
   return pose;
 }
 function addProjectilesAndEffects3D(trans){
+  renderStats.dashTrails3d=0;
+  if(typeof ghosts!=="undefined")for(const g of ghosts){
+    const base=worldFromGame3D(g.x,g.y,-.035),dir=g.dashDir||g.facing||1,alpha=clamp(g.life/Math.max(1,g.max||15),0,1),len=.42+clamp(Math.abs(g.vx||12)/30,0,.3),rows=qualityLevel===0?[.68,1.12]:[.42,.9,1.38],hMul=(g.scale||1)*(g.crouch?.76:1);
+    rows.forEach((h,i)=>addBox3D(trans,[base[0]-dir*len*.42,base[1]+h*hMul,base[2]+(i-1)*.035],[len,.021,.032],[0,0,dir*(i-1)*.035],parseColor3(g.accent||"#ffffff",alpha*.34,.5)));
+    renderStats.dashTrails3d++;
+  }
   if(typeof projectiles!=="undefined")for(const pr of projectiles){
     const center=worldFromGame3D(pr.rx,pr.ry,0),r=Math.max(.09,(pr.r||16)/95),col=parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.92,.9);
     if(pr.kind==="wave"||pr.kind==="ground")center[1]=.18;
@@ -1313,11 +1320,17 @@ function buildParticles3D(){
   R3D_POINT_DATA.count=particles.length; return R3D_POINT_DATA;
 }
 function computeCamera3D(){
-  const midGame=(p1.rx+p2.rx)/2,mid=(midGame-640)*R3D_WORLD,avgAir=((GROUND-p1.ry)+(GROUND-p2.ry))/2*R3D_WORLD;
+  const midGame=(p1.rx+p2.rx)/2+(cam.lead||0),midTarget=(midGame-640)*R3D_WORLD,air1=Math.max(0,(GROUND-p1.ry)*R3D_WORLD),air2=Math.max(0,(GROUND-p2.ry)*R3D_WORLD),avgAir=(air1+air2)/2,maxAir=Math.max(air1,air2);
   const shakeAmt=(typeof shake!=="undefined"?shake:0)*(SETTINGS.shake/100);
-  const camDist3D=clamp(6.55/Math.max(.8,cam.zoom||1),4.65,7.7);
-  const eye=[mid*.9+.82+(Math.random()-.5)*shakeAmt*.012,1.76+clamp(avgAir,.0,1.4)*.13+(Math.random()-.5)*shakeAmt*.008,camDist3D];
-  const target=[mid,1.07+clamp(avgAir,0,1.4)*.25,0];
+  const headTop76=Math.max(1.86*((p1.char&&p1.char.scale)||1)+air1,1.86*((p2.char&&p2.char.scale)||1)+air2);
+  const baseDist76=clamp(6.55/Math.max(.8,cam.zoom||1),4.65,7.7),camDistTarget=clamp(Math.max(baseDist76,headTop76*1.72),4.65,8.4),targetY=Math.max(1.07,headTop76*.52); // V7.6 : le sommet d’un saut reste dans le cadre
+  const cs=renderer3DState.cameraSmooth||(renderer3DState.cameraSmooth={x:midTarget,y:targetY,dist:camDistTarget,init:false});
+  if(!cs.init||Math.abs(midTarget-cs.x)>3.2){ cs.x=midTarget; cs.y=targetY; cs.dist=camDistTarget; cs.init=true; }
+  else { cs.x=smoothMotionValue(cs.x,midTarget,2.8); cs.y=smoothMotionValue(cs.y,targetY,2.1); cs.dist=smoothMotionValue(cs.dist,camDistTarget,1.9); }
+  renderStats.cameraLead3d=Math.round(((cam.lead||0)*R3D_WORLD)*1000)/1000;
+  const mid=cs.x,camDist3D=cs.dist;
+  const eye=[mid*.9+.82+(Math.random()-.5)*shakeAmt*.012,cs.y+.66+clamp(avgAir,0,1.4)*.04+(Math.random()-.5)*shakeAmt*.008,camDist3D];
+  const target=[mid,cs.y,0];
   R3D.camPos=eye; renderer3DState.camera={x:eye[0],y:eye[1],z:eye[2]};
   const proj=mat4Perspective3(39*Math.PI/180,W/H,.1,80); R3D.view=mat4LookAt3(eye,target,[0,1,0]); R3D.vp=mat4Multiply3(proj,R3D.view);
   const mood=arenaMoodTheme();

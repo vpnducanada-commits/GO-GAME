@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 675 Ko / 691 500 octets réels en V7.5, 4 scripts intégrés), sans asset externe.
+- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 684 Ko / 700 539 octets réels en V7.6, 4 scripts intégrés), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.5 — VISAGES & COSTUMES, 41 IDENTITÉS DE COMBAT & PLEIN ÉCRAN FORCÉ
+   Godson FURY ARENA V7.6 — MOBILITÉ DYNAMIQUE, VISAGES & COSTUMES, 41 IDENTITÉS DE COMBAT
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

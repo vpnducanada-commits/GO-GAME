@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.5 — VISAGES & COSTUMES, IDENTITÉS DE COMBAT, PLEIN ÉCRAN FORCÉ & TOURNOI
+   Godson FURY ARENA V7.6 — MOBILITÉ DYNAMIQUE, VISAGES & COSTUMES, IDENTITÉS DE COMBAT & TOURNOI
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.5.0";
+const GAME_VERSION="7.6.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -627,6 +627,18 @@ function m1Enabled(){
   return !v||versionAtLeast(v,"5.1.0"); // les replays antérieurs gardent l'ancien poing générique
 }
 function resetM1Chain(f){ f.m1Next=0; f.m1Step=-1; f.m1ChainT=0; }
+/* V7.6 — MOBILITÉ DYNAMIQUE : le jeu direct gagne en accélération, contrôle
+   aérien, dash et tolérance d'entrée. Les anciens replays gardent le profil
+   V7.5 exact afin que leurs checkpoints et leur hash restent vérifiables. */
+const MOBILITY76={
+  legacy:{name:"legacy",buffer:9,attackBuffer:10,doubleTap:18,coyote:6,dashDur:12,dashSpeed:12.4,baseSpeed:4.7,runMax:.3,runRamp:160,groundAccel:.3,groundStop:.36,groundReverse:.3,attackSlide:.36,airSpeed:.8,airBlend:.15,dashBlend:.65,riseGravity:1,apexGravity:1,fallGravity:1,fallCap:19,ghostEvery:2},
+  dynamic:{name:"dynamic",buffer:11,attackBuffer:12,doubleTap:21,coyote:8,dashDur:13,dashSpeed:12.9,baseSpeed:4.85,runMax:.34,runRamp:135,groundAccel:.34,groundStop:.4,groundReverse:.43,attackSlide:.22,airSpeed:.88,airBlend:.2,dashBlend:.7,riseGravity:.9,apexGravity:.68,fallGravity:1.12,fallCap:20,ghostEvery:1}
+};
+function mobilityProfile76(){
+  const replayVersion=replayPlayback.active&&replayPlayback.data?replayPlayback.data.gameVersion:null;
+  if(replayVersion!==null&&replayVersion!==GAME_VERSION&&!versionAtLeast(replayVersion||"0","7.6.0"))return MOBILITY76.legacy;
+  return MOBILITY76.dynamic;
+}
 
 const DIFFS={
   facile:{label:"Facile",react:24,agg:.42,block:.15,spec:.25,jump:.06,mistake:.38,speed:.9,combo:.18,dash:.08,parry:.04},
@@ -729,6 +741,7 @@ class Fighter{
     this.lastTapDir=0; this.lastTapFrame=-99; this.holdDir=0; this.holdT=0;
     this.anim=replayRand()*100; this.walkPhase=0; this.squashT=0; this.blinkT=80+replayRand()*120;
     this.prev={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
+    this.motion=null; this.crouchBlend=0; // V7.6 : aucun ressort visuel hérité au changement de round/personnage
   }
 }
 const p1=new Fighter(390,1), p2=new Fighter(890,2);
@@ -1142,7 +1155,7 @@ function impactBurst(x,y,kind,color,power,dir){
 function floater(x,y,text,c,big){ if(floaters.length>14)floaters.shift(); floaters.push({x,y,text,c:c||"#fff",life:52,vy:-1.1,big:!!big}); }
 function confetti(){ const n=Math.round(120*particleMul()); for(let i=0;i<n;i++)pushParticle({x:Math.random()*W,y:-10-Math.random()*170,vx:(Math.random()-.5)*2,vy:1.4+Math.random()*2.6,life:125+Math.random()*90,max:215,r:2.8+Math.random()*4,c:["#ffc400","#ff2e88","#00a2ff","#00e676","#fff"][(Math.random()*5)|0],grav:.014,rect:true,rot:Math.random()*6}); }
 function firework(x,y){ const c=["#ffc400","#ff2e88","#00e5ff","#69f0ae"][(Math.random()*4)|0]; spark(x,y,c,34,5.5); ring(x,y,c); }
-function addGhost(f){ if(ghosts.length>36)ghosts.shift(); ghosts.push({x:f.x,y:f.y,facing:f.facing,scale:f.char.scale,bulk:f.char.bulk,c:f.skin.primary,accent:f.skin.trail,life:15,max:15,crouch:f.crouching}); }
+function addGhost(f){ if(ghosts.length>36)ghosts.shift(); ghosts.push({x:f.x,y:f.y,facing:f.facing,scale:f.char.scale,bulk:f.char.bulk,c:f.skin.primary,accent:f.skin.trail,life:15,max:15,crouch:f.crouching,vx:(f.vx||0)+(f.kvx||0),vy:f.vy||0,dashDir:f.dashDir||f.facing}); }
 
 /* ---------------- SUCCÈS / TOAST ---------------- */
 let toastTimer=null;
@@ -1497,7 +1510,7 @@ function tryMeleeHit(f,op){
 function clampX(f){ f.x=clamp(f.x,55,W-55); }
 function startDash(f,dir){
   if(f.dashCD>0||f.dead||f.downT>0||(!f.grounded&&f.airDashed))return;
-  f.dashT=12; f.dashDir=dir||f.facing; f.dashCD=f.char.dashCD; f.dashBufT=0;
+  f.dashT=mobilityProfile76().dashDur; f.dashDir=dir||f.facing; f.dashCD=f.char.dashCD; f.dashBufT=0;
   const dashOpponent=f===p1?p2:p1;
   if(f.grounded&&dashOpponent&&Math.sign(dashOpponent.x-f.x)===-f.dashDir)f.invulnT=Math.max(f.invulnT,6); // backdash défensif bref
   if(!f.grounded){ f.airDashed=true; f.vy=Math.min(f.vy,0); }
@@ -1505,6 +1518,7 @@ function startDash(f,dir){
   dust(f.x,f.y,6); SFX.dash(); if(f===p1)playerHabits.dashes++;
 }
 function updateFighter(f,inp,op){
+  const mob76=mobilityProfile76();
   f.px=f.x; f.py=f.y; f.anim++;
   if(f.hitFlash>0)f.hitFlash--; if(f.squashT>0)f.squashT--; if(f.dashCD>0)f.dashCD--; if(f.invulnT>0)f.invulnT--; if(f.juggleT>0)f.juggleT--;
   if(f.bufT>0)f.bufT--; if(f.jumpBufT>0)f.jumpBufT--; if(f.dashBufT>0)f.dashBufT--;
@@ -1517,7 +1531,7 @@ function updateFighter(f,inp,op){
   if(f.hitStun>0)f.hitStun--; if(f.blockStun>0)f.blockStun--;
   if(wasHitStun&&f.hitStun===0&&f.grounded&&f.downT<=0)f.comboVuln=false;
   if(f.downT>0){ f.downT--; if(f.downT===0){f.invulnT=13;f.comboVuln=false;f.squashT=6;} }
-  if(f.dashT>0){ f.dashT--; if(simFrame%2===0)addGhost(f); }
+  if(f.dashT>0){ f.dashT--; if(simFrame%(mob76.ghostEvery||2)===0)addGhost(f); }
   if(f.attackT>0){
     f.attackT--; const el=f.attackDur-f.attackT;
     if(f.attack&&f.attack.m1&&f.grounded&&el>0&&el<=f.attack.start)f.x+=f.facing*(0.9+(f.attack.m1Advance||0)*.5); // tracking M1 : le combattant recolle pendant le démarrage
@@ -1528,13 +1542,13 @@ function updateFighter(f,inp,op){
   const canAct=isCombat()&&f.hitStun<=0&&f.blockStun<=0&&f.downT<=0;
   // --- Tampons d’entrée (fluidité pro) ---
   if(f===p1){ if(pressed(f,inp,"jump"))playerHabits.jumps++; if(inp.block&&simFrame%24===0)playerHabits.blocks++; }
-  if(pressed(f,inp,"jump"))f.jumpBufT=9;
+  if(pressed(f,inp,"jump"))f.jumpBufT=mob76.buffer;
   if(pressed(f,inp,"block")&&f.grounded&&f.attackT<=0&&f.downT<=0)f.parryT=9; // fenêtre de parry : 9 frames (~150 ms)
   let tapDir=0; if(pressed(f,inp,"left"))tapDir=-1; if(pressed(f,inp,"right"))tapDir=1;
-  if(tapDir!==0){ if(f.lastTapDir===tapDir&&simFrame-f.lastTapFrame<=18){ f.dashBufT=9; f.dashBufDir=tapDir; } f.lastTapDir=tapDir; f.lastTapFrame=simFrame; }
-  if(pressed(f,inp,"dash")){ f.dashBufT=9; f.dashBufDir=inp.left?-1:(inp.right?1:f.facing); }
+  if(tapDir!==0){ if(f.lastTapDir===tapDir&&simFrame-f.lastTapFrame<=mob76.doubleTap){ f.dashBufT=mob76.buffer; f.dashBufDir=tapDir; } f.lastTapDir=tapDir; f.lastTapFrame=simFrame; }
+  if(pressed(f,inp,"dash")){ f.dashBufT=mob76.buffer; f.dashBufDir=inp.left?-1:(inp.right?1:f.facing); }
   f.inputDir=(inp.right?1:0)-(inp.left?1:0); // direction brute immédiate : projections avant/arrière réactives
-  const want=desiredAttack(f,inp); if(want){ f.bufType=want; f.bufT=want==="m1"?18:10; } // 18 frames : martelage humain toléré
+  const want=desiredAttack(f,inp); if(want){ f.bufType=want; f.bufT=want==="m1"?18:mob76.attackBuffer; } // 18 frames : martelage humain toléré
   f.crouching=!!inp.block&&f.grounded&&f.attackT<=0&&f.dashT<=0;
   f.blocking=canAct&&f.crouching;
   if(canAct&&f.dashBufT>0&&f.attackT>0&&f.hitConfirmed&&f.godsonCancelReady&&f.energy>=25&&f.dashCD<=0){
@@ -1554,7 +1568,7 @@ function updateFighter(f,inp,op){
       if(el>=f.attack.end&&(CANCELS[f.attackType]||[]).includes(target)){ f.vx+=f.facing*1.6; if(startAttack(f,f.bufType))f.bufT=0; } }
   }
   // --- Saut : coyote-time + hauteur variable ---
-  if(f.grounded)f.coyote=6; else if(f.coyote>0)f.coyote--;
+  if(f.grounded)f.coyote=mob76.coyote; else if(f.coyote>0)f.coyote--;
   if(canAct&&f.jumpBufT>0&&(f.grounded||f.coyote>0)&&!f.crouching&&f.attackT<=0&&f.dashT<=0){
     f.vy=-f.char.jump; f.grounded=false; f.coyote=0; f.jumpBufT=0; f.jumpCut=false; f.squashT=7; dust(f.x,GROUND,6); SFX.jump();
   }
@@ -1566,16 +1580,19 @@ function updateFighter(f,inp,op){
   if(f.grounded&&vxSign&&f.lastVXSign&&vxSign!==f.lastVXSign){ f.squashT=Math.max(f.squashT,4); if(simFrame%3===0)dust(f.x,GROUND,3); }
   if(vxSign)f.lastVXSign=vxSign;
   if(move!==0&&move===f.holdDir)f.holdT++; else {f.holdDir=move;f.holdT=0;}
-  const runMul=f.grounded?1+Math.min(.3,f.holdT/160):1;
+  const runMul=f.grounded?1+Math.min(mob76.runMax,f.holdT/mob76.runRamp):1;
   const botMul=(f===p2&&(mode==="bot"||mode==="arcade"||mode==="tournament"||mode==="story"||mode==="survival"||(mode==="training"&&dummyMode==="combat")))?currentDiff().speed:1;
-  let target=move*4.7*f.char.speed*botMul*runMul*(f.grounded?1:.8);
-  if(f.dashT>0)target=f.dashDir*12.4*f.char.speed;
-  // Inertie humaine : accélération un peu plus progressive que le freinage, sans perdre la réactivité arcade.
-  const groundBlend=move!==0?.30:.36;
-  f.vx+=(target-f.vx)*(f.dashT>0?.65:(f.grounded?groundBlend:.15));
+  let target=move*mob76.baseSpeed*f.char.speed*botMul*runMul*(f.grounded?1:mob76.airSpeed);
+  if(f.dashT>0)target=f.dashDir*mob76.dashSpeed*f.char.speed;
+  // V7.6 : demi-tour plus franc, freinage net et élan conservé pendant les attaques au sol.
+  const reversing76=move!==0&&Math.abs(f.vx)>1&&Math.sign(f.vx)!==move;
+  const groundBlend=f.attackT>0?mob76.attackSlide:(reversing76?mob76.groundReverse:(move!==0?mob76.groundAccel:mob76.groundStop));
+  f.vx+=(target-f.vx)*(f.dashT>0?mob76.dashBlend:(f.grounded?groundBlend:mob76.airBlend));
   // --- Physique ---
-  let grav=f.char.gravity; if(f.juggleT>0)grav*=.55; if(f.dashT>0&&!f.grounded)grav*=.25; if(inp.block&&!f.grounded)grav+=.5;
-  f.vy+=grav; if(f.vy>19)f.vy=19;
+  let grav=f.char.gravity; if(f.juggleT>0)grav*=.55; if(f.dashT>0&&!f.grounded)grav*=.25;
+  if(!f.grounded&&f.juggleT<=0&&f.dashT<=0){ if(f.vy<-2.6&&inp.jump&&!f.jumpCut)grav*=mob76.riseGravity; else if(Math.abs(f.vy)<=2.6)grav*=mob76.apexGravity; else if(f.vy>3)grav*=mob76.fallGravity; }
+  if(inp.block&&!f.grounded)grav+=.5;
+  f.vy+=grav; if(f.vy>mob76.fallCap)f.vy=mob76.fallCap;
   f.x+=f.vx+f.kvx; f.y+=f.vy; f.kvx*=(f.grounded?.76:.94);
   if(f.y>=GROUND){
     if(!f.grounded){ if(f.vy>5)dust(f.x,GROUND,6); f.squashT=8; f.airDashed=false;
@@ -1591,9 +1608,23 @@ function updateFighter(f,inp,op){
   Object.assign(f.prev,inp);
 }
 function separate(){
-  const dx=p2.x-p1.x,ad=Math.abs(dx),minD=58*(p1.char.bulk+p2.char.bulk)/2;
+  const mob76=mobilityProfile76(),dx=p2.x-p1.x,ad=Math.abs(dx),minD=58*(p1.char.bulk+p2.char.bulk)/2;
   if(ad<minD&&Math.abs(p1.y-p2.y)<105&&!p1.dead&&!p2.dead&&p1.downT<=0&&p2.downT<=0){
-    const push=(minD-ad)/2,s=dx>=0?1:-1; p1.x-=push*s; p2.x+=push*s; clampX(p1); clampX(p2);
+    const s=dx>=0?1:-1;
+    if(mob76.name==="legacy"){
+      const push=(minD-ad)/2; p1.x-=push*s; p2.x+=push*s; clampX(p1); clampX(p2);
+    }else{
+      // V7.6 : contact corporel amorti, avec transfert de correction au mur.
+      const total=(minD-ad)*.78,d1=-s*total/2,d2=s*total/2;
+      let c1=clamp(p1.x+d1,55,W-55),c2=clamp(p2.x+d2,55,W-55);
+      const miss1=d1-(c1-p1.x),miss2=d2-(c2-p2.x);
+      if(Math.abs(miss1)>.001)c2=clamp(c2-miss1,55,W-55);
+      if(Math.abs(miss2)>.001)c1=clamp(c1-miss2,55,W-55);
+      p1.x=c1; p2.x=c2;
+      const inward1=s*p1.vx,inward2=-s*p2.vx;
+      if(inward1>0)p1.vx-=s*inward1*.26;
+      if(inward2>0)p2.vx+=s*inward2*.26;
+    }
   }
 }
 function updateProjectiles(){

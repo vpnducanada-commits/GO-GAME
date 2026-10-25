@@ -3,6 +3,39 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.6.0] — 2026-10-25 — « Mobilité Dynamique »
+
+Demande directe du propriétaire : continuer le travail et rendre la
+mobilité **plus fluide et plus dynamique**. Le sprint agit à la fois sur
+la sensation de contrôle, l’animation à la fréquence réelle de l’écran
+et les caméras, sans réintroduire de gel d’impact.
+
+### Amélioré — Contrôle et déplacements (Nadia + Kenzo)
+- Nouveau profil `MOBILITY76.dynamic` : accélération et freinage plus
+  nets, demi-tour plus franc, course progressive plus rapide, contrôle
+  aérien renforcé et élan mieux conservé pendant les attaques au sol.
+- Sauts plus lisibles : montée tenue légèrement allégée, apex bref et
+  descente plus franche ; coyote-time porté à 8 frames.
+- Dash porté à 13 frames et 12,9 px/frame de cible, avec fantômes à
+  chaque tick et nouvelles traînées de vitesse en 3D.
+- Tampons d’entrée élargis (saut/dash 11 frames, attaques 12, double
+  tap 21) pour le tactile et les écrans rapides.
+- Contact corporel amorti avec transfert de correction au mur, afin
+  d’éviter les micro-sauts quand les combattants se collent.
+- Les replays antérieurs à la V7.6 utilisent le profil `legacy` exact
+  de la V7.5 : leurs checkpoints et leur hash restent vérifiables.
+
+### Amélioré — Animation et caméras (Kenzo)
+- **Foulée anti-patinage** : `gaitPhase` avance avec la distance
+  interpolée réellement affichée, en 2D comme en 3D.
+- **Attaques fractionnaires** : `attackFlow` interpole la phase entre
+  deux ticks 60 Hz pour les écrans 90/120 Hz.
+- Ressorts `turnPulse`, `takeoffPulse`, `landingPulse`, `airPitch` et
+  `accelLean` : appuis de pivot, étirement au décollage, compression à
+  la réception et inclinaison aérienne continue.
+- Caméras avec anticipation de vitesse ; la caméra 3D est amortie et
+  recule/relève son cadre pour garder un saut complet dans l’image.
+
 ## [7.5.0] — 2026-10-25 — « Visages & Costumes »
 
 Suite de la trajectoire graphique du propriétaire : après les postures

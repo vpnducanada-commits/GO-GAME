@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.6 — « Mobilité Dynamique » *(LIVRÉ le 25/10/2026 — 478 assertions source / 714 vérifications, suite verte)*
+
+- **Demande directe du propriétaire** : « Continuez le travail et travaillez aussi la mobilité, que ça soit plus fluide et dynamique. »
+- **Contrôle** : profil direct plus vif (accélération, demi-tour, course progressive, air, dash 13 frames, coyote 8 frames, tampons élargis, contact amorti) et profil `legacy` exact pour relire les replays antérieurs.
+- **Animation** : foulée avancée par la distance interpolée affichée, phases d’attaque fractionnaires pour 90/120 Hz, ressorts de pivot/décollage/réception et traînées de dash en 3D.
+- **Caméras** : anticipation de vitesse en 2D/3D, caméra 3D amortie et cadrage vertical qui garde le sommet d’un saut dans l’image.
+- **Preuves** : mesures navigateur de course/dash/saut/demi-tour/réception et captures WebGL relues, zéro erreur ; aucun gel d’impact réintroduit. Voir `docs/SPRINT_V76_MOBILITE_DYNAMIQUE.md`.
+- 🔜 Prochaines étapes possibles : expressions faciales 3D en combat, mains/armes plus détaillées, puis validations Online/terrain sur téléphones physiques.
+
 ## ✅ V7.5 — « Visages & Costumes » *(LIVRÉ le 25/10/2026 — 470 assertions source / 706 vérifications, suite verte)*
 
 - **Trajectoire graphique du propriétaire, étape têtes** : les fiches prévoyaient 13 coiffures mais le moteur n’en dessinait que 6, avec une coiffe « casque » unique et des barbes en une seule boule.
