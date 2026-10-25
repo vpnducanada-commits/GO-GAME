@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.7 — PRÉSENCE VIVANTE (expressions, mains, appuis) + Réalité 3D II V7.2 (anatomie, matières, caméra) (WebGL maison, zéro dépendance)
+   Godson FURY ARENA V7.8 — ARÈNES SPECTACLE (décors vivants, faisceaux, profondeur) + Présence Vivante V7.7 + Réalité 3D II V7.2 (anatomie, matières, caméra) (WebGL maison, zéro dépendance)
    Personnages humanoïdes articulés, arènes en profondeur, caméra combat.
    La simulation reste celle du moteur déterministe : ce module ne fait
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.
@@ -415,12 +415,15 @@ function buildArenaBatch3D(){
     addBox3D(opaque,[0,.38,-4.72],[23,.42,.18],[0,0,0],parseColor3("#162536"));
     [-8.4,-4.2,0,4.2,8.4].forEach((x,i)=>addBox3D(opaque,[x,.4,-4.61],[3.4,.3,.045],[0,0,0],parseColor3(["#123a63","#5b2147","#6b4b08","#123f39","#33275f"][i%5],1,.18)));
     const crowdN=qualityLevel===0?150:qualityLevel===1?250:360,slots=Math.ceil(crowdN/5),palette=["#26313d","#332f3a","#3a2f36","#263f46","#463b2c","#2c3850","#354233","#43323d"],bright=["#ffc400","#ff2e88","#00a2ff","#00e676","#ff7043"],skins=["#8d5524","#c68642","#e8b98d","#5d4037","#a9714b"];
+    for(let tier78=0;tier78<5;tier78++)addBox3D(opaque,[0,.84+tier78*.5,-5.52-tier78*1.05],[22.4,.13,.34],[0,0,0],materialColor3("#0f1824","concrete"));
     for(let i=0;i<crowdN;i++){
       const tier=i%5,slot=(i/5)|0,x=-10.7+slot/Math.max(1,slots-1)*21.4+(rand3(i*5+2)-.5)*.17,h=.2+rand3(i*7)*.06,w=.19+rand3(i*11)*.04,y=.99+tier*.5+(rand3(i*13)-.5)*.03,z=-5.35-tier*1.05+(rand3(i*17)-.5)*.36;
       const clothes=rand3(i*19)<.05?bright[(rand3(i*23)*bright.length)|0]:palette[(rand3(i*23)*palette.length)|0];
-      addSphere3D(opaque,[x,y,z],[w*.43,h*.48,.07],[0,(rand3(i*29)-.5)*.18,0],materialColor3(clothes,"fabric"),DETAIL3_MICRO);
-      addSphere3D(opaque,[x+(rand3(i*31)-.5)*.02,y+h/2+.055,z],[.037,.046,.037],[0,0,0],materialColor3(skins[(rand3(i*37)*skins.length)|0],"skin"),DETAIL3_MICRO);
-      if(rand3(i*41)>.8)addBox3D(opaque,[x,y+h/2+.115,z],[.095,.025,.095],[0,(rand3(i*43)-.5)*.3,0],parseColor3(rand3(i*47)>.5?"#1f2937":clothes));
+      addSphere3D(opaque,[x,y,z],[w*.48,h*.5,.1],[0,(rand3(i*29)-.5)*.18,0],materialColor3(clothes,"fabric"),DETAIL3_MICRO);
+      if(tier<2)addBox3D(opaque,[x,y+.065,z+.018],[w*.94,.038,.13],[0,(rand3(i*29)-.5)*.18,0],materialColor3(shade(clothes,-8),"fabric"));
+      addSphere3D(opaque,[x+(rand3(i*31)-.5)*.02,y+h/2+.055,z],[.04,.05,.04],[0,0,0],materialColor3(skins[(rand3(i*37)*skins.length)|0],"skin"),DETAIL3_MICRO);
+      if(i%9!==4&&rand3(i*53)>.66){ const armSide78=rand3(i*59)>.5?1:-1; addCylinder3D(opaque,[x+armSide78*w*.42,y+.045,z+.025],[x+armSide78*w*.54,y-.085,z+.045],.017,.013,materialColor3(clothes,"fabric"),5); }
+      if(rand3(i*41)>.58)addBox3D(opaque,[x,y+h/2+.118,z],[.105,.028,.105],[0,(rand3(i*43)-.5)*.3,0],parseColor3(rand3(i*47)>.5?"#1f2937":clothes));
     }
     [-8,-4,0,4,8].forEach(x=>addBox3D(opaque,[x,1.55,-6.65],[.22,2.6,.12],[0,0,0],materialColor3("#101a26","concrete")));
     addBox3D(opaque,[0,3.32,-10.35],[23,.34,.2],[0,0,0],materialColor3("#121c29","concrete"));
@@ -428,8 +431,10 @@ function buildArenaBatch3D(){
     [-2.2,2.2].forEach(x=>addCylinder3D(opaque,[x,2.75,-9.55],[x,3.65,-9.55],.055,.05,parseColor3("#263238"))); addBox3D(opaque,[0,4.35,-9.45],[6.1,1.5,.3],[0,0,0],parseColor3("#101827")); addBox3D(opaque,[0,4.35,-9.27],[5.3,1.08,.06],[0,0,0],parseColor3("#123a63",1,.35));
     addBox3D(opaque,[-1.25,4.58,-9.22],[2.2,.18,.03],[0,0,0],parseColor3("#00e5ff",1,.8)); addBox3D(opaque,[1.15,4.14,-9.22],[2.5,.18,.03],[0,0,0],parseColor3("#ff2e88",1,.8));
     [-7.35,7.35].forEach(x=>{ addCylinder3D(opaque,[x,0,-4.9],[x,5.75,-5.2],.085,.065,parseColor3("#90a4ae")); addBox3D(opaque,[x,5.92,-5.2],[1.05,.42,.18],[0,0,0],parseColor3("#ffffff",1,.85)); });
+    [-1,1].forEach(side78=>{ addBox3D(opaque,[side78*12.6,1.45,-7.4],[6.8,2.7,1.1],[0,side78*.5,0],materialColor3("#1d2a3c","concrete")); addBox3D(opaque,[side78*12.25,2.93,-7.0],[5.8,.08,.08],[0,side78*.5,0],materialColor3(floor.line,"energy",1,.32)); addCylinder3D(opaque,[side78*7.35,5.86,-5.2],[0,6.28,-7.1],.034,.03,materialColor3("#263238","metal"),6); addBox3D(opaque,[side78*3.4,5.42,-6.55],[.55,.78,.28],[0,side78*.12,0],materialColor3("#0b111c","tech")); addBox3D(opaque,[side78*2.2,3.88,-9.42],[.055,.52,.34],[0,0,0],parseColor3(side78<0?"#00e5ff":"#ff2e88",1,.38)); });
   }else if(id==="tokyo"){
     const buildings=[];
+    for(let i78=0;i78<9;i78++){ const farH78=3+rand3(i78*67)*3.8; addBox3D(opaque,[-13+i78*3.1,farH78/2,-14.5-rand3(i78*71)*1.4],[2.15,farH78,1],[0,0,0],materialColor3("#060a1e","concrete")); }
     for(let i=0;i<19;i++){ const w=.9+rand3(i*3)*.8,h=2.4+rand3(i*5+1)*4.6,x=-12+i*1.32+(rand3(i*7)-.5)*.35,z=-7.2-rand3(i*11)*4.3; const bdep=1.1+rand3(i*13)*.7; buildings.push({x,w,h,z,d:bdep}); const bdCol=materialColor3(i%3?"#0b102b":"#17203d",i%4?"concrete":"glass"); addBox3D(opaque,[x,h/2,z],[w,h,bdep],[0,0,0],bdCol); addBox3D(opaque,[x,h+.09,z],[w*1.04,.18,bdep*.72],[0,0,0],materialColor3("#232f4d","metal")); if(rand3(i*17)>.45){ addBox3D(opaque,[x+(rand3(i*19)-.5)*w*.4,h+.42,z],[w*.42,.5,.6],[0,0,0],bdCol); addCylinder3D(opaque,[x,h+.18,z],[x,h+.85+rand3(i*23)*.5,z],.016,.008,materialColor3("#3b4a6b","metal"),5); addSphere3D(opaque,[x,h+.9+rand3(i*23)*.5,z],.035,[0,0,0],materialColor3("#ff5252","energy",1,.7),DETAIL3_MICRO); } }
     let windows=0; const maxWindows=qualityLevel===0?140:qualityLevel===1?230:340;
     buildings.forEach((bd,bi)=>{ for(let y=.45;y<bd.h-.25&&windows<maxWindows;y+=.42)for(let x=-bd.w/2+.2;x<bd.w/2-.1&&windows<maxWindows;x+=.3){ if(rand3(bi*101+y*17+x*31)>.48){ addBox3D(opaque,[bd.x+x,y,bd.z+bd.d/2+.018],[.11,.16,.025],[0,0,0],parseColor3(["#69f0ae","#ffd54f","#4fc3f7","#ff80ab"][(rand3(windows*7)*4)|0],1,.75)); windows++; } } });
@@ -442,6 +447,8 @@ function buildArenaBatch3D(){
     addBox3D(opaque,[-3.4,2.98,-6.47],[7.6,.12,.04],[0,0,0],materialColor3("#00e5ff","energy",1,.7));
     [[-3,.5],[1,1],[5,.7]].forEach(p=>addSphere3D(trans,[p[0],.022,p[1]],[.68,.02,.2],[0,0,0],parseColor3("#4fc3f7",.15,.2)));
   }else if(id==="temple"){
+    [-10.8,10.8].forEach((px78,pi78)=>{ for(let lv78=0;lv78<3;lv78++)addBox3D(opaque,[px78,.55+lv78*1.05,-11.4],[2.15-lv78*.38,1.05,1.15],[0,pi78?.08:-.08,0],materialColor3(lv78%2?"#6d584d":"#7d695c","stone")); addCylinder3D(opaque,[px78,3.55,-11.4],[px78,4.55,-11.4],1.05,.03,materialColor3("#5f2018","stone"),6); });
+    addSphere3D(opaque,[-12,.15,-14],[4.8,1.55,1.1],[0,.2,0],materialColor3("#4b3d35","stone"),DETAIL3_Low); addSphere3D(opaque,[12,.12,-14.4],[5.4,1.8,1.15],[0,-.15,0],materialColor3("#55463c","stone"),DETAIL3_Low);
     for(let i=0;i<3;i++)addBox3D(opaque,[0,.08+i*.13,-4.2-i*.35],[11-i*1.2,.16,1.1],[0,0,0],parseColor3(i%2?"#8d6e63":"#a1887f"));
     [-6.5,-4,-1.5,1.5,4,6.5].forEach(x=>{ addBox3D(opaque,[x,.14,-5.2],[.72,.28,.72],[0,0,0],materialColor3("#8d7d72","stone")); addCylinder3D(opaque,[x,.26,-5.2],[x,4.15,-5.2],.21,.19,materialColor3("#bcaaa4","stone"),14); addCylinder3D(opaque,[x,3.92,-5.2],[x,4.12,-5.2],.26,.23,materialColor3("#a1887f","stone"),14); addBox3D(opaque,[x,4.29,-5.2],[.65,.28,.65],[0,0,0],materialColor3("#6d4c41","stone")); });
     [-9.3,9.3].forEach(x=>{ addBox3D(opaque,[x,1.7,-6.4],[1.5,3.4,1.1],[0,0,0],materialColor3("#9a8578","stone")); addBox3D(opaque,[x,3.52,-6.4],[1.7,.26,1.3],[0,0,0],materialColor3("#6d4c41","stone")); addBox3D(opaque,[x,2.5,-5.82],[.3,1.7,.06],[0,0,0],materialColor3("#ffc400","metal",1,.22)); addCylinder3D(opaque,[x,3.65,-6.4],[x,4.7,-6.4],.3,.03,materialColor3("#8e2418","stone"),6); });
@@ -450,6 +457,8 @@ function buildArenaBatch3D(){
         [-5,-2.5,0,2.5,5].forEach(x=>{ addCylinder3D(opaque,[x,4.02,-4.9],[x,3.56,-4.9],.012,.012,parseColor3("#3e2723")); addSphere3D(opaque,[x,3.38,-4.9],[.15,.18,.15],[0,0,0],parseColor3("#ffb74d",1,.72)); });
   }else{
     addBox3D(opaque,[0,.015,-8.7],[36,.03,10.6],[0,0,0],materialColor3(currentArenaMood==="nuit"?"#075a78":"#0b7da3","water",1,.05));
+    addSphere3D(opaque,[-11.5,.05,-13.2],[5.2,.72,1.15],[0,.15,0],materialColor3("#315c46","stone"),DETAIL3_Low); addSphere3D(opaque,[11.8,.04,-13.6],[5.8,.82,1.2],[0,-.12,0],materialColor3("#28503e","stone"),DETAIL3_Low);
+    [-6,-3,3,6].forEach(x78=>{ addCylinder3D(opaque,[x78,0,-3.25],[x78,1.42,-3.25],.035,.03,materialColor3("#3e2723","wood"),6); addSphere3D(opaque,[x78,1.52,-3.25],.075,[0,0,0],materialColor3("#ffd54f","energy",1,currentArenaMood==="jour"?.12:.62),DETAIL3_MICRO); });
     [-4.6,-3.72].forEach((z,i)=>{ for(let fx=-8;fx<=8;fx+=1.7)addBox3D(trans,[fx+(rand3(i*31+fx*7)-.5)*.5,.035,z+(rand3(i*37+fx*11)-.5)*.16],[1.05,.014,.07],[0,(rand3(i*41+fx*13)-.5)*.12,0],parseColor3("#ffffff",.12,.04)); });
     [[-8.5,-2.8],[-5.2,-3.8],[5.8,-3.8],[9,-2.7]].forEach((p,pi)=>{
       let prev=[p[0],0,p[1]]; for(let sgm=1;sgm<=3;sgm++){ const pt=[p[0]+Math.sin(pi+sgm)*.22*sgm,sgm*1.05,p[1]-sgm*.08]; addCylinder3D(opaque,prev,pt,.11-.015*sgm,.09-.012*sgm,parseColor3("#6d4c41")); prev=pt; }
@@ -1387,7 +1396,55 @@ function buildParticles3D(){
     const wp=worldFromGame3D(p.x,p.y,(rand3(i*31+p.life)-.5)*.35),c=parseColor3(p.c,clamp(p.life/(p.max||30),0,1),0);
     pos.push(wp[0],wp[1],wp[2]); col.push(c[0],c[1],c[2],c[3]); sizes.push(Math.max(.025,(p.r||3)*2/95));
   });
-  R3D_POINT_DATA.count=particles.length; return R3D_POINT_DATA;
+  const sp78=typeof arenaSpectacleState3D==="function"?arenaSpectacleState3D():null,moteN78=qualityLevel===0?14:qualityLevel===1?24:36;
+  renderStats.ambientMotes3d=0;
+  if(sp78&&typeof renderer3DCombatState==="function"&&renderer3DCombatState()){
+    const moteCol78=parseColor3(sp78.arena==="tokyo"?(FLOOR_THEMES.tokyo.line):sp78.arena==="temple"?"#ffd54f":sp78.arena==="Libreville"?"#b2ebf2":"#dff6ff",.16+sp78.intensity*.22,0);
+    for(let i78=0;i78<moteN78;i78++){ const fr78=(sp78.t*.018+rand3(i78*41))%1; pos.push(-6+rand3(i78*43)*12+Math.sin(sp78.t*.16+i78)*.25,.25+fr78*3.1,-1.6+rand3(i78*47)*2.6); col.push(moteCol78[0],moteCol78[1],moteCol78[2],moteCol78[3]); sizes.push(.018+rand3(i78*53)*.03); }
+    renderStats.ambientMotes3d=moteN78;
+  }
+  R3D_POINT_DATA.count=pos.length/3; return R3D_POINT_DATA;
+}
+function arenaSpectacleState3D(){
+  const tick78=renderTicker||0,cached78=R3D.spectacle78;
+  if(cached78&&cached78.tick===tick78&&cached78.arena===currentArena.id&&cached78.mood===currentArenaMood)return cached78;
+  const hp78=f78=>f78&&f78.maxHealth?clamp(f78.health/f78.maxHealth,0,1):1,combo78=Math.max((typeof p1!=="undefined"&&p1&&p1.combo)||0,(typeof p2!=="undefined"&&p2&&p2.combo)||0);
+  const celebrate78=(state==="roundEnd"||state==="matchEnd")?1:0,tension78=clamp((1-Math.min(hp78(p1),hp78(p2)))*.48+combo78*.07+(((p1&&p1.hitFlash>0)||(p2&&p2.hitFlash>0))?.24:0)+Math.max((p1&&p1.energy)||0,(p2&&p2.energy)||0)/260,0,1);
+  const out78={tick:tick78,arena:currentArena.id,mood:currentArenaMood,t:tick78/60,intensity:clamp(.32+Math.max(tension78,celebrate78)*.68,0,1),pulse:.5+.5*Math.sin(tick78*.11),celebrate:celebrate78,midX:(typeof p1!=="undefined"&&typeof p2!=="undefined"&&p1&&p2)?(((p1.rx+p2.rx)/2-640)*R3D_WORLD):0};
+  R3D.spectacle78=out78; renderStats.arenaSpectacle3d=out78.arena+":"+(celebrate78?"celebration":tension78>.55?"tension":"ambiance"); renderStats.spectaclePulse3d=Math.round(out78.intensity*100)/100;
+  return out78;
+}
+function addArenaSpectacle3D(opaque,trans){
+  const sp78=arenaSpectacleState3D(),id78=sp78.arena,floor78=FLOOR_THEMES[id78]||FLOOR_THEMES.stadium,t78=sp78.t,inten78=sp78.intensity;
+  renderStats.spectacleBeams3d=0; renderStats.spectacleActors3d=0;
+  const beam78=(source78,target78,color78,alpha78,width78)=>{
+    const top78=parseColor3(color78,alpha78,.55),low78=parseColor3(color78,alpha78*.16,.32),axis78=norm3(sub3(target78,source78)),side78=norm3(cross3(axis78,[0,1,0])),sideB78=norm3(cross3(axis78,side78)),off78=(p78,v78,s78)=>[p78[0]+v78[0]*s78,p78[1]+v78[1]*s78,p78[2]+v78[2]*s78];
+    quad3(trans,off78(source78,side78,-width78*.16),off78(source78,side78,width78*.16),off78(target78,side78,width78),off78(target78,side78,-width78),[top78,top78,low78,low78]);
+    quad3(trans,off78(source78,sideB78,-width78*.1),off78(source78,sideB78,width78*.1),off78(target78,sideB78,width78*.62),off78(target78,sideB78,-width78*.62),[top78,top78,low78,low78]);
+    addSphere3D(trans,target78,[width78*1.12,.018,width78*.5],[0,0,0],parseColor3(color78,alpha78*.48,.42),DETAIL3_MICRO);
+    addSphere3D(trans,source78,.085,[0,0,0],parseColor3(color78,.48,.8),DETAIL3_MICRO); renderStats.spectacleBeams3d++;
+  };
+  const beamCfg78=id78==="stadium"?{src:[[-7.35,5.92,-5.2],[7.35,5.92,-5.2]],col:"#bfefff",a:sp78.mood==="jour"?.03:.085}:id78==="tokyo"?{src:[[-5,2.38,-3.6],[6,2.38,-3.6]],col:floor78.line,a:.06}:id78==="temple"?{src:[[-5,3.38,-4.9],[5,3.38,-4.9]],col:"#ffd54f",a:.032}:null;
+  if(beamCfg78&&(qualityLevel>0||sp78.celebrate))beamCfg78.src.forEach((src78,i78)=>beam78(src78,[src78[0]*.38+sp78.midX*.22+Math.sin(t78*.32+i78*2.4)*1.25+(i78?.55:-.55),.035,-.55+Math.cos(t78*.21+i78)*.32],beamCfg78.col,beamCfg78.a*(.62+inten78*.58),.38+inten78*.2));
+  if(id78==="stadium"){
+    for(let j78=0;j78<9;j78++){ const h78=.12+(.18+.36*inten78)*(.5+.5*Math.sin(t78*3.1+j78*1.17)); addBox3D(opaque,[-2+j78*.5,4.02+h78/2,-9.18],[.28,h78,.035],[0,0,0],parseColor3(j78%2?"#ff2e88":"#00e5ff",1,.72)); renderStats.spectacleActors3d++; }
+    addBox3D(trans,[0,3.92+((t78*.13)%0.92),-9.16],[5.05,.025,.02],[0,0,0],parseColor3("#ffffff",.16,.4));
+    const crowdN78=qualityLevel===0?150:qualityLevel===1?250:360,slots78=Math.ceil(crowdN78/5),armsN78=qualityLevel===0?18:qualityLevel===1?30:42,skins78=["#8d5524","#c68642","#e8b98d","#5d4037","#a9714b"];
+    for(let k78=0;k78<armsN78;k78++){ const i78=k78*9+4; if(i78>=crowdN78)break; const tier78=i78%5,slot78=(i78/5)|0,x78=-10.7+slot78/Math.max(1,slots78-1)*21.4+(rand3(i78*5+2)-.5)*.17,y78=.99+tier78*.5+(rand3(i78*13)-.5)*.03,z78=-5.35-tier78*1.05+(rand3(i78*17)-.5)*.36,lift78=Math.max(0,Math.sin(t78*2.4-x78*.38+tier78*.35))*inten78; if(lift78<.16)continue; const skin78=materialColor3(skins78[(rand3(i78*37)*skins78.length)|0],"skin"); [-1,1].forEach(s78=>addCylinder3D(opaque,[x78+s78*.075,y78+.06,z78+.035],[x78+s78*(.09+lift78*.025),y78+.23+lift78*.17,z78+.055],.014,.011,skin78,5)); renderStats.spectacleActors3d++; }
+  }else if(id78==="tokyo"){
+    const cycle78=(t78*.055)%1.35;
+    if(cycle78<1.08){ const tx78=-16+cycle78*27; addBox3D(opaque,[tx78,3.5,-7.32],[6.2,.82,.72],[0,0,0],materialColor3("#31456e","metal")); addBox3D(opaque,[tx78,3.98,-7.32],[5.7,.14,.62],[0,0,0],materialColor3("#1c2946","metal")); for(let w78=0;w78<7;w78++)addBox3D(opaque,[tx78-2.35+w78*.78,3.58,-6.94],[.52,.36,.035],[0,0,0],materialColor3(w78%3?"#ffe9a8":"#9be7ff","energy",1,.62)); addBox3D(opaque,[tx78,3.18,-6.93],[6.2,.1,.035],[0,0,0],materialColor3("#00e5ff","energy",1,.68)); addSphere3D(trans,[tx78+3.16,3.42,-7.05],.09,[0,0,0],parseColor3("#ffffff",.55,.85),DETAIL3_MICRO); renderStats.spectacleActors3d++; }
+    [-5,-1.5,2.5,6].forEach((x78,i78)=>addSphere3D(trans,[x78,2.38,-3.6],.13+.025*Math.sin(t78*2.2+i78),[0,0,0],parseColor3(i78%2?"#00e5ff":"#ff80ab",.13,.5),DETAIL3_MICRO));
+  }else if(id78==="temple"){
+    const embers78=qualityLevel===0?7:12; for(let i78=0;i78<embers78;i78++){ const fr78=(t78*.035+rand3(i78*17))%1; addSphere3D(opaque,[-7+rand3(i78*19)*14+Math.sin(t78*.7+i78)*.13,.25+fr78*3.9,-3.6-rand3(i78*23)*1.8],.024+rand3(i78*29)*.018,[0,0,0],materialColor3("#ffca28","energy",1,.62),DETAIL3_MICRO); renderStats.spectacleActors3d++; }
+  }else{
+    const bx78=-9+((t78*.018)%1)*18,by78=.08+Math.sin(t78*1.3)*.04,bz78=-6.4+Math.sin(t78*.23)*.2,roll78=Math.sin(t78*1.3)*.05;
+    addBox3D(opaque,[bx78,by78,bz78],[1.75,.24,.48],[0,.2,roll78],materialColor3("#5d4037","wood")); addCylinder3D(opaque,[bx78,by78+.06,bz78],[bx78,by78+1.5,bz78],.03,.024,materialColor3("#3e2723","wood"),6);
+    tri3(opaque,[bx78,by78+1.46,bz78],[bx78,by78+.24,bz78],[bx78+.82,by78+.28,bz78],materialColor3("#f3ead8","fabric")); tri3(opaque,[bx78,by78+1.46,bz78],[bx78,by78+.24,bz78],[bx78-.58,by78+.28,bz78],materialColor3("#e2d5bd","fabric"));
+    addSphere3D(trans,[bx78-.8,by78-.06,bz78],[.75,.012,.13],[0,.2,0],parseColor3("#ffffff",.16,.02),DETAIL3_MICRO); renderStats.spectacleActors3d++;
+    for(let i78=0;i78<8;i78++){ const ph78=(t78*.07+rand3(i78*23))%1; addBox3D(trans,[-7+i78*1.85+Math.sin(t78+i78)*.08,.04,-4.75+ph78*1.25],[1.15,.012,.055],[0,(rand3(i78*29)-.5)*.1,0],parseColor3("#ffffff",.16*(1-ph78),.03)); }
+  }
+  return sp78;
 }
 function computeCamera3D(){
   const midGame=(p1.rx+p2.rx)/2+(cam.lead||0),midTarget=(midGame-640)*R3D_WORLD,air1=Math.max(0,(GROUND-p1.ry)*R3D_WORLD),air2=Math.max(0,(GROUND-p2.ry)*R3D_WORLD),avgAir=(air1+air2)/2,maxAir=Math.max(air1,air2);
@@ -1408,6 +1465,10 @@ function computeCamera3D(){
   if(currentArenaMood==="jour"){ R3D.lightDir=[-.38,.9,.34]; R3D.lightColor=[1,.94,.78]; R3D.fillColor=[.42,.62,.9]; }
   else if(currentArenaMood==="nuit"){ R3D.lightDir=[.32,.72,.45]; R3D.lightColor=[.62,.74,1]; R3D.fillColor=[.92,.38,.72]; }
   else { R3D.lightDir=[-.72,.38,.3]; R3D.lightColor=[1,.68,.42]; R3D.fillColor=[.3,.48,.95]; }
+  const spectacle78=arenaSpectacleState3D(),lightPulse78=1+Math.sin(spectacle78.t*1.7)*.018*spectacle78.intensity;
+  R3D.lightColor=R3D.lightColor.map(v78=>clamp(v78*lightPulse78,0,1.08));
+  if(currentArena.id==="tokyo"&&currentArenaMood!=="jour"){ const mix78=.5+.5*Math.sin(spectacle78.t*.45); R3D.fillColor=[lerp(.24,.95,mix78),lerp(.78,.34,mix78),lerp(1,.76,mix78)]; }
+  else if(currentArena.id==="temple"){ const flick78=1+(Math.sin(spectacle78.t*7.3)+Math.sin(spectacle78.t*11.7))*.009; R3D.lightColor=R3D.lightColor.map(v78=>clamp(v78*flick78,0,1.08)); }
 }
 function drawPoints3D(points){
   if(!points.count)return;
@@ -1430,7 +1491,7 @@ function draw3DScene(){
     renderer3DState.vertices=0; renderer3DState.drawCalls=0; renderStats.impactBurstsDrawn=0;
     const opaque=resetBatch3D(R3D_DYN_OPAQUE),trans=resetBatch3D(R3D_DYN_TRANS);
     const first=p1.ry>=p2.ry?p1:p2,second=first===p1?p2:p1;
-    addFighter3D(opaque,trans,first); addFighter3D(opaque,trans,second); addProjectilesAndEffects3D(trans);
+    addArenaSpectacle3D(opaque,trans); addFighter3D(opaque,trans,first); addFighter3D(opaque,trans,second); addProjectilesAndEffects3D(trans);
     uploadBatch3D(gl,R3D.dyn,opaque,gl.DYNAMIC_DRAW); uploadBatch3D(gl,R3D.dynTrans,trans,gl.DYNAMIC_DRAW);
     renderShadowMap3D(gl);
     const mood=arenaMoodTheme(),sky=parseColor3(mood.sky[mood.sky.length-1][1]);

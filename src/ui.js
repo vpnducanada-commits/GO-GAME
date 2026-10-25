@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.7 — PRÉSENCE VIVANTE, MOBILITÉ DYNAMIQUE, VISAGES & COSTUMES, 41 IDENTITÉS DE COMBAT
+   Godson FURY ARENA V7.8 — ARÈNES SPECTACLE, PRÉSENCE VIVANTE, MOBILITÉ DYNAMIQUE, 41 IDENTITÉS DE COMBAT
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

@@ -1,4 +1,4 @@
-# 🎮 Godson FURY ARENA — V7.7 « L’Arène des Légendes • Présence Vivante »
+# 🎮 Godson FURY ARENA — V7.8 « L’Arène des Légendes • Arènes Spectacle »
 
 **Jeu de combat 1v1 professionnel — haute résolution, 60 FPS, haut graphisme**
 ✍️ *Créé et signé par **Gideon - Godson** © 2026 — Libreville, Gabon*
@@ -8,7 +8,7 @@
 ## ▶️ Lancer le jeu
 | Fichier | Usage |
 |---|---|
-| ⭐ **`Godson-FURY-Arena-V7.7-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; Godson FURY Online et le duel deux téléphones demandent leurs réseaux respectifs. |
+| ⭐ **`Godson-FURY-Arena-V7.8-PRO.html`** | Version autonome **1 seul fichier** : ouvre-la dans un navigateur, partage-la, aucune installation. Le jeu local fonctionne hors ligne ; Godson FURY Online et le duel deux téléphones demandent leurs réseaux respectifs. |
 | 🌐 **[Jouer en ligne (GitHub Pages HTTPS)](https://vpnducanada-commits.github.io/GO-GAME/)** | Version publique recommandée en HTTPS pour créer un compte, disputer des duels WebRTC et utiliser le mode deux téléphones sur mobile. |
 | `index.html` + `src/` | Version développement modulaire (`python3 -m http.server 8000`). |
 | `docs/` | Charte de gestion, roadmap officielle et suivi des sprints. |
@@ -21,6 +21,7 @@ Après modification dans `src/` : `python3 tools/build-single.py` régénère la
 - 🤖 **Versus Bot** : IA Facile / Moyen / Difficile adaptative (elle sait même faire des *parry* !)
 - 👥 **2 Joueurs** : clavier partagé ou 2 manettes
 - 🏆 **Championnat Godson** : 3 circuits linéaires de 5, 8 et 12 combats dans la Carrière, boss final et récompenses de circuit
+- 🎇 **Arènes Spectacle (nouveau V7.8)** : les décors 3D vivent et réagissent au match — tribunes du stade qui lèvent les bras en vague et écran géant animé, second train qui traverse Tokyo, braises qui montent au Temple, pirogue à voile qui navigue à Libreville, faisceaux de scène et poussières lumineuses dont l’intensité suit combos, vie et fins de round, sans jamais masquer les combattants.
 - ✨ **Présence Vivante (nouveau V7.7)** : expressions faciales 3D selon l’effort, la douleur, la garde, la victoire ou le K.O. ; doigts en phalanges qui forment poings, paumes et prises ; armes soutenues à deux mains ; bottes talon-pointe et corps qui encaisse visiblement sans jamais geler le jeu.
 - 🏃 **Mobilité Dynamique (nouveau V7.6)** : accélération, demi-tour, air et dash plus vifs ; foulée synchronisée au déplacement affiché, attaques interpolées entre ticks, ressorts de saut/réception et caméras qui anticipent l’action sans perdre un saut hors cadre.
 - 💇 **Visages & Costumes (nouveau V7.5)** : cheveux sculptés selon les 13 styles des fiches (mèches qui encadrent le visage, chignon, panneau arrière long), barbes pleines en trois volumes, peintures de guerre orc/alien et ceintures-écharpes des tenues martiales.
@@ -43,7 +44,7 @@ chaîne de 3 à 5 coups, exécutée en **martelant simplement le bouton POING** 
 dans `docs/SPRINT_V51_M1_SIGNATURE.md`). Exemples : Gideon « Foudre du Champion »,
 KAEL « Croisade d’Acier », Zara « Marée de Libreville », TITAN « Marteau de la Montagne ».
 
-✨ **Nouveau V7.7 — Présence Vivante :** les combattants regardent, grimacent, serrent les poings, tiennent leurs armes à deux mains et déroulent leurs appuis au sol. 🏃 **V7.6 — Mobilité Dynamique :** on court, pivote, saute et retombe avec des appuis qui suivent enfin le sol. 💇 **V7.5 — Visages & Costumes :** têtes reconnaissables en gros plan 3D, de la barbe de Brax au chignon de Zara-nova. 🥋 **V7.4 — Identités de combat :** 41 fiches individuelles de posture et d’attaques, en sélection comme en combat 3D. ⛶ **V7.3 — Plein écran & Sélection claire :** ouverture directe en plein écran paysage, menus sans textes inutiles et grille de combattants plein corps. 🎥 **V7.2 — Réalité 3D II :** cinq passes de rendu relues image par image pour quitter l’aspect « dessin d’enfant » : anatomie normalisée, matières grainées, lumière et caméra de combat retravaillées, décors densifiés et zone de combat dégagée. 🌅 **V7.1 — Tournoi & Saisons :** Coupe Express, Coupe Godson et Coupe des Légendes ; têtes de série, scores CPU reproductibles, reprise persistante, historique et cinq paliers de Saison 1. Les points ne sont crédités qu’à la fin du tournoi pour empêcher le farming par abandon.
+🎇 **Nouveau V7.8 — Arènes Spectacle :** les quatre arènes deviennent des scènes de spectacle — profondeur lointaine, lumière vivante et figurants animés derrière le combat, zone de frappe toujours dégagée. ✨ **V7.7 — Présence Vivante :** les combattants regardent, grimacent, serrent les poings, tiennent leurs armes à deux mains et déroulent leurs appuis au sol. 🏃 **V7.6 — Mobilité Dynamique :** on court, pivote, saute et retombe avec des appuis qui suivent enfin le sol. 💇 **V7.5 — Visages & Costumes :** têtes reconnaissables en gros plan 3D, de la barbe de Brax au chignon de Zara-nova. 🥋 **V7.4 — Identités de combat :** 41 fiches individuelles de posture et d’attaques, en sélection comme en combat 3D. ⛶ **V7.3 — Plein écran & Sélection claire :** ouverture directe en plein écran paysage, menus sans textes inutiles et grille de combattants plein corps. 🎥 **V7.2 — Réalité 3D II :** cinq passes de rendu relues image par image pour quitter l’aspect « dessin d’enfant » : anatomie normalisée, matières grainées, lumière et caméra de combat retravaillées, décors densifiés et zone de combat dégagée. 🌅 **V7.1 — Tournoi & Saisons :** Coupe Express, Coupe Godson et Coupe des Légendes ; têtes de série, scores CPU reproductibles, reprise persistante, historique et cinq paliers de Saison 1. Les points ne sont crédités qu’à la fin du tournoi pour empêcher le farming par abandon.
 
 🗿 **V7.0 — Anatomie AAA :** torse et tête sculptés par niveaux, membres musculaires loftés, visage/mains/bottes volumiques, posture 3/4, atlas de matières peau/tissu/cuir/métal/tech, bump mapping et ombres PCF. Toute la géométrie reste procédurale et la simulation déterministe inchangée.
 

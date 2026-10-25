@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.8 — « Arènes Spectacle » *(LIVRÉ le 25/10/2026 — 491 assertions source / 727 vérifications, suite verte)*
+
+- **Trajectoire graphique du propriétaire, étape décors** : après les postures (V7.4), les têtes (V7.5), la mobilité (V7.6) et la présence (V7.7), les quatre arènes 3D deviennent des scènes vivantes qui réagissent au match.
+- **Stade** : vague de bras des tribunes synchronisée avec la foule statique, écran géant animé (égaliseur + balayage), sièges continus, tribunes de retour et arche technique avec enceintes.
+- **Tokyo / Temple / Libreville** : second train qui traverse la ville et skyline lointaine ; braises dorées, pagodes et collines au loin ; pirogue à voile avec sillage, écume mobile, caps boisés et lanternes du front de mer.
+- **Lumière de spectacle** : faisceaux volumiques et flaques au sol, état partagé d’intensité (vie, combos, énergie, célébration de fin de round), pulsations par arène et poussières d’ambiance — réglés finement après relecture des captures (rayons du temple parallèles et discrets, pirogue rapprochée et agrandie).
+- **Périmètre** : rendu seul, quantités bornées par le niveau de qualité, zone de combat toujours dégagée ; stade optimisé à 61 005 sommets en scène complète. Voir `docs/SPRINT_V78_ARENES_SPECTACLE.md`.
+- 🔜 Prochaines étapes possibles : validation terrain sur téléphones physiques, duel Online entre deux réseaux distincts, puis nouvelle passe personnages ou modes selon la priorité du propriétaire.
+
 ## ✅ V7.7 — « Présence Vivante » *(LIVRÉ le 25/10/2026 — 485 assertions source / 721 vérifications, suite verte)*
 
 - **Trajectoire graphique du propriétaire** : après les postures (V7.4), les têtes (V7.5) et la mobilité (V7.6), les combattants gagnent un langage corporel lisible en plein combat.

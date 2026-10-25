@@ -3,6 +3,36 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.8.0] — 2026-10-25 — « Arènes Spectacle »
+
+Après les corps (V7.4→V7.7), l’équipe suit la trajectoire graphique du
+propriétaire sur les **décors** : les quatre arènes 3D deviennent des
+scènes vivantes qui réagissent au match, en rendu seul.
+
+### Amélioré — Décors vivants (Nadia + Kenzo)
+- **Stade** : les tribunes lèvent les bras en vague synchronisée,
+  l’écran géant affiche un égaliseur animé et une barre de balayage,
+  sièges continus, tribunes de retour et arche technique avec
+  enceintes suspendues.
+- **Tokyo** : un second train traverse la ville en arrière-plan,
+  halos de lampadaires qui respirent et skyline lointaine en silhouette.
+- **Temple** : braises dorées qui montent lentement, rayons fins
+  parallèles entre les colonnes, pagodes et collines au loin.
+- **Libreville** : pirogue à voile qui navigue avec son sillage,
+  écume qui avance sur le rivage, caps boisés et lanternes du front de mer.
+
+### Amélioré — Lumière de spectacle (Kenzo + Sarah)
+- Faisceaux volumiques croisés et flaques de lumière au sol, réglés
+  finement après relecture des captures (parallèles et discrets au
+  Temple, façon projecteurs de concert au stade).
+- État de spectacle partagé : intensité calculée depuis la vie, les
+  combos, l’énergie et les fins de round (`celebration` au maximum),
+  pulsations lumineuses propres à chaque arène et poussières
+  d’ambiance dans le même programme de points.
+- Quantités bornées par le niveau de qualité, tout se joue derrière
+  ou au-dessus de la zone de combat : visibilité des combattants,
+  simulation, replays et Online strictement inchangés.
+
 ## [7.7.0] — 2026-10-25 — « Présence Vivante »
 
 Après la mobilité de la V7.6, l’équipe suit la trajectoire graphique du
