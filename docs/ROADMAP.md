@@ -123,6 +123,14 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.9 — « Squelette Stable & 3D fiable » *(LIVRÉ le 25/10/2026 — 497 assertions source / 733 vérifications, suite verte)*
+
+- **Retour direct du propriétaire** : « La 3D bug et ne s'applique pas correctement […] les personnes ne se déforment pas ». Audit complet de l'équipe, mesures à l'appui (738 poses).
+- **Déformations corrigées à la racine** : les coudes/genoux « milieux de segments » (avant-bras de 0,066 à 0,588 m, poing à 1 m de portée) deviennent une **IK deux os à longueurs fixes**, recalée dans le monde après la torsion du buste ; écart d'os affiché ≤ 0,6 %, colonne constante, demi-tour continu, appuis plantés en attaque, aucun sommet sous la plateforme (> −9 mm).
+- **Activation 3D fiabilisée** : précision vertex `highp` compatible mobile (piège de liaison reproduit puis verrouillé), perte de contexte WebGL restaurée automatiquement, indices 32 bits WebGL2, auto-désactivation seulement sous 26 FPS soutenus.
+- **Preuves** : captures avant/après relues (poing M1, genou, projection, K.O., fusil), WebGL1 forcé, qualités 0/1/2, 3 formats et téléphone 915×412 — 3D active partout, zéro erreur. Voir `docs/SPRINT_V79_SQUELETTE_STABLE.md`.
+- 🔜 Prochaines étapes possibles : validation terrain sur téléphones physiques, duel Online entre deux réseaux distincts, puis nouvelle passe graphique ou modes selon le propriétaire.
+
 ## ✅ V7.8 — « Arènes Spectacle » *(LIVRÉ le 25/10/2026 — 491 assertions source / 727 vérifications, suite verte)*
 
 - **Trajectoire graphique du propriétaire, étape décors** : après les postures (V7.4), les têtes (V7.5), la mobilité (V7.6) et la présence (V7.7), les quatre arènes 3D deviennent des scènes vivantes qui réagissent au match.

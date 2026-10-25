@@ -3,6 +3,38 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.9.0] — 2026-10-25 — « Squelette Stable »
+
+Retour direct du propriétaire : « La 3D bug et ne s’applique pas
+correctement […] les personnes ne se déforment pas ». Toute l’équipe a
+audité le pipeline 3D, mesuré les 41 combattants et corrigé à la racine.
+
+### Corrigé — Déformations (Marco + Kenzo)
+- Diagnostic : les coudes/genoux étaient de simples milieux de segments
+  — un avant-bras mesurait de **0,066 m à 0,588 m** selon la pose, un
+  poing M1 atteignait **1 m de portée**, et la torsion du buste étireait
+  encore les bras de **+33 %** dans le monde affiché, surtout face à gauche.
+- Nouveau squelette **IK deux os à longueurs fixes** (bras 0,31/0,29 m,
+  cuisse/tibia 0,54/0,53 m, colonne 0,505 m, cou 0,302 m), résolu en
+  local **puis recalé dans le monde** après torsion : écart mesuré
+  **≤ 0,6 %** sur 738 poses (41 combattants × 18 états).
+- Portée des attaques ramenée à l’anatomie (le buste et l’épaule
+  avancent, le bras ne s’allonge plus), pose au sol reconstruite aux
+  vraies longueurs, demi-tour continu sans saut d’angle, pieds plantés
+  pendant les attaques et aucun sommet sous la plateforme (> −9 mm).
+
+### Corrigé — Activation 3D (Kenzo + Sarah)
+- Précision vertex `highp` pour les GPU mobiles, avec *varyings* et
+  uniforme partagé explicitement compatibles — le piège de liaison qui
+  éteint la 3D sur certains appareils est verrouillé par test navigateur.
+- **Perte de contexte WebGL restaurée proprement** (plein écran,
+  rotation, changement d’onglet) au lieu d’une 3D morte jusqu’au
+  rechargement ; indices 32 bits reconnus en WebGL2 ; désactivation
+  automatique seulement sous 26 FPS soutenus, après 15 s en qualité basse.
+- Vérifié en Chromium réel : WebGL2 **et WebGL1 forcé**, qualités
+  0/1/2, formats Adaptatif/Cinéma/Plein cadre et format téléphone
+  915×412 — 3D active, canvas alignés au pixel, zéro erreur.
+
 ## [7.8.0] — 2026-10-25 — « Arènes Spectacle »
 
 Après les corps (V7.4→V7.7), l’équipe suit la trajectoire graphique du
