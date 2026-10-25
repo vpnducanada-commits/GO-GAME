@@ -1254,12 +1254,21 @@ function finishTestRun() {
 
   /* ===== V7.4 « Identités de combat » : 41 postures et attaques individuelles ===== */
   console.log('\n— V7.4 : Identités de combat (Marco, une fiche par combattant) —');
-  assert(ev('GAME_VERSION')==='7.4.0'&&window.document.title.includes('V7.4')&&window.document.querySelector('h1').textContent.includes('V7.4'),'édition officielle V7.4 affichée');
+  assert(/^7\.[4-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[4-9]/.test(window.document.title),'édition Identités de combat (V7.4+) affichée');
   assert(ev('(() => { const all=CHARACTERS.map(c=>stanceProfile3D({char:c})); return Object.keys(FIGHTER_STANCE3D).length===41&&new Set(all.map(s=>s.name)).size===41&&new Set(all.map(s=>s.punch)).size>=6&&new Set(all.map(s=>s.kick)).size>=6&&new Set(all.map(s=>s.portrait)).size>=5; })()')===true,'fiches V7.4 : 41 postures nommées uniques, au moins 6 styles de poing et 6 styles de pied');
   assert(ev('(() => { const P=i=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; return buildFighterPose3D(p1); }; const titan=P(2),taiko=P(18),lyra=P(15),kazu=P(22); const fz=q=>Math.abs(q.local.footFront[2]-q.local.footBack[2]); return fz(titan)>fz(lyra)&&taiko.local.pelvis[1]<lyra.local.pelvis[1]-.04&&Math.abs(kazu.twist)>Math.abs(titan.twist)+.12&&(lyra.local.handFront[1]-lyra.local.chest[1])>(titan.local.handFront[1]-titan.local.chest[1])+.08; })()')===true,'postures mesurées : Titan large et carré, Taiko bas, Lyra droite garde haute, Kazu très de profil');
   assert(ev('(() => { const atk=(i,type)=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; startAttack(p1,type); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+4)); const q=buildFighterPose3D(p1); p1.attack=null; p1.attackType=""; p1.attackT=0; p1.cooldown=0; return q; }; const hook=atk(2,"punch"),viseur=atk(8,"punch"),hache=atk(39,"kick"),bas=atk(2,"kick"); return Math.abs(hook.local.handFront[2]-viseur.local.handFront[2])>.08&&hache.local.footFront[1]>bas.local.footFront[1]+.5; })()')===true,'attaques individuelles : crochet large contre visée droite, coup de pied hache très haut contre frappe basse');
   const render74=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),ui74=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
   assert(['const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist'].every(h=>render74.includes(h))&&ui74.includes('stanceP')&&ui74.includes('stanceProfile3D(f)'),'hooks sources V7.4 : table des 41 fiches, poses d’attaque et postures d’affiche synchronisées');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
+
+  /* ===== V7.5 « Visages & Costumes » : cheveux, barbes et détails par famille ===== */
+  console.log('\n— V7.5 : Visages & Costumes (Marco + Kenzo) —');
+  assert(ev('GAME_VERSION')==='7.5.0'&&window.document.title.includes('V7.5')&&window.document.querySelector('h1').textContent.includes('V7.5'),'édition officielle V7.5 affichée');
+  assert(ev('(() => { const hairs=CHARACTERS.map(c=>boardModel3D({char:c}).hair); return new Set(hairs).size>=10&&hairs.filter(h=>h==="long").length>=10&&boardModel3D({char:CHARACTERS[33]}).hair==="bun"&&boardModel3D({char:CHARACTERS[5]}).hair==="braids"&&CHARACTERS.filter(c=>(boardModel3D({char:c}).beard||0)>=.65).length>=2; })()')===true,'coiffures V7.5 : au moins 10 styles au roster, chignon de Zara-nova, tresses de Zara et grandes barbes présentes');
+  assert(ev('(() => { applyCharacterTo(p1,21); p1.reset(); p1.rx=560; p1.ry=GROUND; const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); return renderStats.hair3d==="long"&&renderStats.beard3d===1&&renderStats.lastFighterVertices3d>7000; })()')===true,'télémétrie V7.5 : Brax dessiné avec cheveux longs, barbe pleine et géométrie complète');
+  const render75=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8');
+  assert(['capFlat75','backDeep75','beard75','hair==="bun"','sashCenter75','renderStats.hair3d','peintures de guerre'].every(h=>render75.includes(h)),'hooks sources V7.5 : coiffe sculptée par style, barbes en 3 volumes, chignon, peintures orc/alien et ceintures-écharpes');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
 
   console.log('\n================ RÉSULTAT ================');

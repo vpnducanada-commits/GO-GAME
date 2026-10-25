@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.5 — « Visages & Costumes » *(LIVRÉ le 25/10/2026 — 470 assertions source / 706 vérifications, suite verte)*
+
+- **Trajectoire graphique du propriétaire, étape têtes** : les fiches prévoyaient 13 coiffures mais le moteur n’en dessinait que 6, avec une coiffe « casque » unique et des barbes en une seule boule.
+- **Cheveux** : coiffe sculptée par style (plaquée rasé, basse sous mohawk, panneau arrière descendu long/carré/tresses), mèches d’encadrement des joues pour les coiffures longues et chignon dessiné avec bandeau.
+- **Barbes & visages** : barbes en trois volumes proportionnels à la fiche (Brax/Drakar en grandes barbes), peintures de guerre verticales chez les orcs/aliens.
+- **Costumes** : ceintures-écharpes contrastées avec boucle pour les tenues martiales/d’exploration ; télémétrie `hair3d`/`beard3d`.
+- **Périmètre** : rendu seul, captures gros plan relues (Brax/Zara-nova, Zara/Sora, Krak/Drakar), zéro erreur. Voir `docs/SPRINT_V75_VISAGES_COSTUMES.md`.
+- 🔜 Prochaines étapes possibles : expressions faciales en combat 3D (sourcils/bouche selon l’état), mains et armes plus détaillées, puis validations Online/terrain sur téléphones physiques.
+
 ## ✅ V7.4 — « Identités de combat » *(LIVRÉ le 25/10/2026 — 466 assertions source / 702 vérifications, suite verte)*
 
 - **Demande directe du propriétaire** (capture de roster à l’appui) : « Travaille sur chaque personnage individuellement, pour que chacun ait ses attaques, sa posture et etc. Regarde l’exemple. »

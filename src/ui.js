@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.4 — IDENTITÉS DE COMBAT (41 POSTURES), PLEIN ÉCRAN FORCÉ & RÉALITÉ 3D II
+   Godson FURY ARENA V7.5 — VISAGES & COSTUMES, 41 IDENTITÉS DE COMBAT & PLEIN ÉCRAN FORCÉ
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

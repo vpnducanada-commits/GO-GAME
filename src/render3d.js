@@ -688,10 +688,21 @@ function addFaceDetails3D(b,pose,model,sk,mat,S,headR){
   addSphere3D(b,P(.146,-.049,0),[.017*S,.0105*S,.025*S],[0,pose.headYaw||pose.yaw,pose.roll],skinShade,DETAIL3_MICRO);
   addBox3D(b,P(.137,-.074,0),[.015*S,.0075*S,.052*S],[0,pose.headYaw||pose.yaw,pose.roll],skinDeep);
   addSphere3D(b,P(.137,-.086,0),[.0125*S,.0085*S,.03*S],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.skin,-24),1,0,"skin"),DETAIL3_MICRO);
+  /* V7.5 : peintures de guerre verticales sur les joues des orcs/aliens. */
+  if(model.frame==="orc"||model.frame==="alien")[-1,1].forEach(side=>addBox3D(b,P(.136,-.052,side*.068),[.012*S,.052*S,.026*S],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.accent,-22),1,.05,"plain")));
 }
 function addHairLocks3D(b,pose,model,sk,mat,S,headR){
   const H=pose.local.head,hair=model.hair,color=mat(sk.hair,1,0,"hair"),sway=pose.hairSway||0;
   const P=(x,y,z)=>pose.toWorld([H[0]+x,H[1]+y,z||0]);
+  /* V7.5 : mèches qui encadrent le visage (fini l'effet casque chauve de face)
+     pour les coiffures longues, et chignon dessiné pour les fiches "bun". */
+  if(hair==="long"||hair==="bob"||hair==="ponytail"||hair==="braids"||hair==="bun"){
+    [-1,1].forEach(side=>addLoftedTube3D(b,[P(.055,.105,side*.082),P(.088,-.015,side*.104),P(.062,(hair==="long"||hair==="braids")?-.17:-.125,side*.098)],[.017*S,.016*S,.009*S],color,qualityLevel===0?5:7,[1,0,0]));
+  }
+  if(hair==="bun"){
+    addSphere3D(b,P(-.088,.152,0),.044*S,[0,pose.headYaw||pose.yaw,pose.roll],color,detailLow3());
+    addSphere3D(b,P(-.088,.152,0),[.047*S,.02*S,.047*S],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.accent,-14),1,.05,"fabric"),DETAIL3_MICRO);
+  }
   if(hair==="short"||hair==="shaved"){
     [-.075,-.038,0,.038,.075].forEach((z,i)=>{
       const lift=hair==="shaved"?.006:.018+(i===2?.008:0);
@@ -883,7 +894,11 @@ function addHeadGear3D(b,pose,W3,model,sk,mat,S,headR){
   if(model.ears==="elf"||model.ears==="orc")[-1,1].forEach(side=>addCylinder3D(b,P(-.02,.015,side*.13),P(-.08,.07,side*.22),.018*S,.002*S,mat(sk.skin),5));
   if(model.ears==="horns")[-1,1].forEach(side=>addCylinder3D(b,P(-.03,.1,side*.1),P(-.12,.25,side*.17),.026*S,.002*S,mat("#263238"),6));
   if(model.beard>.06){
-    addMuscle3D(b,P(.09,-.095-(model.beard>.7?.03:0),0),[headR*.34,headR*(.22+model.beard*.22),headR*.44],[0,pose.yaw,pose.roll],mat(sk.hair));
+    /* V7.5 : barbe en trois volumes (menton + joues + pointe longue). */
+    const beard75=model.beard;
+    addMuscle3D(b,P(.09,-.095-(beard75>.7?.03:0),0),[headR*.34,headR*(.22+beard75*.22),headR*.44],[0,pose.yaw,pose.roll],mat(sk.hair));
+    if(beard75>=.3)[-1,1].forEach(side=>addMuscle3D(b,P(.055,-.068,side*.06),[headR*.26,headR*(.2+beard75*.18),headR*.22],[0,pose.yaw,pose.roll],mat(shade(sk.hair,-6),1,0,"hair")));
+    if(beard75>=.65)addMuscle3D(b,P(.098,-.155-(beard75-.65)*.14,0),[headR*.3,headR*.32,headR*.36],[0,pose.yaw,pose.roll],mat(shade(sk.hair,-11),1,0,"hair"));
   }
   if(kind==="hoodMask"||model.hair==="hood"){
     addMuscle3D(b,P(-.055,.045,0),[headR*1.06,headR*1.02,headR*1.05],[0,pose.yaw,pose.roll],mat(sk.dark));
@@ -951,6 +966,12 @@ function addGarmentDetails3D(b,pose,W3,model,sk,mat,S,armorKind){
     addBox3D(b,localPoint3D(pose,seamCenter[0]+.118*(.8+(model.chest||1)*.2),seamCenter[1],0),[.026*S,.46*S,.02*S],[0,pose.yaw,pose.roll],mat(shade(sk.primary,-34),1,0,"fabric"));
     const hemCenter=mix3(L.pelvis,L.chest,.16);
     addSphere3D(b,localPoint3D(pose,hemCenter[0],hemCenter[1],0),[.105*(.82+(model.waist||1)*.18)*S,.022*S,.225*(.82+(model.waist||1)*.18)*S],[0,pose.torsoYaw||pose.yaw,pose.roll],mat(shade(sk.primary,-18),1,0,"fabric"),detailLow3());
+    /* V7.5 : ceinture-écharpe contrastée des tenues martiales et d'exploration. */
+    if(["kunoichi","assassin","samurai","ranger","mageCoat","assassinCoat","explorer","pirateArmor","leather"].includes(model.top)){
+      const sashCenter75=mix3(L.pelvis,L.chest,.3),waistScale75=.82+(model.waist||1)*.18;
+      addSphere3D(b,localPoint3D(pose,sashCenter75[0],sashCenter75[1],0),[.102*waistScale75*S,.03*S,.222*waistScale75*S],[0,pose.torsoYaw||pose.yaw,pose.roll],mat(shade(sk.accent,-20),1,0,"fabric"),detailLow3());
+      addBox3D(b,localPoint3D(pose,sashCenter75[0]+.098*waistScale75,sashCenter75[1],0),[.02*S,.038*S,.05*S],[0,pose.torsoYaw||pose.yaw,pose.roll],mat(sk.dark,1,.05,"leather"));
+    }
     if(model.sleeves>.18){
       [[W3.shoulderBack,W3.elbowBack],[W3.shoulderFront,W3.elbowFront]].forEach(pair=>addCylinder3D(b,mix3(pair[0],pair[1],.78),mix3(pair[0],pair[1],.94),.06*S,.055*S,mat(shade(sk.primary,-22),1,0,"fabric"),12));
     }
@@ -1217,10 +1238,16 @@ function addFighter3D(opaque,trans,f){
   const coveredHead=model.head==="robot"||model.head==="helmet"||model.head==="dome"||model.head==="hoodMask"||model.head==="wraps";
   if(!coveredHead)addFaceDetails3D(opaque,pose,model,sk,mat,S,headR);
   if(!coveredHead&&model.hair!=="none"&&model.hair!=="alien"){
-    addMuscle3D(opaque,pose.toWorld([L.head[0]-.05,L.head[1]+.118,0]),[headR*.9,headR*.6,headR*.94],[0,pose.headYaw||pose.yaw,pose.roll],mat(sk.hair,1,0,"hair"));
-    addMuscle3D(opaque,pose.toWorld([L.head[0]-.115,L.head[1]+.008,0]),[headR*.46,headR*.66,headR*.82],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.hair,-8),1,0,"hair"));
+    /* V7.5 : coiffe sculptée selon le style — plaquée pour les crânes rasés,
+       panneau arrière descendu pour les cheveux longs/carrés/tresses. */
+    const hairStyle75=model.hair,capFlat75=hairStyle75==="shaved"?.4:hairStyle75==="short"?.5:hairStyle75==="mohawk"?.34:.6;
+    const capLift75=hairStyle75==="shaved"?.102:hairStyle75==="mohawk"?.098:.118;
+    const backDeep75=hairStyle75==="long"||hairStyle75==="bob"||hairStyle75==="braids";
+    addMuscle3D(opaque,pose.toWorld([L.head[0]-.05,L.head[1]+capLift75,0]),[headR*.9,headR*capFlat75,headR*.94],[0,pose.headYaw||pose.yaw,pose.roll],mat(sk.hair,1,0,"hair"));
+    addMuscle3D(opaque,pose.toWorld([L.head[0]-.115,L.head[1]+(backDeep75?-.032:.008),0]),[headR*(backDeep75?.52:.46),headR*(backDeep75?.82:capFlat75+.14),headR*.82],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.hair,-8),1,0,"hair"));
     addHairLocks3D(opaque,pose,model,sk,mat,S,headR);
   }
+  renderStats.hair3d=model.hair; renderStats.beard3d=model.beard||0;
   addHeadGear3D(opaque,pose,W3,model,sk,mat,S,headR);
   addWeapon3D(opaque,pose,W3,model,sk,mat,S);
   const motif=typeof boardOutfitMotif==="function"?boardOutfitMotif(f):"eclair";

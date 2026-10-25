@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.4 — IDENTITÉS DE COMBAT, PLEIN ÉCRAN FORCÉ, RÉALITÉ 3D II & TOURNOI
+   Godson FURY ARENA V7.5 — VISAGES & COSTUMES, IDENTITÉS DE COMBAT, PLEIN ÉCRAN FORCÉ & TOURNOI
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.4.0";
+const GAME_VERSION="7.5.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;

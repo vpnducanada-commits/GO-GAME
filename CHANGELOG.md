@@ -3,6 +3,31 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.5.0] — 2026-10-25 — « Visages & Costumes »
+
+Suite de la trajectoire graphique du propriétaire : après les postures
+et les attaques individuelles (V7.4), les têtes et les costumes des 41
+combattants gagnent en identité en 3D, toujours en rendu seul.
+
+### Amélioré — Cheveux sculptés par style (Marco + Kenzo)
+- La coiffe n’est plus un « casque » unique : plaquée pour les crânes
+  rasés, abaissée sous la crête des mohawks, et panneau arrière descendu
+  pour les cheveux longs, carrés et tresses.
+- **Mèches d’encadrement** le long des joues pour les coiffures longues
+  (long, bob, queue de cheval, tresses, chignon) : de face en 3/4, plus
+  aucun héros ne semble chauve.
+- Le **chignon** (Zara-nova) est enfin dessiné, avec son bandeau accent.
+
+### Amélioré — Barbes, visages et costumes (Marco)
+- Barbes en **trois volumes** (menton, joues, pointe longue) proportionnels
+  à la fiche : Brax et Drakar portent de vraies grandes barbes.
+- **Peintures de guerre** verticales sur les joues des orcs et aliens.
+- **Ceintures-écharpes** contrastées avec boucle pour les tenues
+  martiales et d’exploration (kunoichi, assassin, samouraï, ranger,
+  manteaux de mage/assassin, exploratrice, pirate, cuir).
+- Télémétrie `renderStats.hair3d` / `beard3d`. Aucun changement de
+  simulation, de hitboxes, de replays ni d’Online.
+
 ## [7.4.0] — 2026-10-25 — « Identités de combat »
 
 Demande directe du propriétaire, captures de référence à l’appui :
