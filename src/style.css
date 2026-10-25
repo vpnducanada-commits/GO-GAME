@@ -737,3 +737,20 @@ header.sig .logo{background:transparent;border-color:transparent;box-shadow:none
 .tournamentHistoryRow{display:flex;justify-content:space-between;gap:12px;align-items:center;padding:9px 11px;margin-top:7px;border-radius:12px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);font-size:12px}.tournamentHistoryRow small{display:block;opacity:.85;font-weight:750;margin-top:2px}.tournamentHistoryRow>b{color:#ffe082;white-space:nowrap}
 @media(max-width:920px){.seasonTiers{grid-template-columns:repeat(2,1fr)}.seasonStats{grid-template-columns:repeat(2,1fr)}.tournamentFormats{grid-template-columns:1fr}.seasonHero{grid-template-columns:1fr}.seasonHero em{justify-self:start}}
 @media(max-width:720px){.mc-tournament{grid-column:1/-1}.tournamentPanel{padding:12px}.seasonStats{grid-template-columns:1fr 1fr}.seasonTier button{font-size:12px}.tournamentActions .btn{min-width:100%}}
+/* ===== V7.2 RÉALITÉ 3D II — HUD DE COMBAT COMPACT & PREMIUM (Lena) =====
+   Le rail supérieur devient un bandeau fin semi-transparent : le combat et
+   les combattants 3D occupent l'écran, plus de gros panneau opaque. */
+#hud{padding:7px 12px 0;gap:10px}
+#hud::before{height:66px;opacity:.78;background:linear-gradient(180deg,rgba(6,10,18,.82),rgba(6,10,18,.42) 72%,transparent);box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--stage-accent) 55%,transparent)}
+.fighterHud{padding:4px 11px 5px;background:linear-gradient(105deg,rgba(4,8,14,.6),rgba(255,255,255,.045) 55%,rgba(4,8,14,.5))}
+.nameRow{font-size:clamp(10px,1.25vw,14px);letter-spacing:.4px}
+.pip{width:9px;height:9px;border-width:1.5px}
+.bar{height:13px;border-width:1px;border-radius:4px;margin-top:4px;background:rgba(0,0,0,.72);box-shadow:0 3px 10px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.18)}
+.bar .fill{background:linear-gradient(180deg,#efffb8,#93e83d 46%,#1da34e);box-shadow:inset 0 1px 0 rgba(255,255,255,.55),inset 0 -3px 5px rgba(0,0,0,.28)}
+.energyWrap{margin-top:4px;gap:4px}
+.energySeg{height:7px;border-width:1px;border-radius:3px}
+.energyLabel{display:none}
+#timerBox{min-width:66px;padding:3px 12px 4px}
+#timerNum{font-size:clamp(19px,2.4vw,29px)}
+#roundLabel{font-size:8px;letter-spacing:1.6px}
+#matchClock{display:none}

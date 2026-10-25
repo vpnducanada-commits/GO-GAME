@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.1 — TOURNOI & SAISONS, ANATOMIE AAA, 2V2 DEUX TÉLÉPHONES, RÉALITÉ 3D & M1 SIGNATURE
+   Godson FURY ARENA V7.2 — RÉALITÉ 3D II, TOURNOI & SAISONS, 2V2 DEUX TÉLÉPHONES & M1 SIGNATURE
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

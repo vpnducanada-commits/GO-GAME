@@ -123,6 +123,14 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.2 — « Réalité 3D II » *(LIVRÉ le 25/10/2026 — 457 assertions source / 693 vérifications, suite verte)*
+
+- **Instruction du propriétaire** : avant toute validation Online/terrain, « travaillons encore et encore sur le graphisme, le réalisme, la disposition, l’affiche, les mouvements et tout ce qui est jouabilité et affichage » — « tout paraît encore comme un dessin d’enfant ».
+- **Cinq passes de rendu relues en captures WebGL réelles** : proportions humaines (épaules ~48 cm, torse aplati, tête −20 %), suppression des volumes plaqués « disques/balles », torse bicolore, jupes annulaires de robes, armes portées en arrière, grain procédural et spéculaire non métallique réduit (fin du plastique), caméra basse en léger 3/4 avec zoom de distance, plateforme panneautée, allées du stade, train de Tokyo, écume segmentée de Libreville et HUD de combat compact.
+- **Périmètre strict** : 100 % rendu/affichage — simulation déterministe, hitboxes, dégâts, M1, replays, lockstep, 2v2 Relais local et salons Supabase 1v1 inchangés ; repli 2D AAA II conservé.
+- **Preuves Sarah** : contrôle QA n°35, quatre duels capturés (18 430–54 582 sommets, zéro erreur), hash de replay inchangé par le rendu. Limite assumée : géométrie toujours procédurale stylisée ; les FPS réels restent à mesurer sur téléphones physiques. Voir `docs/SPRINT_V72_REALITE_3D_II.md`.
+- 🔜 La trajectoire « véritable 3D » continue (V7.3 prévue : visages/cheveux/costumes auteur par famille, éclairage d’arène et animation d’armes), en parallèle des validations Online entre deux réseaux et terrain mobile.
+
 ## ✅ V7.1 — « Tournoi & Saisons » *(LIVRÉ le 24/10/2026 — 453 assertions source / 689 vérifications, suite verte)*
 
 - **Arbitrage d’équipe** : le Championnat Godson reste une tournée linéaire ; le nouveau mode `tournament` est un vrai tableau à élimination directe, local et contrôlé par le bot.

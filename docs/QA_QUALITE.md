@@ -11,7 +11,7 @@
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
 | Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry/EX/projections/cancels, rendus, sauvegardes, déterminisme, replays, Arena Moods, tactile et client Online contre API simulée |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
-| Visuel | captures navigateur réel (Chromium headless + WebGL) et canvas natif pour la 2D | combats et arènes relus par Kenzo/Marco ; en V7.1, menu, bracket, sélection verrouillée, combat et retour au tableau sont relus en paysage, en conservant les preuves V7.0 (sculpture, matières, ombres, bump) et V6.1 (interface-décor, liaison WebRTC) |
+| Visuel | captures navigateur réel (Chromium headless + WebGL) et canvas natif pour la 2D | combats et arènes relus par Kenzo/Marco ; en V7.2, quatre duels (athlète/mage, orc/robot lourd, humain augmenté/robot, héros/espionne) sur les quatre arènes relus image par image après chaque passe, en conservant les preuves V7.1 (bracket), V7.0 (bump/ombres) et V6.1 (WebRTC) |
 | Release | Git + tag | arbre propre, commit et version traçables |
 
 ## Seuils de release non négociables
@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 655 Ko / 671 709 octets réels en V7.1, 4 scripts intégrés), sans asset externe.
+- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 662 Ko / 677 765 octets réels en V7.2, 4 scripts intégrés), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 
@@ -32,7 +32,7 @@
 | Allocations d’objets d’entrée | objets réutilisés par joueur |
 | Dégradés recréés par frame | à éviter : utiliser les caches du pipeline |
 | Cible d’affichage | 60 FPS, dégradation par la qualité auto |
-| Scène 3D V7.0 | arènes statiques en cache, batches/buffers réutilisés ; paires dynamiques mesurées à 13 265–13 797 sommets en basse, 17 745–18 026 en moyenne et 27 286–27 551 en haute ; ombres cadencées, LOD adaptatif et repli auto si FPS durablement bas |
+| Scène 3D V7.2 | arènes statiques en cache, batches/buffers réutilisés ; scènes complètes mesurées à 18 430–54 582 sommets dans Chromium SwiftShader (stade le plus dense), zéro erreur ; ombres cadencées, LOD adaptatif et repli auto si FPS durablement bas — FPS réels à confirmer sur téléphone |
 
 ## Matrice manuelle avant les grosses releases
 
@@ -42,6 +42,7 @@
 - Graphismes AAA II : ombres au sol et en l’air dans les 3 ambiances, lisibilité des impacts léger/lourd/garde/parry/M1, motifs de tenue en sélection/VS/combat et tenue des 60 FPS en qualité auto.
 - Réalité 3D : réglages Auto/Toujours/2D, perte/récupération WebGL, les 4 arènes × 3 ambiances, projectiles/particules sans point géant, poses de course/saut/garde/M1/chute et retour immédiat au pipeline 2D.
 - Anatomie AAA V7.0 : torse/tête/membres loftés, visage, mains, bottes, matières, bump WebGL1/WebGL2, ombres PCF et posture 3/4 sur les familles athlète, féminine, colosse, robot et armure lourde ; contrôler les trois qualités et le retour 2D.
+- Réalité 3D II V7.2 : proportions par famille (athlète, féminine, colosse, robot, armure), armes au repos et en extension, jupes de robes, caméra de distance/saut, HUD compact en paysage étroit et les quatre arènes × ambiances sans plaque ni halo parasite.
 - Tournoi & Saisons V7.1 : générer les brackets 4/8/16, changer de combattant avant le premier match puis vérifier le verrouillage, quitter/reprendre un bracket, gagner un tour, perdre et contrôler le champion CPU, empêcher tout double crédit de points, réclamer/équiper un palier et relire le tableau en paysage étroit.
 - Maquettes Vivantes V6.1 : muscles/proportions/tenues/coiffures/armes sur représentants de chaque famille, IDs à casse mixte (`Zara`, `Lira`, `Kairos`, `Zara-Nova`), aucun gel perceptible après léger/lourd/M1/K.O. et thèmes d’interface des 4 arènes.
 - Manettes : J1 et J2 si disponibles.

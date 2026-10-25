@@ -3,6 +3,47 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.2.0] — 2026-10-25 — « Réalité 3D II »
+
+Sprint 100 % visuel ordonné par le propriétaire après V7.1 : rester sur la
+3D — graphisme, réalisme, disposition, mouvements et affichage — plutôt que
+d’ajouter des modes. Cinq passes de rendu relues image par image dans
+Chromium/WebGL, sans toucher à la simulation déterministe, aux hitboxes,
+aux dégâts, aux M1, aux replays ni au lockstep.
+
+### Amélioré — Anatomie & silhouettes (Marco + Kenzo)
+- Proportions recalculées sur des mensurations humaines : épaules ramenées
+  d’environ 1,15 m à ~48 cm, torse aplati (profondeur poitrine ~25 cm),
+  tête réduite de 20 %, cou, mains, bottes et épaulières rééquilibrés.
+- Les multiplicateurs de fiches personnages sont normalisés autour de 1 :
+  les 41 combattants gardent leur silhouette sans cumul d’échelle monstre.
+- Suppression des volumes plaqués qui lisaient comme des disques ou des
+  balles en profil (coques, pectoraux/abdominaux en sphères, revers,
+  anneaux circulaires) ; la définition vient du loft du torse et des matières.
+- Torse bicolore (panneaux latéraux et bas assombris), jupes/robes en
+  anneaux volumiques réservées aux vraies robes, bottes et genouillères
+  sombres, armes portées derrière l’épaule au repos.
+- Garde plus humaine : main arrière relevée, torsion du haut du corps
+  réduite, appuis resserrés, course et impacts inchangés côté simulation.
+
+### Amélioré — Matières, lumière & caméra (Kenzo)
+- Grain procédural par bruit de valeur dans le shader (albédo et rugosité),
+  neuf familles de matières à l’atlas (pierre, béton, sable, bois, eau,
+  verre…), spéculaire non métallique fortement réduit : fin du brillant
+  « plastique » et des fusils délavés.
+- Lumières d’arène par ambiance, ombres de contact renforcées sous les
+  combattants, et caméra de combat plus basse, en léger 3/4, qui zoome
+  selon la distance et suit les sauts.
+
+### Amélioré — Arènes & affichage (Kenzo + Lena)
+- Plateforme de combat panneautée au-dessus de la dalle, allées du stade,
+  train de Tokyo, toits/plafonds du temple, écume segmentée et voilier de
+  Libreville ; suppression des halos octogonaux et des cônes « tentes ».
+- HUD de combat compact et semi-transparent : barres fines, pips et timer
+  réduits — la zone de combat reste dégagée en paysage.
+- Validation Sarah : quatre duels capturés en WebGL réel (Kael/Sora,
+  Krak/Brutus, Vorak/AEL-7, Gédéon/Kira), zéro erreur d’exécution.
+
 ## [7.1.0] — 2026-10-24 — « Tournoi & Saisons »
 
 Sprint de compétition locale qui suit la roadmap après l’Anatomie AAA : le
