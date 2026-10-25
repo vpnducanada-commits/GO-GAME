@@ -3,6 +3,40 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.7.0] — 2026-10-25 — « Présence Vivante »
+
+Après la mobilité de la V7.6, l’équipe suit la trajectoire graphique du
+propriétaire — quitter définitivement l’aspect « figurine figée » — en
+travaillant le langage corporel des 41 combattants en 3D, en rendu seul.
+
+### Amélioré — Visages vivants (Marco + Kenzo)
+- Expressions nommées selon l’état : focus, attaque, douleur, garde
+  touchée, parry, fatigue, victoire et K.O.
+- Regard qui suit l’adversaire, paupières et clignements, sourcils en
+  deux segments inclinables, bouche ouverte avec dents et langue lors
+  des efforts et des impacts, sourire de victoire.
+- Les visages couverts participent aussi : visières robot/casque,
+  fentes de capuche et bandeaux voilés se resserrent et perdent leur
+  éclat quand le combattant souffre ou tombe K.O.
+
+### Amélioré — Mains, prises et appuis (Kenzo)
+- Doigts reconstruits en **trois phalanges** avec pouce opposé et
+  fermeture continue : paume, main semi-ouverte, garde, poing, prise
+  d’arme et main de soutien.
+- Les armes à deux mains sont enfin soutenues : fusil sous le fût,
+  bâton/lance sur le manche, katana près du pommeau, hache/massue sur
+  la hampe.
+- Bottes articulées à la cheville : attaque du talon et poussée de
+  pointe pendant la course, pied pointé en coup de pied, chevilles
+  relâchées en l’air et semelle qui suit l’angle du pied.
+
+### Amélioré — Impact sans gel (Nadia + Sarah)
+- Tête, épaules, buste, mains, cheveux et tissus absorbent visuellement
+  les coups propres, les gardes touchées et les parry avec des poses
+  distinctes, sans réintroduire le moindre gel ou ralenti.
+- Périmètre strictement visuel : simulation, hitboxes, dégâts, M1,
+  replays, lockstep Online et profils V7.6 inchangés.
+
 ## [7.6.0] — 2026-10-25 — « Mobilité Dynamique »
 
 Demande directe du propriétaire : continuer le travail et rendre la

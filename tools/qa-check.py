@@ -223,37 +223,43 @@ check("Anatomie AAA V7 présente", v7_ok, "torse/tête/membres loftés • visag
 # 34. Tournoi & Saisons V7.1 : brackets locaux persistants 4/8/16, affiches
 # CPU déterministes, classement et points décernés une seule fois, paliers
 # de Saison 1 « Aurore de Libreville » et archivage des anciennes saisons.
-v71_ok = ver == "7.6.0" and all(x in js["engine"] for x in ('const CURRENT_SEASON','const SEASON_TIERS','const TOURNAMENT_FORMATS','function tournamentHash01','function tournamentRating','function setupTournamentRun','function simulateTournamentMatch','function completeTournamentPlayerMatch','function recordTournamentCompletion','function claimSeasonReward','function toggleSeasonTitle','function syncTournamentFromProfile','function tournamentForReplay','activeTournament','lastTournament')) and all(x in js["ui"] for x in ('function renderTournament','function renderTournamentBracket','function renderCareerTournament','function startTournament','function playTournamentMatch','function openTournament','id:"tournament-first"','id:"triple-couronne"')) and all(x in html for x in ('id="btnModeTournament"','id="menuTournament"','id="tournamentFormats"','id="tournamentBracket"','id="tournamentHistory"','id="careerTournament"','Saison 1 — Aurore de Libreville')) and all(x in css for x in ('V7.1 — TOURNOI & SAISONS','.mc-tournament','.bracketGrid','.bracketMatch','.seasonTier','.seasonMeter'))
+v71_ok = ver in ("7.6.0","7.7.0") and all(x in js["engine"] for x in ('const CURRENT_SEASON','const SEASON_TIERS','const TOURNAMENT_FORMATS','function tournamentHash01','function tournamentRating','function setupTournamentRun','function simulateTournamentMatch','function completeTournamentPlayerMatch','function recordTournamentCompletion','function claimSeasonReward','function toggleSeasonTitle','function syncTournamentFromProfile','function tournamentForReplay','activeTournament','lastTournament')) and all(x in js["ui"] for x in ('function renderTournament','function renderTournamentBracket','function renderCareerTournament','function startTournament','function playTournamentMatch','function openTournament','id:"tournament-first"','id:"triple-couronne"')) and all(x in html for x in ('id="btnModeTournament"','id="menuTournament"','id="tournamentFormats"','id="tournamentBracket"','id="tournamentHistory"','id="careerTournament"','Saison 1 — Aurore de Libreville')) and all(x in css for x in ('V7.1 — TOURNOI & SAISONS','.mc-tournament','.bracketGrid','.bracketMatch','.seasonTier','.seasonMeter'))
 check("Tournoi & Saisons V7.1 présents", v71_ok, "brackets 4/8/16 persistants • CPU déterministe • points anti-double-gain • 5 paliers et titres de Saison 1")
 
 # 35. Réalité 3D II V7.2 : proportions humaines normalisées, grain procédural,
 # caméra de combat dynamique, torse bicolore, jupes volumiques et HUD compact.
-v72_ok = ver in ("7.2.0","7.3.0","7.4.0","7.5.0","7.6.0") and all(x in js["render3d"] for x in ('float vnoise','camDist3D','ringSkirt3D','palette=color&&color.main','Réalité 3D II V7.2','shoulderScale3','const headR=(human.headR||15)/95*S*.8;','function addWeapon3D')) and 'Réalité 3D II V7.2' in js["render"] and 'V7.2 RÉALITÉ 3D II' in css and ('V7.2' in html or 'V7.3' in html or 'V7.4' in html or 'V7.5' in html or 'V7.6' in html)
+v72_ok = ver in ("7.2.0","7.3.0","7.4.0","7.5.0","7.6.0","7.7.0") and all(x in js["render3d"] for x in ('float vnoise','camDist3D','ringSkirt3D','palette=color&&color.main','Réalité 3D II V7.2','shoulderScale3','const headR=(human.headR||15)/95*S*.8;','function addWeapon3D')) and 'Réalité 3D II V7.2' in js["render"] and 'V7.2 RÉALITÉ 3D II' in css and ('V7.2' in html or 'V7.3' in html or 'V7.4' in html or 'V7.5' in html or 'V7.6' in html or 'V7.7' in html)
 check("Réalité 3D II V7.2 présente", v72_ok, "anatomie normalisée • matières grainées • caméra basse 3/4 • arènes enrichies • HUD de combat fin")
 
 # 36. Plein écran forcé & Sélection claire V7.3 : porte d'entrée immersive,
 # portrait bloqué sans échappatoire, menus sans textes M1/Signature et
 # grandes cartes de sélection plein corps (demande directe du propriétaire).
-v73_ok = ver in ("7.3.0","7.4.0","7.5.0","7.6.0") and 'id="bootEnter"' in html and 'btnPortraitAnyway' not in html and 'bootEnter' in js["ui"] and '(pointer:coarse)' in js["ui"] and 'V7.3 — PLEIN ÉCRAN FORCÉ' in css and 'minmax(106px' in css and '.bootEnter' in css and 'M1 SIGNATURE • COMBOS' not in js["render"]
+v73_ok = ver in ("7.3.0","7.4.0","7.5.0","7.6.0","7.7.0") and 'id="bootEnter"' in html and 'btnPortraitAnyway' not in html and 'bootEnter' in js["ui"] and '(pointer:coarse)' in js["ui"] and 'V7.3 — PLEIN ÉCRAN FORCÉ' in css and 'minmax(106px' in css and '.bootEnter' in css and 'M1 SIGNATURE • COMBOS' not in js["render"]
 check("Plein écran forcé & Sélection claire V7.3 présents", v73_ok, "entrée plein écran paysage • portrait bloqué • menus épurés • figurines plein corps nom seul")
 
 # 37. Identités de combat V7.4 : une fiche de posture/attaques par combattant
 # (stance, gardes, torsion, styles de poing/pied/spécial, posture d'affiche),
 # appliquée au combat 3D et aux portraits de sélection, en rendu seul.
-v74_ok = ver in ("7.4.0","7.5.0","7.6.0") and js["render3d"].count("ST74(") >= 41 and all(x in js["render3d"] for x in ('const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist')) and 'stanceP' in js["ui"] and 'stanceProfile3D(f)' in js["ui"]
+v74_ok = ver in ("7.4.0","7.5.0","7.6.0","7.7.0") and js["render3d"].count("ST74(") >= 41 and all(x in js["render3d"] for x in ('const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist')) and 'stanceP' in js["ui"] and 'stanceProfile3D(f)' in js["ui"]
 check("Identités de combat V7.4 présentes", v74_ok, "41 fiches individuelles • postures et attaques reconnaissables • sélection et combat synchronisés")
 
 # 38. Visages & Costumes V7.5 : coiffe sculptée selon les 13 styles de cheveux
 # des fiches, mèches d'encadrement, chignon, barbes en trois volumes,
 # peintures de guerre orc/alien et ceintures-écharpes martiales (rendu seul).
-v75_ok = ver in ("7.5.0","7.6.0") and all(x in js["render3d"] for x in ('capFlat75','backDeep75','beard75','hair==="bun"','sashCenter75','renderStats.hair3d','peintures de guerre'))
+v75_ok = ver in ("7.5.0","7.6.0","7.7.0") and all(x in js["render3d"] for x in ('capFlat75','backDeep75','beard75','hair==="bun"','sashCenter75','renderStats.hair3d','peintures de guerre'))
 check("Visages & Costumes V7.5 présents", v75_ok, "cheveux sculptés par style • barbes pleines • chignon/tresses • détails de costume par famille")
 
 # 39. Mobilité Dynamique V7.6 : profil direct plus vif et profil legacy pour
 # les anciens replays, foulée synchronisée à l'interpolation, phases
 # fractionnaires, ressorts demi-tour/saut/réception, dashs et caméras.
-v76_ok = ver == "7.6.0" and all(x in js["engine"] for x in ('const MOBILITY76','function mobilityProfile76','attackSlide','apexGravity')) and all(x in js["render"] for x in ('gaitPhase','attackFlow','turnPulse','landingPulse','renderInterpolationAlpha','cameraLead')) and all(x in js["render3d"] for x in ('dashTrails3d','cameraSmooth','headTop76','cameraLead3d'))
+v76_ok = ver in ("7.6.0","7.7.0") and all(x in js["engine"] for x in ('const MOBILITY76','function mobilityProfile76','attackSlide','apexGravity')) and all(x in js["render"] for x in ('gaitPhase','attackFlow','turnPulse','landingPulse','renderInterpolationAlpha','cameraLead')) and all(x in js["render3d"] for x in ('dashTrails3d','cameraSmooth','headTop76','cameraLead3d'))
 check("Mobilité Dynamique V7.6 présente", v76_ok, "accélération/demi-tour/air/dash plus vifs • foulée anti-patinage • caméras anticipatives • anciens replays en profil legacy")
+
+# 40. Présence Vivante V7.7 : expressions 3D selon l'état de combat, mains
+# en phalanges (poing/paume/prise/soutien), visières expressives, bottes
+# articulées au contact et réaction corporelle d'impact sans aucun gel.
+v77_ok = ver == "7.7.0" and all(x in js["render3d"] for x in ('const face77','segments77','ptsLocal77','visorGlow77','impactLocal77','makeFoot77','renderStats.expression3d','renderStats.weaponGrip3d')) and all(x in js["render"] for x in ('expression3d:"focus"','handCurl3d','footPitch3d','impactPose3d'))
+check("Présence Vivante V7.7 présente", v77_ok, "expressions focus/attaque/douleur/K.O. • mains et prises à deux mains • appuis talon-pointe • impact corporel sans gel")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

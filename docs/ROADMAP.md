@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.7 — « Présence Vivante » *(LIVRÉ le 25/10/2026 — 485 assertions source / 721 vérifications, suite verte)*
+
+- **Trajectoire graphique du propriétaire** : après les postures (V7.4), les têtes (V7.5) et la mobilité (V7.6), les combattants gagnent un langage corporel lisible en plein combat.
+- **Visages** : expressions focus/attaque/douleur/garde/parry/fatigue/victoire/K.O., regard poursuivant l’adversaire, paupières, sourcils segmentés, bouche avec dents/langue ; visières et capuches expriment aussi l’état.
+- **Mains & armes** : trois phalanges par doigt et pouce opposé, fermeture continue paume→poing→prise, main de soutien placée sur fusil, bâton/lance, katana et haches/massues.
+- **Appuis & impact** : bottes articulées talon-pointe en course, pied pointé en frappe/air, semelle orientée ; tête, épaules, mains, cheveux et tissus absorbent les impacts sans aucun gel.
+- **Périmètre** : rendu seul, aucune constante de simulation modifiée. Voir `docs/SPRINT_V77_PRESENCE_VIVANTE.md`.
+- 🔜 Prochaines étapes possibles : validation terrain sur téléphones physiques, duel Online entre deux réseaux distincts, puis nouvelle passe décors/lumière si le propriétaire la priorise.
+
 ## ✅ V7.6 — « Mobilité Dynamique » *(LIVRÉ le 25/10/2026 — 478 assertions source / 714 vérifications, suite verte)*
 
 - **Demande directe du propriétaire** : « Continuez le travail et travaillez aussi la mobilité, que ça soit plus fluide et dynamique. »

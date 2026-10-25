@@ -11,7 +11,7 @@
 | Statique | `tools/qa-check.py` | IDs HTML référencés, ordre des scripts, version, dépendances externes, budgets, hooks replay |
 | Exécution | `tests/smoke-test.js` | menus, combats, IA, Histoire, Survie, parry/EX/projections/cancels, rendus, sauvegardes, déterminisme, replays, Arena Moods, tactile et client Online contre API simulée |
 | HTTP | serveur local + `curl` | toutes les ressources en 200 |
-| Visuel | captures navigateur réel (Chromium headless + WebGL) et canvas natif pour la 2D | combats et arènes relus par Kenzo/Marco ; en V7.5, gros plans Brax/Zara-nova (barbe pleine contre chignon), Zara/Sora (tresses contre cheveux longs) et Krak/Drakar (orc contre barbe rousse) relus en captures Chromium, en conservant les preuves V7.4 (postures), V7.3 (plein écran) et V7.2 (quatre duels WebGL) |
+| Visuel | captures navigateur réel (Chromium headless + WebGL) et canvas natif pour la 2D | combats et arènes relus par Kenzo/Marco ; en V7.7, prises d’arme AEL-7, expression d’impact de Titan et appuis de course/air de Kira et Zara relus en captures Chromium ; en V7.5, gros plans Brax/Zara-nova (barbe pleine contre chignon), Zara/Sora (tresses contre cheveux longs) et Krak/Drakar (orc contre barbe rousse) relus en captures Chromium, en conservant les preuves V7.4 (postures), V7.3 (plein écran) et V7.2 (quatre duels WebGL) |
 | Release | Git + tag | arbre propre, commit et version traçables |
 
 ## Seuils de release non négociables
@@ -19,7 +19,7 @@
 - ✅ 100 % des tests d’exécution verts.
 - ✅ Version autonome régénérée et scripts extraits revalidés.
 - ✅ Zéro dépendance réseau pour jouer en local ; l’Online est opt-in et aucun secret serveur ne doit apparaître dans le client.
-- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 684 Ko / 700 539 octets réels en V7.6, 4 scripts intégrés), sans asset externe.
+- ✅ Bundle officiel ≤ 704 Ko (budget relevé en V7.0 sur décision d’équipe pour la sculpture, les matières et les ombres procédurales ; 694 Ko / 710 784 octets réels en V7.7, 4 scripts intégrés), sans asset externe.
 - ✅ Sauvegarde des anciennes versions migrée sans perte.
 - ✅ `CHANGELOG.md`, `README.md`, roadmap et indicateurs à jour.
 
@@ -43,6 +43,7 @@
 - Réalité 3D : réglages Auto/Toujours/2D, perte/récupération WebGL, les 4 arènes × 3 ambiances, projectiles/particules sans point géant, poses de course/saut/garde/M1/chute et retour immédiat au pipeline 2D.
 - Anatomie AAA V7.0 : torse/tête/membres loftés, visage, mains, bottes, matières, bump WebGL1/WebGL2, ombres PCF et posture 3/4 sur les familles athlète, féminine, colosse, robot et armure lourde ; contrôler les trois qualités et le retour 2D.
 - Visages & Costumes V7.5 : gros plans par famille (barbus, chignon, tresses, cheveux longs, mohawk, capuches, robots) — coiffe sans effet casque, mèches devant les oreilles, barbe raccordée à la mâchoire, aucune géométrie traversant le visage.
+- Présence Vivante V7.7 : expressions focus/attaque/douleur/garde/parry/K.O. sur visages nus, robots, casques et capuches ; doigts sans auto-intersection visible en poing, paume, prise et soutien d’arme ; bottes talon-pointe en course, pointées en l’air/frappe et semelles jamais sous le sol au contact.
 - Identités de combat V7.4 : vérifier sur représentants de chaque famille (colosse carré, moine bas, tireur en visée, lame de profil, mage droit) la stance au repos, le poing, le pied, le spécial et la posture d’affiche à la sélection/VS, sans membre cassé ni pied flottant.
 - Plein écran & Sélection V7.3 : entrée « ENTRER DANS L’ARÈNE » → plein écran + verrouillage paysage sur Android/Chrome, rotation portrait bloquée puis reprise en paysage, menus sans texte parasite, les 41 cartes plein corps et le cadenas secret lisibles en paysage étroit.
 - Réalité 3D II V7.2 : proportions par famille (athlète, féminine, colosse, robot, armure), armes au repos et en extension, jupes de robes, caméra de distance/saut, HUD compact en paysage étroit et les quatre arènes × ambiances sans plaque ni halo parasite.
