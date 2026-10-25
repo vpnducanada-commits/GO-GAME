@@ -587,14 +587,12 @@ try {
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
   assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Paysage (génération 3.2+) exposée au moteur');
-  assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !!window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent avec ses 2 choix');
+  assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent — paysage forcé V7.3, aucune échappatoire portrait');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
   try { ev('requestImmersiveLandscape()'); } catch (e) { landscapeCallOk = false; }
   assert(landscapeCallOk, 'plein écran paysage : aucun crash si l’API est absente');
-  window.document.getElementById('btnPortraitAnyway').click();
-  assert(window.document.body.classList.contains('allowPortrait'), 'choix portrait respecté (classe allowPortrait)');
-  window.document.body.classList.remove('allowPortrait');
+  assert(!window.document.body.classList.contains('allowPortrait'), 'aucun mode portrait toléré par défaut (V7.3)');
   assert(window.document.querySelector('.helpBar') === null, 'barre d’aide sous le jeu supprimée (anti-saturation)');
   assert(window.document.querySelector('footer').textContent.trim().length < 130, 'pied de page condensé en une ligne signature');
   const cssV32 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
@@ -1239,12 +1237,20 @@ function finishTestRun() {
 
   /* ===== V7.2 « Réalité 3D II » : anatomie humaine, matières, caméra & HUD ===== */
   console.log('\n— V7.2 : Réalité 3D II (Kenzo + Marco + Lena, proportions humaines) —');
-  assert(ev('GAME_VERSION')==='7.2.0'&&window.document.title.includes('V7.2')&&window.document.querySelector('h1').textContent.includes('V7.2')&&ev('renderStats.artDirection').includes('Réalité 3D II'),'édition officielle V7.2 « Réalité 3D II » affichée');
+  assert(/^7\.[2-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[2-9]/.test(window.document.title)&&ev('renderStats.artDirection').includes('Réalité 3D II'),'édition Réalité 3D II (V7.2+) affichée');
   assert(ev('(() => { applyCharacterTo(p1,6); applyCharacterTo(p2,7); p1.reset(); p2.reset(); p1.rx=560; p2.rx=730; p1.ry=p2.ry=GROUND; const a=buildFighterPose3D(p1),b=buildFighterPose3D(p2),wA=a.local.shoulderFront[2]-a.local.shoulderBack[2],wB=b.local.shoulderFront[2]-b.local.shoulderBack[2],feet=Math.abs(a.local.footFront[2]-a.local.footBack[2]); return wA>.4&&wA<.58&&wB>.34&&wB<.5&&wB<wA&&a.local.head[1]>1.6&&feet>.28; })()')===true,'proportions V7.2 : épaules d’environ 48 cm, silhouette féminine distincte et appuis écartés');
   assert(ev('(() => { const keep=currentArena,counts=ARENAS.map(a=>{ currentArena=a; return buildArenaBatch3D().opaque.count; }); currentArena=keep; return counts.length===4&&counts.every(c=>c>500); })()')===true,'arènes V7.2 : les quatre décors volumiques se génèrent sans erreur avec leur géométrie enrichie');
   const render72=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),css72=fs.readFileSync(path.join(root,'src/style.css'),'utf8');
   assert(['float vnoise','camDist3D','ringSkirt3D','palette=color&&color.main','Réalité 3D II V7.2','shoulderScale3','addWeapon3D'].every(h=>render72.includes(h))&&css72.includes('V7.2 RÉALITÉ 3D II'),'hooks sources V7.2 : grain procédural, caméra dynamique, torse bicolore, jupes volumiques et HUD compact');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
+
+  /* ===== V7.3 « Plein écran forcé & Sélection claire » : demande directe du propriétaire ===== */
+  console.log('\n— V7.3 : Plein écran forcé & Sélection claire (Lena + Kenzo) —');
+  assert(ev('GAME_VERSION')==='7.3.0'&&window.document.title.includes('V7.3')&&window.document.querySelector('h1').textContent.includes('V7.3'),'édition officielle V7.3 affichée');
+  assert(!!window.document.getElementById('bootEnter')&&!window.document.getElementById('btnPortraitAnyway')&&!!window.document.getElementById('rotateHint'),'paysage forcé V7.3 : porte d’entrée plein écran, aucun bouton « continuer en portrait »');
+  assert(!window.document.querySelector('#menuMain .signed').textContent.includes('M1'),'menu épuré V7.3 : la ligne signée ne contient plus de texte M1/Signature');
+  const css73=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),ui73=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),render73=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
+  assert(css73.includes('V7.3 — PLEIN ÉCRAN FORCÉ')&&css73.includes('minmax(106px')&&css73.includes('.bootEnter')&&ui73.includes('bootEnter')&&ui73.includes('(pointer:coarse)')&&!render73.includes('M1 SIGNATURE • COMBOS'),'hooks sources V7.3 : grandes cartes plein corps, entrée immersive tactile et bandeau de fond sans texte M1');
 
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }

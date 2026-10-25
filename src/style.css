@@ -754,3 +754,33 @@ header.sig .logo{background:transparent;border-color:transparent;box-shadow:none
 #timerNum{font-size:clamp(19px,2.4vw,29px)}
 #roundLabel{font-size:8px;letter-spacing:1.6px}
 #matchClock{display:none}
+
+/* ================= V7.3 — PLEIN ÉCRAN FORCÉ & SÉLECTION CLAIRE =================
+   Demande directe du propriétaire : le jeu s'ouvre en plein écran paysage,
+   les menus perdent leurs textes inutiles (M1/Signature/descriptions) et la
+   sélection montre de grandes figurines plein corps en posture de combat —
+   membres, visages et armes lisibles d'un coup d'œil, nom seulement. */
+.bootEnter{margin-top:4px;padding:16px 34px;border:none;border-radius:16px;cursor:pointer;
+  font-size:clamp(19px,3.2vw,27px);font-weight:1000;font-style:italic;letter-spacing:1px;color:#fff;
+  background:linear-gradient(90deg,#ff7a00,#ff2e88);box-shadow:0 14px 34px rgba(255,46,136,.45),0 0 0 2px rgba(255,255,255,.25) inset;
+  animation:bootPulse 1.25s ease-in-out infinite}
+@keyframes bootPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.045)}}
+.bootFs{font-size:13px;font-weight:800;letter-spacing:2px;opacity:.85}
+/* Menu principal épuré : icône + nom court, aucune description. */
+#menuMain .modeCard small,#menuMain .storyBanner .sbTx small,#menuMain .miniNote,
+#hubCareerTitle,#hubCareerXp{display:none!important}
+#menuMain .modeCard{min-height:94px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:7px}
+#menuMain .modeCard .ic{font-size:33px;line-height:1}
+#menuMain .modeCard b{font-size:15px;letter-spacing:.6px}
+/* Sélection : grandes figurines plein corps, nom seul (façon planches du propriétaire). */
+.roster{grid-template-columns:repeat(auto-fill,minmax(106px,1fr))!important;gap:9px}
+@media(max-width:900px){.roster{grid-template-columns:repeat(auto-fill,minmax(84px,1fr))!important;gap:7px}}
+.charCard{padding:7px 5px 8px}
+.charCard small{display:none!important}
+.charCard b{font-size:12.5px;letter-spacing:.5px;margin-top:4px}
+.charCard .portraitFallback{font-size:44px;padding:26px 0}
+.previewBox canvas{width:148px!important}
+.previewMeta b{font-size:22px;letter-spacing:.6px}
+#previewTitleP1,#previewTitleP2,#previewStatsP1,#previewStatsP2{display:none!important}
+#menuSelect .moveDetails{display:none!important}
+#menuSelect .flowSteps{font-size:12px;opacity:.85}

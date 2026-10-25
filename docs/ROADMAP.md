@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.3 — « Plein écran forcé & Sélection claire » *(LIVRÉ le 25/10/2026 — 461 assertions source / 697 vérifications, suite verte)*
+
+- **Demandes directes du propriétaire** (avec captures de référence) : « le jeu doit directement s’ouvrir en plein écran paysage, ça doit être forcé », « la page du menu a trop de textes inutiles (M1, signature…) », et une sélection où l’on voit « la posture, les membres, les visages, les objets ».
+- **Plein écran forcé** : écran-titre « ▶ ENTRER DANS L’ARÈNE » (le plein écran navigateur exige un geste), verrouillage paysage immédiat, relance d’immersion à tout contact tactile sans plein écran, et suppression du bouton « Continuer en portrait » — en portrait téléphone, seul l’écran de rotation s’affiche.
+- **Menus épurés** : modes en icône + nom court ; descriptions, ligne signature gonflée, mini-notes et bandeau défilant « M1 SIGNATURE • COMBOS » retirés de l’affichage.
+- **Sélection plein corps** : cartes agrandies et zoomées façon grille des captures du propriétaire (figurine entière, bordure couleur, nom seul, cadenas minimal), aperçus latéraux grand format sans statistiques ni texte M1.
+- **Périmètre** : affichage uniquement — simulation, M1 en combat, replays, Online, Tournoi et données DOM techniques inchangés. Voir `docs/SPRINT_V73_PLEIN_ECRAN_SELECTION.md`.
+- 🔜 La trajectoire graphique continue : costumes/visages auteur par famille en 3D et portraits de sélection toujours plus détaillés, plus validations Online/terrain sur téléphones physiques.
+
 ## ✅ V7.2 — « Réalité 3D II » *(LIVRÉ le 25/10/2026 — 457 assertions source / 693 vérifications, suite verte)*
 
 - **Instruction du propriétaire** : avant toute validation Online/terrain, « travaillons encore et encore sur le graphisme, le réalisme, la disposition, l’affiche, les mouvements et tout ce qui est jouabilité et affichage » — « tout paraît encore comme un dessin d’enfant ».

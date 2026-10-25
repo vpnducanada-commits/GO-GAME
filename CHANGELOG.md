@@ -3,6 +3,43 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.3.0] — 2026-10-25 — « Plein écran forcé & Sélection claire »
+
+Sprint d'affichage ordonné par le propriétaire à partir de ses captures de
+référence : le jeu doit s'ouvrir directement en plein écran paysage, les
+menus perdent leurs textes inutiles (M1, Signature, descriptions) et la
+sélection doit montrer les combattants plein corps — posture, membres,
+visages et armes lisibles d'un coup d'œil, comme sur ses images.
+
+### Modifié — Plein écran paysage forcé (Lena)
+- L'écran de chargement devient un écran-titre : à 100 %, un grand bouton
+  **▶ ENTRER DANS L'ARÈNE** attend le geste du joueur (les navigateurs
+  interdisent le plein écran sans interaction). Le toucher déclenche
+  immédiatement plein écran + verrouillage paysage.
+- Sur tactile, tout contact ultérieur sans plein écran relance
+  l'immersion ; le dialogue « Tourne ton appareil » n'offre plus de
+  bouton « Continuer en portrait » : en portrait téléphone, le jeu est
+  bloqué jusqu'à la rotation.
+
+### Modifié — Menus épurés (Lena)
+- Menu principal : icône + nom court uniquement. Disparaissent les
+  descriptions des modes, la ligne « M1 SIGNATURE • TOURNOI & SAISONS »,
+  les mini-notes et les textes secondaires du hub (le rang, le niveau,
+  les Godson et la barre XP restent, façon compteur de monnaie des
+  captures du propriétaire).
+- Le bandeau défilant de fond ne dit plus que « Godson FURY ARENA ✦
+  COMBAT 1V1 ✦ LIBREVILLE ».
+
+### Modifié — Sélection plein corps (Kenzo + Marco)
+- Cartes de combattants agrandies (figurines plein corps zoomées,
+  bordures aux couleurs du héros) avec **le nom seul** — titres,
+  statistiques, ligne M1 et panneau « Techniques » masqués.
+- Aperçus latéraux agrandis (148 px) : grand combattant + nom, rien
+  d'autre ; la carte secrète devient un simple cadenas « ??? SECRET ».
+- Aucun changement de simulation, de roster, de M1 en combat, de
+  replays, d'Online ou de Tournoi ; les données masquées restent dans
+  le DOM pour les écrans qui en ont besoin.
+
 ## [7.2.0] — 2026-10-25 — « Réalité 3D II »
 
 Sprint 100 % visuel ordonné par le propriétaire après V7.1 : rester sur la

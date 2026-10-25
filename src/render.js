@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.2 — RÉALITÉ 3D II + GRAPHISMES AAA II 2D, M1 SIGNATURE & ROSTER 41
+   Godson FURY ARENA V7.3 — RÉALITÉ 3D II + GRAPHISMES AAA II 2D, AFFICHAGE ÉPURÉ & ROSTER 41
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */
@@ -312,7 +312,7 @@ function drawStadium(){
   ctx.fillStyle="rgba(255,255,255,.1)"; for(let r=0;r<5;r++)ctx.fillRect(-220,252+r*27,1720,2);
   // Bandeau LED défilant
   ctx.save(); ctx.fillStyle="#050816"; ctx.fillRect(-220,382,1720,30); ctx.font="1000 19px 'Segoe UI',Arial"; ctx.textAlign="left";
-  const msg=" ✦ Godson FURY ARENA ✦ COMBAT 1V1 ✦ M1 SIGNATURE • COMBOS • DASH • SUPER ATTAQUES ";
+  const msg=" ✦ Godson FURY ARENA ✦ COMBAT 1V1 ✦ LIBREVILLE ";
   const tw=cachedTextWidth(msg,"1000 19px 'Segoe UI',Arial"),off=-((renderTicker*1.15)%tw);
   ctx.fillStyle="#69f0ae"; for(let x=off-tw;x<W+220;x+=tw)ctx.fillText(msg,x,404); ctx.restore();
   ctx.fillStyle="rgba(11,14,42,.68)"; ctx.fillRect(-220,428,1720,50); ctx.fillStyle="rgba(255,255,255,.13)"; ctx.fillRect(-220,428,1720,3);

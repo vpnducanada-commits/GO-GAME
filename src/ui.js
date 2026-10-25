@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.2 — RÉALITÉ 3D II, TOURNOI & SAISONS, 2V2 DEUX TÉLÉPHONES & M1 SIGNATURE
+   Godson FURY ARENA V7.3 — PLEIN ÉCRAN FORCÉ & SÉLECTION CLAIRE, RÉALITÉ 3D II, TOURNOI & SAISONS
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -486,14 +486,14 @@ function syncVSPortraitsToFighters(){
 function updateVSPortraits(){
   const menu=$("menuVS"); if(!menu||menu.classList.contains("hidden"))return;
   if(!vsRigs)syncVSPortraitsToFighters();
-  if(vsRigs)for(const rig of vsRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,326,1.38,rig.sk);
+  if(vsRigs)for(const rig of vsRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,328,1.5,rig.sk);
 }
 
 function updateSelectPortraits(){
   const menu=$("menuSelect"); if(!menu||menu.classList.contains("hidden"))return;
   portraitTick++;
-  if(previewRigs)for(const rig of previewRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,326,1.38,rig.sk);
-  for(let i=0;i<portraitCards.length;i++)if((portraitTick+i)%6===0){ const pc=portraitCards[i]; drawFighterPortrait(pc.ctx,pc.f,220,250,110,240,1.0,pc.sk); }
+  if(previewRigs)for(const rig of previewRigs)drawFighterPortrait(rig.ctx,rig.f,300,340,150,328,1.5,rig.sk);
+  for(let i=0;i<portraitCards.length;i++)if((portraitTick+i)%6===0){ const pc=portraitCards[i]; drawFighterPortrait(pc.ctx,pc.f,220,250,110,242,1.12,pc.sk); }
 }
 /* Navigation clavier dans la grille de sélection (flèches : gauche/droite/haut/bas). */
 document.addEventListener("keydown",e=>{
@@ -1889,6 +1889,7 @@ let bootTimer=null,bootDone=false;
 function finishBoot(){
   if(bootDone)return; bootDone=true; window.__bootDone=true;
   if(bootTimer){ clearInterval(bootTimer); bootTimer=null; }
+  try{ requestImmersiveLandscape(); }catch(e){} /* V7.3 : l'entrée dans l'arène force plein écran + paysage */
   const el=$("bootLoader"); if(!el)return;
   el.classList.add("done"); setTimeout(()=>el.classList.add("hidden"),300);
 }
@@ -1906,11 +1907,11 @@ function startBoot(){
   show();
   bootTimer=setInterval(()=>{
     p=Math.min(100,p+Math.ceil(Math.random()*13)+6); show();
-    if(p>=100){ clearInterval(bootTimer); bootTimer=null; setTimeout(finishBoot,190); }
+    if(p>=100){ clearInterval(bootTimer); bootTimer=null; const be=$("bootEnter"); if(be){ be.classList.remove("hidden"); } if(step)step.textContent="Prêt !"; }
   },105);
   el.addEventListener("click",finishBoot);
   window.addEventListener("keydown",function skipBoot(){ finishBoot(); window.removeEventListener("keydown",skipBoot); });
-  setTimeout(finishBoot,4200); /* filet de sécurité : jamais bloqué au chargement */
+  /* V7.3 : pas de sortie automatique — l’écran-titre attend le geste qui autorise le plein écran. */
 }
 function bindUI(){
   document.addEventListener("pointerdown",()=>{ audio(); if((state==="menu"||state==="select"||state==="scene")&&AC&&!musicTimer)startMusic(); },{once:true});
@@ -1956,6 +1957,9 @@ function bindUI(){
     if(m==="arcade")setupArcadeRun(arcade.circuit||"stade"); if(m==="story")setupStoryRun(); if(m==="survival")setupSurvivalRun(); enterSelect(m); };
   $("btnQuit1").onclick=goMenu; $("btnQuit2").onclick=goMenu; $("btnPauseTop").onclick=togglePause;
   $("btnFull").onclick=()=>{ if(document.fullscreenElement)document.exitFullscreen(); else requestImmersiveLandscape(); };
+  /* V7.3 — Plein écran paysage forcé (tactile) : tout premier contact sans
+     plein écran relance l'immersion. Sur desktop, seule l'entrée la déclenche. */
+  document.addEventListener("pointerdown",()=>{ try{ if(!document.fullscreenElement&&window.matchMedia&&window.matchMedia("(pointer:coarse)").matches)requestImmersiveLandscape(); }catch(e){} },true);
   const _bLand=$("btnLandscape"); if(_bLand)_bLand.onclick=requestImmersiveLandscape;
   const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); };
   const _bPF=$("btnPauseFloat"); if(_bPF)_bPF.onclick=togglePause;
