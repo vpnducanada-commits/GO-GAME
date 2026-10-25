@@ -970,20 +970,73 @@ function addGarmentDetails3D(b,pose,W3,model,sk,mat,S,armorKind){
     addBox3D(b,localPoint3D(pose,p[0]+.055,p[1],p[2]+item[2]*.055),[.07*S,.1*S,.035*S],[0,pose.yaw,pose.roll],mat(shade(sk.pants,-14),1,0,"fabric"));
   });
 }
+/* V7.4 — IDENTITÉS DE COMBAT (Marco) : une fiche de posture et d'attaques par
+   combattant, demandée par le propriétaire d'après ses captures de référence
+   (chaque héros reconnaissable à sa stance, sa garde et ses coups). 100 %
+   rendu : hitboxes, dégâts et déterminisme ne changent pas. Champs : nom,
+   pieds [arrière,avant], largeur, accroupissement, inclinaison, gardes
+   [x,hauteur], rebond, torsion, style de poing, style de pied, pose de
+   spécial et posture d'affiche (sélection/VS). */
+const STANCE_DEFAULT3D={name:"Garde neutre",feet:[-.3,.32],width:1,crouch:.08,lean:.02,guardF:[.38,-.025],guardB:[.07,-.14],bounce:1,twist:1,punch:"jab",kick:"devant",cast:"orbe",portrait:"garde"};
+const ST74=(name,feet,width,crouch,lean,guardF,guardB,bounce,twist,punch,kick,cast,portrait)=>({name,feet,width,crouch,lean,guardF,guardB,bounce,twist,punch,kick,cast,portrait});
+const FIGHTER_STANCE3D={
+  gideon:ST74("Garde du Champion",[-.31,.33],1,.08,.02,[.4,0],[.1,-.08],1,1,"cross","circulaire","orbe","poing"),
+  kira:ST74("Pas de Foudre",[-.26,.38],.92,.22,.06,[.42,.03],[.16,-.04],1.5,1.25,"lame","retourne","lame","pied"),
+  titan:ST74("Mur de Fer",[-.38,.3],1.18,.16,-.01,[.34,-.05],[.04,-.14],.55,.62,"hook","bas","slam","garde"),
+  nova:ST74("Orbite Haute",[-.24,.28],.9,.02,-.03,[.4,.08],[.2,.02],.8,1.05,"palm","devant","orbe","sort"),
+  "godson-prime":ST74("Trône Debout",[-.3,.3],1.02,.03,0,[.38,.05],[.12,-.02],.7,.9,"palm","lateral","orbe","droit"),
+  Zara:ST74("Marée Basse",[-.34,.36],1.02,.18,.04,[.43,-.02],[.08,-.12],1.15,1.15,"lame","circulaire","lame","poing"),
+  kael:ST74("Serment d'Acier",[-.33,.31],1.05,.1,.03,[.41,.02],[.06,-.1],.75,1,"lame","lateral","lame","garde"),
+  sora:ST74("Arcanes Veillées",[-.23,.27],.88,.04,.01,[.39,.1],[.2,.04],.85,1,"palm","devant","orbe","sort"),
+  ael:ST74("Visée Synthétique",[-.29,.34],.96,.06,.05,[.46,.04],[.3,-.06],.5,1.2,"viseur","lateral","viseur","poing"),
+  Lira:ST74("Pas de Route",[-.3,.37],.95,.14,.05,[.4,0],[.12,-.08],1.2,1.1,"lame","circulaire","lame","bas"),
+  zed:ST74("Affût du Traqueur",[-.35,.3],1,.24,.03,[.45,.05],[.22,-.02],.65,1.28,"viseur","bas","viseur","bas"),
+  nyx:ST74("Atelier Nomade",[-.27,.33],.94,.08,.04,[.42,.02],[.24,-.04],1.05,1.05,"viseur","genou","viseur","droit"),
+  vorak:ST74("Rage Penchée",[-.36,.38],1.15,.2,.1,[.37,-.07],[.02,-.18],1.1,.7,"hook","genou","slam","poing"),
+  aerin:ST74("Cime Légère",[-.25,.36],.9,.12,.02,[.44,.06],[.2,0],1.35,1.22,"viseur","retourne","viseur","pied"),
+  korben:ST74("Ancrage Orbital",[-.32,.3],1.06,.07,.01,[.39,-.01],[.09,-.1],.7,.85,"cross","lateral","viseur","garde"),
+  lyra:ST74("Aurore Droite",[-.24,.26],.88,.01,-.04,[.38,.12],[.18,.06],.75,1,"palm","devant","orbe","sort"),
+  drakesh:ST74("Prime en Joue",[-.34,.32],1,.15,.06,[.47,.03],[.28,-.05],.8,1.18,"viseur","bas","viseur","poing"),
+  selene:ST74("Abordage",[-.29,.39],.96,.13,.07,[.44,.04],[.05,-.14],1.3,1.22,"lame","circulaire","lame","poing"),
+  taiko:ST74("Méditation Basse",[-.33,.29],1.08,.3,0,[.36,-.04],[.14,-.06],.45,.95,"palm","bas","orbe","bas"),
+  vex:ST74("Hydraulique Lourde",[-.37,.31],1.16,.12,.05,[.36,-.06],[.03,-.16],.6,.66,"hook","genou","slam","garde"),
+  elara:ST74("Sommeil Léger",[-.22,.29],.86,.05,-.03,[.37,.09],[.19,.03],.95,1.12,"palm","circulaire","orbe","sort"),
+  brax:ST74("Éboulement",[-.4,.29],1.22,.18,0,[.33,-.08],[.02,-.18],.45,.58,"upper","bas","slam","garde"),
+  kazu:ST74("Voie du Vent",[-.36,.34],.98,.16,.04,[.42,.01],[.18,-.06],.7,1.3,"lame","lateral","lame","bas"),
+  sera:ST74("Intrusion",[-.27,.37],.92,.2,.06,[.41,.02],[.21,-.02],1.4,1.15,"revers","retourne","viseur","pied"),
+  vorga:ST74("Sables Anciens",[-.33,.33],1.04,.14,.03,[.4,-.02],[.07,-.12],.85,1.05,"lame","hache","lame","droit"),
+  nox:ST74("Racine Souple",[-.27,.32],.94,.12,-.01,[.38,.06],[.16,-.02],1.1,1.08,"palm","circulaire","orbe","sort"),
+  raven:ST74("Lunette Calme",[-.31,.33],.95,.1,.04,[.48,.05],[.31,-.04],.55,1.26,"viseur","lateral","viseur","poing"),
+  zep:ST74("Pression Abyssale",[-.34,.3],1.08,.18,.02,[.4,-.03],[.08,-.12],.6,.8,"viseur","genou","viseur","garde"),
+  astrid:ST74("Trône Perdu",[-.28,.31],.96,.05,-.01,[.4,.06],[.1,-.04],.8,1.18,"lame","circulaire","lame","droit"),
+  selenia:ST74("Forêt Sacrée",[-.26,.35],.9,.15,.03,[.45,.04],[.22,-.01],1.25,1.24,"viseur","retourne","viseur","bas"),
+  drakar:ST74("Hiver du Clan",[-.38,.32],1.14,.15,.04,[.36,-.04],[.03,-.15],.65,.72,"hook","hache","slam","poing"),
+  "nyx-ombre":ST74("Sentence Basse",[-.28,.4],.9,.3,.08,[.43,-.01],[.13,-.1],1.2,1.3,"lame","bas","lame","bas"),
+  Kairos:ST74("Œil de l'Orage",[-.27,.3],.95,.06,-.02,[.41,.09],[.19,.02],.9,1.05,"palm","circulaire","orbe","sort"),
+  "Zara-nova":ST74("Colonie en Joue",[-.3,.34],.97,.09,.04,[.46,.03],[.27,-.05],.95,1.15,"viseur","lateral","viseur","droit"),
+  brutus:ST74("Légion en Marche",[-.39,.29],1.2,.1,.03,[.42,0],[.05,-.14],.5,.6,"viseur","bas","slam","garde"),
+  aria:ST74("Chœur Droit",[-.23,.26],.87,.02,-.04,[.37,.12],[.17,.06],.7,1,"palm","devant","orbe","sort"),
+  krak:ST74("Marais Penché",[-.35,.36],1.18,.26,.11,[.35,-.1],[0,-.2],1,.64,"hook","genou","slam","bas"),
+  luna:ST74("Exploration 7",[-.28,.35],.94,.07,.03,[.45,.04],[.26,-.04],.9,1.12,"viseur","circulaire","viseur","pied"),
+  velen:ST74("Contrat Froid",[-.31,.35],.97,.18,.05,[.42,0],[.1,-.1],.6,1.2,"revers","bas","lame","bas"),
+  "lyra-azur":ST74("Ciels d'Azur",[-.29,.36],.98,.09,.03,[.41,.05],[.09,-.06],1.1,1.1,"lame","hache","orbe","pied"),
+  orion:ST74("Théorie en Joue",[-.28,.32],.95,.05,.01,[.45,.06],[.24,-.02],.75,1.08,"viseur","devant","orbe","sort")
+};
+function stanceProfile3D(f){ const id=String((f&&f.char&&f.char.id)||"gideon"); const raw=FIGHTER_STANCE3D[id]||FIGHTER_STANCE3D[id.toLowerCase()]; return raw?Object.assign({},STANCE_DEFAULT3D,raw):STANCE_DEFAULT3D; }
 function buildFighterPose3D(f){
-  const ch=f.char,human=humanProfile(f),model=boardModel3D(f),motion=fighterMotion(f),atk=f.attack,phase=motion.attack||0,S=ch.scale||1;
+  const ch=f.char,human=humanProfile(f),model=boardModel3D(f),motion=fighterMotion(f),atk=f.attack,phase=motion.attack||0,S=ch.scale||1,stance=stanceProfile3D(f);
   if(f.crouchBlend==null)f.crouchBlend=0;
   f.crouchBlend=smoothMotionValue(f.crouchBlend,(f.crouching||f.attackType==="uppercut"||f.attackType==="sweep")?1:0,14);
-  const cb=f.crouchBlend,gaitLift=Math.abs(Math.sin(f.walkPhase||0))*motion.run;
-  const bobPx=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1):0;
+  const cb=(f.dead||f.downT>0)?f.crouchBlend:clamp(Math.max(f.crouchBlend,stance.crouch*(f.grounded?1:.25)*(1-phase*.3)),0,.85),gaitLift=Math.abs(Math.sin(f.walkPhase||0))*motion.run;
+  const bobPx=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*stance.bounce*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1):0;
   const bob=bobPx/95,m1Boost=atk&&atk.m1?(4+(atk.m1Step||0)*3+(atk.m1Final?7:0)):0;
   const punchExt=(f.attackType==="punch"||f.attackType==="airPunch")?phase*(48+m1Boost)/95:0;
   const kickExt=(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")?phase*(54+m1Boost)/95:0;
   const upperExt=f.attackType==="uppercut"?phase*(44+m1Boost)/95:0;
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*8:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0)/95;
   const walking=motion.run>.07&&f.grounded&&f.dashT<=0,local={};
-  local.pelvis=[motion.lean*.1+motion.weight*.014-motion.hurt*.02,lerp(.97,.69,cb)+bob,0];
-  local.chest=[motion.lean*.27+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018,0];
+  local.pelvis=[motion.lean*.1+stance.lean*.35+motion.weight*.014-motion.hurt*.02,lerp(.97,.69,cb)+bob,0];
+  local.chest=[motion.lean*.27+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018,0];
   local.head=[.04+local.chest[0]*.62+motion.head*.09+(motion.headLag||0)/95-motion.hurt*.03,lerp(1.78,1.47,cb)+bob+motion.fatigue*.012,0];
   local.neck=mix3(local.chest,local.head,.55);
   const shoulderHalf=(human.shoulder/95)*(.9+ch.bulk*.09)*(.72+(model.shoulders||1)*.28),hipHalf=(human.hip/95)*(.92+ch.bulk*.08)*(.76+(model.hips||1)*.24);
@@ -991,7 +1044,7 @@ function buildFighterPose3D(f){
   local.shoulderFront=[local.chest[0]+.015,local.chest[1]+.035+(motion.shoulderRoll||0)/95,shoulderHalf];
   local.hipBack=[local.pelvis[0]-.01,local.pelvis[1]+.01-(motion.pelvisRoll||0)/95,-hipHalf];
   local.hipFront=[local.pelvis[0]+.01,local.pelvis[1]+.01+(motion.pelvisRoll||0)/95,hipHalf];
-  let bFoot=[-.30-motion.lean*.08,0,-.17],fFoot=[.32+motion.lean*.05,0,.17];
+  let bFoot=[stance.feet[0]-motion.lean*.08,0,-.17*stance.width],fFoot=[stance.feet[1]+motion.lean*.05,0,.17*stance.width];
   if(cb>.12){ bFoot[0]=lerp(bFoot[0],-.36,cb); fFoot[0]=lerp(fFoot[0],.34,cb); }
   if(walking){
     const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stride=(.16+motion.run*.19)*strideDir,s=Math.sin(f.walkPhase||0),c=Math.cos(f.walkPhase||0),mix=clamp(motion.run*1.35,0,1);
@@ -999,9 +1052,10 @@ function buildFighterPose3D(f){
     bFoot[1]=lerp(bFoot[1],Math.max(0,-c)*(.035+motion.run*.075),mix); fFoot[1]=lerp(fFoot[1],Math.max(0,c)*(.035+motion.run*.075),mix);
   }
   if(!f.dead&&motion.air>.03){ const a=motion.air,sw=clamp((f.vy||0)*.006,-.035,.045); bFoot=mix3(bFoot,[-.22-sw,.3+sw,-.17],a); fFoot=mix3(fFoot,[.27+sw,.2-sw,.17],a); }
-  if(f.attackType==="kick")fFoot=[.44+kickExt*.82,.94,.17];
-  if(f.attackType==="airKick")fFoot=[.45+kickExt*.82,.6,.17];
-  if(f.attackType==="sweep")fFoot=[.46+kickExt*.82,.07,.17];
+  const kickPose74={devant:[.44,.94,.17,.82],circulaire:[.42,1.06,.24,.8],lateral:[.5,.82,.12,.9],hache:[.4,1.26,.18,.72],bas:[.46,.42,.18,.85],genou:[.36,.8,.16,.5],retourne:[.43,1.03,.03,.8]}[stance.kick]||[.44,.94,.17,.82];
+  if(f.attackType==="kick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],kickPose74[1],kickPose74[2]];
+  if(f.attackType==="airKick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],Math.max(.34,kickPose74[1]-.34),kickPose74[2]];
+  if(f.attackType==="sweep")fFoot=[.46+kickExt*.82,.07,.17*stance.width];
   if(motion.dash>.04){ bFoot=mix3(bFoot,[-.4,.06,-.17],motion.dash); fFoot=mix3(fFoot,[.38,.02,.17],motion.dash); }
   local.footBack=bFoot; local.footFront=fFoot;
   const kneeFor=(hip,foot,isKick)=>{
@@ -1010,12 +1064,28 @@ function buildFighterPose3D(f){
   };
   local.kneeBack=kneeFor(local.hipBack,bFoot,false); local.kneeFront=kneeFor(local.hipFront,fFoot,f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep");
   const armSwing=Math.sin(f.walkPhase||0)*.09*motion.run*strideSign3(f),guard=motion.guard;
-  let backHand=[lerp(.07+armSwing,.29,guard),lerp(local.chest[1]-.14+bob+cb*.04,local.chest[1]-.03,guard),-.245];
-  let frontHand=[.38+punchExt-armSwing*.5,local.chest[1]-.025,.255];
+  let backHand=[lerp(stance.guardB[0]+armSwing,.29,guard),lerp(local.chest[1]+stance.guardB[1]+bob+cb*.04,local.chest[1]-.03,guard),-.245];
+  let frontHand=[stance.guardF[0]+punchExt-armSwing*.5,local.chest[1]+stance.guardF[1],.255];
+  if(f.attackType==="punch"||f.attackType==="airPunch"){
+    const P74=stance.punch;
+    if(P74==="hook")frontHand=[.34+punchExt*.78,local.chest[1]+.05,.35];
+    else if(P74==="upper")frontHand=[.38+punchExt*.68,local.chest[1]-.3+phase*.55,.2];
+    else if(P74==="palm")frontHand=[.38+punchExt*.95,local.chest[1]-.1,.16];
+    else if(P74==="revers")frontHand=[.34+punchExt*.82,local.chest[1]+.1,.31];
+    else if(P74==="lame")frontHand=[.36+punchExt*.85,local.chest[1]+.17-phase*.24,.22];
+    else if(P74==="viseur"){ frontHand=[.44+punchExt*.9,local.chest[1]+.04,.18]; backHand=[.3,local.chest[1]-.12,-.14]; }
+    else if(P74==="cross"){ frontHand=[.36+punchExt,local.chest[1]-.04,.21]; backHand=[0,local.chest[1]-.1,-.26]; }
+    else frontHand=[.38+punchExt*1.05,local.chest[1]+.01,.24];
+  }
   if(f.victory&&(state==="roundEnd"||state==="matchEnd")&&!f.dead)frontHand=[.18,2.02+Math.sin(renderTicker*.15)*.04,.18];
   else if(guard>.08&&f.attackT<=0)frontHand=mix3(frontHand,[.28,local.chest[1]+.02,.24],guard);
   else if(f.attackType==="throw"){ frontHand=[.5+phase*.3,local.chest[1]-.02,.22]; backHand=[.44+phase*.28,local.chest[1]-.18,-.22]; }
-  else if(f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"){ frontHand=[.43+phase*.22,local.chest[1]-.02,.2]; backHand=[.39+phase*.2,local.chest[1]-.14,-.2]; }
+  else if(f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"){
+    if(stance.cast==="viseur"){ frontHand=[.5+phase*.24,local.chest[1]+.03,.16]; backHand=[.2,local.chest[1]-.18,-.24]; }
+    else if(stance.cast==="slam"){ frontHand=[.3,local.chest[1]+.36-phase*.34,.18]; backHand=[.24,local.chest[1]+.3-phase*.26,-.18]; }
+    else if(stance.cast==="lame"){ frontHand=[.46+phase*.2,local.chest[1]+.15-phase*.2,.2]; backHand=[.08,local.chest[1]-.16,-.25]; }
+    else { frontHand=[.43+phase*.22,local.chest[1]-.02,.2]; backHand=[.39+phase*.2,local.chest[1]-.14,-.2]; }
+  }
   else if(f.attackType==="uppercut")frontHand=[.32+upperExt*.18,1.55+upperExt,.18];
   else if(state==="intro"&&introT>82)frontHand=[.52,local.chest[1]+.03,.18];
   local.handBack=backHand; local.handFront=frontHand;
@@ -1033,7 +1103,7 @@ function buildFighterPose3D(f){
   const twistSign=Math.sign(visualFace||1);
   const twistForY=y=>{
     const t=clamp((y-.82)/.72,0,1),smooth=t*t*(3-2*t);
-    return twistSign*.36*smooth;
+    return twistSign*.36*stance.twist*smooth;
   };
   const poseCr=Math.cos(roll),poseSr=Math.sin(roll),poseCy=Math.cos(yaw),poseSy=Math.sin(yaw);
   let cachedTwistY=Number.NaN,cachedTwist=0,cachedCt=1,cachedSt=0;
@@ -1048,7 +1118,7 @@ function buildFighterPose3D(f){
   const velocityLag=clamp(-(((f.vx||0)+(f.kvx||0))*(f.facing||1))*.007,-.075,.075);
   const hairSway=clamp(velocityLag+Math.sin(renderTicker*.09+(f.id||0)*1.7)*.008-motion.dash*.035,-.11,.11);
   const clothSway=clamp(velocityLag*1.2+Math.sin(renderTicker*.075+(f.id||0))*.012-motion.dash*.06,-.13,.13);
-  return {motion,human,model,cb,phase,yaw,torsoYaw:yaw-twistSign*.27,headYaw:yaw-twistSign*.34+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,hairSway,clothSway};
+  return {motion,human,model,cb,phase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,hairSway,clothSway};
 }
 function strideSign3(f){ return Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1; }
 function addFighter3D(opaque,trans,f){
@@ -1070,6 +1140,7 @@ function addFighter3D(opaque,trans,f){
   const legKind=legHex===sk.skin?"skin":(model.armor>.55?armorKind:"fabric");
   renderStats.boardModel3d=ch.id+":"+model.frame+"/"+model.top+"/"+model.weapon;
   renderStats.boardModels3d=Object.keys(BOARD_MODEL3D).length;
+  renderStats.stance3d=ch.id+":"+(pose.stance?pose.stance.name:""); renderStats.stances3d=Object.keys(FIGHTER_STANCE3D).length;
   const air=Math.max(0,pose.root[1]),heightFactor=clamp(1-air/2.6,.25,1),vec=typeof arenaShadowVector==="function"?arenaShadowVector():{x:-.4,len:1};
   addSphere3D(trans,[pose.root[0]+vec.x*(.22+air*.18),.022,.02],[.58*vec.len*(.55+heightFactor*.45)*S,.025,.34*S],[0,vec.x*.08,0],parseColor3("#000000",.42*heightFactor,0),detailLow3());
   if(f.grounded)[W3.footBack,W3.footFront].forEach(ft=>addSphere3D(trans,[ft[0],.018,ft[2]],[.2*S,.018,.11*S],[0,pose.yaw,0],parseColor3("#000000",.44,0),DETAIL3_MICRO));

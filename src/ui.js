@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.3 — PLEIN ÉCRAN FORCÉ & SÉLECTION CLAIRE, RÉALITÉ 3D II, TOURNOI & SAISONS
+   Godson FURY ARENA V7.4 — IDENTITÉS DE COMBAT (41 POSTURES), PLEIN ÉCRAN FORCÉ & RÉALITÉ 3D II
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -434,6 +434,8 @@ function drawFighterPortrait(pctx,f,w,h,cx,groundY,k,sk){
     pctx.save(); pctx.fillStyle="rgba(0,0,0,.45)"; pctx.beginPath(); pctx.ellipse(cx,groundY+4,54*k,9*k,0,0,7); pctx.fill(); pctx.restore();
     f.x=f.rx=0; f.ry=0; f.y=GROUND; f.vy=0; f.vx=0; f.kvx=0; f.grounded=true;
     f.energy=0; f.hitFlash=0; f.attack=null; f.attackT=0; f.hitStun=0; f.downT=0; f.dead=false; f.blocking=false; f.crouching=false; f.dashT=0; f.victory=false;
+    f.attackType=""; const stanceP=(typeof stanceProfile3D==="function")?stanceProfile3D(f):null;
+    if(stanceP){ if(stanceP.portrait==="bas")f.crouching=true; else if(stanceP.portrait==="garde")f.blocking=true; else if(stanceP.portrait==="poing"||stanceP.portrait==="pied"||stanceP.portrait==="sort"){ f.attackType=stanceP.portrait==="poing"?"punch":stanceP.portrait==="pied"?"kick":"special"; f.attack={start:2}; f.attackDur=24; f.attackT=14; } }
     f.blinkT=((portraitTick+(f.charIndex||0)*47)%260)<7?-1:90;
     f.facing=f.side===2?-1:1; if(f.motion)f.motion.face=f.facing; // les portraits se font face (P1 → droite, P2 → gauche)
     f.anim=(f.anim||0)+1;

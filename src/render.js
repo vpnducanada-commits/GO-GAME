@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.3 — RÉALITÉ 3D II + GRAPHISMES AAA II 2D, AFFICHAGE ÉPURÉ & ROSTER 41
+   Godson FURY ARENA V7.4 — RÉALITÉ 3D II + GRAPHISMES AAA II 2D, 41 IDENTITÉS DE COMBAT
    Caméra dynamique, interpolation écran haute fréquence, 3 arènes.
    Signé : Gideon - Godson
    ===================================================================== */

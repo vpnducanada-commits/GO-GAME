@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.4 — « Identités de combat » *(LIVRÉ le 25/10/2026 — 466 assertions source / 702 vérifications, suite verte)*
+
+- **Demande directe du propriétaire** (capture de roster à l’appui) : « Travaille sur chaque personnage individuellement, pour que chacun ait ses attaques, sa posture et etc. Regarde l’exemple. »
+- **41 fiches `FIGHTER_STANCE3D` nommées et uniques** : pieds, largeur, accroupissement, inclinaison, hauteur des gardes, rebond et torsion propres à chaque héros ; mesures vérifiées en navigateur (Titan large et carré, Taiko bas, Lyra droite garde haute, Kazu presque de profil…).
+- **Attaques signées** : 7 styles de poing, 7 styles de pied et 4 poses de spécial répartis selon l’identité (lames, tireurs en visée, colosses en frappe écrasée, mages en orbe), hérités par les chaînes M1.
+- **Sélection façon captures du propriétaire** : chaque carte/aperçu fige la posture d’affiche du héros (accroupi, garde, poing, pied levé, sort).
+- **Périmètre** : rendu seul — simulation, hitboxes, dégâts, replays/hash, Online et Tournoi inchangés. Voir `docs/SPRINT_V74_IDENTITES_COMBAT.md`.
+- 🔜 Suite de la trajectoire : visages/cheveux/costumes auteur par famille en 3D, puis validations Online entre deux réseaux et terrain sur téléphones physiques.
+
 ## ✅ V7.3 — « Plein écran forcé & Sélection claire » *(LIVRÉ le 25/10/2026 — 461 assertions source / 697 vérifications, suite verte)*
 
 - **Demandes directes du propriétaire** (avec captures de référence) : « le jeu doit directement s’ouvrir en plein écran paysage, ça doit être forcé », « la page du menu a trop de textes inutiles (M1, signature…) », et une sélection où l’on voit « la posture, les membres, les visages, les objets ».

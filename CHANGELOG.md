@@ -3,6 +3,43 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.4.0] — 2026-10-25 — « Identités de combat »
+
+Demande directe du propriétaire, captures de référence à l’appui :
+« Travaille sur chaque personnage individuellement, pour que chacun ait
+ses attaques, sa posture, etc. » Chaque héros doit se reconnaître à sa
+silhouette avant même de lire son nom.
+
+### Ajouté — 41 fiches de posture individuelles (Marco)
+- Nouvelle table `FIGHTER_STANCE3D` : **une fiche nommée par combattant**
+  (« Mur de Fer » pour Titan, « Méditation Basse » pour Taiko, « Voie du
+  Vent » pour Kazu, « Lune »…), avec écart et largeur des pieds,
+  accroupissement de garde, inclinaison, hauteur des deux mains, rebond
+  d’attente et torsion du buste (des colosses carrés face caméra aux
+  escrimeurs presque de profil).
+- Les fiches sont appliquées par `buildFighterPose3D` : au repos, en
+  marche, en garde et en l’air, chaque combattant tient son corps — et
+  donc son arme, ancrée à la main — différemment.
+
+### Ajouté — Attaques au style de chacun (Marco + Kenzo)
+- **7 styles de poing** : jab, cross, crochet large, uppercut, paume,
+  revers, lame descendante et visée à deux mains pour les tireurs.
+- **7 styles de pied** : devant, circulaire, latéral, hache (très haut),
+  bas, genou et retourné — la hauteur et l’angle du pied changent
+  réellement d’un héros à l’autre.
+- **4 poses de spécial** : orbe à deux mains, visée, frappe écrasée
+  depuis le haut et taille de lame.
+- Les chaînes M1 Signature individuelles (V5.1) héritent de ces poses :
+  marteler POING ne produit plus la même silhouette selon le héros.
+
+### Ajouté — Postures d’affiche à la sélection (Marco + Lena)
+- Comme sur les captures du propriétaire, chaque carte de sélection et
+  chaque aperçu VS fige le héros dans **sa** posture : accroupi prêt à
+  bondir, en garde, poing tendu, pied levé ou en train de lancer un sort.
+- 100 % rendu : hitboxes, dégâts, timings, IA, replays, hash
+  déterministe, Online et Tournoi sont inchangés ; télémétrie
+  `renderStats.stance3d` pour le diagnostic.
+
 ## [7.3.0] — 2026-10-25 — « Plein écran forcé & Sélection claire »
 
 Sprint d'affichage ordonné par le propriétaire à partir de ses captures de

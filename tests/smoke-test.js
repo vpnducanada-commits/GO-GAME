@@ -1246,11 +1246,21 @@ function finishTestRun() {
 
   /* ===== V7.3 « Plein écran forcé & Sélection claire » : demande directe du propriétaire ===== */
   console.log('\n— V7.3 : Plein écran forcé & Sélection claire (Lena + Kenzo) —');
-  assert(ev('GAME_VERSION')==='7.3.0'&&window.document.title.includes('V7.3')&&window.document.querySelector('h1').textContent.includes('V7.3'),'édition officielle V7.3 affichée');
+  assert(/^7\.[3-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[3-9]/.test(window.document.title),'édition Plein écran forcé (V7.3+) affichée');
   assert(!!window.document.getElementById('bootEnter')&&!window.document.getElementById('btnPortraitAnyway')&&!!window.document.getElementById('rotateHint'),'paysage forcé V7.3 : porte d’entrée plein écran, aucun bouton « continuer en portrait »');
   assert(!window.document.querySelector('#menuMain .signed').textContent.includes('M1'),'menu épuré V7.3 : la ligne signée ne contient plus de texte M1/Signature');
   const css73=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),ui73=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),render73=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
   assert(css73.includes('V7.3 — PLEIN ÉCRAN FORCÉ')&&css73.includes('minmax(106px')&&css73.includes('.bootEnter')&&ui73.includes('bootEnter')&&ui73.includes('(pointer:coarse)')&&!render73.includes('M1 SIGNATURE • COMBOS'),'hooks sources V7.3 : grandes cartes plein corps, entrée immersive tactile et bandeau de fond sans texte M1');
+
+  /* ===== V7.4 « Identités de combat » : 41 postures et attaques individuelles ===== */
+  console.log('\n— V7.4 : Identités de combat (Marco, une fiche par combattant) —');
+  assert(ev('GAME_VERSION')==='7.4.0'&&window.document.title.includes('V7.4')&&window.document.querySelector('h1').textContent.includes('V7.4'),'édition officielle V7.4 affichée');
+  assert(ev('(() => { const all=CHARACTERS.map(c=>stanceProfile3D({char:c})); return Object.keys(FIGHTER_STANCE3D).length===41&&new Set(all.map(s=>s.name)).size===41&&new Set(all.map(s=>s.punch)).size>=6&&new Set(all.map(s=>s.kick)).size>=6&&new Set(all.map(s=>s.portrait)).size>=5; })()')===true,'fiches V7.4 : 41 postures nommées uniques, au moins 6 styles de poing et 6 styles de pied');
+  assert(ev('(() => { const P=i=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; return buildFighterPose3D(p1); }; const titan=P(2),taiko=P(18),lyra=P(15),kazu=P(22); const fz=q=>Math.abs(q.local.footFront[2]-q.local.footBack[2]); return fz(titan)>fz(lyra)&&taiko.local.pelvis[1]<lyra.local.pelvis[1]-.04&&Math.abs(kazu.twist)>Math.abs(titan.twist)+.12&&(lyra.local.handFront[1]-lyra.local.chest[1])>(titan.local.handFront[1]-titan.local.chest[1])+.08; })()')===true,'postures mesurées : Titan large et carré, Taiko bas, Lyra droite garde haute, Kazu très de profil');
+  assert(ev('(() => { const atk=(i,type)=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; startAttack(p1,type); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+4)); const q=buildFighterPose3D(p1); p1.attack=null; p1.attackType=""; p1.attackT=0; p1.cooldown=0; return q; }; const hook=atk(2,"punch"),viseur=atk(8,"punch"),hache=atk(39,"kick"),bas=atk(2,"kick"); return Math.abs(hook.local.handFront[2]-viseur.local.handFront[2])>.08&&hache.local.footFront[1]>bas.local.footFront[1]+.5; })()')===true,'attaques individuelles : crochet large contre visée droite, coup de pied hache très haut contre frappe basse');
+  const render74=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),ui74=fs.readFileSync(path.join(root,'src/ui.js'),'utf8');
+  assert(['const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist'].every(h=>render74.includes(h))&&ui74.includes('stanceP')&&ui74.includes('stanceProfile3D(f)'),'hooks sources V7.4 : table des 41 fiches, poses d’attaque et postures d’affiche synchronisées');
+  ev('applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
 
   console.log('\n================ RÉSULTAT ================');
   if (errors.length) { console.log('❌ ' + errors.length + ' problème(s) :'); errors.forEach(e => console.log(' - ' + String(e).slice(0, 500))); process.exit(1); }
