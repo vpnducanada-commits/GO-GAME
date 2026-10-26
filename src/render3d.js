@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.10 — GRAPHISMES AAA III (lumière cinéma, matières douces, silhouettes sculptées) + Squelette IK Stable V7.9 + Arènes Spectacle V7.8 + Réalité 3D II V7.2 (WebGL maison, zéro dépendance)
+   Godson FURY ARENA V7.11 — ÉCLATS & REFLETS (reflets directionnels, halos, visages/cheveux cinéma) + Graphismes AAA III V7.10 + Squelette IK Stable V7.9 (WebGL maison, zéro dépendance)
    Personnages humanoïdes articulés, arènes en profondeur, caméra combat.
    La simulation reste celle du moteur déterministe : ce module ne fait
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.
@@ -419,6 +419,7 @@ function buildArenaBatch3D(){
   // V7.2 : vraie plateforme de combat surélevée (bordure, nez lumineux, poteaux d'angle)
   addBox3D(opaque,[0,-.04,0],[16.6,.09,3.3],[0,0,0],materialColor3(shade(floor.top,-16),floorKind));
   for(let pi2=0;pi2<8;pi2++)addBox3D(opaque,[-7+pi2*2,.006,0],[1.86,.004,3.05],[0,0,0],materialColor3(shade(floor.top,pi2%2?-8:5),floorKind));
+  [-2.4,2.4].forEach(px711=>addSphere3D(trans,[px711,.016,0],[1.25,.012,.62],[0,0,0],parseColor3(floor.line,.045,.18),DETAIL3_MICRO));
   addBox3D(opaque,[0,.012,1.68],[16.6,.035,.12],[0,0,0],materialColor3(shade(floor.line,-38),id==="tokyo"?"tech":"metal",1,.05));
   addBox3D(opaque,[0,.012,-1.68],[16.6,.035,.12],[0,0,0],materialColor3(shade(floor.line,-52),id==="tokyo"?"tech":"metal",1,.02));
   [-8.25,8.25].forEach(px=>[-1.68,1.68].forEach(pz=>{ addBox3D(opaque,[px,.17,pz],[.17,.36,.17],[0,0,0],materialColor3("#1c2531","metal")); addSphere3D(opaque,[px,.4,pz],.075,[0,0,0],materialColor3(floor.line,"energy",1,.5),DETAIL3_MICRO); }));
@@ -685,9 +686,9 @@ function addBoot3D(b,pose,localFoot,color,soleColor,S,armored,footPose77){
 function addSculptedHead3D(b,pose,human,color,S,headR){
   const H=pose.local.head,unitScale=headR/Math.max(.001,S)/.145,jawScale=.78+(human.jaw||.65)*.34;
   const levels=[
-    {y:-.122,x:.052,r:[.045,.058]},{y:-.098,x:.045,r:[.072,.088*jawScale]},{y:-.062,x:.052,r:[.09,.102]},
-    {y:-.018,x:.042,r:[.104,.116]},{y:.026,x:.032,r:[.108,.12]},{y:.066,x:.026,r:[.11,.122]},
-    {y:.104,x:.008,r:[.104,.117]},{y:.138,x:-.018,r:[.082,.096]},{y:.162,x:-.032,r:[.038,.048]}
+    {y:-.122,x:.052,r:[.045,.058]},{y:-.098,x:.045,r:[.072,.084*jawScale]},{y:-.062,x:.052,r:[.09,.102]},
+    {y:-.018,x:.042,r:[.104,.12]},{y:.026,x:.036,r:[.108,.12]},{y:.066,x:.026,r:[.11,.122]},
+    {y:.104,x:.008,r:[.104,.117]},{y:.138,x:-.018,r:[.078,.092]},{y:.162,x:-.032,r:[.038,.048]}
   ];
   const seg=headDetail3().sector,rings=[],cosT=[],sinT=[];
   for(let j=0;j<=seg;j++){ const a=j/seg*Math.PI*2; cosT.push(Math.cos(a)); sinT.push(Math.sin(a)); }
@@ -725,6 +726,8 @@ function addFaceDetails3D(b,pose,model,sk,mat,S,headR){
     addSphere3D(b,P(.147+gazeX77*.006,.017-gazeY77*.006,side*.055),[headR*.04,headR*(.006+.05*eyeOpen77),headR*.065],[0,pose.headYaw||pose.yaw,pose.roll],mat(model.frame==="cyborg"||model.frame==="robot"?sk.accent:"#17120e",1,model.frame==="cyborg"?.35:.02,"plain"),DETAIL3_MICRO);
     if(eyeOpen77>.14)addSphere3D(b,P(.154+gazeX77*.005,.023-gazeY77*.005,side*.05),.0026*S,[0,0,0],mat("#ffffff",1,.55,"energy"),DETAIL3_MICRO);
     addBox3D(b,P(.134,.02+.025*eyeOpen77,side*.055),[.017*S,(.009+(1-eyeOpen77)*.013)*S,.048*S],[0,pose.headYaw||pose.yaw,pose.roll],skinShade);
+    addBox3D(b,P(.136,-.004,side*.055),[.014*S,.006*S,.042*S],[0,pose.headYaw||pose.yaw,pose.roll],skinShade);
+    addSphere3D(b,P(.055,-.082,side*.075),[.018*S,.026*S,.02*S],[0,pose.headYaw||pose.yaw,pose.roll],skinShade,DETAIL3_MICRO);
     const browInnerY77=.061-brow77*.009+(face77.smile?.004:0),browOuterY77=.064+(brow77<0?-brow77*.006:brow77*.004);
     addBox3D(b,P(.133,browInnerY77,side*.036),[.017*S,.010*S,.030*S],[0,pose.headYaw||pose.yaw,pose.roll],mat(sk.hair,1,0,"hair"));
     addBox3D(b,P(.132,browOuterY77,side*.073),[.017*S,.0105*S,.030*S],[0,pose.headYaw||pose.yaw,pose.roll],mat(sk.hair,1,0,"hair"));
@@ -755,6 +758,9 @@ function addFaceDetails3D(b,pose,model,sk,mat,S,headR){
 function addHairLocks3D(b,pose,model,sk,mat,S,headR){
   const H=pose.local.head,hair=model.hair,color=mat(sk.hair,1,0,"hair"),sway=pose.hairSway||0;
   const P=(x,y,z)=>pose.toWorld([H[0]+x,H[1]+y,z||0]);
+  const hi711=mat(shade(sk.hair,18),1,.02,"hair"); let strands711=0;
+  if(qualityLevel>0&&hair!=="none"&&hair!=="alien"&&hair!=="hood"&&hair!=="shaved"&&hair!=="mohawk"){ [-.045,0,.045].forEach(z=>{ addLoftedTube3D(b,[P(.07,.125,z),P(-.02,.165,z*.94),P(-.12,.12,z*.88)],[.0085*S,.0095*S,.007*S],hi711,6,[0,1,0]); strands711++; }); }
+  if((model.beard||0)>=.3){ [-1,1].forEach(side=>{ addLoftedTube3D(b,[P(.02,.03,side*.105),P(.045,-.045,side*.1),P(.06,-.085,side*.07)],[.012*S,.011*S,.008*S],color,6,[1,0,0]); strands711++; }); }
   /* V7.5 : mèches qui encadrent le visage (fini l'effet casque chauve de face)
      pour les coiffures longues, et chignon dessiné pour les fiches "bun". */
   if(hair==="long"||hair==="bob"||hair==="ponytail"||hair==="braids"||hair==="bun"){
@@ -778,12 +784,14 @@ function addHairLocks3D(b,pose,model,sk,mat,S,headR){
       const endY=lerp(H[1],pose.local.pelvis[1],.72+((i%2)*.07));
       addLoftedTube3D(b,[P(-.085,.06,z),pose.toWorld([pose.local.chest[0]-.16+sway*.35,(H[1]+pose.local.chest[1])/2,z*1.15]),pose.toWorld([pose.local.pelvis[0]-.18+sway,endY,z*1.2])],[.024*S,.022*S,.011*S],color,qualityLevel===0?6:8,[0,0,1]);
     });
+    if(qualityLevel>0)[-.02,.02].forEach(z=>{ const endY=lerp(H[1],pose.local.pelvis[1],.68); addLoftedTube3D(b,[P(-.08,.07,z),pose.toWorld([pose.local.chest[0]-.15+sway*.3,(H[1]+pose.local.chest[1])/2,z*1.2]),pose.toWorld([pose.local.pelvis[0]-.17+sway,endY,z*1.25])],[.009*S,.008*S,.005*S],hi711,6,[0,0,1]); strands711++; });
   }else if(hair==="ponytail"||hair==="topknot"){
     const knot=P(-.105,hair==="topknot"?.17:.095,0); addSphere3D(b,knot,.038*S,[0,pose.headYaw||pose.yaw,pose.roll],color,detailLow3());
     [-.035,-.012,.012,.035].forEach(z=>addLoftedTube3D(b,[knot,P(-.19+sway*.4,hair==="topknot"?.03:-.16,z),P(-.25+sway,hair==="topknot"?-.12:-.42,z*1.25)],[.018*S,.016*S,.007*S],color,qualityLevel===0?5:7,[0,0,1]));
   }else if(hair==="mohawk"){
     for(let i=0;i<7;i++){ const x=-.105+i*.035,h=.11+Math.sin(i/6*Math.PI)*.075; addCylinder3D(b,P(x,.135,0),P(x-.018,.135+h,0),.025*S,.002*S,color,5); }
   }
+  renderStats.hairDetail3d=(renderStats.hairDetail3d||0)+strands711;
 }
 function addFurTufts3D(b,center,pose,color,S,count,spread){
   const n=qualityLevel===0?Math.ceil(count*.55):count;
@@ -1406,11 +1414,18 @@ function addFighter3D(opaque,trans,f){
   if(model.gear==="core"||model.gear==="orb"||model.gear==="crystal"||model.gear==="sun"||model.gear==="jewel"||motif==="circuit"||motif==="rune"){
     addCylinder3D(opaque,localPoint3D(pose,L.chest[0]+.108*chestScale3,L.chest[1]+.03,0),localPoint3D(pose,L.chest[0]+.128*chestScale3,L.chest[1]+.03,0),.046*S,.046*S,mat(sk.dark,1,.08,"tech"),12);
     addCylinder3D(opaque,localPoint3D(pose,L.chest[0]+.128*chestScale3,L.chest[1]+.03,0),localPoint3D(pose,L.chest[0]+.14*chestScale3,L.chest[1]+.03,0),.038*S,.038*S,mat(sk.accent,1,.42,"energy"),12);
+  }else if(model.bare<=.65){
+    const emb711=localPoint3D(pose,L.chest[0]+.13*chestScale3,L.chest[1]+.02,0),embCol711=mat(sk.accent,1,.18,"energy");
+    if(["orbite","soleil","lune","viseur","circuit"].includes(motif))addSphere3D(opaque,emb711,[.012*S,.035*S,.035*S],[0,pose.yaw,pose.roll],embCol711,DETAIL3_MICRO);
+    else if(["eclair","lame","fleche","aile"].includes(motif))addBox3D(opaque,emb711,[.018*S,.085*S,.035*S],[0,pose.yaw,pose.roll+.5],embCol711);
+    else addBox3D(opaque,emb711,[.016*S,.055*S,.07*S],[0,pose.yaw,pose.roll],embCol711);
   }
+  renderStats.emblem3d=motif;
   if(f.energy>=50&&!f.dead&&f.downT<=0){
     const pulse=1+Math.sin(renderTicker*.12+(f.id||0))*.05;
     addSphere3D(trans,[pose.root[0],.025,pose.root[2]],[.46*S*pulse,.018,.3*S*pulse],[0,pose.yaw,0],mat(sk.trail,f.energy>=100?.16:.1,.45));
     addSphere3D(trans,[pose.root[0],.018,pose.root[2]],[.62*S*pulse,.014,.4*S*pulse],[0,pose.yaw,0],mat(sk.trail,f.energy>=100?.07:.04,.35));
+    if(f.energy>=100){ addSphere3D(trans,W3.chest,[.34*S*pulse,.62*S,.3*S*pulse],[0,pose.yaw,0],mat(sk.trail,.035,.5),detailLow3()); renderStats.glow3d=(renderStats.glow3d||0)+1; }
   }
   if(f.blocking||f.parryFlashT>0){ const parry=f.parryT>0||f.parryFlashT>0; addSphere3D(trans,pose.toWorld([.5,1.22,0]),[.13*S,.5*S,.4*S],[0,pose.yaw,0],parseColor3(parry?"#ffc400":"#4fc3f7",.17,.55)); }
   if(f.attack&&pose.phase>.08&&!["special","super","exspecial"].includes(f.attackType)){
@@ -1436,6 +1451,7 @@ function addProjectilesAndEffects3D(trans){
     if(pr.kind==="blade")addBox3D(trans,center,[r*2.3,r*.55,r*.55],[0,0,-Math.atan2(pr.vy||0,pr.vx||1)],col);
     else addSphere3D(trans,center,pr.kind==="wave"||pr.kind==="ground"?[r*1.35,r*.65,r*1.05]:r,[0,0,0],col);
     addSphere3D(trans,center,r*1.45,[0,0,0],parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.08,.65));
+    addSphere3D(trans,center,r*2.15,[0,0,0],parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.035,.8),detailLow3()); renderStats.glow3d=(renderStats.glow3d||0)+1;
     addSphere3D(trans,center,r*.48,[0,0,0],parseColor3("#ffffff",.85,.9),DETAIL3_MICRO);
     addCapsule3D(trans,[center[0]-(pr.vx||0)*.018,center[1]-(pr.vy||0)*.018,center[2]],center,r*.34,r*.16,parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.22,.6));
   }
@@ -1447,6 +1463,7 @@ function addProjectilesAndEffects3D(trans){
     const age=clamp(1-b.life/Math.max(1,b.max||b.life||1),0,1),pop=easeOutCubic(age),center=worldFromGame3D(b.x,b.y,.08),ground=b.kind==="ground",size=(ground?.55:.42)*(b.power||1)*(.62+pop*.52),alpha=clamp(1.08-age*1.12,0,1);
     addSphere3D(trans,center,[size*.3,size*(ground?.14:.24),size*.08],[0,0,0],parseColor3(b.color,alpha*.13,.65));
     addSphere3D(trans,center,[size*.15,size*(ground?.07:.12),size*.05],[0,0,0],parseColor3("#ffffff",alpha*.5,.75));
+    addSphere3D(trans,center,[size*.55,size*(ground?.2:.42),size*.16],[0,0,0],parseColor3(b.color,alpha*.035,.7),detailLow3()); renderStats.glow3d=(renderStats.glow3d||0)+1;
     const arcCount=b.kind==="block"||b.kind==="parry"?6:5,base=(b.seed||0)*6.283+age*.45*(b.dir||1),seedBase=Math.round((b.seed||0)*997);
     for(let i=0;i<arcCount;i++){
       const rnd=rand3(seedBase+i*19); if(rnd<.16)continue;
@@ -1491,7 +1508,21 @@ function arenaSpectacleState3D(){
 function addArenaSpectacle3D(opaque,trans){
   const sp78=arenaSpectacleState3D(),id78=sp78.arena,floor78=FLOOR_THEMES[id78]||FLOOR_THEMES.stadium,t78=sp78.t,inten78=sp78.intensity;
   renderStats.spectacleBeams3d=0; renderStats.spectacleActors3d=0; renderStats.floorRefl3d=0;
-  [typeof p1!=="undefined"?p1:null,typeof p2!=="undefined"?p2:null].forEach(f710=>{ if(!f710||f710.dead||f710.rx==null)return; const root710=worldFromGame3D(f710.rx,f710.ry==null?f710.y:f710.ry,0),air710=clamp(root710[1]/2.2,0,1),sc710=(f710.char&&f710.char.scale)||1; addSphere3D(trans,[root710[0],.017,.58],[.23*sc710,.012,.76*sc710],[0,0,0],parseColor3(f710.skin&&f710.skin.primary||"#ffffff",.06*(1-air710*.55)+inten78*.018,.2),DETAIL3_MICRO); renderStats.floorRefl3d++; });
+  const gloss711=id78==="tokyo"?1:id78==="stadium"?.9:id78==="temple"?.45:.3,reflDir711=norm3([-(R3D.lightDir?R3D.lightDir[0]:0)*.45,0,.9]),reflPerp711=[-reflDir711[2],0,reflDir711[0]];
+  renderStats.reflDir3d=id78+":"+gloss711;
+  [typeof p1!=="undefined"?p1:null,typeof p2!=="undefined"?p2:null].forEach(f711=>{
+    if(!f711||f711.dead||f711.rx==null)return;
+    const root711=worldFromGame3D(f711.rx,f711.ry==null?f711.y:f711.ry,0),air711=clamp(root711[1]/2.2,0,1),sc711=(f711.char&&f711.char.scale)||1,base711=f711.skin&&f711.skin.primary||"#ffffff",fade711=(1-air711*.55)*gloss711;
+    const streak711=(len711,wid711,aHi711,aLo711)=>{
+      const cx711=root711[0]+reflDir711[0]*len711*.32,cz711=root711[2]+reflDir711[2]*len711*.32;
+      const near711=[cx711-reflDir711[0]*len711/2,.018,cz711-reflDir711[2]*len711/2],far711=[cx711+reflDir711[0]*len711/2,.018,cz711+reflDir711[2]*len711/2],off711=[reflPerp711[0]*wid711/2,0,reflPerp711[2]*wid711/2];
+      const cHi711=parseColor3(base711,aHi711,.18),cLo711=parseColor3(base711,aLo711,.12);
+      quad3(trans,[near711[0]-off711[0],.018,near711[2]-off711[2]],[near711[0]+off711[0],.018,near711[2]+off711[2]],[far711[0]+off711[0],.018,far711[2]+off711[2]],[far711[0]-off711[0],.018,far711[2]-off711[2]],[cHi711,cHi711,cLo711,cLo711]);
+    };
+    streak711(1.15*sc711,.34*sc711,.075*fade711+inten78*.015,.008);
+    streak711(.82*sc711,.13*sc711,.06*fade711,.006);
+    renderStats.floorRefl3d++;
+  });
   const beam78=(source78,target78,color78,alpha78,width78)=>{
     const top78=parseColor3(color78,alpha78,.55),low78=parseColor3(color78,alpha78*.16,.32),axis78=norm3(sub3(target78,source78)),side78=norm3(cross3(axis78,[0,1,0])),sideB78=norm3(cross3(axis78,side78)),off78=(p78,v78,s78)=>[p78[0]+v78[0]*s78,p78[1]+v78[1]*s78,p78[2]+v78[2]*s78];
     quad3(trans,off78(source78,side78,-width78*.16),off78(source78,side78,width78*.16),off78(target78,side78,width78),off78(target78,side78,-width78),[top78,top78,low78,low78]);
@@ -1563,7 +1594,7 @@ function draw3DScene(){
   const gl=R3D.gl;
   try{
     resizeRenderer3D(); computeCamera3D(); ensureArena3D();
-    renderer3DState.vertices=0; renderer3DState.drawCalls=0; renderStats.impactBurstsDrawn=0;
+    renderer3DState.vertices=0; renderer3DState.drawCalls=0; renderStats.impactBurstsDrawn=0; renderStats.glow3d=0; renderStats.hairDetail3d=0;
     const opaque=resetBatch3D(R3D_DYN_OPAQUE),trans=resetBatch3D(R3D_DYN_TRANS);
     const first=p1.ry>=p2.ry?p1:p2,second=first===p1?p2:p1;
     addArenaSpectacle3D(opaque,trans); addFighter3D(opaque,trans,first); addFighter3D(opaque,trans,second); addProjectilesAndEffects3D(trans);

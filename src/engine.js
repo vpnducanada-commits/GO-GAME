@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.10 — GRAPHISMES AAA III, SQUELETTE STABLE, ARÈNES SPECTACLE & TOURNOI
+   Godson FURY ARENA V7.11 — ÉCLATS & REFLETS, GRAPHISMES AAA III, SQUELETTE STABLE & TOURNOI
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.10.0";
+const GAME_VERSION="7.11.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;

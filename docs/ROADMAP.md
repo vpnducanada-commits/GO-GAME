@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.11 — « Éclats & Reflets » *(LIVRÉ le 26/10/2026 — 509 assertions source / 745 vérifications, suite verte)*
+
+- **Demande du propriétaire** : « Continuez ». L'équipe pousse la lumière et les détails de près, squelette V7.9 verrouillé.
+- **Reflets directionnels** : traînées au sol orientées par la lumière de la scène, brillance propre à chaque arène (Tokyo miroir → Libreville mate), atténuées avec la hauteur ; flaques de lumière aux zones de départ.
+- **Éclats** : halos lissés sur projectiles, impacts et aura de pleine énergie — la « bulle facetée » de la première passe a été corrigée après relecture.
+- **Visages, cheveux, tenues** : paupières et mâchoires, mèches de reflet et favoris de barbe (bornés par qualité), emblème des planches en relief sur les 41 poitrines. Voir `docs/SPRINT_V711_ECLATS_REFLETS.md`.
+- ⚠️ **Budget bundle** : 734 035 octets (716 Ko) — marge faible sous le plafond de 720 Ko ; tout sprint futur devra compenser ses ajouts ou arbitrer un nouveau plafond.
+- 🔜 Prochaines étapes possibles : validation terrain téléphones, duel Online deux réseaux, ou nouvelle passe graphique (post-traitement léger, décors réactifs).
+
 ## ✅ V7.10 — « Graphismes AAA III » *(LIVRÉ le 26/10/2026 — 503 assertions source / 739 vérifications, suite verte)*
 
 - **Demande du propriétaire** : continuer à travailler le graphisme. L'équipe cible le grain dur des matières, les silhouettes mannequin, le ciel plat et les sols sans vie visibles sur les captures V7.9.

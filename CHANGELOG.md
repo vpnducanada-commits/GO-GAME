@@ -3,6 +3,33 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.11.0] — 2026-10-26 — « Éclats & Reflets »
+
+Le propriétaire demande de continuer. L'équipe pousse la lumière et les
+détails qui se voient en combat rapproché, sans toucher au squelette V7.9.
+
+### Ajouté — Reflets et éclats (Kenzo + Nadia)
+- Reflets des combattants **directionnels** : traînées au sol orientées
+  par la lumière de la scène, en deux couches (large douce + cœur fin),
+  avec une brillance propre à chaque arène (Tokyo 1, Stade 0,9,
+  Temple 0,45, Libreville 0,3) et atténuation avec la hauteur.
+- Halos d'éclat lissés autour des projectiles, des impacts et de
+  l'aura de pleine énergie ; flaques de lumière statiques aux zones
+  de départ. Le halo d'impact « bulle facetée » de la première passe
+  a été lissé et atténué après relecture.
+
+### Ajouté — Visages, cheveux et tenues (Marco)
+- Paupière basse, angles de mâchoire, couronne et mâchoire affinées.
+- Cheveux en mèches : reflets clairs sur le dessus et les longueurs,
+  favoris pour les barbes fournies — supprimés en qualité basse.
+- **Emblème de tenue des planches en relief** sur la poitrine
+  (orbe, losange ou plaque selon le motif des 41 fiches).
+
+### Validation (Sarah)
+- Captures Chromium relues (Tokyo éclats, stade gros plan, temple
+  barbes) ; squelette toujours ≤ 0,1 % d'écart ; smoke et QA dédiés
+  (contrôle n°44).
+
 ## [7.10.0] — 2026-10-26 — « Graphismes AAA III »
 
 Le propriétaire demande de continuer sur le graphisme. L'équipe cible ce
