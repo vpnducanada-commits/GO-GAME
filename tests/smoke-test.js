@@ -455,7 +455,7 @@ try {
   ev('setArenaMood("auto"); SETTINGS.roundTime=99; SETTINGS.roundsWin=2; saveSelection(); saveProfile(); goMenu();');
 
   console.log('\n— V3.0 : combat pro, GO GAME Online & lockstep —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'génération V3 affichée et exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'génération V3 affichée et exposée au moteur');
   const normalizedCloudProfile = ev('normalizeProfileData({names:{p1:"Nuage Godson"},settings:{roundTime:77},customColors:{p1:{primary:"#123456",accent:"#abcdef"}}})');
   assert(normalizedCloudProfile.names.p1 === 'Nuage Godson' && normalizedCloudProfile.settings.roundTime === 77 && normalizedCloudProfile.settings.quality === 'auto' && !!normalizedCloudProfile.story && !!normalizedCloudProfile.stats, 'profil cloud normalisé avec valeurs par défaut sûres');
   const exportedCloudProfile = ev('exportProfileData()'); exportedCloudProfile.names.p1 = 'Copie uniquement';
@@ -547,7 +547,7 @@ try {
   assert(ev('onlineState.room') === null && ev('state') === 'menu', 'retour menu : salon et transport en ligne nettoyés');
 
   console.log('\n— V3.1 : Humanité++ (proportions, visage, regard, IK) —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Humanité++ (génération 3.1+) exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Humanité++ (génération 3.1+) exposée au moteur');
   assert(ev('typeof humanProfile') === 'function' && ev('typeof drawHumanHead') === 'function' && ev('typeof drawHumanArm') === 'function' && ev('typeof drawHumanLeg') === 'function' && ev('typeof solveJoint') === 'function' && ev('typeof taperedSegment') === 'function', 'moteur anatomique humain V3.1 disponible');
   assert(ev('Object.keys(HUMAN_PROFILES).length') === 41, '41 morphologies humaines déclarées');
   const humanSignatures = new Set(); let minShoulder = 999, maxShoulder = 0;
@@ -586,7 +586,7 @@ try {
   ev('p1.reset(); p2.reset(); goMenu();');
 
   console.log('\n— V3.2 : Paysage prioritaire & interface épurée —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Paysage (génération 3.2+) exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Paysage (génération 3.2+) exposée au moteur');
   assert(!!window.document.getElementById('rotateHint') && !!window.document.getElementById('btnLandscape') && !window.document.getElementById('btnPortraitAnyway'), 'écran « Tourne ton appareil » présent — paysage forcé V7.3, aucune échappatoire portrait');
   assert(ev('typeof requestImmersiveLandscape') === 'function' && ev('typeof handlePortraitChange') === 'function' && ev('typeof initPortraitGuard') === 'function', 'logique paysage (plein écran, orientation, pause portrait) disponible');
   let landscapeCallOk = true;
@@ -602,7 +602,7 @@ try {
   assert(!window.document.getElementById('menuMain').classList.contains('hidden') && !!window.document.getElementById('btnModeBot') && !!window.document.getElementById('btnOnline'), 'menu principal épuré mais complet');
 
   console.log('\n— V3.3 : écran de chargement & parcours d’écrans —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Flux d’écrans (génération 3.3+) exposée au moteur');
   assert(!!window.document.getElementById('bootLoader') && !!window.document.getElementById('bootFill') && !!window.document.getElementById('bootPct') && ev('typeof startBoot') === 'function' && ev('typeof finishBoot') === 'function', 'écran de chargement présent (barre, pourcentage, étapes)');
   ev('finishBoot()');
   assert(ev('bootDone') === true && window.document.getElementById('bootLoader').classList.contains('done'), 'chargement terminé proprement (fondu de sortie)');
@@ -629,7 +629,7 @@ try {
   ev('goMenu()');
 
   console.log('\n— V3.4 : zone de combat dégagée & tactile compact —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Zone dégagée (génération 3.4+) exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version Zone dégagée (génération 3.4+) exposée au moteur');
   const css34 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(css34.includes('ga-jump') && css34.includes('11.5vh') && css34.includes('max-height:520px') && css34.includes('rgba(6,10,26,.42)'), 'tactile compact : grille aux coins, boutons réduits semi-transparents, libellés masqués en paysage court');
   const renderSrc34 = fs.readFileSync(path.join(root, 'src/render.js'), 'utf8');
@@ -644,7 +644,7 @@ try {
   ev('floaters=[]; goMenu()');
 
   console.log('\n— V3.5 : prise en main paysage & impacts fluides —');
-  assert(/^[3-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version V3.5+ affichée et exposée au moteur');
+  assert(/^(?:[3-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version V3.5+ affichée et exposée au moteur');
   assert(ev('Object.values(ATTACKS).every(a=>!("hitstop" in a))') === true, 'zéro gel d’impact : aucune attaque ne déclare de pause ou de ralentissement à la touche');
   ev('goMenu(); selCharP1=0; selCharP2=1; saveSelection();');
   click('btnMode2P'); click('btnLaunchFight'); ev('skipVS()'); step(170);
@@ -811,7 +811,7 @@ try {
 function finishTestRun() {
 
   console.log('\n— V3.6 : Nouveaux Champions (planches du propriétaire) —');
-  assert(/^(3\.[67]|[4-9]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Nouveaux Champions (3.6+) exposée');
+  assert(/^(3\.[67]|(?:[4-9]|10)\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Nouveaux Champions (3.6+) exposée');
   assert(ev('CHARACTERS[6].name+"/"+CHARACTERS[7].name+"/"+CHARACTERS[8].name') === 'KAEL/SORA/AEL-7', 'roster : KAEL, SORA et AEL-7 en fin de grille (indices 6-8, Histoire intacte)');
   assert(ev('CHARACTERS.slice(6,9).map(c=>c.style).join()') === 'guerrier,magicienne,synthetique', '3 styles de rendu dédiés : Guerrier, Magicienne, Synthétique');
   assert(ev('new Set(CHARACTERS.map(c=>c.id)).size') === 41, 'identifiants uniques pour les 41 combattants');
@@ -839,7 +839,7 @@ function finishTestRun() {
 
 
   console.log('\n— V3.7 : Sélection (aperçus animés, bordures à effets) & Corps pleins —');
-  assert(/^(3\.7|[4-9]\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Sélection & Corps pleins (3.7+) exposée');
+  assert(/^(3\.7|(?:[4-9]|10)\.\d+)\.\d+$/.test(ev('GAME_VERSION')) && (window.document.querySelector('h1').textContent.includes('PRO')||/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent)), 'version génération Sélection & Corps pleins (3.7+) exposée');
   ev('goMenu()'); click('btnMode2P');
   assert(!window.document.getElementById('menuSelect').classList.contains('hidden') && ev('state') === 'select', 'écran de sélection ouvert pour les aperçus');
   assert(!!window.document.getElementById('previewP1') && !!window.document.getElementById('previewP2') && !!window.document.getElementById('previewNameP1'), 'grands aperçus présents pour les deux camps');
@@ -867,7 +867,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.0 : Arcade plein écran & anatomie HD —');
-  assert(/^[4-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
+  assert(/^(?:[4-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version génération Arcade plein écran (4.0+) exposée');
   assert(!!window.document.querySelector('#gameWrap > header.sig'), 'barre système intégrée DANS la scène (aucun panneau extérieur)');
   const cssV4 = fs.readFileSync(path.join(root, 'src/style.css'), 'utf8');
   assert(cssV4.includes('#app{position:fixed;inset:0') && cssV4.includes('width:min(100dvw,calc(100dvh * 16 / 9))') && cssV4.includes('height:min(100dvh,calc(100dvw * 9 / 16))') && cssV4.includes('footer{display:none!important}'), 'coque plein écran : scène 16:9 maximale manipulable, aucun pied de page');
@@ -888,7 +888,7 @@ function finishTestRun() {
 
 
   console.log('\n— V4.1 : Peinture, matières & présentation (VS plein corps, intro cinéma) —');
-  assert(/^[4-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
+  assert(/^(?:[4-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')), 'version V4.1+ exposée');
   ev('goMenu()'); click('btnMode2P'); click('btnLaunchFight');
   assert(ev('state') === 'vs' && !!window.document.getElementById('vsPortrait1') && !!window.document.getElementById('vsPortrait2'), 'écran VS : portraits plein corps des deux combattants');
   assert(window.document.querySelector('#vsAvatar1 canvas') && window.document.getElementById('vsAvatar1').style.borderColor, 'cadre VS aux couleurs du combattant');
@@ -910,7 +910,7 @@ function finishTestRun() {
 
 
   /* ===== V4.2 « Graphismes AAA » : peinture, lumière d'arène, profondeur ===== */
-  assert(/^[4-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
+  assert(/^(?:[4-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 4.2+');
   assert(/Graphismes AAA/.test(ev('renderStats.artDirection')),'direction artistique AAA (V4.2+)');
   ev('qualityLevel=2');
   window.document.querySelector('#btnMode2P').click(); window.document.querySelector('#btnLaunchFight').click();
@@ -926,7 +926,7 @@ function finishTestRun() {
 
   /* ===== V4.3 « Roster complet des planches » : les 35 designs du propriétaire jouables ===== */
   console.log('\n— V4.3 : Roster complet des planches (41 combattants) —');
-  assert(/^(4\.[34]|[5-9]\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
+  assert(/^(4\.[34]|(?:[5-9]|10)\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.3+');
   assert(ev('CHARACTERS.length')===41,'roster complet : 41 combattants jouables');
   const boardIds=["Lira","kael","sora","zed","nyx","vorak","ael","aerin","korben","lyra","drakesh","selene","taiko","vex","elara","brax","kazu","sera","vorga","nox","raven","zep","astrid","selenia","drakar","nyx-ombre","Kairos","Zara-nova","brutus","aria","krak","luna","velen","lyra-azur","orion"];
   assert(ev('(()=>{const ids='+JSON.stringify(boardIds)+'; return ids.every(id=>CHARACTERS.some(c=>c.id===id));})()')===true,'les 35 personnages des 3 planches du propriétaire sont dans le roster');
@@ -950,7 +950,7 @@ function finishTestRun() {
 
   /* ===== V4.4 « Navigation Pro & tenues de combat peintes » ===== */
   console.log('\n— V4.4 : Navigation Pro & tenues de combat peintes —');
-  assert(/^(4\.4|[5-9]\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.4+');
+  assert(/^(4\.4|(?:[5-9]|10)\.\d+)\.\d+$/.test(ev('GAME_VERSION')),'version 4.4+');
   ev('goMenu()'); click('btnMode2P');
   assert(!!window.document.getElementById('rosterSearch')&&window.document.querySelectorAll('.filterChip').length>=6,'recherche + filtres par famille présents dans la sélection');
   assert(window.document.querySelectorAll('.stickyActions').length>=2,'barres d’action fixes : Personnages et Arène toujours atteignables');
@@ -973,7 +973,7 @@ function finishTestRun() {
 
   /* ===== V5.0 « Édition Jeu Complet » : carrière, championnat, quêtes & récompenses ===== */
   console.log('\n— V5.0 : Édition Jeu Complet (carrière & championnat) —');
-  assert(/^[5-9]\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
+  assert(/^(?:[5-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION')),'version 5.0+ — édition jeu complet');
   assert(ev('careerLevelFromXp(0)===1&&careerLevelFromXp(100)===2&&careerLevelFromXp(300)===3&&careerLevelFromXp(1000)===5')===true,'niveaux de carrière : seuils XP 0/100/300/1000 respectés');
   assert(ev('(()=>{const p=normalizeProfileData({stats:{wins:10,losses:2,matches:12,arcadeClears:1,bestSurvivalWave:3},story:{chapter1Completed:true}}); return p.career.xp>0&&p.career.Godson>0&&p.career.circuits.stade===0&&Array.isArray(p.career.titles);})()')===true,'migration V5 : un ancien profil reçoit XP, Godson et circuits');
   ev('PROFILE.career={xp:90,Godson:20,title:"",titles:[],questsClaimed:{},fighterWins:{},circuits:{stade:0,monde:0,legendes:0},bestStage:0,lastReward:""}; PROFILE.stats.matches=1; saveProfile();');
@@ -1001,7 +1001,7 @@ function finishTestRun() {
 
   /* ===== V5.1 « Godson FURY — M1 Signature » : nouveau nom + 41 chaînes martelables ===== */
   console.log('\n— V5.1 : Godson FURY ARENA & M1 Signature par combattant —');
-  assert(/^[5-9]\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA (V5.1+)');
+  assert(/^(?:[5-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('GAME_TITLE')==='Godson FURY ARENA'&&window.document.querySelector('h1').textContent.includes('FURY'),'nouveau nom officiel : Godson FURY ARENA (V5.1+)');
   assert(ev('Object.keys(M1_SIGNATURES).length')===41&&ev('CHARACTERS.every(c=>!!M1_SIGNATURES[c.id])')===true,'M1 Signature : les 41 combattants possèdent une chaîne dédiée');
   assert(ev('new Set(Object.values(M1_SIGNATURES).map(s=>s.name)).size')===41&&ev('new Set(Object.values(M1_SIGNATURES).flatMap(s=>s.labels)).size')===168,'M1 Signature : 41 noms de chaînes et 168 coups nommés, tous uniques');
   assert(ev('Object.values(M1_SIGNATURES).every(s=>s.steps.length>=3&&s.steps.length<=5&&s.steps[0].type==="punch"&&s.steps[s.steps.length-1].final)')===true,'M1 Signature : 3 à 5 coups, ouverture Poing et final marqué pour chacun');
@@ -1038,11 +1038,11 @@ function finishTestRun() {
   assert(ev('rosterSearch="sentence des ombres"; rosterMatches(CHARACTERS[31])')===true&&ev('rosterMatches(CHARACTERS[0])')===false,'recherche roster : on peut aussi trouver un combattant par le nom de son M1');
   ev('rosterSearch=""; goMenu()');
   const eng51=fs.readFileSync(path.join(root,'src/engine.js'),'utf8'),ui51=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),html51=fs.readFileSync(path.join(root,'index.html'),'utf8');
-  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&/Godson FURY ARENA V[6-9]\.\d+/.test(html51),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
+  assert(eng51.includes('const M1_RAW=')&&eng51.includes('function startM1Attack')&&eng51.includes('martèle Poing'.replace('Poing','punch'))===false&&ui51.includes('M1 Signature — martèle POING')&&/Godson FURY ARENA V(?:[6-9]|10)\.\d+/.test(html51),'hooks sources V5.1 : données 41 M1, moteur de chaîne, aide et nouveau titre');
 
   /* ===== V5.2 « Écran Adaptatif & Joystick Pro » : décision d'équipe Lena/Nadia/Kenzo/Marco/Sarah ===== */
   console.log('\n— V5.2 : joystick gauche, actions à droite & formats d’écran —');
-  assert(/^(5\.[23]|[6-9]\.\d+)\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
+  assert(/^(5\.[23]|(?:[6-9]|10)\.\d+)\.\d+$/.test(ev('GAME_VERSION'))&&ev('SETTINGS.screenFormat')==='adaptatif'&&window.document.body.classList.contains('screen-adaptatif'),'format par défaut validé par l’équipe : Adaptatif');
   assert(!!window.document.getElementById('joyBase')&&!!window.document.getElementById('joyKnob'),'joystick tactile présent en bas à gauche avec bouton mobile');
   assert(!window.document.querySelector('.tBtn[data-t="left"]')&&!window.document.querySelector('.tBtn[data-t="right"]')&&!window.document.querySelector('.tBtn[data-t="jump"]'),'anciens boutons directionnels supprimés : le joystick remplace gauche/droite/saut');
   assert([...window.document.querySelectorAll('.actionGroup .tBtn')].map(b=>b.dataset.t).join(',')==='special,dash,block,kick,punch','cluster droit ergonomique : Spécial, Dash, Garde, Pied et grand POING•M1');
@@ -1073,7 +1073,7 @@ function finishTestRun() {
 
   /* ===== V5.3 « Graphismes AAA II » : ombres portées, impacts sprites, tenues des planches ===== */
   console.log('\n— V5.3 : Graphismes AAA II (Kenzo + Marco, render-only) —');
-  assert(/^[6-9]\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('renderStats.artDirection').includes('Graphismes AAA II'),'direction artistique génération 6+ : Réalité 3D avec repli Graphismes AAA II');
+  assert(/^(?:[6-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&ev('renderStats.artDirection').includes('Graphismes AAA II'),'direction artistique génération 6+ : Réalité 3D avec repli Graphismes AAA II');
   assert(ev('Object.keys(BOARD_OUTFIT_MOTIFS).length')===41&&ev('CHARACTERS.every(c=>!!BOARD_OUTFIT_MOTIFS[String(c.id).toLowerCase()])')===true,'tenues des planches : motif explicite pour chacun des 41 combattants');
   assert(ev('BOARD_OUTFIT_MOTIFS["godson-prime"]')==='couronne'&&ev('BOARD_OUTFIT_MOTIFS["zara"]')==='vague'&&ev('BOARD_OUTFIT_MOTIFS["kael"]')==='lame'&&ev('BOARD_OUTFIT_MOTIFS["lyra-azur"]')==='aile','motifs fidèles aux identités : couronne royale, vague de Libreville, lame d’acier, aile d’Azur');
   ev('qualityLevel=2; renderStats.boardOutfits=0;');
@@ -1112,7 +1112,7 @@ function finishTestRun() {
   assert(render53.includes('BOARD_OUTFIT_MOTIFS')&&render53.includes('function drawBoardMotif')&&render53.includes('function arenaShadowVector')&&render53.includes('function impactSprite')&&render53.includes('function drawImpactBursts')&&engine53.includes('function impactBurst')&&engine53.includes('"m1final"')&&engine53.includes('"parry"'),'hooks sources V5.3 : motifs 41, ombres directionnelles et impacts typés');
   /* ===== V6.0 « Réalité 3D » : WebGL maison, poses humanoïdes, arènes 3D, repli 2D ===== */
   console.log('\n— V6.0 : Réalité 3D (Kenzo + Marco + Nadia, moteur WebGL maison) —');
-  assert(/^[6-9]\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&/V[6-9]\.\d+/.test(window.document.title)&&/V[6-9]\.\d+/.test(window.document.querySelector('h1').textContent),'génération officielle V6+ « Réalité 3D » affichée');
+  assert(/^(?:[6-9]|10)\.\d+\.\d+$/.test(ev('GAME_VERSION'))&&/V(?:[6-9]|10)\.\d+/.test(window.document.title)&&/V(?:[6-9]|10)\.\d+/.test(window.document.querySelector('h1').textContent),'génération officielle V6+ « Réalité 3D » affichée');
   assert(ev('SETTINGS.renderer3d')==='auto'&&!!window.document.getElementById('setRenderer3d')&&!!window.document.getElementById('gl3d')&&ev('typeof draw3DScene')==='function'&&ev('typeof buildFighterPose3D')==='function','3D Réalité activée par défaut en automatique, canvas WebGL et réglage présents');
   assert(ev('(() => { const b=newBatch3D(); addBox3D(b,[0,1,0],[1,2,1],[0,.4,0],parseColor3("#ff8000")); const c=parseColor3("#ff8000"); return b.count===24&&b.idx.length===36&&c[0]===1&&Math.abs(c[1]-128/255)<.002; })()')===true,'moteur 3D : géométrie indexée et couleurs converties sans bibliothèque externe');
   ev('applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=560; p2.rx=760; p1.ry=p2.ry=GROUND; state="fight"; computeCamera3D();');
@@ -1237,7 +1237,7 @@ function finishTestRun() {
 
   /* ===== V7.2 « Réalité 3D II » : anatomie humaine, matières, caméra & HUD ===== */
   console.log('\n— V7.2 : Réalité 3D II (Kenzo + Marco + Lena, proportions humaines) —');
-  assert(/^7\.[2-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[2-9]/.test(window.document.title)&&ev('renderStats.artDirection').includes('Réalité 3D II'),'édition Réalité 3D II (V7.2+) affichée');
+  assert(/^7\.(?:[2-9]|10)\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.(?:[2-9]|10)/.test(window.document.title)&&ev('renderStats.artDirection').includes('Réalité 3D II'),'édition Réalité 3D II (V7.2+) affichée');
   assert(ev('(() => { applyCharacterTo(p1,6); applyCharacterTo(p2,7); p1.reset(); p2.reset(); p1.rx=560; p2.rx=730; p1.ry=p2.ry=GROUND; const a=buildFighterPose3D(p1),b=buildFighterPose3D(p2),wA=a.local.shoulderFront[2]-a.local.shoulderBack[2],wB=b.local.shoulderFront[2]-b.local.shoulderBack[2],feet=Math.abs(a.local.footFront[2]-a.local.footBack[2]); return wA>.4&&wA<.58&&wB>.34&&wB<.5&&wB<wA&&a.local.head[1]>1.6&&feet>.28; })()')===true,'proportions V7.2 : épaules d’environ 48 cm, silhouette féminine distincte et appuis écartés');
   assert(ev('(() => { const keep=currentArena,counts=ARENAS.map(a=>{ currentArena=a; return buildArenaBatch3D().opaque.count; }); currentArena=keep; return counts.length===4&&counts.every(c=>c>500); })()')===true,'arènes V7.2 : les quatre décors volumiques se génèrent sans erreur avec leur géométrie enrichie');
   const render72=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),css72=fs.readFileSync(path.join(root,'src/style.css'),'utf8');
@@ -1246,7 +1246,7 @@ function finishTestRun() {
 
   /* ===== V7.3 « Plein écran forcé & Sélection claire » : demande directe du propriétaire ===== */
   console.log('\n— V7.3 : Plein écran forcé & Sélection claire (Lena + Kenzo) —');
-  assert(/^7\.[3-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[3-9]/.test(window.document.title),'édition Plein écran forcé (V7.3+) affichée');
+  assert(/^7\.(?:[3-9]|10)\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.(?:[3-9]|10)/.test(window.document.title),'édition Plein écran forcé (V7.3+) affichée');
   assert(!!window.document.getElementById('bootEnter')&&!window.document.getElementById('btnPortraitAnyway')&&!!window.document.getElementById('rotateHint'),'paysage forcé V7.3 : porte d’entrée plein écran, aucun bouton « continuer en portrait »');
   assert(!window.document.querySelector('#menuMain .signed').textContent.includes('M1'),'menu épuré V7.3 : la ligne signée ne contient plus de texte M1/Signature');
   const css73=fs.readFileSync(path.join(root,'src/style.css'),'utf8'),ui73=fs.readFileSync(path.join(root,'src/ui.js'),'utf8'),render73=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
@@ -1254,7 +1254,7 @@ function finishTestRun() {
 
   /* ===== V7.4 « Identités de combat » : 41 postures et attaques individuelles ===== */
   console.log('\n— V7.4 : Identités de combat (Marco, une fiche par combattant) —');
-  assert(/^7\.[4-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[4-9]/.test(window.document.title),'édition Identités de combat (V7.4+) affichée');
+  assert(/^7\.(?:[4-9]|10)\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.(?:[4-9]|10)/.test(window.document.title),'édition Identités de combat (V7.4+) affichée');
   assert(ev('(() => { const all=CHARACTERS.map(c=>stanceProfile3D({char:c})); return Object.keys(FIGHTER_STANCE3D).length===41&&new Set(all.map(s=>s.name)).size===41&&new Set(all.map(s=>s.punch)).size>=6&&new Set(all.map(s=>s.kick)).size>=6&&new Set(all.map(s=>s.portrait)).size>=5; })()')===true,'fiches V7.4 : 41 postures nommées uniques, au moins 6 styles de poing et 6 styles de pied');
   assert(ev('(() => { const P=i=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; return buildFighterPose3D(p1); }; const titan=P(2),taiko=P(18),lyra=P(15),kazu=P(22); const fz=q=>Math.abs(q.local.footFront[2]-q.local.footBack[2]); return fz(titan)>fz(lyra)&&taiko.local.pelvis[1]<lyra.local.pelvis[1]-.04&&Math.abs(kazu.twist)>Math.abs(titan.twist)+.12&&(lyra.local.handFront[1]-lyra.local.chest[1])>(titan.local.handFront[1]-titan.local.chest[1])+.08; })()')===true,'postures mesurées : Titan large et carré, Taiko bas, Lyra droite garde haute, Kazu très de profil');
   assert(ev('(() => { const atk=(i,type)=>{ applyCharacterTo(p1,i); p1.reset(); p1.rx=560; p1.ry=GROUND; startAttack(p1,type); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+4)); const q=buildFighterPose3D(p1); p1.attack=null; p1.attackType=""; p1.attackT=0; p1.cooldown=0; return q; }; const hook=atk(2,"punch"),viseur=atk(8,"punch"),hache=atk(39,"kick"),bas=atk(2,"kick"); return Math.abs(hook.local.handFront[2]-viseur.local.handFront[2])>.08&&hache.local.footFront[1]>bas.local.footFront[1]+.5; })()')===true,'attaques individuelles : crochet large contre visée droite, coup de pied hache très haut contre frappe basse');
@@ -1264,7 +1264,7 @@ function finishTestRun() {
 
   /* ===== V7.5 « Visages & Costumes » : cheveux, barbes et détails par famille ===== */
   console.log('\n— V7.5 : Visages & Costumes (Marco + Kenzo) —');
-  assert(/^7\.[5-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[5-9]/.test(window.document.title),'édition Visages & Costumes (V7.5+) affichée');
+  assert(/^7\.(?:[5-9]|10)\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.(?:[5-9]|10)/.test(window.document.title),'édition Visages & Costumes (V7.5+) affichée');
   assert(ev('(() => { const hairs=CHARACTERS.map(c=>boardModel3D({char:c}).hair); return new Set(hairs).size>=10&&hairs.filter(h=>h==="long").length>=10&&boardModel3D({char:CHARACTERS[33]}).hair==="bun"&&boardModel3D({char:CHARACTERS[5]}).hair==="braids"&&CHARACTERS.filter(c=>(boardModel3D({char:c}).beard||0)>=.65).length>=2; })()')===true,'coiffures V7.5 : au moins 10 styles au roster, chignon de Zara-nova, tresses de Zara et grandes barbes présentes');
   assert(ev('(() => { applyCharacterTo(p1,21); p1.reset(); p1.rx=560; p1.ry=GROUND; const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); return renderStats.hair3d==="long"&&renderStats.beard3d===1&&renderStats.lastFighterVertices3d>7000; })()')===true,'télémétrie V7.5 : Brax dessiné avec cheveux longs, barbe pleine et géométrie complète');
   const render75=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8');
@@ -1273,7 +1273,7 @@ function finishTestRun() {
 
   /* ===== V7.6 « Mobilité Dynamique » : foulée, air, dash, caméras ===== */
   console.log('\n— V7.6 : Mobilité Dynamique (Kenzo + Nadia + Sarah) —');
-  assert(/^7\.[6-9]\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.[6-9]/.test(window.document.title)&&/V7\.[6-9]/.test(window.document.querySelector('h1').textContent),'édition Mobilité Dynamique (V7.6+) affichée');
+  assert(/^7\.(?:[6-9]|10)\.\d+$/.test(ev('GAME_VERSION'))&&/V7\.(?:[6-9]|10)/.test(window.document.title)&&/V7\.(?:[6-9]|10)/.test(window.document.querySelector('h1').textContent),'édition Mobilité Dynamique (V7.6+) affichée');
   assert(ev('(() => { const keep={active:replayPlayback.active,data:replayPlayback.data}; const live=mobilityProfile76(); replayPlayback.active=true; replayPlayback.data={gameVersion:"7.5.0"}; const old=mobilityProfile76(); replayPlayback.active=keep.active; replayPlayback.data=keep.data; return live.name==="dynamic"&&live.buffer===11&&live.coyote===8&&live.dashDur===13&&live.airBlend===.2&&old.name==="legacy"&&old.buffer===9&&old.baseSpeed===4.7&&old.dashSpeed===12.4; })()')===true,'profils V7.6 : jeu direct plus tolérant et plus vif, anciens replays relus avec la physique V7.5 exacte');
   assert(ev('(() => { mode="training"; state="training"; dummyMode="idle"; keys.clear(); applyCharacterTo(p1,1); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.x=p1.px=p1.rx=260; p2.x=p2.px=p2.rx=1040; p1.y=p1.py=p1.ry=GROUND; p2.y=p2.py=p2.ry=GROUND; keys.add("KeyD"); for(let i=0;i<42;i++){ updateGameLogic(); prepareInterpolation(i%2?.5:1); updateCamera(16); render(); } const out={dx:p1.x-260,vx:p1.vx,gait:p1.motion&&p1.motion.gaitPhase,speed:p1.motion&&p1.motion.gaitSpeed}; keys.clear(); return out.dx>250&&out.vx>7.1&&out.gait>7.5&&out.speed>3.5; })()')===true,'course V7.6 mesurée : Kira accélère franchement et sa foulée suit la distance réellement affichée, sans patinage');
   assert(ev('(() => { keys.clear(); ghosts.length=0; p1.dashCD=0; const startX=p1.x; startDash(p1,1); const dur=p1.dashT; for(let i=0;i<5;i++){ updateGameLogic(); prepareInterpolation(.55); render(); } const t=newBatch3D(); addProjectilesAndEffects3D(t); return dur===13&&p1.x-startX>48&&ghosts.length>=5&&renderStats.dashTrails3d>=5&&t.count>=240; })()')===true,'dash V7.6 : 13 frames, impulsion plus longue et traînées de vitesse visibles en 2D comme en 3D');
@@ -1286,7 +1286,7 @@ function finishTestRun() {
 
   /* ===== V7.7 « Présence Vivante » : expressions, mains, prises et appuis ===== */
   console.log('\n— V7.7 : Présence Vivante (Marco + Kenzo + Sarah) —');
-  assert(['7.7.0','7.8.0','7.9.0'].includes(ev('GAME_VERSION'))&&/V7\.[789]/.test(window.document.title)&&/V7\.[789]/.test(window.document.querySelector('h1').textContent),'édition officielle V7.7+ affichée');
+  assert(['7.7.0','7.8.0','7.9.0','7.10.0'].includes(ev('GAME_VERSION'))&&/V7\.(?:[789]|10)/.test(window.document.title)&&/V7\.(?:[789]|10)/.test(window.document.querySelector('h1').textContent),'édition officielle V7.7+ affichée');
   assert(ev('(() => { applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=560; p2.rx=760; p1.ry=p2.ry=GROUND; const idle=buildFighterPose3D(p1); startAttack(p1,"punch"); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+3)); p1.motion=null; const atk=buildFighterPose3D(p1); p2.motion=null; p2.hitStun=12; p2.hitFlash=6; p2.kvx=6; const hurt=buildFighterPose3D(p2); p2.motion=null; p2.hitStun=0; p2.hitFlash=0; p2.kvx=0; p2.downT=10; const ko=buildFighterPose3D(p2); return idle.face77.name==="focus"&&idle.face77.eyeOpen>.9&&atk.face77.name==="attack"&&atk.face77.brow>=.7&&atk.face77.eyeOpen>=.45&&atk.face77.eyeOpen<=.55&&atk.hand77.front.curl>=.95&&atk.hand77.front.name==="poing"&&hurt.face77.name==="hurt"&&hurt.face77.eyeOpen<.25&&hurt.face77.mouth>.75&&ko.face77.name==="ko"&&ko.face77.eyeOpen<=.05; })()')===true,'expressions V7.7 mesurées : focus ouvert, attaque sourcils tendus et poing fermé, douleur yeux plissés/bouche ouverte, K.O. yeux fermés');
   assert(ev('(() => { applyCharacterTo(p1,8); p1.reset(); p1.rx=560; p1.ry=GROUND; const rifle=buildFighterPose3D(p1); applyCharacterTo(p1,5); p1.reset(); p1.rx=560; p1.ry=GROUND; startAttack(p1,"throw"); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+3)); p1.motion=null; const thr=buildFighterPose3D(p1); applyCharacterTo(p1,3); p1.reset(); p1.energy=60; p1.rx=560; p1.ry=GROUND; startAttack(p1,"special"); p1.attackT=Math.max(1,p1.attackDur-(p1.attack.start+3)); p1.motion=null; const cast=buildFighterPose3D(p1); return rifle.hand77.front.curl>=.95&&rifle.hand77.front.name==="prise"&&rifle.hand77.back.curl>=.95&&rifle.hand77.back.name==="soutien"&&rifle.local.handBack[0]>rifle.local.handFront[0]+.2&&thr.hand77.front.curl>=.35&&thr.hand77.front.curl<=.85&&cast.hand77.back.curl<=.15&&cast.hand77.back.name==="paume"; })()')===true,'mains V7.7 : fusil tenu à deux mains, projection en main semi-ouverte et paume ouverte pour un sort en orbe');
   assert(ev('(() => { applyCharacterTo(p1,1); applyCharacterTo(p2,5); p1.reset(); p2.reset(); p1.rx=480; p2.rx=900; p1.ry=p2.ry=GROUND; p1.vx=6.5; buildFighterPose3D(p1); p1.motion.gaitPhase=2.2; p1.motion.run=1; const run=buildFighterPose3D(p1); p1.grounded=false; p1.y=p1.ry=GROUND-160; p1.motion.air=1; const air=buildFighterPose3D(p1); return run.foot77.front.pitch>.07&&run.foot77.front.contact>=.95&&run.foot77.back.pitch<-.15&&run.foot77.back.contact<.45&&air.foot77.front.pitch<-.25&&air.foot77.back.pitch<-.25&&air.foot77.front.contact===0; })()')===true,'appuis V7.7 : talon avant posé et pointe arrière en poussée pendant la course, chevilles relâchées en l’air');
@@ -1298,7 +1298,7 @@ function finishTestRun() {
 
   /* ===== V7.8 « Arènes Spectacle » : décors vivants, faisceaux et profondeur ===== */
   console.log('\n— V7.8 : Arènes Spectacle (Nadia + Kenzo + Sarah) —');
-  assert(['7.8.0','7.9.0'].includes(ev('GAME_VERSION'))&&/V7\.[89]/.test(window.document.title)&&/V7\.[89]/.test(window.document.querySelector('h1').textContent),'édition officielle V7.8+ affichée');
+  assert(['7.8.0','7.9.0','7.10.0'].includes(ev('GAME_VERSION'))&&/V7\.(?:[89]|10)/.test(window.document.title)&&/V7\.(?:[89]|10)/.test(window.document.querySelector('h1').textContent),'édition officielle V7.8+ affichée');
   assert(ev('(() => { keys.clear(); mode="training"; state="training"; setArenaById("stadium","nuit"); applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=500; p2.rx=800; p1.ry=p2.ry=GROUND; p1.combo=5; p1.comboT=90; p1.energy=72; p2.health=Math.round(p2.maxHealth*.58); renderTicker=1800; R3D.spectacle78=null; const hash=replayStateHash(),o=newBatch3D(),t=newBatch3D(),sp=addArenaSpectacle3D(o,t); return renderStats.spectacleBeams3d===2&&renderStats.spectacleActors3d>=15&&sp.intensity>.5&&o.count>500&&t.count>50&&renderStats.arenaSpectacle3d.startsWith("stadium:")&&replayStateHash()===hash; })()')===true,'stade vivant V7.8 : faisceaux de scène, écran géant animé et tribunes qui lèvent les bras, hash déterministe inchangé');
   assert(ev('(() => { const ticks78={stadium:1800,tokyo:600,temple:1500,Libreville:1800}; return ARENAS.every(a=>{ setArenaById(a.id,"nuit"); state="training"; renderTicker=ticks78[a.id]; R3D.spectacle78=null; const o=newBatch3D(),t=newBatch3D(); addArenaSpectacle3D(o,t); const built=buildArenaBatch3D(); return built.opaque.count>1000&&o.count+t.count>40&&(renderStats.spectacleBeams3d>0||renderStats.spectacleActors3d>0)&&renderStats.arenaSpectacle3d.startsWith(a.id+":"); }); })()')===true,'les 4 arènes ont leur spectacle propre : vague du stade, train de Tokyo, braises du Temple et pirogue de Libreville');
   assert(ev('(() => { setArenaById("temple","crepuscule"); state="fight"; renderTicker=1500; R3D.spectacle78=null; const old=particles; particles=[]; const pts=buildParticles3D(); const motes=renderStats.ambientMotes3d; particles=old; return motes>0&&pts.count===motes&&pts.sizes.every(s=>s>0&&s<.06); })()')===true,'poussières d’ambiance V7.8 : points fins en mètres monde, jamais de point géant devant les combattants');
@@ -1309,13 +1309,24 @@ function finishTestRun() {
 
   /* ===== V7.9 « Squelette Stable » : IK à os fixes et WebGL robuste ===== */
   console.log('\n— V7.9 : Squelette Stable (Kenzo + Marco + Sarah) —');
-  assert(ev('GAME_VERSION')==='7.9.0'&&window.document.title.includes('V7.9')&&window.document.querySelector('h1').textContent.includes('V7.9'),'édition officielle V7.9 affichée');
+  assert(['7.9.0','7.10.0'].includes(ev('GAME_VERSION'))&&/V7\.(?:9|10)/.test(window.document.title)&&/V7\.(?:9|10)/.test(window.document.querySelector('h1').textContent),'édition officielle V7.9+ affichée');
   assert(ev('(() => { let worst=0,finite=true; for(let i=0;i<CHARACTERS.length;i++){ for(const sc of ["idle","punch","kick","sweep","air","down"]){ applyCharacterTo(p1,i); applyCharacterTo(p2,(i+2)%CHARACTERS.length); p1.reset(); p2.reset(); p1.rx=520; p2.rx=800; p1.ry=p2.ry=GROUND; p1.facing=1; p2.facing=-1; p1.energy=100; if(sc==="air"){p1.grounded=false;p1.y=p1.ry=GROUND-170;p1.vy=-4;} if(sc==="down")p1.downT=20; if(sc==="punch"||sc==="kick"||sc==="sweep"){ startAttack(p1,sc); if(p1.attack){ if(sc==="punch"){p1.attack.m1=true;p1.attack.m1Step=3;p1.attack.m1Final=true;} p1.attackT=Math.max(1,p1.attackDur-((p1.attack.start||3)+3)); } } p1.motion=null; p1.faceSmooth3d=null; let q=null; for(let k=0;k<4;k++)q=buildFighterPose3D(p1); worst=Math.max(worst,q.boneError||0); if(!Object.values(q.world).every(p=>p.every(Number.isFinite)))finite=false; } } return finite&&worst<=.01; })()')===true,'squelette IK V7.9 : os fixes dans le monde affiché pour les 41 combattants (repos, poing M1, pied, sweep, air, sol), écart ≤ 1 %');
   assert(ev('(() => { const d=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1],a[2]-b[2]); const near=(v,t)=>Math.abs(v-t)<=.006; applyCharacterTo(p1,15); p1.reset(); p1.rx=520; p1.ry=GROUND; p1.energy=100; startAttack(p1,"punch"); if(p1.attack){p1.attack.m1=true;p1.attack.m1Step=3;p1.attack.m1Final=true;p1.attackT=Math.max(1,p1.attackDur-((p1.attack.start||3)+3));} p1.motion=null; const q=buildFighterPose3D(p1),S=p1.char.scale||1,W=q.world; return near(d(W.shoulderFront,W.elbowFront)/S,.31)&&near(d(W.elbowFront,W.handFront)/S,.29)&&d(W.shoulderFront,W.handFront)/S<=.6&&q.boneError<=.01; })()')===true,'poing M1 final V7.9 : bras à 0,31 + 0,29 m exactement, portée anatomique bornée — fini le bras élastique d’1 m');
   assert(ev('(() => { applyCharacterTo(p1,36); p1.reset(); p1.rx=520; p1.ry=GROUND; p1.energy=100; startAttack(p1,"punch"); if(p1.attack){p1.attack.m1=true;p1.attack.m1Final=true;p1.attackT=Math.max(1,p1.attackDur-((p1.attack.start||3)+3));} p1.motion=null; const o=newBatch3D(),t=newBatch3D(); addFighter3D(o,t,p1); let minY=1e9; for(let i=1;i<o.pos.length;i+=3)minY=Math.min(minY,o.pos[i]); return renderStats.skeleton3d==="ik-fixe"&&renderStats.boneError3d<=.01&&minY>=-.012&&o.count>8000; })()')===true,'contact au sol V7.9 : aucun sommet du colosse ne traverse la plateforme pendant un M1, télémétrie squelette active');
   assert(ev('(() => { renderDtFactor=1; applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); p1.rx=520; p2.rx=800; p1.ry=p2.ry=GROUND; p1.facing=1; p1.faceSmooth3d=1; p1.motion=null; buildFighterPose3D(p1); p1.facing=-1; if(p1.motion)p1.motion.face=-1; let prev=null,maxStep=0,sawMid=false; for(let i=0;i<14;i++){ const q=buildFighterPose3D(p1); if(prev!=null)maxStep=Math.max(maxStep,Math.abs(q.yaw-prev)); if(Math.abs(q.visualFace)<.3)sawMid=true; prev=q.yaw; } return sawMid&&maxStep<.7&&prev>2.9; })()')===true,'demi-tour V7.9 : la rotation traverse la face caméra en continu, sans saut d’angle ni torsion inversée d’un coup');
   const render79=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),renderBase79=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
   assert(['const BONE3D','function solveTwoBone3D','function boneDeviation3D','webglcontextrestored','resetRenderer3DResources','precision highp float;attribute vec3 aPos','varying mediump vec4 vColor','uniform mediump vec3 uCamPos','faceSmooth3d'].every(h=>render79.includes(h))&&['skeleton3d:','boneError3d','context3d:','canvas3d:'].every(h=>renderBase79.includes(h)),'hooks sources V7.9 : IK deux os, précision shader mobile, restauration de contexte et télémétrie squelette/canvas');
+  ev('keys.clear(); setArenaById("stadium","auto"); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
+
+  /* ===== V7.10 « Graphismes AAA III » : lumière cinéma, matières et silhouettes ===== */
+  console.log('\n— V7.10 : Graphismes AAA III (Nadia + Kenzo + Marco + Sarah) —');
+  assert(ev('GAME_VERSION')==='7.10.0'&&window.document.title.includes('V7.10')&&window.document.querySelector('h1').textContent.includes('V7.10'),'édition officielle V7.10 affichée');
+  assert(ev('(() => { keys.clear(); mode="training"; state="training"; setArenaById("stadium","nuit"); applyCharacterTo(p1,0); applyCharacterTo(p2,2); p1.reset(); p2.reset(); p1.rx=500; p2.rx=800; p1.ry=p2.ry=GROUND; renderTicker=1800; const hash=replayStateHash(); buildArenaBatch3D(); const sky=renderStats.skyDetail3d,o=newBatch3D(),t=newBatch3D(); addArenaSpectacle3D(o,t); syncRenderer3DStats(); return sky>=60&&renderStats.floorRefl3d===2&&renderStats.cinemaLight3d==="AAAIII"&&replayStateHash()===hash; })()')===true,'ciel et sols AAA III : halos, étoiles et brumes en couches, deux reflets de combattants au sol, hash déterministe inchangé');
+  assert(ev('(() => { const counts=[]; let ok=true; for(const ci of [0,15,36]){ applyCharacterTo(p1,ci); p1.reset(); p1.rx=540; p1.ry=GROUND; const o=newBatch3D(),t=newBatch3D(),q=addFighter3D(o,t,p1); counts.push(o.count+t.count); if(!(q.boneError<=.01)||o.pos.some(v=>!Number.isFinite(v)))ok=false; } return ok&&counts.every(c=>c>8000); })()')===true,'silhouettes sculptées AAA III : buste, tête et membres affinés sur athlète, mage et colosse sans toucher aux os V7.9');
+  assert(ev('(() => { projectiles.length=0; projectiles.push({rx:700,ry:430,x:700,y:430,vx:9,vy:0,r:18,kind:"orb",owner:p1}); const t=newBatch3D(); addProjectilesAndEffects3D(t); projectiles.length=0; return t.count>300&&t.pos.every(Number.isFinite); })()')===true,'projectiles AAA III : cœur blanc, halo et traînée conique en volume');
+  assert(ev('(() => { setArenaById("stadium","nuit"); qualityLevel=0; buildArenaBatch3D(); const low=renderStats.skyDetail3d; qualityLevel=2; buildArenaBatch3D(); const high=renderStats.skyDetail3d; return low>=25&&low<high&&high>=60; })()')===true,'budgets graphiques V7.10 : le ciel détaillé se réduit en qualité basse et s’enrichit en qualité haute');
+  const render710=fs.readFileSync(path.join(root,'src/render3d.js'),'utf8'),renderBase710=fs.readFileSync(path.join(root,'src/render.js'),'utf8');
+  assert(['envCol','albedo*fillLin*pow','smoothstep(12.0,38.0','aces(col*1.32)','pec710','hx710','skyDetail710','starN710','floorRefl3d++'].every(h=>render710.includes(h))&&['cinemaLight3d:','skyDetail3d:','floorRefl3d:'].every(h=>renderBase710.includes(h)),'hooks sources V7.10 : shader cinéma, atlas adouci, buste/tête sculptés, ciel vivant et reflets au sol');
   ev('keys.clear(); setArenaById("stadium","auto"); applyCharacterTo(p1,0); applyCharacterTo(p2,1); p1.reset(); p2.reset(); goMenu()');
 
   console.log('\n================ RÉSULTAT ================');

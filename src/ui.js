@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.9 — SQUELETTE STABLE, ARÈNES SPECTACLE, PRÉSENCE VIVANTE, 41 IDENTITÉS DE COMBAT
+   Godson FURY ARENA V7.10 — GRAPHISMES AAA III, SQUELETTE STABLE, 41 IDENTITÉS DE COMBAT
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];

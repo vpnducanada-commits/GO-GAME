@@ -123,6 +123,14 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.10 — « Graphismes AAA III » *(LIVRÉ le 26/10/2026 — 503 assertions source / 739 vérifications, suite verte)*
+
+- **Demande du propriétaire** : continuer à travailler le graphisme. L'équipe cible le grain dur des matières, les silhouettes mannequin, le ciel plat et les sols sans vie visibles sur les captures V7.9.
+- **Lumière cinéma & matières douces** : ciel ambiant, reflets d’environnement, sheen teinté par l’albédo, atlas adouci et bump réduit, brume de profondeur — avec deux passes de réglage couleur après relecture (le piège du sol lavé au magenta a été reproduit puis corrigé).
+- **Silhouettes sculptées** : pectoraux/dos/trapèzes dans le loft du buste, plan facial et pommettes, ligne de cheveux frontale, galbes des membres renforcés — squelette IK V7.9 strictement inchangé.
+- **Ciel & sols vivants** : halos soleil/lune, étoiles 3D et brumes en couches bornées par qualité, reflets doux des combattants sur les sols brillants, projectiles à cœur et traînée conique. Voir `docs/SPRINT_V710_GRAPHISMES_AAA3.md`.
+- 🔜 Prochaines étapes possibles : validation terrain sur téléphones physiques, duel Online entre deux réseaux distincts, ou nouvelle passe graphisme (visages/cheveux, décors destructibles légers, post-traitement).
+
 ## ✅ V7.9 — « Squelette Stable & 3D fiable » *(LIVRÉ le 25/10/2026 — 497 assertions source / 733 vérifications, suite verte)*
 
 - **Retour direct du propriétaire** : « La 3D bug et ne s'applique pas correctement […] les personnes ne se déforment pas ». Audit complet de l'équipe, mesures à l'appui (738 poses).

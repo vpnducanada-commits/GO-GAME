@@ -3,6 +3,40 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.10.0] — 2026-10-26 — « Graphismes AAA III »
+
+Le propriétaire demande de continuer sur le graphisme. L'équipe cible ce
+qui se voyait encore sur les captures V7.9 : grain dur des matières,
+bustes et têtes trop lisses, ciel plat et sols sans vie.
+
+### Ajouté — Lumière et matières (Kenzo)
+- Shader « cinéma » : ciel ambiant teinté, reflets d'environnement au
+  Fresnel atténués dans l'ombre, sheen des tissus teinté par la couleur
+  du matériau, spéculaire large de peau, brume de profondeur rapprochée
+  et grade ACES rééquilibré (moins de contraste dur, couleurs tenues).
+- Atlas procédural adouci (peau, tissu, cuir, métal, cheveux, énergie)
+  et bump fortement réduit : les robes et visages ne « pixellisent » plus.
+- Le piège du sheen indépendant de l'albédo — sols lavés au magenta —
+  a été reproduit en capture puis corrigé avant release.
+
+### Ajouté — Silhouettes (Marco)
+- Buste sculpté dans le loft même : pectoraux, ventre, dos aplati et
+  trapèzes ; tête au plan facial affirmé, pommettes, arcade et crâne
+  arrière ; orbites douces, narines et ligne de cheveux frontale.
+- Galbes des membres renforcés (cuisses, mollets, bras, avant-bras) à
+  sections elliptiques — mêmes os, mêmes longueurs V7.9.
+
+### Ajouté — Ciel et sols (Nadia)
+- Halos doux autour du soleil/de la lune, étoiles 3D et nuages/brumes
+  en couches sur les quatre arènes, bornés par le niveau de qualité.
+- Reflets doux et colorés des deux combattants sur les sols brillants,
+  projectiles à cœur blanc et traînée conique.
+
+### Validation (Sarah)
+- Captures Chromium relues sur les 4 arènes (dont deux passes de
+  réglage couleur), squelette toujours ≤ 0,1 % d'écart sur les scènes
+  mesurées, smoke et gate QA dédiés (contrôle n°43).
+
 ## [7.9.0] — 2026-10-25 — « Squelette Stable »
 
 Retour direct du propriétaire : « La 3D bug et ne s’applique pas

@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.9 — SQUELETTE IK STABLE (os fixes, WebGL robuste) + Arènes Spectacle V7.8 + Présence Vivante V7.7 + Réalité 3D II V7.2 (anatomie, matières, caméra) (WebGL maison, zéro dépendance)
+   Godson FURY ARENA V7.10 — GRAPHISMES AAA III (lumière cinéma, matières douces, silhouettes sculptées) + Squelette IK Stable V7.9 + Arènes Spectacle V7.8 + Réalité 3D II V7.2 (WebGL maison, zéro dépendance)
    Personnages humanoïdes articulés, arènes en profondeur, caméra combat.
    La simulation reste celle du moteur déterministe : ce module ne fait
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.
@@ -20,7 +20,7 @@ function syncRenderer3DStats(){
   renderStats.renderer3dVertices=renderer3DState.vertices;
   renderStats.renderer3dDrawCalls=renderer3DState.drawCalls;
   renderStats.camera3d=renderer3DState.camera.x.toFixed(2)+","+renderer3DState.camera.y.toFixed(2)+","+renderer3DState.camera.z.toFixed(2);
-  renderStats.renderer3dScale=R3D.renderScale; renderStats.materialAtlas3d=!!R3D.materialTexture; renderStats.bumpMap3d=!!R3D.bumpEnabled; renderStats.shadowMap3d=!!R3D.shadowEnabled; renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.context3d=renderer3DState.contextLost?"perdu":renderer3DState.initialized?"actif":"inactif"; renderStats.canvas3d=R3D.canvas?R3D.canvas.width+"x"+R3D.canvas.height+"@"+(R3D.canvas.clientWidth||0)+"x"+(R3D.canvas.clientHeight||0):"";
+  renderStats.renderer3dScale=R3D.renderScale; renderStats.materialAtlas3d=!!R3D.materialTexture; renderStats.bumpMap3d=!!R3D.bumpEnabled; renderStats.shadowMap3d=!!R3D.shadowEnabled; renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.cinemaLight3d="AAAIII"; renderStats.context3d=renderer3DState.contextLost?"perdu":renderer3DState.initialized?"actif":"inactif"; renderStats.canvas3d=R3D.canvas?R3D.canvas.width+"x"+R3D.canvas.height+"@"+(R3D.canvas.clientWidth||0)+"x"+(R3D.canvas.clientHeight||0):"";
 }
 function setRenderer3DEnabled(on,mode){
   renderer3DState.requested=!!on;
@@ -93,13 +93,13 @@ function createMaterialAtlas3D(gl){
       for(let i=0;i<n;i++){ const v=132+Math.round(rand3(base+i*7)*112); g.fillStyle="rgba("+v+","+v+","+v+","+alpha+")"; g.fillRect(rand3(base+i*11)*256,rand3(base+i*13)*256,size,size); }
     };
     tile(0,()=>{ speckle(10,1500,.24,2); for(let i=0;i<26;i++){ const x=rand3(60+i)*256,y=rand3(80+i)*256,w=24+rand3(90+i)*74; g.fillStyle=i%2?"rgba(70,70,70,.10)":"rgba(255,255,255,.12)"; g.fillRect(x,y,w,3+rand3(95+i)*9); } });
-    tile(1,()=>{ speckle(100,2200,.19,1); for(let i=0;i<42;i++){ const x=rand3(200+i)*256,y=rand3(300+i)*256,r=10+rand3(400+i)*28; const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,"rgba(255,214,190,.13)"); gr.addColorStop(1,"rgba(120,70,50,0)"); g.fillStyle=gr; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); } });
-    tile(2,()=>{ for(let y=0;y<256;y+=4){ g.fillStyle=y%8?"rgba(55,55,55,.26)":"rgba(255,255,255,.2)"; g.fillRect(0,y,256,1); } for(let x=0;x<256;x+=4){ g.fillStyle=x%8?"rgba(50,50,50,.2)":"rgba(255,255,255,.16)"; g.fillRect(x,0,1,256); } speckle(500,500,.16,1); });
-    tile(3,()=>{ speckle(700,1500,.24,2); g.strokeStyle="rgba(42,26,14,.56)"; for(let i=0;i<34;i++){ g.beginPath(); let x=rand3(800+i)*256,y=rand3(900+i)*256; g.moveTo(x,y); for(let j=0;j<4;j++){ x+=(rand3(1000+i*5+j)-.5)*54; y+=(rand3(1100+i*5+j)-.5)*54; g.lineTo(x,y); } g.stroke(); } });
-    tile(4,()=>{ for(let i=0;i<260;i++){ const y=rand3(1300+i)*256,v=165+Math.round(rand3(1400+i)*80); g.fillStyle="rgba("+v+","+v+","+v+",.68)"; g.fillRect(0,y,256,1); } for(let i=0;i<28;i++){ g.strokeStyle="rgba(255,255,255,.25)"; g.beginPath(); const y=rand3(1500+i)*256; g.moveTo(rand3(1600+i)*80,y); g.lineTo(150+rand3(1700+i)*100,y+(rand3(1800+i)-.5)*8); g.stroke(); } });
-    tile(5,()=>{ for(let i=0;i<190;i++){ const x=rand3(2000+i)*256,v=120+Math.round(rand3(2100+i)*110); g.strokeStyle="rgba("+v+","+v+","+v+",.78)"; g.beginPath(); g.moveTo(x,-8); g.bezierCurveTo(x+(rand3(2200+i)-.5)*18,70,x+(rand3(2300+i)-.5)*18,170,x+(rand3(2400+i)-.5)*26,264); g.stroke(); } });
+    tile(1,()=>{ speckle(100,1400,.11,1); for(let i=0;i<42;i++){ const x=rand3(200+i)*256,y=rand3(300+i)*256,r=10+rand3(400+i)*28; const gr=g.createRadialGradient(x,y,0,x,y,r); gr.addColorStop(0,"rgba(255,214,190,.09)"); gr.addColorStop(1,"rgba(120,70,50,0)"); g.fillStyle=gr; g.beginPath(); g.arc(x,y,r,0,7); g.fill(); } });
+    tile(2,()=>{ for(let y=0;y<256;y+=6){ g.fillStyle=y%12?"rgba(55,55,55,.13)":"rgba(255,255,255,.1)"; g.fillRect(0,y,256,1); } for(let x=0;x<256;x+=6){ g.fillStyle=x%12?"rgba(50,50,50,.1)":"rgba(255,255,255,.08)"; g.fillRect(x,0,1,256); } speckle(500,500,.08,1); });
+    tile(3,()=>{ speckle(700,1500,.16,2); g.strokeStyle="rgba(42,26,14,.38)"; for(let i=0;i<34;i++){ g.beginPath(); let x=rand3(800+i)*256,y=rand3(900+i)*256; g.moveTo(x,y); for(let j=0;j<4;j++){ x+=(rand3(1000+i*5+j)-.5)*54; y+=(rand3(1100+i*5+j)-.5)*54; g.lineTo(x,y); } g.stroke(); } });
+    tile(4,()=>{ for(let i=0;i<260;i++){ const y=rand3(1300+i)*256,v=165+Math.round(rand3(1400+i)*80); g.fillStyle="rgba("+v+","+v+","+v+",.42)"; g.fillRect(0,y,256,1); } for(let i=0;i<28;i++){ g.strokeStyle="rgba(255,255,255,.16)"; g.beginPath(); const y=rand3(1500+i)*256; g.moveTo(rand3(1600+i)*80,y); g.lineTo(150+rand3(1700+i)*100,y+(rand3(1800+i)-.5)*8); g.stroke(); } });
+    tile(5,()=>{ for(let i=0;i<190;i++){ const x=rand3(2000+i)*256,v=120+Math.round(rand3(2100+i)*110); g.strokeStyle="rgba("+v+","+v+","+v+",.52)"; g.beginPath(); g.moveTo(x,-8); g.bezierCurveTo(x+(rand3(2200+i)-.5)*18,70,x+(rand3(2300+i)-.5)*18,170,x+(rand3(2400+i)-.5)*26,264); g.stroke(); } });
     tile(6,()=>{ g.fillStyle="#d4dde8"; g.fillRect(0,0,256,256); g.strokeStyle="rgba(35,120,160,.5)"; g.lineWidth=2; for(let i=0;i<32;i++){ let x=Math.round(rand3(2600+i)*8)*32,y=Math.round(rand3(2700+i)*8)*32; g.beginPath(); g.moveTo(x,y); for(let j=0;j<3;j++){ if(rand3(2800+i*3+j)>.5)x+= (rand3(2900+i*3+j)>.5?32:-32); else y+=(rand3(3000+i*3+j)>.5?32:-32); g.lineTo(clamp(x,0,256),clamp(y,0,256)); } g.stroke(); g.fillStyle="rgba(255,255,255,.75)"; g.beginPath(); g.arc(clamp(x,0,256),clamp(y,0,256),3,0,7); g.fill(); } });
-    tile(7,()=>{ for(let i=-8;i<16;i++){ g.fillStyle=i%2?"rgba(255,255,255,.23)":"rgba(90,160,255,.15)"; g.save(); g.translate(i*24,0); g.rotate(.55); g.fillRect(0,-80,10,420); g.restore(); } speckle(3200,700,.2,2); });
+    tile(7,()=>{ for(let i=-8;i<16;i++){ g.fillStyle=i%2?"rgba(255,255,255,.16)":"rgba(90,160,255,.1)"; g.save(); g.translate(i*24,0); g.rotate(.55); g.fillRect(0,-80,10,420); g.restore(); } speckle(3200,700,.12,2); });
     const tex=gl.createTexture(); if(!tex)return null;
     gl.bindTexture(gl.TEXTURE_2D,tex); gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL,false);
     gl.texImage2D(gl.TEXTURE_2D,0,gl.RGBA,gl.RGBA,gl.UNSIGNED_BYTE,c);
@@ -354,7 +354,7 @@ function initRenderer3D(){
     const mainVertex3D=
       "precision highp float;attribute vec3 aPos;attribute vec3 aNorm;attribute vec4 aColor;attribute float aEmissive;attribute vec2 aUV;attribute vec3 aMat;uniform mat4 uVP;uniform mat4 uLightVP;uniform mediump vec3 uCamPos;varying mediump vec4 vColor;varying mediump vec3 vNorm;varying mediump vec3 vWorld;varying mediump float vEmissive;varying mediump float vFog;varying mediump vec2 vUV;varying mediump vec3 vMat;varying mediump vec4 vShadowCoord;void main(){vColor=aColor;vNorm=aNorm;vWorld=aPos;vEmissive=aEmissive;vUV=aUV;vMat=aMat;vFog=distance(uCamPos,aPos);vShadowCoord=uLightVP*vec4(aPos,1.0);gl_Position=uVP*vec4(aPos,1.0);}";
     const mainFragment3D=
-      "precision mediump float;uniform vec3 uLightDir;uniform vec3 uLightColor;uniform vec3 uFillColor;uniform vec3 uCamPos;uniform vec3 uFogColor;uniform sampler2D uAtlas;uniform sampler2D uShadowMap;uniform float uShadowEnabled;uniform float uShadowTexel;varying vec4 vColor;varying vec3 vNorm;varying vec3 vWorld;varying float vEmissive;varying float vFog;varying vec2 vUV;varying vec3 vMat;varying vec4 vShadowCoord;float hash31(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}float vnoise(vec3 p){vec3 i=floor(p);vec3 f=fract(p);f=f*f*(3.0-2.0*f);float a=hash31(i);float b=hash31(i+vec3(1.0,0.0,0.0));float c=hash31(i+vec3(0.0,1.0,0.0));float d=hash31(i+vec3(1.0,1.0,0.0));float e=hash31(i+vec3(0.0,0.0,1.0));float g=hash31(i+vec3(1.0,0.0,1.0));float h=hash31(i+vec3(0.0,1.0,1.0));float k=hash31(i+vec3(1.0,1.0,1.0));return mix(mix(mix(a,b,f.x),mix(c,d,f.x),f.y),mix(mix(e,g,f.x),mix(h,k,f.x),f.y),f.z);}float unpackDepth(vec4 rgba){return dot(rgba,vec4(1.0,0.0039215686,0.0000153787,0.0000000603));}float shadowFactor(vec3 n,vec3 l){if(uShadowEnabled<0.5)return 1.0;vec3 coord=vShadowCoord.xyz/max(0.0001,vShadowCoord.w)*0.5+0.5;if(coord.x<0.0||coord.x>1.0||coord.y<0.0||coord.y>1.0||coord.z<0.0||coord.z>1.0)return 1.0;float bias=max(0.0015,0.006*(1.0-max(dot(n,l),0.0)));float total=0.0;for(int x=-1;x<=1;x++){for(int y=-1;y<=1;y++){float d=unpackDepth(texture2D(uShadowMap,coord.xy+vec2(float(x),float(y))*uShadowTexel));total+=coord.z-bias<=d?1.0:0.0;}}return 0.045+0.955*(total/9.0);}vec3 aces(vec3 x){return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0);}void main(){vec3 texRaw=texture2D(uAtlas,vUV).rgb;vec3 tex=clamp((texRaw-0.40)*1.62,vec3(0.0),vec3(1.12));float microN=vnoise(vWorld*23.0)*0.62+vnoise(vWorld*61.0)*0.38;float macroN=vnoise(vWorld*2.7);vec3 albedo=pow(max(vColor.rgb,vec3(0.0)),vec3(2.2))*(0.30+0.84*tex);albedo*=0.86+0.18*microN+0.10*macroN;float rough=clamp(vMat.x,0.08,1.0);float metal=clamp(vMat.y,0.0,1.0);float skin=clamp(vMat.z,0.0,1.0);rough=clamp(rough+(microN-0.5)*0.15*(1.0-skin*0.55),0.06,1.0);vec3 n=normalize(vNorm);vec3 l=normalize(uLightDir);vec3 v=normalize(uCamPos-vWorld);vec3 h=normalize(l+v);float nd=max(dot(n,l),0.0);float wrapped=pow(clamp((nd+0.48)/1.48,0.0,1.0),1.45);float diff=mix(nd,wrapped,skin*0.72);float shadow=shadowFactor(n,l);vec3 fillDir=normalize(vec3(-l.x*0.8,0.32,-0.62));float fill=max(dot(n,fillDir),0.0);float hemi=0.105+0.135*(n.y*0.5+0.5);float specPow=mix(96.0,9.0,rough);float fres=pow(1.0-max(dot(n,v),0.0),5.0);vec3 f0=mix(vec3(0.035),albedo,metal);vec3 fresCol=f0+(1.0-f0)*fres;float spec=pow(max(dot(n,h),0.0),specPow)*mix(0.08,1.25,metal)*(1.05-rough*0.58);vec3 lightLin=pow(max(uLightColor,vec3(0.0)),vec3(2.2));vec3 fillLin=pow(max(uFillColor,vec3(0.0)),vec3(2.2));float ao=0.60+0.40*clamp(vWorld.y/1.75,0.0,1.0);vec3 col=albedo*(hemi*ao+lightLin*diff*1.78*shadow+fillLin*fill*0.34);col+=lightLin*spec*shadow*(0.35+fresCol);col+=uLightColor*fres*mix(0.045,0.3,metal);col+=vec3(0.55,0.14,0.08)*skin*pow(clamp(dot(v,-l),0.0,1.0),3.0)*0.34*shadow;col+=pow(max(vColor.rgb,vec3(0.0)),vec3(2.2))*vEmissive*1.7;float fogF=smoothstep(21.0,49.0,vFog);col=mix(col,pow(max(uFogColor,vec3(0.0)),vec3(2.2)),fogF*0.56);col=aces(col*1.30);col=pow(col,vec3(0.4545));float lum=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(lum),col,1.045);col=(col-0.5)*1.13+0.5;gl_FragColor=vec4(col,vColor.a);}";
+      "precision mediump float;uniform vec3 uLightDir;uniform vec3 uLightColor;uniform vec3 uFillColor;uniform vec3 uCamPos;uniform vec3 uFogColor;uniform sampler2D uAtlas;uniform sampler2D uShadowMap;uniform float uShadowEnabled;uniform float uShadowTexel;varying vec4 vColor;varying vec3 vNorm;varying vec3 vWorld;varying float vEmissive;varying float vFog;varying vec2 vUV;varying vec3 vMat;varying vec4 vShadowCoord;float hash31(vec3 p){return fract(sin(dot(p,vec3(127.1,311.7,74.7)))*43758.5453);}float vnoise(vec3 p){vec3 i=floor(p);vec3 f=fract(p);f=f*f*(3.0-2.0*f);float a=hash31(i);float b=hash31(i+vec3(1.0,0.0,0.0));float c=hash31(i+vec3(0.0,1.0,0.0));float d=hash31(i+vec3(1.0,1.0,0.0));float e=hash31(i+vec3(0.0,0.0,1.0));float g=hash31(i+vec3(1.0,0.0,1.0));float h=hash31(i+vec3(0.0,1.0,1.0));float k=hash31(i+vec3(1.0,1.0,1.0));return mix(mix(mix(a,b,f.x),mix(c,d,f.x),f.y),mix(mix(e,g,f.x),mix(h,k,f.x),f.y),f.z);}float unpackDepth(vec4 rgba){return dot(rgba,vec4(1.0,0.0039215686,0.0000153787,0.0000000603));}float shadowFactor(vec3 n,vec3 l){if(uShadowEnabled<0.5)return 1.0;vec3 coord=vShadowCoord.xyz/max(0.0001,vShadowCoord.w)*0.5+0.5;if(coord.x<0.0||coord.x>1.0||coord.y<0.0||coord.y>1.0||coord.z<0.0||coord.z>1.0)return 1.0;float bias=max(0.0015,0.006*(1.0-max(dot(n,l),0.0)));float total=0.0;for(int x=-1;x<=1;x++){for(int y=-1;y<=1;y++){float d=unpackDepth(texture2D(uShadowMap,coord.xy+vec2(float(x),float(y))*uShadowTexel));total+=coord.z-bias<=d?1.0:0.0;}}return 0.045+0.955*(total/9.0);}vec3 aces(vec3 x){return clamp((x*(2.51*x+0.03))/(x*(2.43*x+0.59)+0.14),0.0,1.0);}void main(){vec3 texRaw=texture2D(uAtlas,vUV).rgb;vec3 tex=clamp((texRaw-0.52)*1.05+0.18,vec3(0.0),vec3(1.02));float microN=vnoise(vWorld*23.0)*0.62+vnoise(vWorld*61.0)*0.38;float macroN=vnoise(vWorld*2.7);vec3 albedo=pow(max(vColor.rgb,vec3(0.0)),vec3(2.2))*(0.58+0.50*tex);float rough=clamp(vMat.x,0.08,1.0);float metal=clamp(vMat.y,0.0,1.0);float skin=clamp(vMat.z,0.0,1.0);rough=clamp(rough+(microN-0.5)*0.15*(1.0-skin*0.55),0.06,1.0);albedo*=mix(0.93+0.09*microN+0.05*macroN,0.985+0.03*microN,skin);vec3 n=normalize(vNorm);vec3 l=normalize(uLightDir);vec3 v=normalize(uCamPos-vWorld);vec3 h=normalize(l+v);float nd=max(dot(n,l),0.0);float wrapped=pow(clamp((nd+0.48)/1.48,0.0,1.0),1.45);float diff=mix(nd,wrapped,skin*0.72);float shadow=shadowFactor(n,l);vec3 fillDir=normalize(vec3(-l.x*0.8,0.32,-0.62));float fill=max(dot(n,fillDir),0.0);float hemi=0.105+0.135*(n.y*0.5+0.5);float specPow=mix(96.0,9.0,rough);float fres=pow(1.0-max(dot(n,v),0.0),5.0);vec3 f0=mix(vec3(0.035),albedo,metal);vec3 fresCol=f0+(1.0-f0)*fres;float spec=pow(max(dot(n,h),0.0),specPow)*mix(0.08,1.25,metal)*(1.05-rough*0.58);vec3 lightLin=pow(max(uLightColor,vec3(0.0)),vec3(2.2));vec3 fillLin=pow(max(uFillColor,vec3(0.0)),vec3(2.2));float ao=0.72+0.28*clamp(vWorld.y/1.75,0.0,1.0);vec3 col=albedo*(fillLin*hemi*0.20*ao+lightLin*(hemi*0.50*ao+diff*1.68*shadow)+fillLin*fill*0.34);col+=lightLin*spec*shadow*(0.35+fresCol);vec3 envCol=mix(fillLin,lightLin,clamp(n.y*0.5+0.5,0.0,1.0));col+=envCol*fres*mix(0.03,0.38,metal)*(1.1-rough*0.55)*(0.35+0.65*shadow);col+=albedo*fillLin*pow(1.0-max(dot(n,v),0.0),3.0)*clamp((rough-0.55)*1.4,0.0,0.6)*(1.0-metal)*0.08;col+=lightLin*pow(max(dot(n,h),0.0),18.0)*skin*0.05*shadow;col+=vec3(0.55,0.14,0.08)*skin*pow(clamp(dot(v,-l),0.0,1.0),3.0)*0.34*shadow;col+=pow(max(vColor.rgb,vec3(0.0)),vec3(2.2))*vEmissive*1.7;float fogF=smoothstep(12.0,38.0,vFog);col=mix(col,pow(max(uFogColor,vec3(0.0)),vec3(2.2)),fogF*0.42);col=aces(col*1.32);col=pow(col,vec3(0.4545));float lum=dot(col,vec3(0.299,0.587,0.114));col=mix(vec3(lum),col,1.06);col=(col-0.5)*1.07+0.5;gl_FragColor=vec4(col,vColor.a);}";
     const mainAttribs3D=["aPos","aNorm","aColor","aEmissive","aUV","aMat"],mainUniforms3D=["uVP","uLightVP","uCamPos","uLightDir","uLightColor","uFillColor","uFogColor","uAtlas","uShadowMap","uShadowEnabled","uShadowTexel"];
     const derivativeExt3D=gl.getExtension("OES_standard_derivatives");
     const isWebGL2_3D=typeof WebGL2RenderingContext!=="undefined"&&gl instanceof WebGL2RenderingContext;
@@ -362,7 +362,7 @@ function initRenderer3D(){
     if(derivativeExt3D||isWebGL2_3D){
       bumpRequested3D=true;
       const bumpFn3D="vec3 perturbNormal3D(vec3 n,vec3 p,vec2 uv,float strength){vec3 q0=dFdx(p);vec3 q1=dFdy(p);vec2 st0=dFdx(uv);vec2 st1=dFdy(uv);float h0=texture2D(uAtlas,uv).r;float hx=texture2D(uAtlas,uv+vec2(0.004,0.0)).r-h0;float hy=texture2D(uAtlas,uv+vec2(0.0,0.008)).r-h0;vec3 ss=q0*st1.t-q1*st0.t;vec3 tt=q1*st0.s-q0*st1.s;float det=st0.s*st1.t-st1.s*st0.t;if(abs(det)<0.00001)return n;vec3 grad=sign(det)*(hx*ss+hy*tt);return normalize(abs(det)*n-strength*grad);}";
-      const bumpFragment3D=mainFragment3D.replace("void main(){vec3 tex",bumpFn3D+"void main(){vec3 tex").replace("vec3 n=normalize(vNorm);","vec3 n=perturbNormal3D(normalize(vNorm),vWorld,vUV,mix(0.2,0.62,rough)*(1.0-skin*0.52));");
+      const bumpFragment3D=mainFragment3D.replace("void main(){vec3 tex",bumpFn3D+"void main(){vec3 tex").replace("vec3 n=normalize(vNorm);","vec3 n=perturbNormal3D(normalize(vNorm),vWorld,vUV,mix(0.07,0.30,rough)*(1.0-skin*0.68));");
       if(isWebGL2_3D){ vertex3D=convertShader3003D(mainVertex3D,false); fragment3D=convertShader3003D(bumpFragment3D,true); }
       else fragment3D="#extension GL_OES_standard_derivatives : enable\n"+bumpFragment3D;
     }
@@ -405,6 +405,14 @@ function buildArenaBatch3D(){
   const celestial=mood.celestial==="moon"?[-5.5,5.9,-17]:mood.celestial==="sunLow"?[-6.2,4.9,-17]:[6,6.35,-17];
   const celestialR=mood.celestial==="moon"?.5:mood.celestial==="sunLow"?.78:.86,celestialCol=mood.celestial==="moon"?"#dbeafe":"#ffd54f";
   addSphere3D(opaque,celestial,celestialR,[0,0,0],parseColor3(celestialCol,1,.9));
+  let skyDetail710=0;
+  addSphere3D(trans,celestial,celestialR*1.85,[0,0,0],parseColor3(celestialCol,.07,.45),headDetail3()); skyDetail710++;
+  addSphere3D(trans,celestial,celestialR*2.9,[0,0,0],parseColor3(celestialCol,.025,.3),headDetail3()); skyDetail710++;
+  const starN710=currentArenaMood==="jour"?0:(qualityLevel===0?28:qualityLevel===1?46:64);
+  for(let i710=0;i710<starN710;i710++){ addSphere3D(opaque,[-22+rand3(i710*37)*44,3.5+rand3(i710*41)*7,-19.4],.025+rand3(i710*43)*.035,[0,0,0],parseColor3(i710%5?"#ffffff":"#bfe3ff",1,.55),DETAIL3_MICRO); skyDetail710++; }
+  const cloudCol710=mood.sky.length>2?mood.sky[1][1]:celestialCol;
+  for(let i710=0;i710<5;i710++){ addSphere3D(trans,[-15+i710*6.5+(rand3(i710*47)-.5)*3,5.2+rand3(i710*53)*2.6,-18.6],[1.8+rand3(i710*59)*2.1,.2+rand3(i710*61)*.12,.35],[0,0,0],parseColor3(cloudCol710,currentArenaMood==="jour"?.16:.09,.05),detailLow3()); skyDetail710++; }
+  renderStats.skyDetail3d=skyDetail710;
   const floorKind=id==="Libreville"?"sand":id==="temple"?"stone":id==="tokyo"?"glass":"stone";
   addBox3D(opaque,[0,-.1,-1],[36,.2,23],[0,0,0],materialColor3(floor.mid,floorKind));
   addBox3D(opaque,[0,-.006,.35],[15.5,.02,7.2],[0,0,0],materialColor3(floor.top,floorKind));
@@ -579,10 +587,10 @@ function addLoftedTube3D(b,points,radii,color,segments,sideHint){
 }
 function addAnatomyLimb3D(b,a,bp,r1,r2,color,kind,muscle){
   const profiles={
-    thigh:{t:[0,.16,.36,.58,.8,1],f:[.96,1.03,1.07,1,.9,.8],e:[1.06,.95]},
-    calf:{t:[0,.15,.34,.56,.79,1],f:[.9,1,1.08,.94,.74,.6],e:[1.01,.92]},
-    upper:{t:[0,.16,.36,.58,.8,1],f:[.95,1.03,1.08,1,.88,.8],e:[1,.94]},
-    forearm:{t:[0,.15,.34,.56,.79,1],f:[.9,1.02,1.06,.93,.76,.65],e:[.97,.92]}
+    thigh:{t:[0,.16,.36,.58,.8,1],f:[.92,1.05,1.12,1,.86,.76],e:[1.1,.9]},
+    calf:{t:[0,.15,.34,.56,.79,1],f:[.86,1.02,1.13,.92,.68,.55],e:[1.04,.88]},
+    upper:{t:[0,.16,.36,.58,.8,1],f:[.92,1.05,1.12,1,.84,.75],e:[1.04,.9]},
+    forearm:{t:[0,.15,.34,.56,.79,1],f:[.86,1.04,1.1,.9,.7,.6],e:[1,.88]}
   };
   const pr=profiles[kind]||profiles.forearm,muscleBoost=.96+(muscle||.75)*.07;
   const points=pr.t.map(t=>mix3(a,bp,t));
@@ -614,7 +622,14 @@ function addLoftedTorso3D(b,pose,model,color,S){
     for(let j=0;j<=seg;j++){
       const ca=circle[j][0],sa=circle[j][1],rx=levelRow.r[0]*S,rz=levelRow.r[1]*S;
       const shapedX=circle[j][2],shapedZ=circle[j][3];
-      const local=[levelRow.c[0]+shapedX*levelRow.r[0],levelRow.c[1],shapedZ*levelRow.r[1]];
+      let shapeX710=shapedX*levelRow.r[0],shapeZ710=shapedZ*levelRow.r[1];
+      const front710=Math.max(0,ca),sideAbs710=Math.abs(sa);
+      if(i>=4&&i<=6&&ca>0){ const pec710=Math.exp(-Math.pow(sideAbs710-.46,2)/.07); shapeX710+=.010*pec710*ca; }
+      if(i===3&&ca>0)shapeX710+=.004*ca*(1-sideAbs710);
+      if(ca<0)shapeX710*=i>=4?.94:.97;
+      if(i<=2)shapeZ710*=1-.03*front710;
+      if(i>=7)shapeZ710*=1.03;
+      const local=[levelRow.c[0]+shapeX710,levelRow.c[1],shapeZ710];
       const nLocal=[levelRow.c[0]+ca/Math.max(.02,levelRow.r[0])*.08,levelRow.c[1],sa/Math.max(.02,levelRow.r[1])*.08];
       const world=pose.toWorld(local),normal=norm3(sub3(pose.toWorld(nLocal),centerW));
       let vcol=i<=1||i>=7?palette.dark:palette.main;
@@ -680,7 +695,11 @@ function addSculptedHead3D(b,pose,human,color,S,headR){
     const ring=[],center=[H[0]+level.x*unitScale,H[1]+level.y*unitScale,0],centerW=pose.toWorld(center);
     for(let j=0;j<=seg;j++){
       const ca=cosT[j],sa=sinT[j],rx=level.r[0]*unitScale,rz=level.r[1]*unitScale;
-      const local=[center[0]+ca*rx,center[1],sa*rz];
+      let hx710=ca*rx,hz710=sa*rz; const sideAbs710=Math.abs(sa);
+      if(ca>0){ hx710*=i>=2&&i<=5?.96:.99; if(i===3||i===4)hz710*=1+.05*Math.exp(-Math.pow(sideAbs710-.72,2)/.05); if(i===4)hx710+=.006*unitScale*ca*ca; }
+      else if(i>=6)hx710*=1.03;
+      if(i<=1)hx710*=.94;
+      const local=[center[0]+hx710,center[1],hz710];
       const nLocal=[center[0]+ca/Math.max(.02,rx)*.055,center[1],sa/Math.max(.02,rz)*.055];
       const world=pose.toWorld(local),normal=norm3(sub3(pose.toWorld(nLocal),centerW));
       ring.push(vertRaw3(b,world[0],world[1],world[2],normal[0],normal[1],normal[2],color,j/seg*1.4,i*.22));
@@ -700,7 +719,8 @@ function addFaceDetails3D(b,pose,model,sk,mat,S,headR){
   const face77=pose.face77||{name:"focus",brow:.12,mouth:.06,eyeOpen:.96,gazeX:0,gazeY:0,fatigue:0,smile:0};
   const brow77=clamp(face77.brow||0,-.7,1),mouth77=clamp(face77.mouth||0,0,1),eyeOpen77=clamp(face77.eyeOpen==null?.96:face77.eyeOpen,.03,1),gazeX77=clamp(face77.gazeX||0,-1,1),gazeY77=clamp(face77.gazeY||0,-1,1);
   [-1,1].forEach(side=>{
-    addSphere3D(b,P(.104,-.026+(face77.smile?.005:0),side*.066),[headR*.21,headR*.18,headR*.21],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.skin,2),1,0,"skin"),detailLow3());
+    addSphere3D(b,P(.132,.02,side*.055),[headR*.045,headR*(.03+.055*eyeOpen77),headR*.125],[0,pose.headYaw||pose.yaw,pose.roll],skinDeep,DETAIL3_MICRO);
+    addSphere3D(b,P(.11,-.02+(face77.smile?.005:0),side*.07),[headR*.19,headR*.17,headR*.23],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.skin,2),1,0,"skin"),detailLow3());
     addSphere3D(b,P(.139,.018-(1-eyeOpen77)*.002,side*.055),[headR*.055,headR*(.012+.058*eyeOpen77),headR*.12],[0,pose.headYaw||pose.yaw,pose.roll],mat("#f7f3e8",1,.02,"plain"),DETAIL3_MICRO);
     addSphere3D(b,P(.147+gazeX77*.006,.017-gazeY77*.006,side*.055),[headR*.04,headR*(.006+.05*eyeOpen77),headR*.065],[0,pose.headYaw||pose.yaw,pose.roll],mat(model.frame==="cyborg"||model.frame==="robot"?sk.accent:"#17120e",1,model.frame==="cyborg"?.35:.02,"plain"),DETAIL3_MICRO);
     if(eyeOpen77>.14)addSphere3D(b,P(.154+gazeX77*.005,.023-gazeY77*.005,side*.05),.0026*S,[0,0,0],mat("#ffffff",1,.55,"energy"),DETAIL3_MICRO);
@@ -715,6 +735,7 @@ function addFaceDetails3D(b,pose,model,sk,mat,S,headR){
   });
   addLoftedTube3D(b,[P(.122,.032,0),P(.152,.0,0),P(.166,-.022,0),P(.144,-.046,0)],[.010*S,.012*S,.0145*S,.0125*S],skin,qualityLevel===0?6:8,[0,0,1]);
   addSphere3D(b,P(.146,-.049,0),[.017*S,.0105*S,.025*S*(1+Math.max(0,brow77)*.18)],[0,pose.headYaw||pose.yaw,pose.roll],skinShade,DETAIL3_MICRO);
+  [-1,1].forEach(ns710=>addSphere3D(b,P(.152,-.052,ns710*.013),[.006*S,.004*S,.006*S],[0,pose.headYaw||pose.yaw,pose.roll],skinDeep,DETAIL3_MICRO));
   if(mouth77>.13){
     addSphere3D(b,P(.139,-.076-mouth77*.008,0),[.012*S,(.004+mouth77*.012)*S,(.026+mouth77*.009)*S],[0,pose.headYaw||pose.yaw,pose.roll],mat("#2a0d08",1,0,"plain"),DETAIL3_MICRO);
     if(mouth77>.22)addBox3D(b,P(.148,-.066,0),[.008*S,.006*S,.043*S],[0,pose.headYaw||pose.yaw,pose.roll],mat("#fff8e7",1,.01,"plain"));
@@ -1375,6 +1396,7 @@ function addFighter3D(opaque,trans,f){
     const backDeep75=hairStyle75==="long"||hairStyle75==="bob"||hairStyle75==="braids";
     addMuscle3D(opaque,pose.toWorld([L.head[0]-.05,L.head[1]+capLift75,0]),[headR*.9,headR*capFlat75,headR*.94],[0,pose.headYaw||pose.yaw,pose.roll],mat(sk.hair,1,0,"hair"));
     addMuscle3D(opaque,pose.toWorld([L.head[0]-.115,L.head[1]+(backDeep75?-.032:.008),0]),[headR*(backDeep75?.52:.46),headR*(backDeep75?.82:capFlat75+.14),headR*.82],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.hair,-8),1,0,"hair"));
+    if(hairStyle75!=="shaved"&&hairStyle75!=="mohawk")addMuscle3D(opaque,pose.toWorld([L.head[0]+.035,L.head[1]+.108,0]),[headR*.55,headR*.2,headR*.8],[0,pose.headYaw||pose.yaw,pose.roll],mat(shade(sk.hair,4),1,0,"hair"));
     addHairLocks3D(opaque,pose,model,sk,mat,S,headR);
   }
   renderStats.hair3d=model.hair; renderStats.beard3d=model.beard||0;
@@ -1414,6 +1436,8 @@ function addProjectilesAndEffects3D(trans){
     if(pr.kind==="blade")addBox3D(trans,center,[r*2.3,r*.55,r*.55],[0,0,-Math.atan2(pr.vy||0,pr.vx||1)],col);
     else addSphere3D(trans,center,pr.kind==="wave"||pr.kind==="ground"?[r*1.35,r*.65,r*1.05]:r,[0,0,0],col);
     addSphere3D(trans,center,r*1.45,[0,0,0],parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.08,.65));
+    addSphere3D(trans,center,r*.48,[0,0,0],parseColor3("#ffffff",.85,.9),DETAIL3_MICRO);
+    addCapsule3D(trans,[center[0]-(pr.vx||0)*.018,center[1]-(pr.vy||0)*.018,center[2]],center,r*.34,r*.16,parseColor3(pr.owner&&pr.owner.skin?pr.owner.skin.trail:"#fff",.22,.6));
   }
   if(typeof rings!=="undefined")for(const r of rings){
     const center=worldFromGame3D(r.x,r.y,.03),radius=Math.max(.07,r.r/95),alpha=clamp(r.life/15,0,1)*.62;
@@ -1466,7 +1490,8 @@ function arenaSpectacleState3D(){
 }
 function addArenaSpectacle3D(opaque,trans){
   const sp78=arenaSpectacleState3D(),id78=sp78.arena,floor78=FLOOR_THEMES[id78]||FLOOR_THEMES.stadium,t78=sp78.t,inten78=sp78.intensity;
-  renderStats.spectacleBeams3d=0; renderStats.spectacleActors3d=0;
+  renderStats.spectacleBeams3d=0; renderStats.spectacleActors3d=0; renderStats.floorRefl3d=0;
+  [typeof p1!=="undefined"?p1:null,typeof p2!=="undefined"?p2:null].forEach(f710=>{ if(!f710||f710.dead||f710.rx==null)return; const root710=worldFromGame3D(f710.rx,f710.ry==null?f710.y:f710.ry,0),air710=clamp(root710[1]/2.2,0,1),sc710=(f710.char&&f710.char.scale)||1; addSphere3D(trans,[root710[0],.017,.58],[.23*sc710,.012,.76*sc710],[0,0,0],parseColor3(f710.skin&&f710.skin.primary||"#ffffff",.06*(1-air710*.55)+inten78*.018,.2),DETAIL3_MICRO); renderStats.floorRefl3d++; });
   const beam78=(source78,target78,color78,alpha78,width78)=>{
     const top78=parseColor3(color78,alpha78,.55),low78=parseColor3(color78,alpha78*.16,.32),axis78=norm3(sub3(target78,source78)),side78=norm3(cross3(axis78,[0,1,0])),sideB78=norm3(cross3(axis78,side78)),off78=(p78,v78,s78)=>[p78[0]+v78[0]*s78,p78[1]+v78[1]*s78,p78[2]+v78[2]*s78];
     quad3(trans,off78(source78,side78,-width78*.16),off78(source78,side78,width78*.16),off78(target78,side78,width78),off78(target78,side78,-width78),[top78,top78,low78,low78]);
