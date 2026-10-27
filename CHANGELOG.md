@@ -3,6 +3,38 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.15.0] — 2026-10-27 — « Appuis & Pivots »
+
+Nouvel audit en séquences continues après la colonne V7.14 : la
+course et la garde étaient déjà saines, mais le pied d'appui raclait
+**0,37 m** pendant un coup de pied et **0,49 m** pendant un sweep, et
+le demi-tour faisait pivoter le corps entier comme une statue sur
+un plateau (semelles « en contact » parcourant ≈1,2 m).
+
+### Corrigé — Appuis au sol
+- **Pied d'appui ancré dans le monde** pendant les coups de pied et
+  sweeps au sol : la cheville plantée est capturée au départ de
+  l'attaque et reconvertie chaque image dans le repère du corps,
+  avec garde de portée IK. Trajet mesuré : coup de pied
+  **0,37 → 0,03 m**, sweep **0,49 → 0,11 m**.
+- **Chaussure qui pivote** : chaque botte a son propre angle autour
+  de la cheville ; à la frappe, le pied d'appui passe sur
+  l'avant-pied, talon levé et pointe tournée avec l'ouverture des
+  hanches. Orteils ouverts en accroupi, talon levé aussi en repli 2D.
+- **Demi-tour en deux pas** : le pied arrière pivote sur place
+  (6 mm/image mesurés) pendant que le pied avant, levé, rejoint son
+  point d'arrivée final ; puis le pied avant se plante et le pied
+  arrière fait son pas. Frottement des semelles en contact :
+  **≈1,2 m → 0,07 m / 0,06 m**, sans réglage glissé en fin de tour.
+
+### Validation
+- Diagnostic image par image et captures navigateur (frappe, sweep,
+  milieu et fin de demi-tour) relues par l'équipe ; erreur d'os ~0,
+  course V7.13 inchangée (patinage 0,22 px/image, balancier des bras
+  opposé aux jambes −0,96/+0,95).
+- Smoke source + bundle (534 assertions), QA statique n°48. Rendu
+  uniquement : simulation, hitboxes, dégâts, IA et replays inchangés.
+
 ## [7.14.0] — 2026-10-27 — « Colonne VIVANTE »
 
 Suite directe de « Mouvement Réel » : les membres ne téléportaient
