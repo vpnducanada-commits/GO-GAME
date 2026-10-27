@@ -123,6 +123,15 @@ Moteur 60 Hz interpolé, caméra dynamique, dash/uppercut/balayage, combos annul
 - 🧍 Personnages : proportions adultes allongées, volumes ombrés, tenues signatures par style et caméra combat 1,34× — présentation inspirée des grandes licences 2D, sans toucher hitboxes/déterminisme/Online.
 - 🔜 Trajectoire V4 : V4.1 → V4.4 livrées ci-dessous. Priorités du propriétaire : visuel AAA (V4.2), TOUS les personnages des planches (V4.3), navigation/affichage professionnels (V4.4). Cap suivant décidé par le propriétaire : **V5.0 Édition Jeu Complet** (livrée ci-dessous). La compétition locale devient le Championnat Godson ; les priorités Graphismes AAA II et Online public sont reportées en V5.1/V5.3.
 
+## ✅ V7.12 — « Lancement & Disposition » *(LIVRÉ le 27/10/2026 — 515 assertions source / 751 vérifications, suite verte)*
+
+- **Retour direct du propriétaire** : « Impossible de lancer le jeu car l'affichage, la disposition ne sont pas optimales ». Audit navigateur sur 9 tailles d'écran, mesures à l'appui.
+- **Causes prouvées** : en paysage téléphone, les modes du menu étaient ~500 px sous l'écran (titre + hub + bannières) avec un défilement tactile gêné ; le boot dépassait des deux bords sous 412 px de haut ; en portrait, l'écran « Tourne ton appareil » n'avait aucune issue si le plein écran/rotation échouait.
+- **Corrections** : boot compact garanti dès 320 px de haut, menu principal en un écran jusqu'à 700 px (bouton Bot de ~500 px à 239 px), `touch-action:pan-y` sur les panneaux (glisser mesuré +87 à +251 px), plein écran attendu avant verrouillage et tentatives espacées, viewport synchronisé sur `visualViewport`, et bouton **« Jouer quand même »** ouvrant un portrait adapté non étiré.
+- **Preuves** : parcours complet boot → combat réussi en 568×320, 915×412, 360×640 portrait adapté et 1280×720 — 3D active, zéro erreur. Voir `docs/SPRINT_V712_LANCEMENT_DISPOSITION.md`.
+- ⚠️ **Budget bundle** porté à 736 Ko (741 232 octets réels) — arbitrage d'équipe : un jeu qui se lance partout prime.
+- 🔜 Prochaines étapes possibles : retest du propriétaire sur son appareil, validation terrain Online, ou reprise des graphismes.
+
 ## ✅ V7.11 — « Éclats & Reflets » *(LIVRÉ le 26/10/2026 — 509 assertions source / 745 vérifications, suite verte)*
 
 - **Demande du propriétaire** : « Continuez ». L'équipe pousse la lumière et les détails de près, squelette V7.9 verrouillé.

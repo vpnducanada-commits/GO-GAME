@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.11 — ÉCLATS & REFLETS, GRAPHISMES AAA III, 41 IDENTITÉS DE COMBAT
+   Godson FURY ARENA V7.12 — LANCEMENT TOUT ÉCRAN, ÉCLATS & REFLETS, 41 IDENTITÉS DE COMBAT
    Signed: Gideon - Godson
    ===================================================================== */
 const MENUS=["menuMain","menuBot","menuSelect","menuArena","menuVS","menuStory","menuCareer","menuTournament","menuHall","menuReplays","menuOnline","menuChallenges","menuCustomize","menuSettings","menuHow","menuPause","menuEnd"];
@@ -1660,11 +1660,11 @@ function goMenu(){
 async function requestImmersiveLandscape(){
   const el=$("gameWrap");
   try{
-    if(el&&el.requestFullscreen){
+    if(el&&!document.fullscreenElement&&el.requestFullscreen){
       const r=el.requestFullscreen({navigationUI:"hide"});
-      if(r&&r.catch)r.catch(()=>{ try{el.requestFullscreen();}catch(e){} });
+      if(r&&r.then)await r.catch(async()=>{ try{ const r2=el.requestFullscreen(); if(r2&&r2.catch)await r2.catch(()=>{}); }catch(e){} });
     }
-  }catch(e){ try{ if(el&&el.requestFullscreen)el.requestFullscreen(); }catch(e2){} }
+  }catch(e){}
   try{
     if(window.screen&&screen.orientation&&screen.orientation.lock){
       const p=screen.orientation.lock("landscape");
@@ -1673,10 +1673,13 @@ async function requestImmersiveLandscape(){
   }catch(e){}
 }
 let portraitQuery=null;
+function syncLayoutStats(){
+  try{ const vv=window.visualViewport,w=Math.round(vv?vv.width:window.innerWidth),h=Math.round(vv?vv.height:window.innerHeight); document.documentElement.style.setProperty("--app-w",w+"px"); document.documentElement.style.setProperty("--app-h",h+"px"); if(typeof renderStats!=="undefined"){ renderStats.viewportBox=w+"x"+h; renderStats.layoutMode=document.body.classList.contains("allowPortrait")?"portrait-adapté":(h>w?"portrait":"paysage")+(h<=580&&w>h?"-court":""); } }catch(e){}
+}
 function handlePortraitChange(){
   if(!portraitQuery)return;
   const portrait=!!portraitQuery.matches;
-  document.body.classList.toggle("portraitSmall",portrait);
+  document.body.classList.toggle("portraitSmall",portrait); syncLayoutStats();
   if(portrait&&!document.body.classList.contains("allowPortrait")&&state==="fight"&&mode!=="online"&&!(typeof replayPlayback!=="undefined"&&replayPlayback.active))togglePause();
 }
 /* V3.5 : tenu en paysage sur téléphone, l'écran entier appartient au combat
@@ -1693,6 +1696,9 @@ function initPortraitGuard(){
     if(portraitQuery.addEventListener)portraitQuery.addEventListener("change",handlePortraitChange);
     else if(portraitQuery.addListener)portraitQuery.addListener(handlePortraitChange);
     handlePortraitChange();
+    window.addEventListener("resize",syncLayoutStats);
+    if(window.visualViewport&&visualViewport.addEventListener)visualViewport.addEventListener("resize",syncLayoutStats);
+    syncLayoutStats();
   }catch(e){}
 }
 function togglePause(){
@@ -1961,9 +1967,10 @@ function bindUI(){
   $("btnFull").onclick=()=>{ if(document.fullscreenElement)document.exitFullscreen(); else requestImmersiveLandscape(); };
   /* V7.3 — Plein écran paysage forcé (tactile) : tout premier contact sans
      plein écran relance l'immersion. Sur desktop, seule l'entrée la déclenche. */
-  document.addEventListener("pointerdown",()=>{ try{ if(!document.fullscreenElement&&window.matchMedia&&window.matchMedia("(pointer:coarse)").matches)requestImmersiveLandscape(); }catch(e){} },true);
+  let _immersiveTryAt=0;
+  document.addEventListener("pointerdown",()=>{ try{ const now=Date.now(); if(now-_immersiveTryAt<2500)return; _immersiveTryAt=now; if(!document.body.classList.contains("allowPortrait")&&!document.fullscreenElement&&window.matchMedia&&window.matchMedia("(pointer:coarse)").matches)requestImmersiveLandscape(); }catch(e){} },true);
   const _bLand=$("btnLandscape"); if(_bLand)_bLand.onclick=requestImmersiveLandscape;
-  const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); };
+  const _bPort=$("btnPortraitAnyway"); if(_bPort)_bPort.onclick=()=>{ document.body.classList.add("allowPortrait"); if(typeof applyScreenFormat==="function")applyScreenFormat("adaptatif"); syncLayoutStats(); showToast("📱 Affichage adapté activé — pivote l’appareil quand tu peux pour le plein paysage."); };
   const _bPF=$("btnPauseFloat"); if(_bPF)_bPF.onclick=togglePause;
   initPortraitGuard();
   startBoot();

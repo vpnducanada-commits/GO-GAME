@@ -3,6 +3,42 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.12.0] — 2026-10-27 — « Lancement & Disposition »
+
+Retour direct du propriétaire : « Impossible de lancer le jeu car
+l'affichage, la disposition ne sont pas optimales ». Audit navigateur
+sur 9 tailles d'écran (568×320 → 1366×640, portrait inclus).
+
+### Corrigé — Lancement bloqué ou laborieux
+- **Menu principal** : sur les téléphones en paysage, les boutons de
+  mode se trouvaient ~500 px sous l'écran (titre + hub + bannières) et
+  le `touch-action:none` de la scène empêchait de les atteindre au
+  doigt. Le menu tient désormais au premier écran jusqu'à 700 px de
+  haut (hub en une ligne, bannières compactes, modes en 4 colonnes) et
+  les panneaux défilent réellement (`touch-action:pan-y`, vérifié par
+  glisser tactile : +87 à +251 px mesurés).
+- **Écran de démarrage** : le contenu dépassait des deux bords dès
+  412 px de haut (logo rogné, signature hors écran). Boot compact en
+  unités `vh`, astuce/signature masquées en écran court : tout tient
+  dès **320 px de haut**, bouton toujours visible et cliquable.
+- **Portrait sans issue** : si le plein écran ou la rotation échoue
+  (iPhone, rotation verrouillée, navigateur intégré), l'écran
+  « Tourne ton appareil » piégeait le joueur. Nouveau bouton
+  **« Jouer quand même »** : affichage portrait adapté (scène 16:9
+  centrée non étirée, menus plein format, contrôles aux bords).
+- **Plein écran** : le verrouillage d'orientation attend désormais
+  l'entrée effective en plein écran, et les tentatives automatiques
+  sont espacées (fini la demande à chaque toucher).
+- **Viewport réel** : hauteur/largeur visibles synchronisées via
+  `visualViewport` (barres navigateur mobiles) + replis `vh/vw` pour
+  les navigateurs sans `dvh` ; télémétrie `layoutMode`/`viewportBox`.
+
+### Validation
+- Matrice Chromium : boot cliquable et contenu complet sur les
+  9 tailles ; parcours complet boot → menu → personnages → arène →
+  difficulté → VS → combat réussi en 568×320, 915×412, 360×640
+  portrait adapté et 1280×720 (3D active, zéro erreur).
+
 ## [7.11.0] — 2026-10-26 — « Éclats & Reflets »
 
 Le propriétaire demande de continuer. L'équipe pousse la lumière et les

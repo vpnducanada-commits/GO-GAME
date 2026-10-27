@@ -1,6 +1,6 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.11 — ÉCLATS & REFLETS (reflets directionnels, halos, visages/cheveux cinéma) + Graphismes AAA III V7.10 + Squelette IK Stable V7.9 (WebGL maison, zéro dépendance)
+   Godson FURY ARENA V7.12 — DISPOSITION TOUT ÉCRAN + Éclats & Reflets V7.11 + Graphismes AAA III V7.10 + Squelette IK Stable V7.9 (WebGL maison, zéro dépendance)
    Personnages humanoïdes articulés, arènes en profondeur, caméra combat.
    La simulation reste celle du moteur déterministe : ce module ne fait
    que dessiner. Repli automatique vers le rendu 2D AAA II si besoin.
