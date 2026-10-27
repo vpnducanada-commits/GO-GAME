@@ -225,74 +225,81 @@ check("Anatomie AAA V7 présente", v7_ok, "torse/tête/membres loftés • visag
 # 34. Tournoi & Saisons V7.1 : brackets locaux persistants 4/8/16, affiches
 # CPU déterministes, classement et points décernés une seule fois, paliers
 # de Saison 1 « Aurore de Libreville » et archivage des anciennes saisons.
-v71_ok = ver in ("7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["engine"] for x in ('const CURRENT_SEASON','const SEASON_TIERS','const TOURNAMENT_FORMATS','function tournamentHash01','function tournamentRating','function setupTournamentRun','function simulateTournamentMatch','function completeTournamentPlayerMatch','function recordTournamentCompletion','function claimSeasonReward','function toggleSeasonTitle','function syncTournamentFromProfile','function tournamentForReplay','activeTournament','lastTournament')) and all(x in js["ui"] for x in ('function renderTournament','function renderTournamentBracket','function renderCareerTournament','function startTournament','function playTournamentMatch','function openTournament','id:"tournament-first"','id:"triple-couronne"')) and all(x in html for x in ('id="btnModeTournament"','id="menuTournament"','id="tournamentFormats"','id="tournamentBracket"','id="tournamentHistory"','id="careerTournament"','Saison 1 — Aurore de Libreville')) and all(x in css for x in ('V7.1 — TOURNOI & SAISONS','.mc-tournament','.bracketGrid','.bracketMatch','.seasonTier','.seasonMeter'))
+v71_ok = ver in ("7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["engine"] for x in ('const CURRENT_SEASON','const SEASON_TIERS','const TOURNAMENT_FORMATS','function tournamentHash01','function tournamentRating','function setupTournamentRun','function simulateTournamentMatch','function completeTournamentPlayerMatch','function recordTournamentCompletion','function claimSeasonReward','function toggleSeasonTitle','function syncTournamentFromProfile','function tournamentForReplay','activeTournament','lastTournament')) and all(x in js["ui"] for x in ('function renderTournament','function renderTournamentBracket','function renderCareerTournament','function startTournament','function playTournamentMatch','function openTournament','id:"tournament-first"','id:"triple-couronne"')) and all(x in html for x in ('id="btnModeTournament"','id="menuTournament"','id="tournamentFormats"','id="tournamentBracket"','id="tournamentHistory"','id="careerTournament"','Saison 1 — Aurore de Libreville')) and all(x in css for x in ('V7.1 — TOURNOI & SAISONS','.mc-tournament','.bracketGrid','.bracketMatch','.seasonTier','.seasonMeter'))
 check("Tournoi & Saisons V7.1 présents", v71_ok, "brackets 4/8/16 persistants • CPU déterministe • points anti-double-gain • 5 paliers et titres de Saison 1")
 
 # 35. Réalité 3D II V7.2 : proportions humaines normalisées, grain procédural,
 # caméra de combat dynamique, torse bicolore, jupes volumiques et HUD compact.
-v72_ok = ver in ("7.2.0","7.3.0","7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('float vnoise','camDist3D','ringSkirt3D','palette=color&&color.main','Réalité 3D II V7.2','shoulderScale3','const headR=(human.headR||15)/95*S*.8;','function addWeapon3D')) and 'Réalité 3D II V7.2' in js["render"] and 'V7.2 RÉALITÉ 3D II' in css and ('V7.2' in html or 'V7.3' in html or 'V7.4' in html or 'V7.5' in html or 'V7.6' in html or 'V7.7' in html or 'V7.8' in html or 'V7.9' in html or 'V7.10' in html or 'V7.11' in html or 'V7.12' in html)
+v72_ok = ver in ("7.2.0","7.3.0","7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('float vnoise','camDist3D','ringSkirt3D','palette=color&&color.main','Réalité 3D II V7.2','shoulderScale3','const headR=(human.headR||15)/95*S*.8;','function addWeapon3D')) and 'Réalité 3D II V7.2' in js["render"] and 'V7.2 RÉALITÉ 3D II' in css and ('V7.2' in html or 'V7.3' in html or 'V7.4' in html or 'V7.5' in html or 'V7.6' in html or 'V7.7' in html or 'V7.8' in html or 'V7.9' in html or 'V7.10' in html or 'V7.11' in html or 'V7.12' in html or 'V7.13' in html)
 check("Réalité 3D II V7.2 présente", v72_ok, "anatomie normalisée • matières grainées • caméra basse 3/4 • arènes enrichies • HUD de combat fin")
 
 # 36. Plein écran forcé & Sélection claire V7.3 : porte d'entrée immersive,
 # portrait bloqué sans échappatoire, menus sans textes M1/Signature et
 # grandes cartes de sélection plein corps (demande directe du propriétaire).
-v73_ok = ver in ("7.3.0","7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and 'id="bootEnter"' in html and 'id="btnPortraitAnyway"' in html and 'bootEnter' in js["ui"] and '(pointer:coarse)' in js["ui"] and 'V7.3 — PLEIN ÉCRAN FORCÉ' in css and 'minmax(106px' in css and '.bootEnter' in css and 'M1 SIGNATURE • COMBOS' not in js["render"]
+v73_ok = ver in ("7.3.0","7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and 'id="bootEnter"' in html and 'id="btnPortraitAnyway"' in html and 'bootEnter' in js["ui"] and '(pointer:coarse)' in js["ui"] and 'V7.3 — PLEIN ÉCRAN FORCÉ' in css and 'minmax(106px' in css and '.bootEnter' in css and 'M1 SIGNATURE • COMBOS' not in js["render"]
 check("Plein écran forcé & Sélection claire V7.3 présents", v73_ok, "entrée plein écran paysage • portrait bloqué • menus épurés • figurines plein corps nom seul")
 
 # 37. Identités de combat V7.4 : une fiche de posture/attaques par combattant
 # (stance, gardes, torsion, styles de poing/pied/spécial, posture d'affiche),
 # appliquée au combat 3D et aux portraits de sélection, en rendu seul.
-v74_ok = ver in ("7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and js["render3d"].count("ST74(") >= 41 and all(x in js["render3d"] for x in ('const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist')) and 'stanceP' in js["ui"] and 'stanceProfile3D(f)' in js["ui"]
+v74_ok = ver in ("7.4.0","7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and js["render3d"].count("ST74(") >= 41 and all(x in js["render3d"] for x in ('const FIGHTER_STANCE3D','function stanceProfile3D','kickPose74','renderStats.stance3d','stance.twist')) and 'stanceP' in js["ui"] and 'stanceProfile3D(f)' in js["ui"]
 check("Identités de combat V7.4 présentes", v74_ok, "41 fiches individuelles • postures et attaques reconnaissables • sélection et combat synchronisés")
 
 # 38. Visages & Costumes V7.5 : coiffe sculptée selon les 13 styles de cheveux
 # des fiches, mèches d'encadrement, chignon, barbes en trois volumes,
 # peintures de guerre orc/alien et ceintures-écharpes martiales (rendu seul).
-v75_ok = ver in ("7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('capFlat75','backDeep75','beard75','hair==="bun"','sashCenter75','renderStats.hair3d','peintures de guerre'))
+v75_ok = ver in ("7.5.0","7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('capFlat75','backDeep75','beard75','hair==="bun"','sashCenter75','renderStats.hair3d','peintures de guerre'))
 check("Visages & Costumes V7.5 présents", v75_ok, "cheveux sculptés par style • barbes pleines • chignon/tresses • détails de costume par famille")
 
 # 39. Mobilité Dynamique V7.6 : profil direct plus vif et profil legacy pour
 # les anciens replays, foulée synchronisée à l'interpolation, phases
 # fractionnaires, ressorts demi-tour/saut/réception, dashs et caméras.
-v76_ok = ver in ("7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["engine"] for x in ('const MOBILITY76','function mobilityProfile76','attackSlide','apexGravity')) and all(x in js["render"] for x in ('gaitPhase','attackFlow','turnPulse','landingPulse','renderInterpolationAlpha','cameraLead')) and all(x in js["render3d"] for x in ('dashTrails3d','cameraSmooth','headTop76','cameraLead3d'))
+v76_ok = ver in ("7.6.0","7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["engine"] for x in ('const MOBILITY76','function mobilityProfile76','attackSlide','apexGravity')) and all(x in js["render"] for x in ('gaitPhase','attackFlow','turnPulse','landingPulse','renderInterpolationAlpha','cameraLead')) and all(x in js["render3d"] for x in ('dashTrails3d','cameraSmooth','headTop76','cameraLead3d'))
 check("Mobilité Dynamique V7.6 présente", v76_ok, "accélération/demi-tour/air/dash plus vifs • foulée anti-patinage • caméras anticipatives • anciens replays en profil legacy")
 
 # 40. Présence Vivante V7.7 : expressions 3D selon l'état de combat, mains
 # en phalanges (poing/paume/prise/soutien), visières expressives, bottes
 # articulées au contact et réaction corporelle d'impact sans aucun gel.
-v77_ok = ver in ("7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('const face77','segments77','ptsLocal77','visorGlow77','impactLocal77','makeFoot77','renderStats.expression3d','renderStats.weaponGrip3d')) and all(x in js["render"] for x in ('expression3d:"focus"','handCurl3d','footPitch3d','impactPose3d'))
+v77_ok = ver in ("7.7.0","7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('const face77','segments77','ptsLocal77','visorGlow77','impactLocal77','makeFoot77','renderStats.expression3d','renderStats.weaponGrip3d')) and all(x in js["render"] for x in ('expression3d:"focus"','handCurl3d','footPitch3d','impactPose3d'))
 check("Présence Vivante V7.7 présente", v77_ok, "expressions focus/attaque/douleur/K.O. • mains et prises à deux mains • appuis talon-pointe • impact corporel sans gel")
 
 # 41. Arènes Spectacle V7.8 : couche dynamique par arène réactive au match
 # (tribunes, écran géant, train, braises, pirogue), faisceaux de scène,
 # poussières d'ambiance et silhouettes lointaines — rendu seul, quantités
 # bornées par le niveau de qualité et zone de combat toujours dégagée.
-v78_ok = ver in ("7.8.0","7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('function arenaSpectacleState3D','function addArenaSpectacle3D','spectacle78','beam78','renderStats.spectacleBeams3d','renderStats.spectacleActors3d','farH78','tier78')) and all(x in js["render"] for x in ('arenaSpectacle3d:','spectaclePulse3d','ambientMotes3d'))
+v78_ok = ver in ("7.8.0","7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('function arenaSpectacleState3D','function addArenaSpectacle3D','spectacle78','beam78','renderStats.spectacleBeams3d','renderStats.spectacleActors3d','farH78','tier78')) and all(x in js["render"] for x in ('arenaSpectacle3d:','spectaclePulse3d','ambientMotes3d'))
 check("Arènes Spectacle V7.8 présentes", v78_ok, "tribunes qui lèvent les bras • écran géant animé • train, braises et pirogue • faisceaux et poussières réactifs au match")
 
 # 42. Squelette Stable V7.9 : IK deux os à longueurs fixes (local + monde),
 # colonne à longueur constante, demi-tour continu, précision vertex highp
 # compatible mobile et restauration après perte de contexte WebGL.
-v79_ok = ver in ("7.9.0","7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('const BONE3D','function solveTwoBone3D','function boneDeviation3D','webglcontextrestored','function resetRenderer3DResources','precision highp float;attribute vec3 aPos','varying mediump vec4 vColor','uniform mediump vec3 uCamPos','faceSmooth3d','renderStats.skeleton3d')) and all(x in js["render"] for x in ('skeleton3d:','boneError3d','context3d:','canvas3d:'))
+v79_ok = ver in ("7.9.0","7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('const BONE3D','function solveTwoBone3D','function boneDeviation3D','webglcontextrestored','function resetRenderer3DResources','precision highp float;attribute vec3 aPos','varying mediump vec4 vColor','uniform mediump vec3 uCamPos','faceSmooth3d','renderStats.skeleton3d')) and all(x in js["render"] for x in ('skeleton3d:','boneError3d','context3d:','canvas3d:'))
 check("Squelette Stable V7.9 présent", v79_ok, "bras 0,31/0,29 m et jambes 0,54/0,53 m fixes • IK monde après torsion • demi-tour continu • WebGL1/2 et contexte restauré")
 
 # 43. Graphismes AAA III V7.10 : lumière cinéma (ciel ambiant, environnement,
 # sheen teinté, brume de profondeur), atlas adouci, buste/tête/membres à
 # sections sculptées, ciel en couches et reflets doux au sol — visuel pur.
-v710_ok = ver in ("7.10.0","7.11.0","7.12.0") and all(x in js["render3d"] for x in ('envCol','albedo*fillLin*pow','smoothstep(12.0,38.0','aces(col*1.32)','pec710','hx710','skyDetail710','starN710','renderStats.floorRefl3d','renderStats.cinemaLight3d')) and all(x in js["render"] for x in ('cinemaLight3d:','skyDetail3d:','floorRefl3d:'))
+v710_ok = ver in ("7.10.0","7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('envCol','albedo*fillLin*pow','smoothstep(12.0,38.0','aces(col*1.32)','pec710','hx710','skyDetail710','starN710','renderStats.floorRefl3d','renderStats.cinemaLight3d')) and all(x in js["render"] for x in ('cinemaLight3d:','skyDetail3d:','floorRefl3d:'))
 check("Graphismes AAA III V7.10 présents", v710_ok, "lumière cinéma et matières douces • pectoraux/pommettes intégrés aux lofts • halos, étoiles et brumes • reflets des combattants au sol")
 
 # 44. Éclats & Reflets V7.11 : reflets au sol orientés par la lumière et la
 # brillance propre à chaque arène, halos d'éclat bornés, visages/cheveux
 # cinéma et emblème de tenue des planches en relief — visuel pur.
-v711_ok = ver in ("7.11.0","7.12.0") and all(x in js["render3d"] for x in ('gloss711','reflDir711','streak711','hi711','strands711','emb711','renderStats.glow3d','renderStats.reflDir3d','renderStats.hairDetail3d','renderStats.emblem3d','px711')) and all(x in js["render"] for x in ('glow3d:','reflDir3d:','hairDetail3d:','emblem3d:'))
+v711_ok = ver in ("7.11.0","7.12.0","7.13.0") and all(x in js["render3d"] for x in ('gloss711','reflDir711','streak711','hi711','strands711','emb711','renderStats.glow3d','renderStats.reflDir3d','renderStats.hairDetail3d','renderStats.emblem3d','px711')) and all(x in js["render"] for x in ('glow3d:','reflDir3d:','hairDetail3d:','emblem3d:'))
 check("Éclats & Reflets V7.11 présents", v711_ok, "reflets directionnels par arène • halos projectile/impact/aura • mèches et favoris • emblèmes des 41 tenues en 3D")
 
 # 45. Lancement & Disposition V7.12 : boot compact sur écrans courts, menu
 # principal en un écran jusqu'à 700 px de haut, défilement tactile réel,
 # viewport visible synchronisé et issue portrait adaptée — jamais piégé.
-v712_ok = ver == "7.12.0" and 'id="btnPortraitAnyway"' in html and all(x in css for x in ('V7.12 — LANCEMENT & DISPOSITION','--app-w','touch-action:pan-y','clamp(42px,11vh,74px)','@media(max-height:500px)','max-height:700px','body.allowPortrait.screen-cinema')) and all(x in js["ui"] for x in ('_immersiveTryAt','await r.catch','function syncLayoutStats','visualViewport','applyScreenFormat("adaptatif")')) and all(x in js["render"] for x in ('layoutMode:','viewportBox:'))
+v712_ok = ver in ("7.12.0","7.13.0") and 'id="btnPortraitAnyway"' in html and all(x in css for x in ('V7.12 — LANCEMENT & DISPOSITION','--app-w','touch-action:pan-y','clamp(42px,11vh,74px)','@media(max-height:500px)','max-height:700px','body.allowPortrait.screen-cinema')) and all(x in js["ui"] for x in ('_immersiveTryAt','await r.catch','function syncLayoutStats','visualViewport','applyScreenFormat("adaptatif")')) and all(x in js["render"] for x in ('layoutMode:','viewportBox:'))
 check("Lancement & Disposition V7.12 présents", v712_ok, "boot visible dès 320 px de haut • modes du menu au premier écran • scroll tactile • portrait adapté sans piège")
+
+# 46. Mouvement Réel V7.13 : attaques en images-clés fondues, limiteurs de
+# vitesse d'articulation, pôles IK stables, foulée cycloïdale à appuis
+# plantés, chute/relève fondues et squelette 2D à longueurs constantes —
+# animation pure, simulation/hitboxes/replays inchangés.
+v713_ok = ver == "7.13.0" and all(x in js["render3d"] for x in ('function rateLimit3','function stablePole3','function smoother01','downBlend3d','gait713','atkW713','chamber713','motionReal13','renderStats.motionReal3d','stablePole3(f.poseMidW3d')) and all(x in js["render"] for x in ('function dampMotionValue','function solveLimb2D','downBlend2d','smoother01Motion','motionReal3d:','gait713')) and 'posePrev3d=null' in js["engine"]
+check("Mouvement Réel V7.13 présent", v713_ok, "aucune téléportation de membre • appuis plantés • angles 34-172° • chute/relève fondues 3D+2D")
 
 # 14. Aucun secret serveur dans le client livré au navigateur
 client_blob = html + all_js

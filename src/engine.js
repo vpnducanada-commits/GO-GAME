@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.12 — LANCEMENT & DISPOSITION, ÉCLATS & REFLETS, SQUELETTE STABLE & TOURNOI
+   Godson FURY ARENA V7.13 — MOUVEMENT RÉEL, LANCEMENT & DISPOSITION, SQUELETTE STABLE & TOURNOI
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.12.0";
+const GAME_VERSION="7.13.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
@@ -742,6 +742,7 @@ class Fighter{
     this.anim=replayRand()*100; this.walkPhase=0; this.squashT=0; this.blinkT=80+replayRand()*120;
     this.prev={left:false,right:false,jump:false,block:false,punch:false,kick:false,special:false,dash:false};
     this.motion=null; this.crouchBlend=0; // V7.6 : aucun ressort visuel hérité au changement de round/personnage
+    this.posePrev3d=null; this.poseMidL3d=null; this.poseMidW3d=null; this.downBlend3d=0; this.downBlend2d=0; this.victoryBlend2d=0; this.faceSmooth3d=null; // V7.13 : mémoire d'animation repartie à zéro
   }
 }
 const p1=new Fighter(390,1), p2=new Fighter(890,2);

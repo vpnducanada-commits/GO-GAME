@@ -3,6 +3,60 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.13.0] — 2026-10-27 — « Mouvement Réel »
+
+Retour direct du propriétaire : « Les personnes sont totalement
+déformés, les mouvements sont trop irréaliste ». Audit en **séquences
+continues** (et non plus en poses fixes) sur repos, marche avant/
+arrière, dash, saut, accroupi, toutes les attaques, air, juggle,
+chute/relève, demi-tour et victoire. Les os fixes de la V7.9 étaient
+réels mais insuffisants : mesurés image par image, la relève
+téléportait les membres jusqu'à **1,89 m en une image**, le coup de
+pied sautait de **1,07 m** au départ et au retour, les pieds en appui
+glissaient jusqu'à **6,7 px/image**, le coude de garde se repliait à
+**26,7°**, et le repli 2D faisait varier l'avant-bras de **4,6 à
+59,8 px**. Cause racine supplémentaire : le filtre d'animation
+historique convergeait en pratique en 1 image pour la garde, l'air,
+la douleur et l'accroupissement.
+
+### Corrigé — Animation corporelle (3D + repli 2D)
+- **Zéro téléportation** : limiteurs de vitesse d'articulation
+  (mains/pieds, contexte frappe ou transition), fondu d'entrée/sortie
+  de chaque attaque, et coups de pied en images-clés posture →
+  chambre → frappe tenue → chambre → posture.
+- **Chute et relève fondues** : le squelette entier bascule au sol
+  puis se relève en ~0,4 s, re-résolu en IK à chaque image (os et
+  colonne à longueur constante pendant toute la transition).
+- **Appuis plantés** : foulée cycloïdale appui linéaire/oscillation
+  accordée à la distance parcourue, pied qui recule déjà avant la
+  pose du talon : patinage mesuré **0,22 px/image en moyenne**
+  (pic 1,42), contre 2,43/6,7 avant.
+- **Angles humains** : flexion minimale coude/genou dans le solveur
+  IK, pôles coude/genou stabilisés par la mémoire de flexion
+  (local + monde) : angles mesurés **40,3° à 165,5°** sur toutes
+  les séquences, plus d'hyper-flexion ni de retournement.
+- **Transferts de poids** : bassin ancré sur la jambe d'appui et
+  buste en contre-balance pendant pied/sweep, uppercut en deux
+  temps (flexion puis détente, poing à hauteur de menton), tête
+  stabilisée par le cou, juggle qui bascule en arrière jambes
+  traînantes, demi-tour à vitesse angulaire bornée.
+- **Amortissement réel** : nouveau filtre calibré par seconde pour
+  les canaux corporels (garde, air, douleur, course, accroupi…).
+- **Repli 2D reconstruit** : solveur à longueurs constantes pour
+  bras et jambes (cibles bornées à la portée), foulée plantée,
+  coups de pied en images-clés, chute/relève et victoire fondues,
+  fin de l'écrasement cartoon du corps entier.
+
+### Validation
+- Audit dynamique avant/après : saut d'articulation maximal
+  **1,89 m → 0,24 m** (impulsion de frappe), écart d'os monde
+  **~0 %**, patinage moyen **2,43 → 0,22 px/image**.
+- Captures de séquences relues image par image (marche, chambre et
+  pic du coup de pied, poing, uppercut, sweep, au sol, relève,
+  juggle, victoire).
+- Smoke source + bundle, QA statique n°46. Simulation, hitboxes,
+  dégâts, IA et replays inchangés (animation pure).
+
 ## [7.12.0] — 2026-10-27 — « Lancement & Disposition »
 
 Retour direct du propriétaire : « Impossible de lancer le jeu car

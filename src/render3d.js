@@ -1117,8 +1117,23 @@ const FIGHTER_STANCE3D={
 };
 function stanceProfile3D(f){ const id=String((f&&f.char&&f.char.id)||"gideon"); const raw=FIGHTER_STANCE3D[id]||FIGHTER_STANCE3D[id.toLowerCase()]; return raw?Object.assign({},STANCE_DEFAULT3D,raw):STANCE_DEFAULT3D; }
 const BONE3D={upperArm:.31,forearm:.29,thigh:.54,shin:.53,spine:.505,neck:.302};
-function solveTwoBone3D(rootBone,target,l1,l2,pole,preserveY){
-  const total=l1+l2,maxD=total*.995,minD=Math.max(.14,Math.abs(l1-l2)+.04),poleDir=pole||[0,-1,0];
+function smoother01(x){ x=clamp(x,0,1); return x*x*x*(x*(x*6-15)+10); }
+function rateLimit3(f,key,target,maxSpeed){
+  if(!f.posePrev3d)f.posePrev3d={};
+  const prev=f.posePrev3d[key];
+  if(!prev){ f.posePrev3d[key]=target.slice(); return target.slice(); }
+  const step=maxSpeed*clamp(renderDtFactor||1,.2,3)/60,delta=sub3(target,prev),d=len3(delta);
+  if(d<=step||d<1e-6){ f.posePrev3d[key]=target.slice(); return target.slice(); }
+  const out=add3(prev,scale3(delta,step/d)); f.posePrev3d[key]=out.slice(); return out;
+}
+function stablePole3(prevMid,rootBone,endBone,pole){
+  if(!prevMid)return pole;
+  const d713=sub3(endBone,rootBone),len713=len3(d713)||1,t713=clamp(dot3(sub3(prevMid,rootBone),d713)/(len713*len713),0,1),off713=sub3(prevMid,add3(rootBone,scale3(d713,t713)));
+  if(len3(off713)<.015)return pole;
+  return norm3(add3(scale3(norm3(pole),.45),scale3(norm3(off713),.55)));
+}
+function solveTwoBone3D(rootBone,target,l1,l2,pole,preserveY,minDist){
+  const total=l1+l2,maxD=total*.992,minD=Math.max(.14,Math.abs(l1-l2)+.04,minDist||0),poleDir=pole||[0,-1,0];
   let end=target.slice(),delta=sub3(end,rootBone),d=len3(delta);
   if(d>maxD){
     if(preserveY&&Math.abs(delta[1])<maxD){
@@ -1143,7 +1158,11 @@ function boneDeviation3D(local,scale){
 function buildFighterPose3D(f){
   const ch=f.char,human=humanProfile(f),model=boardModel3D(f),motion=fighterMotion(f),atk=f.attack,phase=motion.attack||0,S=ch.scale||1,stance=stanceProfile3D(f);
   if(f.crouchBlend==null)f.crouchBlend=0;
-  f.crouchBlend=smoothMotionValue(f.crouchBlend,(f.crouching||f.attackType==="uppercut"||f.attackType==="sweep")?1:0,14);
+  const atkDur713=Math.max(1,f.attackDur||((atk&&atk.dur)||1)),atkEl713=f.attack?clamp(atkDur713-(f.attackT||0),0,atkDur713):0,atkU713=f.attack?atkEl713/atkDur713:0;
+  const atkStart713=(atk&&atk.start)||4,atkEnd713=(atk&&atk.end)||Math.round(atkDur713*.62);
+  const atkW713=f.attack?smoother01(atkEl713/Math.max(2,atkStart713))*smoother01((atkDur713-atkEl713)/Math.max(3,atkDur713-atkEnd713)):0;
+  const crouchTarget713=f.crouching?1:f.attackType==="sweep"?1:f.attackType==="uppercut"?(atkU713<.34?.92:.22):0;
+  f.crouchBlend=dampMotionValue(f.crouchBlend,crouchTarget713,20);
   const cb=(f.dead||f.downT>0)?f.crouchBlend:clamp(Math.max(f.crouchBlend,stance.crouch*(f.grounded?1:.25)*(1-phase*.3)),0,.85),gaitPhase=motion.gaitPhase==null?(f.walkPhase||0):motion.gaitPhase,gaitLift=Math.abs(Math.sin(gaitPhase))*motion.run;
   const flash77=clamp((f.hitFlash||0)/6,0,1),hitPulse77=f.hitStun>0?Math.max(.55,flash77):flash77*.45,blockPulse77=f.blockStun>0?.48:0,parryPulse77=(f.parryFlashT>0||f.parryT>0)?.62:0;
   const impact77=clamp(Math.max(hitPulse77,blockPulse77,parryPulse77),0,1),impactDir77=clamp(((f.kvx||0)*(f.facing||1))*.11,-1,1),impactLocal77=impact77*(impactDir77||-.72),impactLift77=clamp((-(f.vy||0))*.025+(f.juggleT>0?.28:0),0,.55)*impact77;
@@ -1158,10 +1177,11 @@ function buildFighterPose3D(f){
   const upperExt=f.attackType==="uppercut"?phase*(44+m1Boost)/95:0;
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*14:f.attackType==="uppercut"?phase*7:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0)/95;
   const walking=motion.run>.07&&f.grounded&&f.dashT<=0&&!f.attack,local={};
-  local.pelvis=[motion.lean*.1+(motion.accelLean||0)*.18+stance.lean*.35+attackShift*.34+motion.weight*.014-motion.hurt*.02+impactLocal77*.025,lerp(.97,.69,cb)+bob-impact77*.006,0];
-  local.chest=[motion.lean*.27+(motion.accelLean||0)*.38+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06+impactLocal77*.075,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018-impact77*.012+impactLift77*.01,0];
-  local.head=[.04+local.chest[0]*.62+motion.head*.09+(motion.headLag||0)/95-motion.hurt*.03+impactLocal77*.055,lerp(1.78,1.47,cb)+bob+motion.fatigue*.012-impact77*.018+impactLift77*.012,0];
-  { const spineDir79=norm3(sub3(local.chest,local.pelvis)); local.chest=add3(local.pelvis,scale3(spineDir79,BONE3D.spine)); const neckDir79=norm3(sub3(local.head,local.chest)); local.head=add3(local.chest,scale3(neckDir79,BONE3D.neck)); }
+  const kickStrike713=(f.attackType==="kick"||f.attackType==="airKick")?clamp(phase,0,1)*atkW713:0,sweepStrike713=f.attackType==="sweep"?clamp(phase,0,1)*atkW713:0,airHurt713=(motion.air||0)*clamp(motion.hurt||0,0,1);
+  local.pelvis=[motion.lean*.1+(motion.accelLean||0)*.18+stance.lean*.35+attackShift*.34+motion.weight*.014-motion.hurt*.02+impactLocal77*.025-kickStrike713*.055-sweepStrike713*.06,lerp(.97,.69,cb)+bob-impact77*.006-kickStrike713*.022-sweepStrike713*.07-airHurt713*.01,0];
+  local.chest=[motion.lean*.27+(motion.accelLean||0)*.38+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06+impactLocal77*.075-kickStrike713*.105-sweepStrike713*.05-airHurt713*.055,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018-impact77*.012+impactLift77*.01-kickStrike713*.008-airHurt713*.012,0];
+  local.head=[.04+local.chest[0]*.62+motion.head*.09+(motion.headLag||0)/95-motion.hurt*.03+impactLocal77*.055-kickStrike713*.045-sweepStrike713*.02-airHurt713*.035,lerp(1.78,1.47,cb)+bob+motion.fatigue*.012-impact77*.018+impactLift77*.012,0];
+  { const spineDir79=norm3(sub3(local.chest,local.pelvis)); local.chest=add3(local.pelvis,scale3(spineDir79,BONE3D.spine)); const neckRaw79=norm3(sub3(local.head,local.chest)),neckStab713=(f.dead||f.downT>0)?0:clamp(.36-(motion.hurt||0)*.2-(motion.air||0)*.08,.08,.36),neckDir79=norm3(mix3(neckRaw79,[.07,1,0],neckStab713)); local.head=add3(local.chest,scale3(neckDir79,BONE3D.neck)); }
   local.neck=mix3(local.chest,local.head,.55);
   const shoulderHalf=(human.shoulder/95)*(.9+ch.bulk*.09)*(.72+(model.shoulders||1)*.28),hipHalf=(human.hip/95)*(.92+ch.bulk*.08)*(.76+(model.hips||1)*.24);
   local.shoulderBack=[local.chest[0]-.015+impactLocal77*.035,local.chest[1]+.035-(motion.shoulderRoll||0)/95-impact77*.011,-shoulderHalf];
@@ -1174,23 +1194,44 @@ function buildFighterPose3D(f){
   let bFoot=[stance.feet[0]-motion.lean*.08,0,-.17*stance.width],fFoot=[stance.feet[1]+motion.lean*.05,0,.17*stance.width];
   if(cb>.12){ bFoot[0]=lerp(bFoot[0],-.36,cb); fFoot[0]=lerp(fFoot[0],.34,cb); }
   if(walking){
-    const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stride=(.16+motion.run*.19)*strideDir,s=Math.sin(gaitPhase),c=Math.cos(gaitPhase),mix=clamp(motion.run*1.35,0,1);
-    bFoot[0]=lerp(bFoot[0],-.03-s*stride,mix); fFoot[0]=lerp(fFoot[0],.05+s*stride,mix);
-    bFoot[1]=lerp(bFoot[1],Math.max(0,-c)*(.035+motion.run*.075),mix); fFoot[1]=lerp(fFoot[1],Math.max(0,c)*(.035+motion.run*.075),mix);
+    const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stanceF713=.6-motion.run*.12,amp713=.23+motion.run*.14,mix=clamp(motion.run*1.35,0,1);
+    const gait713=off713=>{ let u713=((gaitPhase+off713)/(Math.PI*2))%1; if(u713<0)u713+=1; if(u713<stanceF713)return [amp713*(1-2*u713/stanceF713)*strideDir,0]; const v713=(u713-stanceF713)/(1-stanceF713); return [amp713*(-1+2*(v713-Math.sin(v713*Math.PI*2)/(Math.PI*2*stanceF713)))*strideDir,(.035+motion.run*.085)*Math.pow(Math.sin(Math.PI*v713),.8)]; };
+    const gb713=gait713(Math.PI),gf713=gait713(0);
+    bFoot[0]=lerp(bFoot[0],-.03+gb713[0],mix); fFoot[0]=lerp(fFoot[0],.04+gf713[0],mix);
+    bFoot[1]=lerp(bFoot[1],gb713[1],mix); fFoot[1]=lerp(fFoot[1],gf713[1],mix);
   }
   if(f.grounded&&(motion.turnPulse||0)>.03){ const tp=(motion.turnPulse||0)*.7; bFoot=mix3(bFoot,[stance.feet[0]-.07,.015,-.2*stance.width],tp); fFoot=mix3(fFoot,[stance.feet[1]+.05,.055,.2*stance.width],tp); }
   if(!f.dead&&motion.air>.03){ const a=motion.air,sw=clamp((motion.airPitch||0)*.42,-.045,.055); bFoot=mix3(bFoot,[-.22-sw,.3+sw,-.17],a); fFoot=mix3(fFoot,[.27+sw,.2-sw,.17],a); }
+  if(airHurt713>.03){ bFoot=mix3(bFoot,[-.14,.15,-.17],airHurt713*.8); fFoot=mix3(fFoot,[.16,.09,.17],airHurt713*.8); }
   const kickPose74={devant:[.44,.94,.17,.82],circulaire:[.42,1.06,.24,.8],lateral:[.5,.82,.12,.9],hache:[.4,1.26,.18,.72],bas:[.46,.42,.18,.85],genou:[.36,.8,.16,.5],retourne:[.43,1.03,.03,.8]}[stance.kick]||[.44,.94,.17,.82];
-  if(f.attackType==="kick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],kickPose74[1],kickPose74[2]];
-  if(f.attackType==="airKick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],Math.max(.34,kickPose74[1]-.34),kickPose74[2]];
-  if(f.attackType==="sweep")fFoot=[.46+kickExt*.82,.07,.17*stance.width];
-  if(motion.dash>.04){ bFoot=mix3(bFoot,[-.4,.06,-.17],motion.dash); fFoot=mix3(fFoot,[.38,.02,.17],motion.dash); }
-  const legBack79=solveTwoBone3D(local.hipBack,bFoot,BONE3D.thigh,BONE3D.shin,[1,.1,-.14],f.grounded);
-  const legFront79=solveTwoBone3D(local.hipFront,fFoot,BONE3D.thigh,BONE3D.shin,[1,.1,.14],f.grounded&&(f.attackType!=="kick"&&f.attackType!=="airKick"));
+  const baseBFoot713=bFoot.slice(),baseFFoot713=fFoot.slice(),isKick713=f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep";
+  if(isKick713&&f.attack){
+    const peakExt713=(54+m1Boost)/95;
+    let strike713,chamber713;
+    if(f.attackType==="sweep"){ strike713=[.46+peakExt713*.82,.07,.17*stance.width]; chamber713=[.22,.09,.17*stance.width]; }
+    else if(f.attackType==="airKick"){ strike713=[kickPose74[0]+peakExt713*kickPose74[3],Math.max(.34,kickPose74[1]-.34),kickPose74[2]]; chamber713=[.3,.34,kickPose74[2]]; }
+    else { strike713=[kickPose74[0]+peakExt713*kickPose74[3],kickPose74[1],kickPose74[2]]; chamber713=[.3,Math.max(.4,kickPose74[1]-.3),kickPose74[2]]; }
+    const u1713=clamp((atkStart713*.55)/atkDur713,.05,.38),u2713=clamp((atkStart713+Math.max(1,(atkEnd713-atkStart713)*.25))/atkDur713,u1713+.05,.72),uH713=clamp(atkEnd713/atkDur713,u2713+.04,.8),u3713=clamp((atkEnd713+4)/atkDur713,uH713+.04,.94);
+    if(atkU713<u1713)fFoot=mix3(baseFFoot713,chamber713,smoother01(atkU713/u1713));
+    else if(atkU713<u2713)fFoot=mix3(chamber713,strike713,smoother01((atkU713-u1713)/(u2713-u1713)));
+    else if(atkU713<uH713)fFoot=strike713.slice();
+    else if(atkU713<u3713)fFoot=mix3(strike713,chamber713,smoother01((atkU713-uH713)/(u3713-uH713)));
+    else fFoot=mix3(chamber713,baseFFoot713,smoother01((atkU713-u3713)/Math.max(.03,1-u3713)));
+    if(f.grounded)bFoot=mix3(bFoot,f.attackType==="sweep"?[-.08,0,-.17*stance.width]:[-.1,0,-.17*stance.width],atkW713*.82);
+  }else if(f.attackType==="kick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],kickPose74[1],kickPose74[2]];
+  else if(f.attackType==="airKick")fFoot=[kickPose74[0]+kickExt*kickPose74[3],Math.max(.34,kickPose74[1]-.34),kickPose74[2]];
+  else if(f.attackType==="sweep")fFoot=[.46+kickExt*.82,.07,.17*stance.width];
+  if(motion.dash>.04){ bFoot=mix3(bFoot,[-.4,.06,-.17],motion.dash); if(!isKick713)fFoot=mix3(fFoot,[.38,.02,.17],motion.dash); }
+  bFoot=rateLimit3(f,"footBack",bFoot,7); fFoot=rateLimit3(f,"footFront",fFoot,isKick713?10.5:7);
+  if(!f.poseMidL3d)f.poseMidL3d={};
+  const legBack79=solveTwoBone3D(local.hipBack,bFoot,BONE3D.thigh,BONE3D.shin,stablePole3(f.poseMidL3d.kneeBack,local.hipBack,bFoot,[1,.1,-.14]),f.grounded,.32);
+  const legFront79=solveTwoBone3D(local.hipFront,fFoot,BONE3D.thigh,BONE3D.shin,stablePole3(f.poseMidL3d.kneeFront,local.hipFront,fFoot,[1,.1,.14]),f.grounded&&(f.attackType!=="kick"&&f.attackType!=="airKick"),.32);
   local.footBack=legBack79.end; local.footFront=legFront79.end; local.kneeBack=legBack79.mid; local.kneeFront=legFront79.mid;
-  const armSwing=Math.sin(gaitPhase)*.09*motion.run*strideSign3(f),guard=motion.guard;
+  f.poseMidL3d.kneeBack=local.kneeBack.slice(); f.poseMidL3d.kneeFront=local.kneeFront.slice();
+  const armSwing=Math.cos(gaitPhase)*.085*motion.run*strideSign3(f),guard=motion.guard;
   let backHand=[lerp(stance.guardB[0]+armSwing,.29,guard),lerp(local.chest[1]+stance.guardB[1]+bob+cb*.04,local.chest[1]-.03,guard),-.245];
   let frontHand=[stance.guardF[0]+punchExt-armSwing*.5,local.chest[1]+stance.guardF[1],.255];
+  const baseBackHand713=backHand.slice(),baseFrontHand713=[stance.guardF[0]-armSwing*.5,local.chest[1]+stance.guardF[1],.255];
   if(f.attackType==="punch"||f.attackType==="airPunch"){
     const P74=stance.punch;
     if(P74==="hook")frontHand=[.34+punchExt*.78,local.chest[1]+.05,.35];
@@ -1199,7 +1240,7 @@ function buildFighterPose3D(f){
     else if(P74==="revers")frontHand=[.34+punchExt*.82,local.chest[1]+.1,.31];
     else if(P74==="lame")frontHand=[.36+punchExt*.85,local.chest[1]+.17-phase*.24,.22];
     else if(P74==="viseur"){ frontHand=[.44+punchExt*.9,local.chest[1]+.04,.18]; backHand=[.3,local.chest[1]-.12,-.14]; }
-    else if(P74==="cross"){ frontHand=[.36+punchExt,local.chest[1]-.04,.21]; backHand=[0,local.chest[1]-.1,-.26]; }
+    else if(P74==="cross"){ frontHand=[.36+punchExt,local.chest[1]-.04,.21]; backHand=[.12,local.chest[1]-.17,-.29]; }
     else frontHand=[.38+punchExt*1.05,local.chest[1]+.01,.24];
   }
   if(f.victory&&(state==="roundEnd"||state==="matchEnd")&&!f.dead)frontHand=[.18,2.02+Math.sin(renderTicker*.15)*.04,.18];
@@ -1211,7 +1252,9 @@ function buildFighterPose3D(f){
     else if(stance.cast==="lame"){ frontHand=[.46+phase*.2,local.chest[1]+.15-phase*.2,.2]; backHand=[.08,local.chest[1]-.16,-.25]; }
     else { frontHand=[.43+phase*.22,local.chest[1]-.02,.2]; backHand=[.39+phase*.2,local.chest[1]-.14,-.2]; }
   }
-  else if(f.attackType==="uppercut")frontHand=[.32+upperExt*.18,1.55+upperExt,.18];
+  else if(f.attackType==="kick"||f.attackType==="airKick"){ frontHand=[.3,local.chest[1]+.02,.26]; backHand=[-.1,local.chest[1]-.3,-.3]; }
+  else if(f.attackType==="sweep"){ frontHand=[.34,local.chest[1]-.02,.26]; backHand=[-.05,local.chest[1]-.42,-.3]; }
+  else if(f.attackType==="uppercut")frontHand=[.34+upperExt*.15,local.chest[1]+.16+upperExt*.55,.18];
   else if(state==="intro"&&introT>82)frontHand=[.52,local.chest[1]+.03,.18];
   if(!f.attack&&!f.dead&&!(f.downT>0)&&!(f.victory&&(state==="roundEnd"||state==="matchEnd"))){
     if(model.weapon==="rifle"){ frontHand=[.34,local.chest[1]-.02,.21]; backHand=[frontHand[0]+.27,frontHand[1]-.035,.17]; local.shoulderBack[0]+=.055; local.shoulderBack[2]*=.88; }
@@ -1227,18 +1270,29 @@ function buildFighterPose3D(f){
     }
     if(f.hasHit&&f.attack&&phase>.05)frontHand=[frontHand[0]-.018,frontHand[1]-.006,frontHand[2]];
   }
-  const armBack79=solveTwoBone3D(local.shoulderBack,backHand,BONE3D.upperArm,BONE3D.forearm,[-.42,-1,-.3],false);
-  const armFront79=solveTwoBone3D(local.shoulderFront,frontHand,BONE3D.upperArm,BONE3D.forearm,[-.42,-1,.3],false);
+  if(airHurt713>.03&&!f.attack){ frontHand=[frontHand[0]-.06*airHurt713,frontHand[1]+.1*airHurt713,frontHand[2]+.05*airHurt713]; backHand=[backHand[0]-.09*airHurt713,backHand[1]+.04*airHurt713,backHand[2]-.05*airHurt713]; }
+  if(f.attack){ frontHand=mix3(baseFrontHand713,frontHand,atkW713); backHand=mix3(baseBackHand713,backHand,atkW713); }
+  frontHand=rateLimit3(f,"handFront",frontHand,f.attack?9.5:7.5); backHand=rateLimit3(f,"handBack",backHand,f.attack?9:7);
+  const armBack79=solveTwoBone3D(local.shoulderBack,backHand,BONE3D.upperArm,BONE3D.forearm,stablePole3(f.poseMidL3d.elbowBack,local.shoulderBack,backHand,[-.42,-1,-.3]),false,.21);
+  const armFront79=solveTwoBone3D(local.shoulderFront,frontHand,BONE3D.upperArm,BONE3D.forearm,stablePole3(f.poseMidL3d.elbowFront,local.shoulderFront,frontHand,[-.42,-1,.3]),false,.21);
   local.handBack=armBack79.end; local.handFront=armFront79.end; local.elbowBack=armBack79.mid; local.elbowFront=armFront79.mid;
-  if(f.dead||f.downT>0){
-    local.pelvis=[.02,.27,0]; local.chest=[-.485,.3,0]; local.head=[-.787,.31,0]; local.neck=mix3(local.chest,local.head,.55);
-    local.shoulderBack=[-.485,.34,-shoulderHalf]; local.shoulderFront=[-.485,.34,shoulderHalf]; local.hipBack=[.02,.28,-hipHalf]; local.hipFront=[.02,.28,hipHalf];
-    local.footBack=[.78,.07,-.15]; local.footFront=[1.0,.07,.14];
-    local.handBack=[-.72,.12,-.36]; local.handFront=[-.1,.1,.38];
-    const downLegB79=solveTwoBone3D(local.hipBack,local.footBack,BONE3D.thigh,BONE3D.shin,[.12,.16,-.9],false),downLegF79=solveTwoBone3D(local.hipFront,local.footFront,BONE3D.thigh,BONE3D.shin,[.12,.16,.9],false);
+  f.poseMidL3d.elbowBack=local.elbowBack.slice(); f.poseMidL3d.elbowFront=local.elbowFront.slice();
+  if(f.downBlend3d==null)f.downBlend3d=(f.dead||f.downT>0)?1:0;
+  const downTarget713=(f.dead||f.downT>0)?1:0,downStep713=clamp(renderDtFactor||1,.2,3)/(downTarget713?19:26);
+  f.downBlend3d=clamp(f.downBlend3d+clamp(downTarget713-f.downBlend3d,-downStep713,downStep713),0,1);
+  if(f.downBlend3d>.003){
+    const dw713=smoother01(f.downBlend3d);
+    const stand713={pelvis:local.pelvis,chest:local.chest,head:local.head,shoulderBack:local.shoulderBack,shoulderFront:local.shoulderFront,hipBack:local.hipBack,hipFront:local.hipFront,footBack:local.footBack,footFront:local.footFront,handBack:local.handBack,handFront:local.handFront};
+    const down713={pelvis:[.02,.27,0],chest:[-.485,.3,0],head:[-.787,.31,0],shoulderBack:[-.485,.34,-shoulderHalf],shoulderFront:[-.485,.34,shoulderHalf],hipBack:[.02,.28,-hipHalf],hipFront:[.02,.28,hipHalf],footBack:[.78,.07,-.15],footFront:[1.0,.07,.14],handBack:[-.72,.12,-.36],handFront:[-.1,.1,.38]};
+    for(const k713 in down713)local[k713]=mix3(stand713[k713],down713[k713],dw713);
+    const chestOld713=local.chest.slice(); local.chest=add3(local.pelvis,scale3(norm3(sub3(local.chest,local.pelvis)),BONE3D.spine));
+    const chestDelta713=sub3(local.chest,chestOld713); local.shoulderBack=add3(local.shoulderBack,chestDelta713); local.shoulderFront=add3(local.shoulderFront,chestDelta713); local.head=add3(local.head,chestDelta713);
+    local.head=add3(local.chest,scale3(norm3(sub3(local.head,local.chest)),BONE3D.neck)); local.neck=mix3(local.chest,local.head,.55);
+    const downLegB79=solveTwoBone3D(local.hipBack,local.footBack,BONE3D.thigh,BONE3D.shin,stablePole3(f.poseMidL3d.kneeBack,local.hipBack,local.footBack,mix3([1,.1,-.14],[.12,.16,-.9],dw713)),false,.32),downLegF79=solveTwoBone3D(local.hipFront,local.footFront,BONE3D.thigh,BONE3D.shin,stablePole3(f.poseMidL3d.kneeFront,local.hipFront,local.footFront,mix3([1,.1,.14],[.12,.16,.9],dw713)),false,.32);
     local.footBack=downLegB79.end; local.footFront=downLegF79.end; local.kneeBack=downLegB79.mid; local.kneeFront=downLegF79.mid;
-    const downArmB79=solveTwoBone3D(local.shoulderBack,local.handBack,BONE3D.upperArm,BONE3D.forearm,[-.1,-.18,-.85],false),downArmF79=solveTwoBone3D(local.shoulderFront,local.handFront,BONE3D.upperArm,BONE3D.forearm,[-.1,-.18,.85],false);
+    const downArmB79=solveTwoBone3D(local.shoulderBack,local.handBack,BONE3D.upperArm,BONE3D.forearm,stablePole3(f.poseMidL3d.elbowBack,local.shoulderBack,local.handBack,mix3([-.42,-1,-.3],[-.1,-.18,-.85],dw713)),false,.21),downArmF79=solveTwoBone3D(local.shoulderFront,local.handFront,BONE3D.upperArm,BONE3D.forearm,stablePole3(f.poseMidL3d.elbowFront,local.shoulderFront,local.handFront,mix3([-.42,-1,.3],[-.1,-.18,.85],dw713)),false,.21);
     local.handBack=downArmB79.end; local.handFront=downArmF79.end; local.elbowBack=downArmB79.mid; local.elbowFront=downArmF79.mid;
+    f.poseMidL3d.kneeBack=local.kneeBack.slice(); f.poseMidL3d.kneeFront=local.kneeFront.slice(); f.poseMidL3d.elbowBack=local.elbowBack.slice(); f.poseMidL3d.elbowFront=local.elbowFront.slice();
   }
   const weapon77=model.weapon||"none",support77=!f.attack&&["rifle","staff","spear","katana","axe","club"].includes(weapon77);
   const frontPunch77=f.attackType==="punch"||f.attackType==="airPunch"||f.attackType==="uppercut";
@@ -1252,8 +1306,9 @@ function buildFighterPose3D(f){
     if(f.dead||f.downT>0){ pitch77=.08; contact77=.55; }
     else if(!f.grounded||motion.air>.08){ pitch77=-.34*motion.air; toe77=-.14*motion.air; contact77=1-motion.air; }
     else if(walking){
-      const lift77=isFront77?Math.max(0,gaitCos77):Math.max(0,-gaitCos77),fwd77=(isFront77?gaitSin77:-gaitSin77)*strideDir77;
-      contact77=clamp(1-lift77*1.25,0,1); pitch77=clamp(fwd77*.13-lift77*.2,-.28,.22); toe77=clamp(-fwd77*.09-lift77*.05,-.14,.12);
+      const stanceF713=.6-motion.run*.12; let u713=((gaitPhase+(isFront77?0:Math.PI))/(Math.PI*2))%1; if(u713<0)u713+=1;
+      if(u713<stanceF713){ const st713=u713/stanceF713; contact77=1; pitch77=lerp(.16,-.3,st713); toe77=lerp(.02,-.1,st713); }
+      else { const v713=(u713-stanceF713)/(1-stanceF713); contact77=0; pitch77=lerp(-.3,.14,Math.sin(Math.PI*Math.min(1,v713*1.15))); toe77=-.05; }
     }else if(cb>.15){ pitch77+=(isFront77?.05:-.14)*cb; }
     if(motion.dash>.04){ pitch77=isFront77?.12:-.3; toe77=isFront77?.03:-.08; contact77=isFront77?.85:.55; }
     if(isFront77&&(f.attackType==="kick"||f.attackType==="airKick")){ pitch77=-.24; toe77=-.08; contact77=0; }
@@ -1266,9 +1321,9 @@ function buildFighterPose3D(f){
   const foot77={back:makeFoot77(false),front:makeFoot77(true)};
   const root=[((f.rx==null?f.x:f.rx)-640)*R3D_WORLD,(GROUND-(f.ry==null?f.y:f.ry))*R3D_WORLD,0];
   if(f.faceSmooth3d==null)f.faceSmooth3d=f.facing||1;
-  f.faceSmooth3d=smoothMotionValue(f.faceSmooth3d,f.facing||1,.3);
+  { const faceStep713=.15*clamp(renderDtFactor||1,.2,3); f.faceSmooth3d=clamp(f.faceSmooth3d+clamp((f.facing||1)-f.faceSmooth3d,-faceStep713,faceStep713),-1,1); }
   const visualFace=clamp(f.faceSmooth3d,-1,1),yaw=(1-visualFace)*Math.PI/2-visualFace*.2;
-  const roll=(f.dead||f.downT>0)?0:clamp(-(motion.lean+(motion.accelLean||0)*.65+motion.air*((motion.airPitch||0)*.55+clamp((f.vy||0)*.0008,-.012,.018))-motion.hurt*.055+motion.dash*.09+(motion.turnPulse||0)*.025),-.24,.28);
+  const roll=(f.dead||f.downT>0)?0:clamp(-(motion.lean+(motion.accelLean||0)*.65+motion.air*((motion.airPitch||0)*.55+clamp((f.vy||0)*.0008,-.012,.018))-motion.hurt*.055+motion.dash*.09+(motion.turnPulse||0)*.025+(f.juggleT>0?.12:0)),-.3,.28);
   const twistSign=visualFace;
   const twistForY=y=>{
     const t=clamp((y-.82)/.72,0,1),smooth=t*t*(3-2*t);
@@ -1286,18 +1341,21 @@ function buildFighterPose3D(f){
   };
   const world={}; Object.keys(local).forEach(k=>world[k]=toWorld(local[k]));
   {
-    const fwd79=[Math.cos(yaw),0,-Math.sin(yaw)],side79=[Math.sin(yaw),0,Math.cos(yaw)],down79=f.dead||f.downT>0;
+    const fwd79=[Math.cos(yaw),0,-Math.sin(yaw)],side79=[Math.sin(yaw),0,Math.cos(yaw)],downW713=smoother01(f.downBlend3d||0);
     const pole79=(fw,up,sd)=>[fwd79[0]*fw+side79[0]*sd,up,fwd79[2]*fw+side79[2]*sd];
-    const fix79=(rootK,midK,endK,l1,l2,pole)=>{ const solved79=solveTwoBone3D(world[rootK],world[endK],l1*S,l2*S,pole,false); world[midK]=solved79.mid; world[endK]=solved79.end; };
-    fix79("shoulderBack","elbowBack","handBack",BONE3D.upperArm,BONE3D.forearm,down79?pole79(-.1,-.18,-.85):pole79(-.42,-1,-.3));
-    fix79("shoulderFront","elbowFront","handFront",BONE3D.upperArm,BONE3D.forearm,down79?pole79(-.1,-.18,.85):pole79(-.42,-1,.3));
-    fix79("hipBack","kneeBack","footBack",BONE3D.thigh,BONE3D.shin,down79?pole79(.12,.16,-.9):pole79(1,.1,-.14));
-    fix79("hipFront","kneeFront","footFront",BONE3D.thigh,BONE3D.shin,down79?pole79(.12,.16,.9):pole79(1,.1,.14));
+    const poleMix713=(a713,b713)=>mix3(pole79(a713[0],a713[1],a713[2]),pole79(b713[0],b713[1],b713[2]),downW713);
+    { const chestOldW713=world.chest.slice(); world.chest=add3(world.pelvis,scale3(norm3(sub3(world.chest,world.pelvis)),BONE3D.spine*S)); const cdW713=sub3(world.chest,chestOldW713); world.shoulderBack=add3(world.shoulderBack,cdW713); world.shoulderFront=add3(world.shoulderFront,cdW713); world.head=add3(world.head,cdW713); world.head=add3(world.chest,scale3(norm3(sub3(world.head,world.chest)),BONE3D.neck*S)); world.neck=mix3(world.chest,world.head,.55); }
+    if(!f.poseMidW3d)f.poseMidW3d={};
+    const fix79=(rootK,midK,endK,l1,l2,pole,minD79)=>{ const solved79=solveTwoBone3D(world[rootK],world[endK],l1*S,l2*S,stablePole3(f.poseMidW3d[midK],world[rootK],world[endK],pole),false,(minD79||0)*S); world[midK]=solved79.mid; world[endK]=solved79.end; f.poseMidW3d[midK]=solved79.mid.slice(); };
+    fix79("shoulderBack","elbowBack","handBack",BONE3D.upperArm,BONE3D.forearm,poleMix713([-.42,-1,-.3],[-.1,-.18,-.85]),.21);
+    fix79("shoulderFront","elbowFront","handFront",BONE3D.upperArm,BONE3D.forearm,poleMix713([-.42,-1,.3],[-.1,-.18,.85]),.21);
+    fix79("hipBack","kneeBack","footBack",BONE3D.thigh,BONE3D.shin,poleMix713([1,.1,-.14],[.12,.16,-.9]),.32);
+    fix79("hipFront","kneeFront","footFront",BONE3D.thigh,BONE3D.shin,poleMix713([1,.1,.14],[.12,.16,.9]),.32);
   }
   const velocityLag=clamp(-(((f.vx||0)+(f.kvx||0))*(f.facing||1))*.007,-.075,.075);
   const hairSway=clamp(velocityLag-(motion.accelLean||0)*.18+(motion.landingPulse||0)*.01-(motion.takeoffPulse||0)*.012+Math.sin(renderTicker*.09+(f.id||0)*1.7)*.008-motion.dash*.035+impactLocal77*.055,-.14,.14);
   const clothSway=clamp(velocityLag*1.2+Math.sin(renderTicker*.075+(f.id||0))*.012-motion.dash*.06+impactLocal77*.07,-.16,.16);
-  return {motion,human,model,cb,phase,gaitPhase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,hairSway,clothSway,face77,hand77,foot77,impact77,impactLocal:impactLocal77,bones:BONE3D,boneError:boneDeviation3D(world,S),footRoll:groundedRoll79?0:roll};
+  return {motion,human,model,cb,phase,gaitPhase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,downBlend:f.downBlend3d||0,atkU:atkU713,atkW:atkW713,motionReal13:true,hairSway,clothSway,face77,hand77,foot77,impact77,impactLocal:impactLocal77,bones:BONE3D,boneError:boneDeviation3D(world,S),footRoll:groundedRoll79?0:roll};
 }
 function strideSign3(f){ return Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1; }
 function addFighter3D(opaque,trans,f){
@@ -1435,7 +1493,7 @@ function addFighter3D(opaque,trans,f){
   }
   renderStats.fighterPose3d=ch.id+":"+(f.attackType||"idle")+":"+pose.phase.toFixed(2);
   renderStats.lastFighterVertices3d=(opaque.count+trans.count)-vertexStart3d;
-  renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.skeleton3d="ik-fixe"; renderStats.boneError3d=Math.round((pose.boneError||0)*1000)/1000;
+  renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.skeleton3d="ik-fixe"; renderStats.boneError3d=Math.round((pose.boneError||0)*1000)/1000; renderStats.motionReal3d=!!pose.motionReal13; renderStats.downBlend3d=Math.round((pose.downBlend||0)*100)/100; renderStats.atkBlend3d=Math.round((pose.atkW||0)*100)/100;
   return pose;
 }
 function addProjectilesAndEffects3D(trans){
