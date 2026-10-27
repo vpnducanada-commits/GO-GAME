@@ -3,6 +3,43 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.14.0] — 2026-10-27 — « Colonne VIVANTE »
+
+Suite directe de « Mouvement Réel » : les membres ne téléportaient
+plus, mais le buste restait lofté sur une droite bassin → poitrine et
+les jupes/robes formaient un cône centré sur le bassin. Le milieu du
+corps devient une vraie articulation et les tenues suivent les jambes.
+
+### Ajouté — Colonne et tenues vivantes
+- **Taille articulée** : nouveau point de taille entre bassin et
+  poitrine ; les anneaux du torse suivent une courbe quadratique. Le
+  ventre fléchit en accroupi/garde/fatigue/poing (**−25 mm** mesurés
+  en accroupi stabilisé) et se cambre en contre-balance de pied ou
+  sous l'impact (**+21 mm**), avec une composante latérale liée à la
+  contre-rotation bassin/épaules.
+- **Colonne toujours à longueur constante** : la taille participe au
+  fondu chute/relève et aux renormalisations local + monde ; écart
+  d'os mesuré ~0 et continuité taille incluse à **0,244 m/image**
+  maximum (genou en pleine frappe), sous le seuil V7.13 de 0,30 m.
+- **Jupes et robes suiveuses** : chaque anneau libre échantillonne la
+  jambe correspondante (hanche → genou → pied) ; l'ourlet accompagne
+  la cuisse levée jusqu'à 55 % tout en gardant son évasement, au lieu
+  de cacher les deux jambes dans un cône.
+- **Repli 2D assorti** : le centre de taille 2D fléchit/cambre avec
+  l'accroupi, la fatigue et l'impact.
+- **3D qui se relance** : un échec transitoire de création WebGL
+  (transition plein écran/orientation, retour d'arrière-plan) ne
+  condamne plus la session au 2D — relances espacées sur canvas neuf,
+  repli 2D affiché pendant l'attente, aucun écran noir.
+
+### Validation
+- Diagnostic image par image et captures navigateur : coup de pied
+  de Lyra avec jambe dégagée de la tenue et buste en contre-balance,
+  balayage bas lisible, zéro erreur de page.
+- Smoke source + bundle (528 assertions), QA statique n°47. Animation
+  et robustesse de rendu uniquement : simulation, hitboxes, dégâts,
+  IA et replays inchangés.
+
 ## [7.13.0] — 2026-10-27 — « Mouvement Réel »
 
 Retour direct du propriétaire : « Les personnes sont totalement
