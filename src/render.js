@@ -9,7 +9,7 @@ const glowCache=new Map();
 const impactSpriteCache=new Map();
 const gradientCache=new Map();
 const RENDER_PIPELINE=["background","floor","shadows","entities","projectiles","effects","post"];
-const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D II V7.2 — Anatomie, matières & caméra (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dRetries:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:"",mobilityGait:0,mobilitySpeed:0,mobilityTurn:0,mobilityLanding:0,mobilityAttackFlow:0,cameraLead:0,cameraLead3d:0,dashTrails3d:0,expression3d:"focus",handCurl3d:0,handState3d:"",footPitch3d:0,footContact3d:0,impactPose3d:0,weaponGrip3d:"",arenaSpectacle3d:"",spectacleBeams3d:0,spectacleActors3d:0,spectaclePulse3d:0,ambientMotes3d:0,skeleton3d:"",boneError3d:0,cinemaLight3d:"",skyDetail3d:0,floorRefl3d:0,glow3d:0,reflDir3d:"",hairDetail3d:0,emblem3d:"",context3d:"",canvas3d:"",layoutMode:"",viewportBox:"",motionReal3d:false,downBlend3d:0,atkBlend3d:0,spineBend3d:0,skirtFollow3d:0,supportAnchor3d:0,turnPivot3d:0,footYaw3d:0};
+const renderStats={frame:0,passesRun:[],gradientHits:0,gradientMisses:0,gradientCacheSize:0,lastPost:"",motionSamples:0,ambientPeople:0,textCacheSize:0,arenaMood:"crepuscule",moodStars:0,moodCelestial:"",signatureVfx:0,lastSignatureVfx:"",fpsEstimate:60,frameBudgetOk:true,frameMs:0,logicMs:0,renderMs:0,perfTier:"ultra",effectScale:1,onlineFrame:0,onlineStalls:0,onlineDesync:false,speedScale:1,portraits:0,outfitDetails:0,materialDetails:0,torsoPaint:0,rosterVisible:41,introBanners:0,ambientMotes:0,foregroundDepth:"",rimLight:"",cylinderShading:false,facePaint:0,artDirection:"Réalité 3D II V7.2 — Anatomie, matières & caméra (repli Graphismes AAA II)",humanProfiles:0,lastHumanProfile:"",lastFacialExpression:"focus",humanMotionSamples:0,gazeX:0,gazeY:0,hairSway:0,fatigue:0,billboardAlpha:1,floaterSpread:0,spotlightX:-1,dynamicShadows:0,shadowLayers:0,shadowDirection:"",shadowHeightFactor:1,floorLightPools:0,floorReflections:0,boardOutfits:0,boardOutfit:"",impactBurstsDrawn:0,impactSpriteCacheSize:0,lastImpactFx:"",renderer3dMode:"auto",renderer3dRequested:true,renderer3dActive:false,renderer3dAvailable:false,renderer3dFallback:"",renderer3dFrames:0,renderer3dRetries:0,renderer3dVertices:0,renderer3dDrawCalls:0,fighterPose3d:"",arena3d:"",camera3d:"",mobilityGait:0,mobilitySpeed:0,mobilityTurn:0,mobilityLanding:0,mobilityAttackFlow:0,cameraLead:0,cameraLead3d:0,dashTrails3d:0,expression3d:"focus",handCurl3d:0,handState3d:"",footPitch3d:0,footContact3d:0,impactPose3d:0,weaponGrip3d:"",arenaSpectacle3d:"",spectacleBeams3d:0,spectacleActors3d:0,spectaclePulse3d:0,ambientMotes3d:0,skeleton3d:"",boneError3d:0,cinemaLight3d:"",skyDetail3d:0,floorRefl3d:0,glow3d:0,reflDir3d:"",hairDetail3d:0,emblem3d:"",context3d:"",canvas3d:"",layoutMode:"",viewportBox:"",motionReal3d:false,downBlend3d:0,atkBlend3d:0,spineBend3d:0,skirtFollow3d:0,supportAnchor3d:0,turnPivot3d:0,footYaw3d:0,planted3d:0,landDip3d:0,landPrep3d:0,reactions16:0};
 const FLOOR_THEMES={
   stadium:{top:"#37474f",mid:"#263238",bot:"#0b0f26",line:"#00e5ff",grade:"rgba(255,138,60,.16)"},
   tokyo:{top:"#1a2238",mid:"#101728",bot:"#050816",line:"#ff2e88",grade:"rgba(80,90,255,.15)"},
@@ -75,7 +75,7 @@ function attackMotionCurve(elapsed,start,duration){
   return 1-easeInOutCubic((elapsed-strikeEnd)/Math.max(1,duration-strikeEnd)); // récupération / follow-through
 }
 function fighterMotion(f){
-  if(!f.motion)f.motion={face:f.facing||1,lean:0,run:0,air:f.grounded?0:1,guard:0,hurt:0,dash:0,breath:(f.id||1)*1.7,head:0,weight:0,squash:0,attack:0,attackFlow:0,gazeX:0,gazeY:0,headLag:0,hairSway:0,clothSway:0,pelvisRoll:0,shoulderRoll:0,fatigue:0,mouthOpen:0,browTension:0,prevVX:0,gaitPhase:f.walkPhase||0,gaitSpeed:0,lastRx:f.rx==null?f.x:f.rx,lastRy:f.ry==null?f.y:f.ry,renderVX:0,renderVY:0,accelLean:0,airPitch:0,turnPulse:0,takeoffPulse:0,landingPulse:0,wasGrounded:!!f.grounded,lastVy:f.vy||0};
+  if(!f.motion)f.motion={face:f.facing||1,lean:0,run:0,air:f.grounded?0:1,guard:0,hurt:0,dash:0,breath:(f.id||1)*1.7,head:0,weight:0,squash:0,attack:0,attackFlow:0,gazeX:0,gazeY:0,headLag:0,hairSway:0,clothSway:0,pelvisRoll:0,shoulderRoll:0,fatigue:0,mouthOpen:0,browTension:0,prevVX:0,gaitPhase:f.walkPhase||0,gaitSpeed:0,lastRx:f.rx==null?f.x:f.rx,lastRy:f.ry==null?f.y:f.ry,renderVX:0,renderVY:0,accelLean:0,airPitch:0,turnPulse:0,takeoffPulse:0,landingPulse:0,wasGrounded:!!f.grounded,lastVy:f.vy||0,landT:99,landImpact:0,landDip716:0};
   const m=f.motion,op=f===p1?p2:p1,apparentVX=(f.vx||0)+(f.kvx||0),localSpeed=apparentVX*(f.facing||1);
   if(m.gazeX==null){ m.gazeX=0; m.gazeY=0; m.headLag=0; m.hairSway=0; m.clothSway=0; m.pelvisRoll=0; m.shoulderRoll=0; m.fatigue=0; m.mouthOpen=0; m.browTension=0; m.prevVX=apparentVX; }
   m.face=dampMotionValue(m.face,f.facing||1,18);
@@ -93,6 +93,7 @@ function fighterMotion(f){
      décollage et réception alimentent des ressorts corporels courts. */
   const rxNow76=f.rx==null?f.x:f.rx,ryNow76=f.ry==null?f.y:f.ry,dt76=clamp(renderDtFactor||1,.2,3);
   if(m.gaitPhase==null){ m.gaitPhase=f.walkPhase||0; m.gaitSpeed=0; m.lastRx=rxNow76; m.lastRy=ryNow76; m.renderVX=apparentVX; m.renderVY=f.vy||0; m.accelLean=0; m.airPitch=0; m.turnPulse=0; m.takeoffPulse=0; m.landingPulse=0; m.wasGrounded=!!f.grounded; m.lastVy=f.vy||0; }
+  if(m.landT==null){ m.landT=99; m.landImpact=0; m.landDip716=0; }
   let dx76=rxNow76-(m.lastRx==null?rxNow76:m.lastRx),dy76=ryNow76-(m.lastRy==null?ryNow76:m.lastRy);
   if(Math.abs(dx76)>90||Math.abs(dy76)>140){ dx76=0; dy76=0; m.gaitPhase=f.walkPhase||m.gaitPhase||0; m.takeoffPulse=0; m.landingPulse=0; }
   m.lastRx=rxNow76; m.lastRy=ryNow76;
@@ -106,11 +107,13 @@ function fighterMotion(f){
   m.airPitch=smoothMotionValue(m.airPitch||0,f.grounded?0:clamp((f.vy||0)*.0055+localSpeed*.0035,-.13,.17),2.7);
   const velDir76=Math.abs(apparentVX)>1.2?Math.sign(apparentVX):0;
   if(f.grounded&&velDir76&&(f.inputDir||0)&&velDir76!==f.inputDir)m.turnPulse=1; else m.turnPulse=(m.turnPulse||0)*Math.exp(-.13*dt76);
+  m.landT=(m.landT==null?99:m.landT)+dt76;
   if(m.wasGrounded&&!f.grounded&&(f.vy||0)<-2)m.takeoffPulse=1;
-  if(!m.wasGrounded&&f.grounded)m.landingPulse=clamp(Math.abs(m.lastVy||0)/15,.35,1);
+  if(!m.wasGrounded&&f.grounded){ m.landingPulse=clamp(Math.abs(m.lastVy||0)/15,.35,1); m.landT=0; m.landImpact=clamp(Math.abs(m.lastVy||0)/19,.3,1); }
   m.wasGrounded=!!f.grounded; m.lastVy=f.vy||0;
   m.takeoffPulse=(m.takeoffPulse||0)*Math.exp(-.16*dt76);
   m.landingPulse=(m.landingPulse||0)*Math.exp(-.2*dt76);
+  m.landDip716=f.grounded?(m.landImpact||0)*Math.sin(Math.PI*clamp((m.landT||0)/16,0,1)):0;
   m.weight=dampMotionValue(m.weight,Math.sin((m.gaitPhase==null?(f.walkPhase||0):m.gaitPhase)*2)*(.45+m.run*.8),20);
   m.head=smoothMotionValue(m.head,clamp(((op&&op.ry!=null?op.ry:f.ry)-f.ry)*.0016,-.16,.16),7);
   m.squash=smoothMotionValue(m.squash,f.squashT>3?-1:(f.squashT>0?.55:0),15);
@@ -141,7 +144,7 @@ function fighterMotion(f){
   renderStats.humanMotionSamples=(renderStats.humanMotionSamples||0)+1;
   renderStats.gazeX=Math.round(m.gazeX*100)/100; renderStats.gazeY=Math.round(m.gazeY*100)/100;
   renderStats.hairSway=Math.round(m.hairSway*10)/10; renderStats.fatigue=Math.round(m.fatigue*100)/100;
-  renderStats.mobilityGait=Math.round((m.gaitPhase||0)*100)/100; renderStats.mobilitySpeed=Math.round((m.gaitSpeed||0)*100)/100; renderStats.mobilityTurn=Math.round((m.turnPulse||0)*100)/100; renderStats.mobilityLanding=Math.round((m.landingPulse||0)*100)/100; renderStats.mobilityAttackFlow=Math.round((m.attackFlow||0)*100)/100;
+  renderStats.mobilityGait=Math.round((m.gaitPhase||0)*100)/100; renderStats.mobilitySpeed=Math.round((m.gaitSpeed||0)*100)/100; renderStats.mobilityTurn=Math.round((m.turnPulse||0)*100)/100; renderStats.mobilityLanding=Math.round((m.landingPulse||0)*100)/100; renderStats.mobilityAttackFlow=Math.round((m.attackFlow||0)*100)/100; renderStats.landDip=Math.round((m.landDip716||0)*100)/100;
   return m;
 }
 const textWidthCache=new Map();
@@ -904,8 +907,8 @@ function drawFighter(f){
   f.victoryBlend2d=dampMotionValue(f.victoryBlend2d,(f.victory&&(state==="roundEnd"||state==="matchEnd")&&!f.dead)?1:0,7);
   const cb=f.crouchBlend;
   const gaitPhase=motion.gaitPhase==null?(f.walkPhase||0):motion.gaitPhase,gaitLift=Math.abs(Math.sin(gaitPhase))*motion.run;
-  const bob=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1+(motion.landingPulse||0)*2.2-(motion.takeoffPulse||0)*1.1+(motion.turnPulse||0)*.8):0;
-  const walking=motion.run>.07&&f.grounded&&f.dashT<=0,hurt=f.hitStun>0,down=f.downT>0;
+  const bob=!f.dead&&f.downT<=0?(Math.sin(motion.breath)*(1.45+motion.fatigue*1.25)*(1-cb*.45)*(1-motion.air*.72)-gaitLift*2.1+motion.weight*.85-motion.hurt*1.3+motion.guard*1.1+(motion.landingPulse||0)*2.2+(motion.landDip716||0)*9-(motion.takeoffPulse||0)*1.1+(motion.turnPulse||0)*.8):0;
+  const impact2d716=f.grounded&&(f.hitStun>0||f.blockStun>0||Math.abs(f.kvx||0)>=1.2),walking=motion.run>.07&&f.grounded&&f.dashT<=0&&!impact2d716,hurt=f.hitStun>0,down=f.downT>0;
   drawShadow(f);
   if(f.energy>=50&&!f.dead&&!down){ const size=f.energy>=100?225:168,pulse=1+Math.sin(renderTicker*.12+f.id)*.06; ctx.save(); ctx.globalAlpha=f.energy>=100?.62:.42; ctx.drawImage(glowSprite(sk.trail),f.rx-size*pulse/2,f.ry-104*ch.scale-size*pulse/2,size*pulse,size*pulse); ctx.restore(); }
   ctx.save(); ctx.translate(f.rx,f.ry);
@@ -931,9 +934,10 @@ function drawFighter(f){
     bFoot.x=lerp(bFoot.x,hipX-4+gb713[0],mix); fFoot.x=lerp(fFoot.x,hipX+6+gf713[0],mix);
     bFoot.y=lerp(bFoot.y,-gb713[1],mix); fFoot.y=lerp(fFoot.y,-gf713[1],mix);
   }
+  if(impact2d716&&!f.attack){ bFoot.x=lerp(bFoot.x,hipX-32,.55); fFoot.x=lerp(fFoot.x,hipX+22,.55); bFoot.y=lerp(bFoot.y,0,.55); fFoot.y=lerp(fFoot.y,0,.55); }
   if(f.grounded&&(motion.turnPulse||0)>.03){ const tp=(motion.turnPulse||0)*.68; bFoot={x:lerp(bFoot.x,hipX-31,tp),y:lerp(bFoot.y,-1,tp)}; fFoot={x:lerp(fFoot.x,hipX+29,tp),y:lerp(fFoot.y,-5,tp)}; }
   if(!f.dead&&motion.air>.03){
-    const a=motion.air,airSwing=clamp((motion.airPitch||0)*36,-4,4.5);
+    const prep2d716=!f.grounded?clamp(1-(GROUND-f.ry)/75,0,1)*clamp(((f.vy||0)+2)/8,0,1):0,a=motion.air*(1-.72*prep2d716),airSwing=clamp((motion.airPitch||0)*36,-4,4.5);
     bFoot={x:lerp(bFoot.x,hipX-18-airSwing,a),y:lerp(bFoot.y,-29+airSwing,a)}; fFoot={x:lerp(fFoot.x,hipX+23+airSwing,a),y:lerp(fFoot.y,-18-airSwing,a)};
     bKnee={x:lerp(bKnee.x,hipX-12,a),y:lerp(bKnee.y,-55,a)}; fKnee={x:lerp(fKnee.x,hipX+20,a),y:lerp(fKnee.y,-55,a)};
   }

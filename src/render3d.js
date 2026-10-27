@@ -1215,11 +1215,13 @@ function buildFighterPose3D(f){
   const kickExt=(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")?phase*(54+m1Boost)/95:0;
   const upperExt=f.attackType==="uppercut"?phase*(44+m1Boost)/95:0;
   const attackShift=(f.attackType==="throw"?phase*10:f.attackType==="punch"||f.attackType==="airPunch"?phase*14:f.attackType==="uppercut"?phase*7:f.attackType==="kick"||f.attackType==="airKick"?phase*4:f.attackType==="special"||f.attackType==="super"||f.attackType==="exspecial"?phase*6:0)/95;
-  const walking=motion.run>.07&&f.grounded&&f.dashT<=0&&!f.attack,local={};
+  const landT716=motion.landT==null?99:motion.landT,landDip716=motion.landDip716||0,impactGround716=f.grounded&&(f.hitStun>0||f.blockStun>0||Math.abs(f.kvx||0)>=1.2),stopPlant716=f.grounded&&(f.inputDir||0)===0&&motion.run>.1&&Math.abs((f.vx||0)+(f.kvx||0))<2.2;
+  const walking=motion.run>.07&&f.grounded&&f.dashT<=0&&!f.attack&&!impactGround716&&!stopPlant716&&landT716>=5,local={};
   const kickStrike713=(f.attackType==="kick"||f.attackType==="airKick")?clamp(phase,0,1)*atkW713:0,sweepStrike713=f.attackType==="sweep"?clamp(phase,0,1)*atkW713:0,airHurt713=(motion.air||0)*clamp(motion.hurt||0,0,1);
   local.pelvis=[motion.lean*.1+(motion.accelLean||0)*.18+stance.lean*.35+attackShift*.34+motion.weight*.014-motion.hurt*.02+impactLocal77*.025-kickStrike713*.055-sweepStrike713*.06,lerp(.97,.69,cb)+bob-impact77*.006-kickStrike713*.022-sweepStrike713*.07-airHurt713*.01,0];
   local.chest=[motion.lean*.27+(motion.accelLean||0)*.38+stance.lean+motion.weight*.022+attackShift+motion.guard*.03-motion.hurt*.06+impactLocal77*.075-kickStrike713*.105-sweepStrike713*.05-airHurt713*.055,lerp(1.48,1.18,cb)+bob+motion.fatigue*.018-impact77*.012+impactLift77*.01-kickStrike713*.008-airHurt713*.012,0];
   local.head=[.04+local.chest[0]*.62+motion.head*.09+(motion.headLag||0)/95-motion.hurt*.03+impactLocal77*.055-kickStrike713*.045-sweepStrike713*.02-airHurt713*.035,lerp(1.78,1.47,cb)+bob+motion.fatigue*.012-impact77*.018+impactLift77*.012,0];
+  if(landDip716>.001){ local.pelvis[1]-=landDip716*.085; local.chest[1]-=landDip716*.055; local.head[1]-=landDip716*.04; }
   { const spineDir79=norm3(sub3(local.chest,local.pelvis)); local.chest=add3(local.pelvis,scale3(spineDir79,BONE3D.spine)); const neckRaw79=norm3(sub3(local.head,local.chest)),neckStab713=(f.dead||f.downT>0)?0:clamp(.36-(motion.hurt||0)*.2-(motion.air||0)*.08,.08,.36),neckDir79=norm3(mix3(neckRaw79,[.07,1,0],neckStab713)); local.head=add3(local.chest,scale3(neckDir79,BONE3D.neck)); }
   local.neck=mix3(local.chest,local.head,.55);
   const punchBend714=(f.attackType==="punch"||f.attackType==="airPunch")?clamp(phase,0,1)*atkW713:0;
@@ -1236,6 +1238,7 @@ function buildFighterPose3D(f){
   if(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")local.hipFront[0]+=phase*.025;
   let bFoot=[stance.feet[0]-motion.lean*.08,0,-.17*stance.width],fFoot=[stance.feet[1]+motion.lean*.05,0,.17*stance.width];
   if(cb>.12){ bFoot[0]=lerp(bFoot[0],-.36,cb); fFoot[0]=lerp(fFoot[0],.34,cb); }
+  const stanceB716=bFoot.slice(),stanceF716=fFoot.slice();
   if(walking){
     const strideDir=Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1,stanceF713=.6-motion.run*.12,amp713=.23+motion.run*.14,mix=clamp(motion.run*1.35,0,1);
     const gait713=off713=>{ let u713=((gaitPhase+off713)/(Math.PI*2))%1; if(u713<0)u713+=1; if(u713<stanceF713)return [amp713*(1-2*u713/stanceF713)*strideDir,0]; const v713=(u713-stanceF713)/(1-stanceF713); return [amp713*(-1+2*(v713-Math.sin(v713*Math.PI*2)/(Math.PI*2*stanceF713)))*strideDir,(.035+motion.run*.085)*Math.pow(Math.sin(Math.PI*v713),.8)]; };
@@ -1246,6 +1249,15 @@ function buildFighterPose3D(f){
   if(f.grounded&&(motion.turnPulse||0)>.03){ const tp=(motion.turnPulse||0)*.7; bFoot=mix3(bFoot,[stance.feet[0]-.07,.015,-.2*stance.width],tp); fFoot=mix3(fFoot,[stance.feet[1]+.05,.055,.2*stance.width],tp); }
   if(!f.dead&&motion.air>.03){ const a=motion.air,sw=clamp((motion.airPitch||0)*.42,-.045,.055); bFoot=mix3(bFoot,[-.22-sw,.3+sw,-.17],a); fFoot=mix3(fFoot,[.27+sw,.2-sw,.17],a); }
   if(airHurt713>.03){ bFoot=mix3(bFoot,[-.14,.15,-.17],airHurt713*.8); fFoot=mix3(fFoot,[.16,.09,.17],airHurt713*.8); }
+  let landPrep716=0;
+  if(!f.grounded&&!f.dead){
+    const h716=(GROUND-(f.ry==null?f.y:f.ry))*R3D_WORLD;
+    landPrep716=clamp(1-h716/.45,0,1)*clamp(((f.vy||0)+2)/8,0,1)*(airHurt713>.03?.55:1);
+    if(landPrep716>.01){
+      bFoot=mix3(bFoot,[stanceB716[0]-.03,.03,stanceB716[2]],landPrep716*.85);
+      if(!(f.attackType==="airKick"||f.attackType==="kick"))fFoot=mix3(fFoot,[stanceF716[0]+.02,.02,stanceF716[2]],landPrep716*.85);
+    }
+  }
   const kickPose74={devant:[.44,.94,.17,.82],circulaire:[.42,1.06,.24,.8],lateral:[.5,.82,.12,.9],hache:[.4,1.26,.18,.72],bas:[.46,.42,.18,.85],genou:[.36,.8,.16,.5],retourne:[.43,1.03,.03,.8]}[stance.kick]||[.44,.94,.17,.82];
   const baseBFoot713=bFoot.slice(),baseFFoot713=fFoot.slice(),isKick713=f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep";
   const facing715=f.facing||1,prevFace715=currentFace715(f),nextFace715=predictedFace715(f),turning715=f.grounded&&!f.dead&&f.downT<=0&&Math.abs(facing715-prevFace715)>.04;
@@ -1284,6 +1296,38 @@ function buildFighterPose3D(f){
     if(!isKick713&&f.turnAnchor715.frontOffsetX!=null){ const rx715=f.rx==null?f.x:f.rx,fAnch715=anchorFootLocal715(f,{gameX:rx715+f.turnAnchor715.frontOffsetX,worldZ:f.turnAnchor715.frontWorldZ},S); fAnch715[1]=fFoot[1]; const dF715=len3(sub3(fAnch715,local.hipFront)),rF715=dF715>1.02?clamp((dF715-1.02)*2.2,0,.6):0; fFoot=mix3(fFoot,mix3(fAnch715,fFoot,rF715),.25+.75*smoother01(frontStep715)); }
     if(!isKick713)fFoot[1]+=Math.sin(Math.PI*frontStep715)*.075;
   }else f.turnAnchor715=null;
+  let planted716=0,stepBack716=0,stepFront716=0;
+  const plantStepRun716=!!(f.plant716&&(f.plant716.stepB||f.plant716.stepF));
+  let plantHold716=false;
+  if(f.plant716&&f.grounded&&(f.inputDir||0)===0&&Math.abs((f.vx||0)+(f.kvx||0))<2.2){
+    for(const side716 of ["back","front"])if(f.plant716[side716]){ const a716=anchorFootLocal715(f,f.plant716[side716],S),g716=side716==="back"?stanceB716:stanceF716; if(Math.hypot(a716[0]-g716[0],a716[2]-g716[2])>.07)plantHold716=true; }
+  }
+  const plantOn716=f.grounded&&!f.dead&&f.downT<=0&&!f.attack&&f.dashT<=0&&(motion.dash||0)<=.25&&!turning715&&(impactGround716||landT716<13||stopPlant716||plantStepRun716||plantHold716);
+  if(plantOn716){
+    if(!f.plant716||f.plant716.uB==null)f.plant716={back:null,front:null,stepB:false,stepF:false,uB:0,uF:0};
+    const P716=f.plant716,dt716=clamp(renderDtFactor||1,.2,3),spread716=impactGround716?.05:0;
+    const goals716={back:[stanceB716[0]-spread716,0,stanceB716[2]],front:[stanceF716[0]-spread716*.35,0,stanceF716[2]]};
+    const D2h716=(a716,b716)=>Math.hypot(a716[0]-b716[0],a716[2]-b716[2]);
+    const anchLocal716=side716=>anchorFootLocal715(f,P716[side716],S);
+    for(const side716 of ["back","front"])if(!P716[side716]){ const cap716=(f.posePrev3d&&f.posePrev3d[side716==="back"?"footBack":"footFront"])||goals716[side716]; const anch716=makeFootAnchor715(f,cap716,S); anch716.gameX-=((f.vx||0)+(f.kvx||0))*dt716; P716[side716]=anch716; }
+    const stepNeed716=impactGround716?.16:.09,plantFoot716=side716=>{
+      const uKey716=side716==="back"?"uB":"uF",sKey716=side716==="back"?"stepB":"stepF",hip716=side716==="back"?local.hipBack:local.hipFront,g716=goals716[side716];
+      if(!P716[sKey716]){ const a716=anchLocal716(side716); if(D2h716(a716,g716)>stepNeed716||len3(sub3(a716,hip716))>1.045){ P716[sKey716]=true; P716[uKey716]=0; } }
+      if(P716[sKey716]){
+        P716[uKey716]+=dt716/8;
+        const su716=smoother01(P716[uKey716]),arc716=Math.sin(Math.PI*clamp(P716[uKey716],0,1));
+        const pos716=mix3(anchLocal716(side716),g716,su716); pos716[1]=arc716*.07;
+        if(side716==="back"){ bFoot=pos716; stepBack716=arc716; }else{ fFoot=pos716; stepFront716=arc716; }
+        if(P716[uKey716]>=1){ P716[side716]=makeFootAnchor715(f,g716,S); P716[sKey716]=false; P716[uKey716]=0; }
+      }else{
+        const a716=anchLocal716(side716); a716[1]=0;
+        const d716=len3(sub3(a716,hip716)),r716=d716>1.03?clamp((d716-1.03)*1.6,0,.5):0,pos716=mix3(a716,g716,r716);
+        if(side716==="back")bFoot=pos716; else fFoot=pos716;
+      }
+    };
+    plantFoot716("back"); plantFoot716("front");
+    planted716=1;
+  }else f.plant716=null;
   bFoot=rateLimit3(f,"footBack",bFoot,turnRelease715>0?11:7); fFoot=rateLimit3(f,"footFront",fFoot,isKick713?10.5:7);
   if(!f.poseMidL3d)f.poseMidL3d={};
   const legBack79=solveTwoBone3D(local.hipBack,bFoot,BONE3D.thigh,BONE3D.shin,stablePole3(f.poseMidL3d.kneeBack,local.hipBack,bFoot,[1,.1,-.14]),f.grounded,.32);
@@ -1377,6 +1421,7 @@ function buildFighterPose3D(f){
     else if(!isFront77&&(f.attackType==="kick"||f.attackType==="airKick"||f.attackType==="sweep")){ const piv715=f.grounded?clamp(kickStrike713+sweepStrike713*.85,0,1):0; pitch77=lerp(-.08,-.32,piv715); toe77=-.06*piv715; contact77=1; yawFoot715=lerp(-.09,f.attackType==="sweep"?-.38:-.58,piv715); }
     else if(isFront77&&f.attackType==="sweep"){ pitch77=.02; toe77=.02; contact77=.85; yawFoot715=.16; }
     if(turning715&&f.grounded){ const tp715=turnPivot715,rel715=Math.sin(Math.PI*turnRelease715); if(isFront77){ if(!(f.attackType==="kick"||f.attackType==="airKick"))contact77=lerp(contact77,.12,tp715); pitch77=lerp(pitch77,-.18,tp715); yawFoot715=lerp(yawFoot715,.22,tp715); }else if(turnRelease715>0){ contact77=lerp(1,.12,rel715); pitch77=lerp(pitch77,-.2,rel715); yawFoot715=lerp(yawFoot715,-.3,rel715); }else{ contact77=1; pitch77=lerp(pitch77,-.26,tp715); yawFoot715=lerp(yawFoot715,-.48,tp715); } }
+    if(planted716>0){ const su716=isFront77?stepFront716:stepBack716; if(su716>0){ contact77=lerp(1,.12,su716); pitch77=lerp(pitch77,-.18,su716); }else contact77=1; }
     const land77=clamp(motion.landingPulse||0,0,1);
     if(land77>0&&f.grounded){ contact77=Math.max(contact77,land77); pitch77*=1-land77*.45; toe77+=land77*.04; }
     return {pitch:clamp(pitch77,-.48,.36),toe:clamp(toe77,-.28,.22),contact:clamp(contact77,0,1),yaw:clamp(yawFoot715,-.7,.45)};
@@ -1418,7 +1463,7 @@ function buildFighterPose3D(f){
   const velocityLag=clamp(-(((f.vx||0)+(f.kvx||0))*(f.facing||1))*.007,-.075,.075);
   const hairSway=clamp(velocityLag-(motion.accelLean||0)*.18+(motion.landingPulse||0)*.01-(motion.takeoffPulse||0)*.012+Math.sin(renderTicker*.09+(f.id||0)*1.7)*.008-motion.dash*.035+impactLocal77*.055,-.14,.14);
   const clothSway=clamp(velocityLag*1.2+Math.sin(renderTicker*.075+(f.id||0))*.012-motion.dash*.06+impactLocal77*.07,-.16,.16);
-  return {motion,human,model,cb,phase,gaitPhase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,downBlend:f.downBlend3d||0,atkU:atkU713,atkW:atkW713,motionReal13:true,spineBend:Math.round(spineBend714*1000)/1000,spineLive14:true,appuis15:true,supportAnchor:Math.round(supportAnchor715*100)/100,turnPivot:Math.round(turnPivot715*100)/100,hairSway,clothSway,face77,hand77,foot77,impact77,impactLocal:impactLocal77,bones:BONE3D,boneError:boneDeviation3D(world,S),footRoll:groundedRoll79?0:roll};
+  return {motion,human,model,cb,phase,gaitPhase,yaw,torsoYaw:yaw-twistSign*.27*stance.twist,headYaw:yaw-twistSign*.34*stance.twist+clamp((motion.head||0)*.1,-.16,.16),twist:twistSign*.36*stance.twist,stance,roll,root,visualFace,local,world,toWorld,punchExt,kickExt,upperExt,breathScale:1+Math.sin(motion.breath)*.014,downBlend:f.downBlend3d||0,atkU:atkU713,atkW:atkW713,motionReal13:true,spineBend:Math.round(spineBend714*1000)/1000,spineLive14:true,appuis15:true,reactions16:true,planted:planted716,landDip:Math.round(landDip716*1000)/1000,landPrep:Math.round(landPrep716*100)/100,supportAnchor:Math.round(supportAnchor715*100)/100,turnPivot:Math.round(turnPivot715*100)/100,hairSway,clothSway,face77,hand77,foot77,impact77,impactLocal:impactLocal77,bones:BONE3D,boneError:boneDeviation3D(world,S),footRoll:groundedRoll79?0:roll};
 }
 function strideSign3(f){ return Math.sign(((f.vx||0)+(f.kvx||0))*(f.facing||1))||1; }
 function addFighter3D(opaque,trans,f){
@@ -1556,7 +1601,7 @@ function addFighter3D(opaque,trans,f){
   }
   renderStats.fighterPose3d=ch.id+":"+(f.attackType||"idle")+":"+pose.phase.toFixed(2);
   renderStats.lastFighterVertices3d=(opaque.count+trans.count)-vertexStart3d;
-  renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.skeleton3d="ik-fixe"; renderStats.boneError3d=Math.round((pose.boneError||0)*1000)/1000; renderStats.motionReal3d=!!pose.motionReal13; renderStats.downBlend3d=Math.round((pose.downBlend||0)*100)/100; renderStats.atkBlend3d=Math.round((pose.atkW||0)*100)/100; renderStats.spineBend3d=pose.spineBend||0; renderStats.supportAnchor3d=pose.supportAnchor||0; renderStats.turnPivot3d=pose.turnPivot||0; renderStats.footYaw3d=pose.foot77?Math.round(pose.foot77.back.yaw*1000)/1000:0;
+  renderStats.anatomie3d="Réalité 3D II V7.2"; renderStats.skeleton3d="ik-fixe"; renderStats.boneError3d=Math.round((pose.boneError||0)*1000)/1000; renderStats.motionReal3d=!!pose.motionReal13; renderStats.downBlend3d=Math.round((pose.downBlend||0)*100)/100; renderStats.atkBlend3d=Math.round((pose.atkW||0)*100)/100; renderStats.spineBend3d=pose.spineBend||0; renderStats.supportAnchor3d=pose.supportAnchor||0; renderStats.turnPivot3d=pose.turnPivot||0; renderStats.footYaw3d=pose.foot77?Math.round(pose.foot77.back.yaw*1000)/1000:0; renderStats.planted3d=pose.planted||0; renderStats.landDip3d=pose.landDip||0; renderStats.landPrep3d=pose.landPrep||0; renderStats.reactions16=pose.reactions16?1:0;
   return pose;
 }
 function addProjectilesAndEffects3D(trans){

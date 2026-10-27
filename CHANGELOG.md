@@ -3,6 +3,38 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.16.0] — 2026-10-27 — « Réactions & Réceptions »
+
+Dernier angle mort de l'audit en mouvement : les pieds pendant le
+**recul sous impact** n'avaient jamais été prouvés. Mesure faite avec
+la vraie loi du moteur : le pied avant frottait **0,43 m** sur un recul
+dur — plus que le recul lui-même — parce que la foulée de course
+s'inversait d'un coup à l'impact. Et à l'atterrissage, les chevilles
+restaient jusqu'à **23 cm** au-dessus du sol avec un amorti de 4 cm.
+
+### Corrigé — Réagir et se réceptionner comme un combattant
+- **Recul en pas chancelants** : sous impact au sol, la foulée est
+  coupée et les deux pieds sont ancrés dans le monde ; chaque pied
+  fait son pas de rattrapage levé (7 cm) quand l'équilibre l'exige,
+  posture élargie en résistance. Frottement du pied avant :
+  **0,43 → 0,08 m** en recul dur, **0,25/0,21 → 0,02 m** en recul
+  léger et en blocage.
+- **Réception de saut** : en descente, les pieds se préparent dès que
+  le sol approche (chevilles à **0-4 cm** au contact au lieu de
+  14-23 cm) ; au touche, le bassin amortit **~12 cm** sur des pieds
+  plantés, genoux à 117° mesurés — puis le corps remonte en ressort.
+- **Arrêt de course** : le rétablissement des pieds devient un dernier
+  pas planté au lieu d'un glissement (**0,10 → 0,03 m**).
+- Repli 2D assorti : foulée coupée sous impact, résistance, amorti et
+  préparation des pieds en descente.
+
+### Validation
+- Diagnostic image par image (recul léger/dur, blocage, chute, arrêt)
+  et captures navigateur relues ; erreur d'os ~0 ; diagnostic V7.15
+  complet inchangé (appuis d'attaque, demi-tour, course).
+- Smoke source + bundle (539 assertions), QA statique n°49. Rendu
+  uniquement : simulation, hitboxes, dégâts, IA et replays inchangés.
+
 ## [7.15.0] — 2026-10-27 — « Appuis & Pivots »
 
 Nouvel audit en séquences continues après la colonne V7.14 : la
