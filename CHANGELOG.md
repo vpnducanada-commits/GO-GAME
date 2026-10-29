@@ -3,6 +3,37 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.18.0] — 2026-10-29 — « Appuis sous pression »
+
+L'audit mouvement se poursuit sur les corps imposés. Bonne nouvelle,
+preuves à l'appui : **projections, knockdowns, juggles et
+atterrissages en attaque aérienne sont sains** (aucune pénétration du
+sol, pas relatif d'articulation ≤ 0,22 m, erreur d'os ~0). Il restait
+un angle mort : **l'attaquant repoussé pendant sa propre attaque**.
+Sur une parade parfaite, le moteur conserve l'attaque tout en
+repoussant le combattant — et ses pieds raclaient **0,21 m** au poing,
+**0,22 m** à l'uppercut, le régime d'appuis plantés étant interdit en
+attaque et l'ancre dédiée réservée aux coups de pied.
+
+### Corrigé — Se rattraper même en pleine attaque
+- **Régime planté ouvert à l'attaquant repoussé** : pendant une
+  attaque au sol (hors pied/sweep qui gardent leur ancre), un recul
+  forcé active les appuis ancrés au monde avec **pas de rattrapage
+  rapides** (seuil 7 cm). Frottement : poing **0,21 → 0,10 m**,
+  uppercut **0,22 → 0,07 m** sur le pied fautif.
+- Sans recul forcé, zéro changement : avancer volontairement pendant
+  une attaque garde le comportement V7.17, et le coup de pied paré
+  était déjà propre (0,03/0,01 m) grâce à l'ancre et au step-in.
+- Repli 2D : posture de résistance également en attaque repoussée.
+
+### Validation
+- Diagnostic complet (projection→relève, juggle ×4, air-kick,
+  parades poing/uppercut/pied) et captures navigateur relues :
+  retraite en pas de rattrapage bras tendu, knockdown à mi-fondu
+  sans pénétration ; erreur d'os ~0 ; smoke historique vert.
+- Smoke source + bundle (548 assertions), QA statique n°51. Rendu
+  uniquement : simulation, hitboxes, dégâts, IA et replays inchangés.
+
 ## [7.17.0] — 2026-10-29 — « Dash & Élan »
 
 Toute l'équipe sur le mouvement, suite de l'audit : les déplacements à
