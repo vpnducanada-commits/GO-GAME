@@ -3,6 +3,40 @@
 Toutes les versions officielles du jeu, de la plus récente à la plus ancienne.
 Gestion de projet : Manager & Développeur principal (Assistant Arena) • Propriétaire : Gideon - Godson.
 
+## [7.17.0] — 2026-10-29 — « Dash & Élan »
+
+Toute l'équipe sur le mouvement, suite de l'audit : les déplacements à
+haute énergie n'avaient jamais été mesurés. Verdict sans appel — le
+**dash** était un glissement sur glace (le pied annoncé en contact
+raclait **1,88 m** sur 1,91 m de dash, **2,57 m** en dash arrière), la
+**réception en course** faisait sauter un pied de **169 mm** en une
+image quand la foulée reprenait, et le pied d'appui « ancré » du coup
+de pied cédait sur toute la translation d'un **dash-in** (0,30 m).
+
+### Corrigé — Se déplacer vite sans patiner
+- **Dash en pas plantés** : le régime d'appuis V7.16 pilote le dash —
+  fente élargie dans le sens du dash, pas rapides levés de 10 cm,
+  poussée et réception plantées. Quand un appui est arraché par la
+  vitesse, la cheville se relève franchement au lieu de racler.
+  Frottement : **1,88 → 0,18 m** (avant), **2,57 → 0,16 m** (arrière).
+- **Réception en course** : le régime planté se maintient jusqu'au
+  rétablissement même si le joueur court déjà, et la **phase de foulée
+  est recalée** sur les pieds réels pendant le régime — la course
+  repart du bon pied, sans le saut de 169 mm (pic résiduel 53 mm, le
+  replantage d'un pas à pleine vitesse).
+- **Pas d'élan (step-in)** : sous la translation d'un coup de pied
+  lancé, le pied d'appui se replante en micro-pas de 4 images au lieu
+  de glisser en cédant (0,30 → **0,12 m**) ; à racine fixe, rien ne
+  change (acquis V7.15 strictement conservés).
+- Repli 2D : pieds davantage levés pendant le dash.
+
+### Validation
+- Diagnostic image par image (dash ×2, réception en course, kick en
+  élan) + série fine de la transition réception→course ; captures
+  navigateur relues ; erreur d'os ~0 ; smoke historique complet vert.
+- Smoke source + bundle (544 assertions), QA statique n°50. Rendu
+  uniquement : simulation, hitboxes, dégâts, IA et replays inchangés.
+
 ## [7.16.0] — 2026-10-27 — « Réactions & Réceptions »
 
 Dernier angle mort de l'audit en mouvement : les pieds pendant le

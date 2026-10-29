@@ -1,11 +1,11 @@
 "use strict";
 /* =====================================================================
-   Godson FURY ARENA V7.16 — RÉACTIONS & RÉCEPTIONS, APPUIS & PIVOTS, Colonne VIVANTE & MOUVEMENT RÉEL
+   Godson FURY ARENA V7.17 — DASH & ÉLAN, RÉACTIONS & RÉCEPTIONS, APPUIS & PIVOTS, Colonne VIVANTE
    Physique 60 img/s interpolée, combos annulables, IA adaptative,
    projections, EX, Godson Cancel et lockstep en ligne Godson FURY.
    Signé : Gideon - Godson
    ===================================================================== */
-const GAME_VERSION="7.16.0";
+const GAME_VERSION="7.17.0";
 const GAME_TITLE="Godson FURY ARENA";
 const GAME_SUBTITLE="L’Arène des Légendes";
 const W=1280,H=720,GROUND=600;
